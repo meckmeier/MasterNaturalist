@@ -66,7 +66,7 @@ view_option = st.selectbox("Choose view:", ["Card View", "Map View"])
 if view_option == "Map View":
         
     # Prepare the filtered dataframe for mapping
-    map_df = filtered_df.dropna(subset=["latitude", "longitude", "Organization", "City", "OrgURL"]).copy()
+    map_df = filtered_df.dropna(subset=["latitude", "longitude", "Organization", "About", "OrgURL"]).copy()
     
     # Create Folium map centered on Wisconsin
     m = folium.Map(location=[44.5, -89.5], zoom_start=7)
@@ -78,7 +78,7 @@ if view_option == "Map View":
         popup_html = f"""
         <div style="font-size: 14px;">
             <b>{row['Organization']}</b><br>
-            <i>{row['City']}</i><br>
+            <i>{row['About']}</i><br>
             <a href="{row['OrgURL']}" target="_blank">Visit Website</a>
         </div>
         """
