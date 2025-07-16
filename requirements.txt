@@ -1,5 +1,5 @@
 pandas
-nympy
+numpy
 streamlit
 folium
 streamlit_folium
