@@ -1,0 +1,586 @@
+[
+{
+  "model": "orgs.county",
+  "pk": 1,
+  "fields": {
+    "county_name": "ADAMS",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 2,
+  "fields": {
+    "county_name": "ASHLAND",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 3,
+  "fields": {
+    "county_name": "BARRON",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 4,
+  "fields": {
+    "county_name": "BAYFIELD",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 5,
+  "fields": {
+    "county_name": "BROWN",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 6,
+  "fields": {
+    "county_name": "BUFFALO",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 7,
+  "fields": {
+    "county_name": "BURNETT",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 8,
+  "fields": {
+    "county_name": "CALUMET",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 9,
+  "fields": {
+    "county_name": "CHIPPEWA",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 10,
+  "fields": {
+    "county_name": "CLARK",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 11,
+  "fields": {
+    "county_name": "COLUMBIA",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 12,
+  "fields": {
+    "county_name": "CRAWFORD",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 13,
+  "fields": {
+    "county_name": "DANE",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 14,
+  "fields": {
+    "county_name": "DODGE",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 15,
+  "fields": {
+    "county_name": "DOOR",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 16,
+  "fields": {
+    "county_name": "DOUGLAS",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 17,
+  "fields": {
+    "county_name": "DUNN",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 18,
+  "fields": {
+    "county_name": "EAU CLAIRE",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 19,
+  "fields": {
+    "county_name": "FLORENCE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 20,
+  "fields": {
+    "county_name": "FOND DU LAC",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 21,
+  "fields": {
+    "county_name": "FOREST",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 22,
+  "fields": {
+    "county_name": "GRANT",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 23,
+  "fields": {
+    "county_name": "GREEN",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 24,
+  "fields": {
+    "county_name": "GREEN LAKE",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 25,
+  "fields": {
+    "county_name": "IOWA",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 26,
+  "fields": {
+    "county_name": "IRON",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 27,
+  "fields": {
+    "county_name": "JACKSON",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 28,
+  "fields": {
+    "county_name": "JEFFERSON",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 29,
+  "fields": {
+    "county_name": "JUNEAU",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 30,
+  "fields": {
+    "county_name": "KENOSHA",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 31,
+  "fields": {
+    "county_name": "KEWAUNEE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 32,
+  "fields": {
+    "county_name": "LA CROSSE",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 33,
+  "fields": {
+    "county_name": "LAFAYETTE",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 34,
+  "fields": {
+    "county_name": "LANGLADE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 35,
+  "fields": {
+    "county_name": "LINCOLN",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 36,
+  "fields": {
+    "county_name": "MANITOWOC",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 37,
+  "fields": {
+    "county_name": "MARATHON",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 38,
+  "fields": {
+    "county_name": "MARINETTE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 39,
+  "fields": {
+    "county_name": "MARQUETTE",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 40,
+  "fields": {
+    "county_name": "MENOMINEE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 41,
+  "fields": {
+    "county_name": "MILWAUKEE",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 42,
+  "fields": {
+    "county_name": "MONROE",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 43,
+  "fields": {
+    "county_name": "OCONTO",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 44,
+  "fields": {
+    "county_name": "ONEIDA",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 45,
+  "fields": {
+    "county_name": "OUTAGAMIE",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 46,
+  "fields": {
+    "county_name": "OZAUKEE",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 47,
+  "fields": {
+    "county_name": "PEPIN",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 48,
+  "fields": {
+    "county_name": "PIERCE",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 49,
+  "fields": {
+    "county_name": "POLK",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 50,
+  "fields": {
+    "county_name": "PORTAGE",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 51,
+  "fields": {
+    "county_name": "PRICE",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 52,
+  "fields": {
+    "county_name": "RACINE",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 53,
+  "fields": {
+    "county_name": "RICHLAND",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 54,
+  "fields": {
+    "county_name": "ROCK",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 55,
+  "fields": {
+    "county_name": "RUSK",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 56,
+  "fields": {
+    "county_name": "SAUK",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 57,
+  "fields": {
+    "county_name": "SAWYER",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 58,
+  "fields": {
+    "county_name": "SHAWANO",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 59,
+  "fields": {
+    "county_name": "SHEBOYGAN",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 60,
+  "fields": {
+    "county_name": "ST. CROIX",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 61,
+  "fields": {
+    "county_name": "Statewide",
+    "region_name": "St"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 62,
+  "fields": {
+    "county_name": "TAYLOR",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 63,
+  "fields": {
+    "county_name": "TREMPEALEAU",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 64,
+  "fields": {
+    "county_name": "VERNON",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 65,
+  "fields": {
+    "county_name": "VILAS",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 66,
+  "fields": {
+    "county_name": "WALWORTH",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 67,
+  "fields": {
+    "county_name": "WASHBURN",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 68,
+  "fields": {
+    "county_name": "WASHINGTON",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 69,
+  "fields": {
+    "county_name": "WAUKESHA",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 70,
+  "fields": {
+    "county_name": "WAUPACA",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 71,
+  "fields": {
+    "county_name": "WAUSHARA",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 72,
+  "fields": {
+    "county_name": "WINNEBAGO",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 73,
+  "fields": {
+    "county_name": "WOOD",
+    "region_name": "C"
+  }
+}
+]

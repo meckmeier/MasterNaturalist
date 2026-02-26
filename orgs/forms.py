@@ -1,0 +1,209 @@
+from django import forms
+from django.forms import inlineformset_factory, BaseInlineFormSet
+from django.core.exceptions import ValidationError
+
+from .models import *
+
+class OrgForm(forms.ModelForm):
+    in_wisconsin = forms.CharField(label='WI', widget=forms.CheckboxInput(), required=False)
+    class Meta:
+        model = Organization
+        fields = ['id', 'org_name', 'org_url', 'volunteer_url','training_url' ,'in_wisconsin', 'about', 'region_name', 'host', 'deleted']
+        widgets = {
+            "about": forms.Textarea(attrs={
+                "rows": 5,
+               
+            }),
+        }
+
+class BaseOrgLocationFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        all_names =[]
+        for form in self.forms:
+            if not hasattr(form, "cleaned_data"):
+                continue
+            if form.cleaned_data.get('DELETE'):
+                continue 
+            if form.cleaned_data:
+                continue
+
+            loc_name = form.cleaned_data.get('loc_name')
+            physical = form.cleaned_data.get('physical_location')
+            deleted = form.cleaned_data.get('deleted')
+
+            if not loc_name or not physical or deleted:
+                continue
+            normalized_name = loc_name.strip().lower()
+
+            if normalized_name in all_names:
+                raise ValidationError(f"Duplicate location name '{loc_name}' is not allowed.")
+            all_names.append(normalized_name)
+
+            qs.OrgLocation.objects.filter(
+                physical_location=True,
+                deleted=False,
+                loc_name__iexact=loc_name.strip()
+            )
+            if form.instance.pk:
+                qs=qs.exclude(pk=form.instance.pk)
+            if qs.exists():
+                raise ValidationError(f"Location name '{loc_name}' already exists for another organization.")
+
+
+OrgLocationFormSet = inlineformset_factory(
+    Organization,
+    OrgLocation,
+    fields = ['id','loc_name', 'region_name','physical_location','org_loc_url', 'contact_email',  'location_about',  'address', 'city_name','county_id', 'state', 'zip_code'],
+    extra=0,
+    can_delete=True,
+    formset=BaseOrgLocationFormSet,
+)
+
+
+class EventForm(forms.ModelForm):
+
+    class Meta:
+        model = Event
+        fields = "__all__"
+        widgets = {
+            "categories": forms.CheckboxSelectMultiple,
+            "event_description": forms.Textarea(attrs={
+                    "rows": 4,
+                }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        org_id = kwargs.pop("org_id", None)
+        super().__init__(*args, **kwargs)
+
+        # --- Default state ---
+        self.fields["orgloc"].queryset = OrgLocation.objects.filter(deleted=False)
+        self.fields["participant_max"].required=False
+        self.fields["participant_max"].initial=0
+        self.fields["org"].queryset = Organization.objects.filter(deleted=False).order_by("org_name")
+
+         # ✅ Set org dropdown if passed
+        if org_id and not self.instance.pk:
+            self.initial["org"] = org_id
+
+        if not(self.instance.pk and self.instance.org) and "org" not in self.data:
+           
+            self.fields["orgloc"].disabled = True
+
+
+
+class EventFilterForm(forms.Form):
+    event_type = forms.ChoiceField(
+        choices=[("", "Any"), ("v", "Volunteer Opportunity"), ("t", "Training"), ("m", "Master Naturalist")],
+        required=False, 
+        label="Event Type",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )
+    filter_type = forms.ChoiceField(
+        choices=[("a", "All"), ("o", "Online"), ("u", "Upcoming"), ("p", "Past")],
+        required=False,    
+        label="Filter Type",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )
+
+    org= forms.ModelChoiceField(
+        queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
+        required=False,
+        empty_label="Any",
+        label="Org Name",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )  
+    my_orgs = forms.BooleanField(
+        required=False,
+        label="Show events for My Favorite Orgs"
+    )
+    county = forms.ModelChoiceField(
+        queryset = County.objects.all().order_by("county_name"),
+        required=False,
+        empty_label="Any",
+        label="County" ,
+        widget=forms.Select(attrs={"class":"form-select"})       
+    )
+    REGION_CHOICES = [
+        ("", "Any"),
+        ("C", "Central"),
+        ("EC", "East Central"),
+        ("NE", "Northeast"),
+        ("NW", "Northwest"),
+        ("SC", "South Central"),
+        ("SE", "Southeast"),
+        ("SW", "Southwest"),
+        ("St", "Statewide"),
+    ]
+    region = forms.ChoiceField(
+        choices=REGION_CHOICES,
+        required=False,
+        label="Region",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            "class":"form-control mr-2",
+            "placeholder":"Search in org, location, event or description"
+        })
+    )
+    categories = forms.ModelMultipleChoiceField(
+        queryset=EventCategory.objects.all().order_by("name"),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="Event Categories"
+    )
+
+class OrgFilterForm(forms.Form):
+    org= forms.ModelChoiceField(
+        queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
+        required=False,
+        empty_label="Any",
+        label="Org Name",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )  
+    my_orgs = forms.BooleanField(
+        required=False,
+        label="Show My Favorite Orgs"
+    )
+    has_v = forms.BooleanField(
+        required=False,
+        label="Has Volunteer Opportunities"
+    )
+    has_t = forms.BooleanField(
+        required=False,
+        label="Has Trainings"
+    )
+    county = forms.ModelChoiceField(
+        queryset = County.objects.all().order_by("county_name"),
+        required=False,
+        empty_label="Any",
+        label="County" ,
+        widget=forms.Select(attrs={"class":"form-select"})       
+    )
+    REGION_CHOICES = [
+        ("", "Any"),
+        ("C", "Central"),
+        ("EC", "East Central"),
+        ("NE", "Northeast"),
+        ("NW", "Northwest"),
+        ("SC", "South Central"),
+        ("SE", "Southeast"),
+        ("SW", "Southwest"),
+        ("St", "Statewide"),
+    ]
+    region = forms.ChoiceField(
+        choices=REGION_CHOICES,
+        required=False,
+        label="Region",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            "class":"form-control mr-2",
+            "placeholder":"Search in name, location or description"
+        })
+    )

@@ -1,0 +1,128 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% if org.owner == request.user.profile %}
+    <p class="text-muted">You are the owner of this organization.</p>
+{% endif %}
+<form method="post" class="org-form">
+    {% csrf_token %}
+   {{form.id}}
+    <div class = "form-grid {% if view_only %}view-mode{% endif %}">
+        <div class ="form-field title">
+            {{ form.org_name.label_tag }}
+            {{ form.org_name}}
+            {{ form.org_name.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.org_url.label_tag }}
+            {{ form.org_url}}
+            {{ form.org_url.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.in_wisconsin.label_tag }}
+            {{ form.in_wisconsin}}
+            {{ form.in_wisconsin.errors }}
+        </div>
+         <div class ="form-field">
+            {{ form.region_name.label_tag }}
+            {{ form.region_name}}
+            {{ form.region_name.errors }}
+        </div>
+        <div class ="form-field-full">
+            {{ form.about.label_tag }}
+            {{ form.about}}
+            {{ form.about.errors }} 
+        </div>
+    </div>
+    
+     <button type="button"><a href ="{% url 'event_list' %}?org_id= {{ org.id }}" class="btn btn-primary">Event List</a></button>
+     <button type="button"><a href="{% url 'event_create' %}?org_id={{ org.id }}" class="btn btn-primary">Add Event</a></button>
+    {% if can_edit %}
+        {% if not view_only %}
+            <button type ="submit" class="btn btn-primary">
+                {% if org %}Save{% else %}Add{% endif %}
+            </button>
+                Check this box if you want to delete this organization: {{form.deleted}}
+            {% if org %}
+                <button type="button"><a href="{% url 'event_create' %}?org_id={{org.id}}" class="btn btn-primary">Add Events</a></button>
+            {% endif %}
+            
+        {% else %}
+            <button type="button"><a href="{% url 'org_edit' org.id %}" class="btn btn-primary">Edit</a></button>
+        {% endif %}
+    {% endif %}    
+
+    <h3>Locations</h3>
+    <div class="formset" data-prefix="locations">
+        {% if not view_only %}
+            <button type="button" id="add-btn" class="btn btn_primary">
+            Add Locations
+        </button>
+        {% endif %}
+
+        {{ loc_formset.management_form }}
+        <table class="formset-table {% if view_only %}view-mode{% endif %}">
+            <thead>
+                <tr> 
+                    <th>Name</th>
+                    <th>Region</th>
+                    <th>Has Physical Location</th>
+                    <th>URL</th>
+                    <th>Contact Email</th>
+                    <th>About</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th>County</th>
+                    <th>State</th>
+                    <th>Zip Code</th>
+                    <th>DELETE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in loc_formset %}
+                    <tr class ="formset-row">
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+
+                        {% for each in form.visible_fields %}
+                        <td>
+                         <span class="field-value">
+                              {% if each.name == "county_id" %}
+                                {{ form.instance.county_id|default:"—" }}
+                            {% else %}
+                                {{ each.value|default:"—" }}
+                            {% endif %}
+                         </span>
+                            {{ each.errors }}
+                            {{ each }}
+                        </td>
+                        {% endfor %}               
+                    </tr>
+            {% empty %}
+                    <tr class="empty-hint">
+                        <td colspan="4">No locations added.</td>
+                    </tr>
+            {% endfor %}
+                    <tr class="formset-row form-template" style="display:none;">
+                        {% for hidden in loc_formset.empty_form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+
+                        {% for each in loc_formset.empty_form.visible_fields %}
+                            <td>{{ each }}</td>
+                        {% endfor %}
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+</form>
+
+{% endblock %}

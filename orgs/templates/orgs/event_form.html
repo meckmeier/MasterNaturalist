@@ -1,0 +1,118 @@
+{% extends "orgs/layout.html" %}
+
+{%block body %}
+{% load static %}
+{% if event.org.owner == request.user.profile %}
+    <p class="text-muted">You are the owner of the organizer of this event.</p>
+{% endif %}
+<form method="post" class="event-form">
+    {% csrf_token %}
+    <div class = "form-grid {% if view_only %}view-mode{% endif %}">
+        <div class ="form-field">
+            {{ form.org.label_tag }}
+            {{ form.org}}
+            {{ form.org.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.orgloc.label_tag }}
+            <select id="id_orgloc" name="{{ form.orgloc.name }}" data-current="{{ form.instance.orgloc.id|default_if_none:'' }}">
+                <!-- options will be populated by JS -->
+            </select>
+            {{ form.orgloc.errors }}
+        </div>
+        <div class ="form-field title">
+            {{ form.event_name.label_tag }}
+            {{ form.event_name}}
+            {{ form.event_name.errors }}
+        </div>
+        <div class ="form-field-full">
+            {{ form.event_description.label_tag }}
+            {{ form.event_description}}
+            {{ form.event_description.errors }} 
+        </div>
+        <div class="form-field-full">
+            <label>{{ form.categories.label }}</label>
+            {% if view_only %}
+                <div class = d-flex flex-wrap gap-2">
+                {% for cat in event.categories.all %}
+                    <span class=""badge bg-secondary"> {{cat.name}} | </span>
+                {% empty %}
+                    <span>--</span>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="d-flex flex-wrap gap-2">
+                    {% for checkbox in form.categories %}
+                        <div class="form-check form-check-inline">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                    </div>
+            {% endif %}
+            {% if not view_only %}
+                {{ form.categories.errors }}
+            {% endif %}
+        </div>
+        <div class ="form-field">
+            {{ form.event_type.label_tag }}
+            {{ form.event_type}}
+            {{ form.event_type.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.no_cost.label_tag }}
+            {{ form.no_cost}}
+            {{ form.no_cost.errors }}
+            {{ form.online.label_tag }}
+            {{ form.online}}
+            {{ form.online.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.event_url.label_tag }}
+            {{ form.event_url}}
+            {{ form.event_url.errors }}
+        </div>
+
+        <div class="form-field">
+            {{ form.date_description.label_tag }}
+            {{ form.date_description}}
+            {{ form.date_description.errors }}
+        </div>
+         <div class ="form-field">
+            How long:
+            {{ form.time_commitment}}
+            {{ form.time_commitment.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.date.label_tag }}
+            {{ form.date}}
+            {{ form.date.errors }}
+       
+            End date (OPTIONAL (only for multi-day events):
+            {{ form.end_date}}
+            {{ form.end_date.errors }}
+        </div>
+         
+        <div class ="form-field">
+            {{ form.instructors.label_tag }}
+            {{ form.instructors}}
+            {{ form.instructors.errors }}
+        </div>
+      
+
+    </div>
+    {% if not view_only %}
+        <button type ="submit" class="btn btn-primary">Save</button>
+
+
+    {% elif can_edit %}
+        <button type="button"><a href="{% url 'event_edit' event.id %}" class="btn btn-primary">Edit</a></button>
+        
+    {% endif %}
+
+
+</form>
+
+{% endblock %}
