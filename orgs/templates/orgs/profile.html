@@ -1,0 +1,55 @@
+{% extends "orgs/layout.html" %}
+{% load static %}
+
+{% block body %}
+<div class="container mt-4">
+
+  <h2 class="mb-3">Profile for {{ request.user.get_full_name|default:request.user.username }}</h2>
+
+  <div class="card shadow-sm p-4">
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Bio -->
+      <div class="mb-4">
+        {{form.bio.label_tag }}
+        {{form.bio  }}
+
+        {{form.bio.errors }}
+      </div>
+
+      <!-- Preferred Region -->
+      <div class="mb-4">
+        {{ form.preferred_region.label_tag }}
+        {{form.preferred_region}}
+        {{ form.preferred_region.errors }}
+    
+      </div>
+
+      <!-- Include Online Opportunities -->
+      <div class="form-check mb-4">
+        {{ form.include_online }}
+        {{ form.include_online.errors }}
+        <label class="form-check-label" for="{{ form.include_online.id_for_label }}">
+          Include online opportunities
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-success">Save Preferences</button>
+
+    </form>
+  </div>
+
+  <!-- Display Current Settings -->
+  <div class="mt-4">
+    <h5 class="fw-semibold">Current Preferences:</h5>
+    <ul class="list-unstyled">
+      <li><strong>Bio:</strong> {{ form.instance.bio|default:"(none)" }}</li>
+      <li><strong>Preferred Region:</strong> {{ form.instance.preferred_region|default:"(none)" }}</li>
+      <li><strong>Include Online:</strong> {{ form.instance.include_online|yesno:"Yes,No" }}</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

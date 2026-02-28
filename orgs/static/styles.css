@@ -179,6 +179,32 @@ img{
 .event-m {background:#007bff}
 
 
+/* Remove boxed look */
+.nav-tabs .nav-link {
+    border: none;
+    border-radius: 0;
+    background: none;
+    color: #555;
+}
+
+/* Active tab styling */
+.nav-tabs .nav-link.active {
+    border-bottom: 2px solid #0d6efd;
+    font-weight: 500;
+    color: #000;
+}
+.form-select-wide{
+    width: 100%;
+}
+
+/* Vertical version on desktop */
+@media (min-width: 768px) {
+    .nav-tabs.flex-md-column .nav-link.active {
+        border-bottom: none;
+        border-right: 2px solid #0d6efd;
+    }
+}
+
 /* Make the collapsed menu not full screen */
 @media (max-width: 991.98px) {
     .navbar-collapse {

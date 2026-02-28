@@ -46,8 +46,11 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     bio=models.TextField(blank=True)
-    location =models.CharField(max_length =100, choices = region_list, default='', blank=True)
     staff = models.BooleanField(default=False)
+    preferred_region = models.CharField(max_length =100, choices = region_list, default='', blank=True)
+     # Personalization Toggles
+    include_online = models.BooleanField(default=True)
+    
 
     def __str__(self):
         return f'Profile of {self.user.username}'
@@ -80,11 +83,11 @@ class Organization(models.Model):
     def follower_count(self):
         return self.following.count()
     def upcoming_volunteer_count(self):
-        return self.events.filter(event_type='v').count()
+        return self.events.upcoming().filter(event_type='v').count()
     def upcoming_training_count(self):
-        return self.events.filter(event_type='t').count()
+        return self.events.upcoming().filter(event_type='t').count()
     def upcoming_online_count(self):
-        return self.events.filter(online=True).count()
+        return self.events.upcoming().filter(online=True).count()
     
     REGION_IMAGE_MAP = {
         'SC': 'orgs/images/SC.jpg',
@@ -143,8 +146,15 @@ class EventQuerySet(models.QuerySet):
         today = timezone.now().date()
 
         return self.active().filter(
-            Q(end_date__isnull=True, date__gte=today) |
-            Q(end_date__isnull=False, end_date__gte=today)
+            Q(
+                end_date__isnull=True,
+                date__gte=today
+            ) |
+            Q(
+                end_date__isnull=False,
+                date__lte=today,
+                end_date__gte=today
+            )
         )
 
     def past(self):
@@ -171,7 +181,7 @@ class Event(models.Model):
     online = models.BooleanField(default=False)
     inperson = models.BooleanField(default=True)
     instructors = models.CharField(max_length=400, blank=True, default="")
-    participant_max = models.IntegerField(default=0)
+    participant_max = models.IntegerField(default=0, blank=True, null=True)
     event_url = models.URLField(max_length=200, default="", blank=True)
     no_cost = models.BooleanField(default=False)
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="events")
@@ -188,3 +198,37 @@ class Event(models.Model):
     def __str__(self):
         return f"{self.event_name}"
 
+class VolunteerRole(models.Model):
+    org = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="roles"
+    )
+    orgloc = models.ForeignKey(OrgLocation, on_delete=models.CASCADE, related_name="rolelocations",blank=True, null=True)
+
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    time_commitment = models.ForeignKey(
+        Commitment,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    categories = models.ManyToManyField(
+        EventCategory,
+        blank=True,
+        related_name="category_roles"
+    )
+
+    ongoing = models.BooleanField(default=True)
+    expire_date = models.DateField(blank=True, null=True)
+    online = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["title"]
+
+    def __str__(self):
+        return self.title
+    

@@ -1,0 +1,113 @@
+{% extends "orgs/layout.html" %}
+{% load static %}
+
+{% block body %}
+<h2>{{ role.title|default:"New Role" }}</h2>
+{% if role and role.org.owner == request.user.profile %}
+    <p class="text-muted">You are the owner of this organization.</p>
+{% endif %}
+
+<form method="post" class="role-form">
+    {% csrf_token %}
+    <div class="form-grid {% if view_only %}view-mode{% endif %}">
+        
+        <!-- Organization -->
+        <div class="form-field">
+            {{ form.org.label_tag }}
+            {{ form.org }}
+            {{ form.org.errors }}
+        </div>
+        <div></div>
+        <!-- Location -->
+        <div class="form-field">
+            {{ form.orgloc.label_tag }}
+            <select name="{{ form.orgloc.name }}" id="id_orgloc">
+            <option value="">---------</option>
+            {% for loc in form.orgloc.field.queryset %}
+                <option value="{{ loc.id }}" data-org-id="{{ loc.org.id }}"
+                    {% if form.orgloc.value == loc.id %}selected{% endif %}>
+                    {{ loc.loc_name }} - {{ loc.org.org_name }}
+                </option>
+            {% endfor %}
+        </select>
+            {{ form.orgloc.errors }}
+        </div>
+
+        <!-- Title -->
+        <div class="form-field title">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+
+        <!-- Description -->
+        <div class="form-field-full">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {{ form.description.errors }}
+        </div>
+
+        <!-- Categories -->
+        <div class="form-field-full">
+            <label>{{ form.categories.label }}</label>
+            {% if view_only %}
+                <div class="d-flex flex-wrap gap-2">
+                    {% for cat in role.categories.all %}
+                        <span class="badge bg-secondary">{{ cat.name }}</span>
+                    {% empty %}
+                        <span>--</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="d-flex flex-wrap gap-2">
+                    {% for checkbox in form.categories %}
+                        <div class="form-check form-check-inline">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                {{ form.categories.errors }}
+            {% endif %}
+        </div>
+
+        <!-- Time Commitment -->
+        <div class="form-field">
+            {{ form.time_commitment.label_tag }}
+            {{ form.time_commitment }}
+            {{ form.time_commitment.errors }}
+        </div>
+
+        <!-- Ongoing / Online -->
+        <div class="form-field">
+            {{ form.ongoing.label_tag }}
+            {{ form.ongoing }}
+            {{ form.ongoing.errors }}
+
+            {{ form.online.label_tag }}
+            {{ form.online }}
+            {{ form.online.errors }}
+        </div>
+
+        <!-- Expiration / Deleted -->
+        <div class="form-field">
+            {{ form.expire_date.label_tag }}
+            {{ form.expire_date }}
+            {{ form.expire_date.errors }}
+
+            Check this box to delete:
+            {{ form.deleted }}
+            {{ form.deleted.errors }}
+        </div>
+
+    </div>
+
+    {% if not view_only %}
+        <button type="submit" class="btn btn-primary">Save</button>
+    {% elif can_edit %}
+        <a href="{% url 'role_edit' role.id %}" class="btn btn-primary">Edit</a>
+    {% endif %}
+</form>
+{% endblock %}

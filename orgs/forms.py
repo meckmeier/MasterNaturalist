@@ -62,7 +62,6 @@ OrgLocationFormSet = inlineformset_factory(
 
 
 class EventForm(forms.ModelForm):
-
     class Meta:
         model = Event
         fields = "__all__"
@@ -73,24 +72,19 @@ class EventForm(forms.ModelForm):
                 }),
         }
 
-    def __init__(self, *args, **kwargs):
-        org_id = kwargs.pop("org_id", None)
-        super().__init__(*args, **kwargs)
 
-        # --- Default state ---
-        self.fields["orgloc"].queryset = OrgLocation.objects.filter(deleted=False)
-        self.fields["participant_max"].required=False
-        self.fields["participant_max"].initial=0
-        self.fields["org"].queryset = Organization.objects.filter(deleted=False).order_by("org_name")
 
-         # ✅ Set org dropdown if passed
-        if org_id and not self.instance.pk:
-            self.initial["org"] = org_id
+class RoleForm(forms.ModelForm):
 
-        if not(self.instance.pk and self.instance.org) and "org" not in self.data:
-           
-            self.fields["orgloc"].disabled = True
-
+    class Meta:
+        model = VolunteerRole
+        fields = "__all__"
+        widgets = {
+            "categories": forms.CheckboxSelectMultiple,
+            "description": forms.Textarea(attrs={
+                    "rows": 4,
+                }),
+        }
 
 
 class EventFilterForm(forms.Form):
@@ -207,3 +201,14 @@ class OrgFilterForm(forms.Form):
             "placeholder":"Search in name, location or description"
         })
     )
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        model = Profile
+        fields = ["bio", "preferred_region", "include_online"]
+        widgets = {
+            "bio": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "preferred_region": forms.Select(attrs={"class": "form-select"}),
+            "include_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+   

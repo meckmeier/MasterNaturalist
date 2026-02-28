@@ -1,0 +1,209 @@
+{% extends "orgs/layout.html" %}
+
+{% block filter_button %}
+    <button class="btn btn-outline-secondary ms-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#filterPanel"
+            aria-controls="filterPanel">
+        <i class="bi bi-funnel"></i>
+        Filter
+    </button>
+{% endblock %}
+
+{% block filters %}
+
+<form method="get" action="{{ request.path }}">
+    
+    <div class="mb-3">
+        {{ filter_form.org.label_tag }}
+        {{ filter_form.org }}
+        {{ filter_form.org.errors }}
+    </div>
+    <div class="mb-3">
+       {{ filter_form.my_orgs }}
+       {{ filter_form.my_orgs.label_tag }}
+       {{ filter_form.my_orgs.errors }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.has_v }}
+        {{ filter_form.has_v.label_tag }}
+        {{ filter_form.has_v.errors }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.has_t }}
+        {{ filter_form.has_t.label_tag }}
+        {{ filter_form.has_t.errors }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.county.label_tag}}
+        {{ filter_form.county }}
+        {{ filter_form.county.errors }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.region.label_tag}}
+        {{ filter_form.region }}
+        {{ filter_form.region.errors }}
+    </div>
+    <div class="mb-3"> 
+        {{ filter_form.q.label_tag }}
+        {{ filter_form.q }}
+        {{ filter_form.q.errors }}
+    </div>      
+    
+    <div class="d-flex gap-2">
+        <button type = "submit" class="btn btn-primary">Apply</button>
+        <a href="{% url 'index'%}" class ="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block body %}
+{% load static %}
+{% load highlight %}
+{% with query_params.urlencode as query_string %}
+
+{% for org in organizations %}
+<div class="card mb-4 shadow-sm">
+
+  <!-- Header: Org Name + Heart + Region -->
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <h4 class="mb-1 fw-semibold">{{ org.org_name }}</h4>
+      <div class="small text-muted d-flex gap-3 mt-1">
+        {% if user.is_authenticated %}
+          <a href="{% url 'follow_org' org.id %}" class="btn btn-link p-0 btn-sm">
+            {% if org.id in followed_orgs %}
+              <i class="bi bi-heart-fill text-danger"></i> Following
+            {% else %}
+              <i class="bi bi-heart"></i> Follow
+            {% endif %}
+          </a>
+        {% endif %}
+        
+        <span><a href="{% url 'org_view' org.id %}" class="text-decoration-none"><i class="bi bi-info-circle"></i> Details</a></span>
+        <span><a href="{{ org.org_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe"></i> Website</a></span>
+      </div>
+    </div>
+
+    <!-- Region Icon -->
+    <div>
+      <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="height:50px; width:auto;">
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="row">
+
+      <!-- Tabs Column (vertical on md+, horizontal on mobile) -->
+      <div class="col-12 col-md-3 order-md-2 mb-3 mb-md-0">
+        <div class="d-flex d-md-block justify-content-start justify-content-md-end">
+
+          <!-- Horizontal on mobile -->
+          <ul class="nav nav-tabs d-flex flex-row flex-md-column" id="orgTabs{{ org.id }}" role="tablist" aria-orientation="vertical">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active px-2 py-1" id="v-pills-info-tab{{ org.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-info{{ org.id }}" type="button" role="tab">Info</button>
+            </li>
+            <li class="nav-item " role="presentation">
+              <button class="nav-link px-2 py-1" id="v-pills-events-tab{{ org.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-events{{ org.id }}" type="button" role="tab">Events</button>
+            </li>
+            <li class="nav-item me-2 me-md-0" role="presentation">
+              <button class="nav-link px-2 py-1" id="v-pills-trainings-tab{{ org.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-trainings{{ org.id }}" type="button" role="tab">Trainings</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="col-12 col-md-9 order-md-1 tab-content" id="v-pills-tabContent{{ org.id }}">
+        
+        <!-- Info Tab -->
+        <div class="tab-pane fade show active" id="v-pills-info{{ org.id }}" role="tabpanel">
+          {% if org.about %}
+            <p class="text-secondary">{{ org.about|truncatechars:250 }}</p>
+          {% endif %}
+
+          {% if org.roles.all %}
+            <div>
+              <strong>🤝 Ongoing Volunteer Roles:</strong>
+              {% for role in org.roles.all %}
+                <a href="{% url 'role_view' role.id %}" class="text-decoration-none">{{ role.title }}{% if not forloop.last %}, {% endif %}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if org.locations.all %}
+            <div class="mt-2">
+              <strong>📍 Locations:</strong>
+              {% for loc in org.locations.all %}
+                {{ loc.loc_name }} {% if loc.county_id %}({{ loc.county_id.county_name }}){% endif %}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Events Tab -->
+        <div class="tab-pane fade" id="v-pills-events{{ org.id }}" role="tabpanel">
+          <h5 class="fw-semibold">{{ org.org_name }} - Upcoming Volunteer Events</h5>
+          {% for event in org.events.all %}
+            {% if event.event_type == "v" %}
+              <div class="mb-1">
+                <a href="{% url 'event_view' event.id %}" class="text-decoration-none">{{ event.event_name }} </a>
+                {% if event.orgloc %} at {{ event.orgloc.loc_name }} {% endif %}
+                ({{ event.date|date:"M d" }}{% if event.end_date %}-{{ event.end_date|date:"M d" }}{% endif %})
+              </div>
+            {% endif %}
+          {% empty %}
+            <div class="text-muted">No upcoming volunteer events.</div>
+          {% endfor %}
+        </div>
+
+        <!-- Trainings Tab -->
+        <div class="tab-pane fade" id="v-pills-trainings{{ org.id }}" role="tabpanel">
+          <h5 class="fw-semibold">{{ org.org_name }} - Upcoming Trainings</h5>
+          {% for event in org.events.all %}
+            {% if event.event_type == "t" %}
+              <div class="mb-1">
+                <a href="{% url 'event_view' event.id %}" class="text-decoration-none">{{ event.event_name }} </a>
+                {% if event.orgloc %} at {{ event.orgloc.loc_name }} {% endif %}
+                ({{ event.date|date:"M d" }}{% if event.end_date %}-{{ event.end_date|date:"M d" }}{% endif %})
+              </div>
+            {% endif %}
+          {% empty %}
+            <div class="text-muted">No upcoming trainings.</div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<!-- Pagination -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if organizations.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ organizations.previous_page_number }}&{{ query_params.urlencode }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      {% endif %}
+      {% for num in organizations.paginator.page_range %}
+        <li class="page-item {% if organizations.number == num %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}&{{ query_params.urlencode }}">{{ num }}</a>
+        </li>
+      {% endfor %}
+      {% if organizations.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ organizations.next_page_number }}&{{ query_params.urlencode }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+</div>
+{% endwith %}
+{% endblock %}

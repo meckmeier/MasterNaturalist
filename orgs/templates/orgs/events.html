@@ -1,0 +1,226 @@
+{% extends "orgs/layout.html" %}
+
+{% block filter_button %}
+    <button class="btn btn-outline-secondary ms-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#filterPanel"
+            aria-controls="filterPanel">
+        <i class="bi bi-funnel"></i>
+        Filter
+    </button>
+{% endblock %}
+
+{% block filters %}
+
+<form method="get" action="{{ request.path }}">
+    <div class="mb-3"> 
+        {{ filter_form.q }}
+        {{ filter_form.q.errors}}
+    </div>  
+    <div class="mb-3">
+        {{ filter_form.event_type.label_tag}}
+        {{ filter_form.event_type }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.filter_type.label_tag}}
+        {{ filter_form.filter_type }}
+    </div>
+
+    <div class="mb-3">
+        {{ filter_form.my_orgs }}
+        {{ filter_form.my_orgs.label_tag }}
+        {{ filter_form.my_orgs.errors }}
+    </div>
+    <hr>
+    <div class="mb-3">
+        {{ filter_form.county.label_tag}}
+        {{ filter_form.county }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.region.label_tag}}
+        {{ filter_form.region }}
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Categories</label>
+        <div class="d-flex flex-wrap gap-2">
+            {% for cat in filter_form.categories %}
+                <div class="form-check form-check-inline">
+                    {{cat.tag}}
+                    <label class="form-check-label" for="{{cat.id_for_label }}">
+                        {{cat.choice_label}}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+  
+    
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Apply</button>
+        <a href="{% url 'event_list' %}" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block body %}
+{% load static %}
+{% load highlight %}
+{% with query_params.urlencode as query_string %}
+
+
+<div class="container my-4">
+  <h1>Upcoming Events & Volunteer Roles</h1>
+
+  <!-- Tabs nav -->
+  <ul class="nav nav-tabs mb-3" id="eventTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="current-tab" data-bs-toggle="tab" data-bs-target="#current" type="button" role="tab">Current</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing" type="button" role="tab">Ongoing</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="future-tab" data-bs-toggle="tab" data-bs-target="#future" type="button" role="tab">Future</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="online-tab" data-bs-toggle="tab" data-bs-target="#online" type="button" role="tab">Online</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab">Roles</button>
+    </li>
+  </ul>
+
+<!-- Tabs content -->
+<div class="tab-content" id="eventTabsContent">
+
+  <!-- Current Events -->
+  <div class="tab-pane fade show active" id="current" role="tabpanel">
+    {% if current_events %}
+    {% for e in current_events %}
+    <div class="card shadow-sm mb-3 border-0">
+      <!-- Date row -->
+      <div class="mt-2 small text-muted">
+            <strong>Starts:</strong> {{ e.date }}
+            {% if e.end_date %}
+                | <strong>Ends:</strong> {{ e.end_date }}
+            {% endif %}
+      </div>
+      <!-- Title row -->
+      <div class="d-flex justify-content-between align-items-start">
+        <div><h5 class="card-title mb-1">
+                <a href="{% url 'event_view' e.id %}" class="text-decoration-none">
+                        {{ e.event_name }} </a></h5>
+          <div class="text-muted small">
+                    {{ e.org.org_name }}
+                    {% if e.orgloc %}
+                          · {{ e.orgloc.loc_name }}
+                      {% endif %}
+          </div>
+          <div>
+                  {{e.event_description|truncatewords:200 }}
+          </div>
+                {% if e.online %}
+                  <span class="badge bg-info text-dark">Online</span>
+                {% endif %}
+        </div>
+            {% if e.online %}
+                <span class="badge bg-info text-dark">Online</span>
+            {% endif %}
+    </div> 
+    </div>
+    {% endfor %}
+    {% else %}
+        <p class="text-muted">No current events.</p>
+    {% endif %}
+  </div>  
+
+    <!-- Ongoing Events -->
+    <div class="tab-pane fade" id="ongoing" role="tabpanel">
+      
+    {% if ongoing_events %}
+    {% for e in ongoing_events %}
+      <div class="card mb-2 p-3 shadow-sm">
+         <!-- Title row -->
+      <div class="d-flex justify-content-between align-items-start">
+        <div><h5 class="card-title mb-1">
+                <a href="{% url 'event_view' e.id %}" class="text-decoration-none">
+                        {{ e.event_name }} </a></h5>
+          <div class="text-muted small">
+                    {{ e.org.org_name }}
+                    {% if e.orgloc %}
+                          · {{ e.orgloc.loc_name }}
+                      {% endif %}
+          </div>
+          <div>
+                  {{e.event_description|truncatewords:200 }}
+          </div>
+                {% if e.online %}
+                  <span class="badge bg-info text-dark">Online</span>
+                {% endif %}
+        </div>
+            {% if e.online %}
+                <span class="badge bg-info text-dark">Online</span>
+            {% endif %}
+    </div> 
+    </div>
+    {% endfor %}
+    {% else %}
+        <p class="text-muted">No current events.</p>
+    {% endif %}
+  </div>  
+  
+
+    <!-- Future Events -->
+    <div class="tab-pane fade" id="future" role="tabpanel">
+      {% if future_events %}
+        {% for e in future_events %}
+          <div class="card mb-2 p-3 shadow-sm">
+            <h5>{{ e.title }}</h5>
+            <p class="mb-1">{{ e.org.org_name }}{% if e.orgloc %} – {{ e.orgloc.loc_name }}{% endif %}</p>
+            <p class="text-muted">{{ e.date }}{% if e.end_date %} – {{ e.end_date }}{% endif %}</p>
+            <p>{{ e.description|truncatewords:20 }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">No future events.</p>
+      {% endif %}
+    </div>
+
+    <!-- Online Events -->
+    <div class="tab-pane fade" id="online" role="tabpanel">
+      {% if online_events %}
+        {% for e in online_events %}
+          <div class="card mb-2 p-3 shadow-sm">
+            <h5>{{ e.title }}</h5>
+            <p class="mb-1">{{ e.org.org_name }}</p>
+            <p class="text-muted">{{ e.date }}{% if e.end_date %} – {{ e.end_date }}{% endif %}</p>
+            <p>{{ e.description|truncatewords:20 }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">No online events.</p>
+      {% endif %}
+    </div>
+
+    <!-- Volunteer Roles -->
+    <div class="tab-pane fade" id="roles" role="tabpanel">
+      {% if online_roles %}
+        {% for r in online_roles %}
+          <div class="card mb-2 p-3 shadow-sm">
+            <h5>{{ r.title }}</h5>
+            <p class="mb-1">{{ r.org.org_name }}{% if r.orgloc %} – {{ r.orgloc.loc_name }}{% endif %}</p>
+            <p class="text-muted">{% if r.expire_date %}Expires: {{ r.expire_date }}{% endif %}</p>
+            <p>{{ r.description|truncatewords:20 }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">No volunteer roles.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endwith %}
+{% endblock %}
