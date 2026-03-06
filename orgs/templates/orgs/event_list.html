@@ -75,9 +75,9 @@
                  <span><strong><span class="event-tag event-{{event.event_type}}">{{event.event_type|capfirst}}</span>
                     <a href="{% url 'event_view' event_id=event.id %}">
                      {% if q %}
-                        {{event.event_name|highlight:q|safe}} 
+                        {{event.title|highlight:q|safe}} 
                     {% else %}
-                        {{ event.event_name }}
+                        {{ event.title }}
                     {% endif %}</a></span></strong> 
             </div>
             <div>
@@ -115,9 +115,9 @@
 
             <div class="event_description">
                 <p> {% if q %}
-                            {{event.event_description|highlight:q|safe}}
+                            {{event.description|highlight:q|safe}}
                         {% else %}
-                            {{event.event_description | truncatechars:300}}
+                            {{event.description | truncatechars:300}}
                         {% endif %}
                         </p>
                 {% if event.event_url %}

@@ -8,7 +8,24 @@
         {% endfor %}
     </ul>
 {% endif %}
-{% if org.owner == request.user.profile %}
+     <button type="button"><a href ="{% url 'event_list' %}?org_id= {{ org.id }}" class="btn btn-primary">Event List</a></button>
+     <button type="button"><a href="{% url 'event_create' %}?org_id={{ org.id }}" class="btn btn-primary">Add Event</a></button>
+     <button type="button"><a href="{% url 'role_create' %}?org_id={{org.id}}" class="btn btn-primary">On going roles</a></button>
+    {% if can_edit %}
+        {% if not view_only %}
+            <button type ="submit" class="btn btn-primary">
+                {% if org %}Save{% else %}Add{% endif %}
+            </button>
+                Check this box if you want to delete this organization: {{form.deleted}}
+            {% if org %}
+                <button type="button"><a href="{% url 'event_create' %}?org_id={{org.id}}" class="btn btn-primary">Add Events</a></button>
+                
+            {% endif %}
+            
+        {% else %}
+            <button type="button"><a href="{% url 'org_edit' org.id %}" class="btn btn-primary">Edit</a></button>
+        {% endif %}
+    {% endif %}    {% if org.owner == request.user.profile %}
     <p class="text-muted">You are the owner of this organization.</p>
 {% endif %}
 <form method="post" class="org-form">
@@ -42,24 +59,7 @@
         </div>
     </div>
     
-     <button type="button"><a href ="{% url 'event_list' %}?org_id= {{ org.id }}" class="btn btn-primary">Event List</a></button>
-     <button type="button"><a href="{% url 'event_create' %}?org_id={{ org.id }}" class="btn btn-primary">Add Event</a></button>
-     <button type="button"><a href="{% url 'role_create' %}?org_id={{org.id}}" class="btn btn-primary">On going roles</a></button>
-    {% if can_edit %}
-        {% if not view_only %}
-            <button type ="submit" class="btn btn-primary">
-                {% if org %}Save{% else %}Add{% endif %}
-            </button>
-                Check this box if you want to delete this organization: {{form.deleted}}
-            {% if org %}
-                <button type="button"><a href="{% url 'event_create' %}?org_id={{org.id}}" class="btn btn-primary">Add Events</a></button>
-                
-            {% endif %}
-            
-        {% else %}
-            <button type="button"><a href="{% url 'org_edit' org.id %}" class="btn btn-primary">Edit</a></button>
-        {% endif %}
-    {% endif %}    
+
 
     <h3>Locations</h3>
     <div class="formset" data-prefix="locations">

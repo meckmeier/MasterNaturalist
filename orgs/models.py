@@ -14,6 +14,16 @@ region_list = [
     ,('SW', 'Southwest')
     ,('St','Statewide')]
 
+REGION_IMAGE_MAP = {
+        'SC': 'orgs/images/SC.jpg',
+        'NW': 'orgs/images/NW.jpg',
+        'C':  'orgs/images/C.jpg',
+        'NE': 'orgs/images/NE.jpg',
+        'SW': 'orgs/images/SW.jpg',
+        'SE': 'orgs/images/SE.jpg',
+        'EC': 'orgs/images/CE.jpg',
+        'St': 'orgs/images/St.jpg',
+    }
 class Commitment(models.Model):
     time= models.CharField(max_length=50)
 
@@ -89,20 +99,9 @@ class Organization(models.Model):
     def upcoming_online_count(self):
         return self.events.upcoming().filter(online=True).count()
     
-    REGION_IMAGE_MAP = {
-        'SC': 'orgs/images/SC.jpg',
-        'NW': 'orgs/images/NW.jpg',
-        'C':  'orgs/images/C.jpg',
-        'NE': 'orgs/images/NE.jpg',
-        'SW': 'orgs/images/SW.jpg',
-        'SE': 'orgs/images/SE.jpg',
-        'EC': 'orgs/images/CE.jpg',
-        'St': 'orgs/images/St.jpg',
-    }
-
     @property
     def region_image(self):
-        return self.REGION_IMAGE_MAP.get(
+        return REGION_IMAGE_MAP.get(
             self.region_name,
             'orgs/images/default.jpg'
         )
@@ -174,15 +173,15 @@ class EventQuerySet(models.QuerySet):
         return self.active()
     
 class Event(models.Model):
-    event_name = models.CharField(max_length=100)
-    event_description = models.TextField(default="", blank=True)
-    event_type = models.CharField(max_length=1,
+    title = models.CharField(max_length=100)
+    description = models.TextField(default="", blank=True)
+    type = models.CharField(max_length=1,
                                   choices=[("v","Volunteer Opportunity"),("t","Training" ), ("m","Master Naturalist")])
     online = models.BooleanField(default=False)
     inperson = models.BooleanField(default=True)
     instructors = models.CharField(max_length=400, blank=True, default="")
     participant_max = models.IntegerField(default=0, blank=True, null=True)
-    event_url = models.URLField(max_length=200, default="", blank=True)
+    url = models.URLField(max_length=200, default="", blank=True)
     no_cost = models.BooleanField(default=False)
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="events")
     orgloc = models.ForeignKey(OrgLocation, on_delete=models.CASCADE, related_name="eventlocations",blank=True, null=True)
@@ -196,7 +195,23 @@ class Event(models.Model):
     objects = EventQuerySet.as_manager()
 
     def __str__(self):
-        return f"{self.event_name}"
+        return f"{self.title}"
+
+    @property
+    def region_image(self):
+        # 1️⃣ If event has orgloc, use that region
+        if self.orgloc and self.orgloc.region_name:
+            region = self.orgloc.region_name
+        # 2️⃣ Otherwise fall back to org
+        elif self.org and self.org.region_name:
+            region = self.org.region_name
+        else:
+            region = None
+
+        return REGION_IMAGE_MAP.get(
+            region,
+            'orgs/images/default.jpg'
+        )
 
 class VolunteerRole(models.Model):
     org = models.ForeignKey(
@@ -222,6 +237,7 @@ class VolunteerRole(models.Model):
     )
 
     ongoing = models.BooleanField(default=True)
+    date_description = models.CharField(max_length=100, default='', blank=True, null=True)
     expire_date = models.DateField(blank=True, null=True)
     online = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
@@ -231,4 +247,18 @@ class VolunteerRole(models.Model):
 
     def __str__(self):
         return self.title
-    
+    @property
+    def region_image(self):
+        # 1️⃣ If event has orgloc, use that region
+        if self.orgloc and self.orgloc.region_name:
+            region = self.orgloc.region_name
+        # 2️⃣ Otherwise fall back to org
+        elif self.org and self.org.region_name:
+            region = self.org.region_name
+        else:
+            region = None
+
+        return REGION_IMAGE_MAP.get(
+            region,
+            'orgs/images/default.jpg'
+        )

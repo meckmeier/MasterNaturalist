@@ -1,0 +1,25 @@
+{% load static %}
+{% load highlight %}
+
+<div class="card shadow-sm mb-3 border-0">
+        <!-- Title row -->
+        <div class="d-flex justify-content-between align-items-start">
+          <h5 class="card-title mb-1">
+                  <a href="{% url 'org_view' o.id %}" class="text-decoration-none">
+                          {% if q %}{{ o.org_name|highlight:q|safe }}{% else %}{{ o.org_name }} {% endif %} </a></h5>
+            
+                <img src="{% static o.region_image %}"  style="height:50px; width:auto;">
+                
+            
+        </div>
+        <div class="text-muted small">
+                    {% if o.orgloc %}
+                          · {{ o.orgloc.loc_name }}
+                      {% endif %}
+        </div>
+        <div>
+                    {{o.about|truncatewords:500 }}
+        </div>
+           
+
+      </div>

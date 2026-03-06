@@ -36,12 +36,15 @@
             {% if request.path != "/" %}<li class ="nav-item"><a class="nav-link" href="{% url 'index' %}">Orgs</a></li>{% endif %}
 
             {% if user.is_authenticated %}
-                {% if request.path != "/event_list/" %}<li class="nav-item"><a class="nav-link" href="{% url 'event_list' %}">
+                {% if request.path != "/eventlist/" %}<li class="nav-item"><a class="nav-link" href="{% url 'events' %}">
                     Events</a></li>{% endif %}
                 {% if request.path != "/org_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'org_create' %}">
                     Add Org</a></li>{% endif %}
                 {% if request.path != "/event_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'event_create' %}">
                     Add Event</a></li>{% endif %}
+                {% if request.path != "/role_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'role_create' %}">
+                    Add Role</a></li>{% endif %}
+                
                 {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="/admin/">
                     Admin</a></li>
                 {% endif %}  

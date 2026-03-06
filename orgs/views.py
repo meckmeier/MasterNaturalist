@@ -1,8 +1,8 @@
-from datetime import timedelta
+from datetime import date, timedelta
+from itertools import chain
 
 from django.contrib.auth.decorators import login_required
-from pkgutil import get_data
-from urllib import request
+
 from django.contrib.auth import authenticate, login, logout
 
 from django.db import IntegrityError
@@ -17,6 +17,12 @@ from django.contrib import messages
 
 from orgs.models import *
 from .forms import *
+def sort_key(x):
+    # Use date or expire_date; fallback to far-future
+    d = getattr(x, "date", None) or getattr(x, "expire_date", None)
+    if d is None:
+        return date.max
+    return d
 
 def index(request):
 
@@ -65,7 +71,7 @@ def index(request):
                                       ).distinct()
         if data.get("has_v"):
             queryset = queryset.filter(
-                events__event_type='v',
+                events__type='v',
                 events__deleted=False
             ).filter(
                 Q(events__end_date__isnull=True, events__date__gte=today) |
@@ -74,7 +80,7 @@ def index(request):
 
         if data.get("has_t"):
             queryset = queryset.filter(
-                events__event_type='t',
+                events__type='t',
                 events__deleted=False
             ).filter(
                 Q(events__end_date__isnull=True, events__date__gte=today) |
@@ -107,19 +113,37 @@ def index_dense(request):
     q = request.GET.get("q", "")
     today = timezone.now().date()
 
-    upcoming_events = Event.objects.upcoming()
+    
     active_locations = OrgLocation.objects.filter(deleted=False)
+    volunteer_roles = VolunteerRole.objects.filter(Q(expire_date__gte=today) | Q(expire_date__isnull=True))
 
     queryset = (
         Organization.objects
         .filter(deleted=False)
         .order_by("org_name")
         .prefetch_related(
-            Prefetch("events", queryset=upcoming_events),
+           
+                # Volunteer events (type="v") attached as volunteer_events
+            Prefetch(
+                "events",  # must be the related_name from Event -> Organization
+                queryset=Event.objects.upcoming().filter(type="v", deleted=False),
+                to_attr="volunteer_events"  # this is the **attribute you'll use in Python**
+            ),
+            Prefetch(
+                "events",  # must be the related_name from Event -> Organization
+                queryset=Event.objects.upcoming().filter(type="t", deleted=False),
+                to_attr="training_events"  # this is the **attribute you'll use in Python**
+            ),
+            Prefetch(
+                "roles",  # must match the related_name on VolunteerRole
+                queryset=volunteer_roles,
+                to_attr="volunteer_roles"  # this creates the attribute you reference later
+            ),
             Prefetch("locations", queryset=active_locations),
-            "roles",   # <-- this matches related_name="roles"
+            
         )
     )
+        
     get_data = request.GET.copy()
 
     if "org_id" in get_data and "org" not in get_data:
@@ -151,7 +175,7 @@ def index_dense(request):
                                       ).distinct()
         if data.get("has_v"):
             queryset = queryset.filter(
-                events__event_type='v',
+                events__type='v',
                 events__deleted=False
             ).filter(
                 Q(events__end_date__isnull=True, events__date__gte=today) |
@@ -160,7 +184,7 @@ def index_dense(request):
 
         if data.get("has_t"):
             queryset = queryset.filter(
-                events__event_type='t',
+                events__type='t',
                 events__deleted=False
             ).filter(
                 Q(events__end_date__isnull=True, events__date__gte=today) |
@@ -168,9 +192,7 @@ def index_dense(request):
             ).distinct()
     
     followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
-    orgs=Paginator(queryset, 5)
 
-    
     orgs=Paginator(queryset, 5)
     page_number = request.GET.get('page')
     page_obj = orgs.get_page(page_number)
@@ -180,6 +202,22 @@ def index_dense(request):
     all_orgs =Organization.objects.filter(deleted=False).order_by("org_name")
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
+
+
+    for org in page_obj:
+        volunteer_events = getattr(org, "volunteer_events", [])
+        volunteer_roles = getattr(org, "volunteer_roles", [])
+
+        # Combine lists
+        combined = list(volunteer_events) + list(volunteer_roles)
+
+        # Sort by date (Event.date) or expire_date (VolunteerRole.expire_date)
+        org.volunteer_items = sorted(
+            combined,
+            key=lambda x: sort_key(x)
+        )
+        print("volunteer_items:", [i.title for i in getattr(org, "volunteer_items", [])])
+
     return render(
         request,
         "orgs/index_dense.html",
@@ -202,11 +240,12 @@ def events(request):
     get_data = request.GET.copy()
     
     ongoing_events = Event.objects.filter(date__lte=today).filter( Q(end_date__gte=today) | Q(end_date__isnull=True)).select_related('org', 'orgloc').order_by("date")
-    ongoing_roles = VolunteerRole.objects.filter(Q(expire_date__gte=today)).select_related('org', 'orgloc')
+    ongoing_roles = VolunteerRole.objects.filter(Q(expire_date__gte=today) | Q(expire_date__isnull=True)).select_related('org', 'orgloc')
 
     current_events = Event.objects.filter( date__gt=today,date__lte=current_window_end).select_related('org', 'orgloc').order_by("date")
 
-    future_events = Event.objects.filter(date__gt=current_window_end).select_related('org', 'orgloc').order_by("date")
+    all_events = Event.objects.all().select_related('org', 'orgloc').order_by("date")
+    
 
     online_events = Event.objects.upcoming().filter(online=True).select_related('org', 'orgloc')
     online_roles = VolunteerRole.objects.filter(online=True).select_related('org', 'orgloc')
@@ -216,33 +255,49 @@ def events(request):
     if filter_form.is_valid():
         data = filter_form.cleaned_data
         
+        if data.get("categories"):
+            current_events = current_events.filter(categories__in=data["categories"]).distinct()
+            online_events = online_events.filter(categories__in=data["categories"]).distinct()
+            online_roles = online_roles.filter(categories__in=data["categories"]).distinct()
+            ongoing_events = ongoing_events.filter(categories__in=data["categories"]).distinct()
+            ongoing_roles = ongoing_roles.filter(categories__in=data["categories"]).distinct()
+            all_events = all_events.filter(categories__in=data["categories"]).distinct()
+
+        if data.get("type"):
+            current_events = current_events.filter(type=data["type"])
+            online_events = online_events.filter(type=data["type"])
+            
+            ongoing_events = ongoing_events.filter(type=data["type"])
+            
+            all_events = all_events.filter(type=data["type"])
+
         if data.get("county") :
-            current=current.filter(orgloc__county_id=data["county"])
+            current_events=current_events.filter(orgloc__county_id=data["county"])
             online_events=online_events.filter(orgloc__county_id=data["county"])
             online_roles=online_roles.filter(orgloc__county_id=data["county"])
             ongoing_events=ongoing_events.filter(orgloc__county_id=data["county"])
             ongoing_roles=ongoing_roles.filter(orgloc__county_id=data["county"])
-            future_events=future_events.filter(orgloc__county_id=data["county"])
+            all_events=all_events.filter(orgloc__county_id=data["county"])
         
         if data.get("org"):
-            current=current.filter(org=data["org"])
+            current_events=current_events.filter(org=data["org"])
             online_events=online_events.filter(org=data["org"])
             online_roles=online_roles.filter(org=data["org"])
             ongoing_events=ongoing_events.filter(org=data["org"])
             ongoing_roles=ongoing_roles.filter(org=data["org"])
-            future_events=future_events.filter(org=data["org"])
+            all_events=all_events.filter(org=data["org"])
 
         if data.get("my_orgs"):
             followed_orgs = request.user.profile.following_orgs.all()
-            current = current.filter(org__in=followed_orgs)
+            current_events = current_events.filter(org__in=followed_orgs)
             online_events = online_events.filter(org__in=followed_orgs)
             online_roles = online_roles.filter(org__in=followed_orgs)
             ongoing_events = ongoing_events.filter(org__in=followed_orgs)
             ongoing_roles = ongoing_roles.filter(org__in=followed_orgs)
-            future_events = future_events.filter(org__in=followed_orgs)
+            all_events = all_events.filter(org__in=followed_orgs)
 
         if data.get("region"):
-            current=current.filter(
+            current_events=current_events.filter(
                 Q(org__region_name=data["region"]) 
                 | Q(orgloc__region_name=data["region"])
             )
@@ -252,7 +307,7 @@ def events(request):
             )
             online_roles=online_roles.filter(
                 Q(org__region_name=data["region"]) 
-                | Q(location__region_name=data["region"])
+                | Q(orgloc__region_name=data["region"])
             )
             ongoing_events=ongoing_events.filter(
                 Q(org__region_name=data["region"]) 
@@ -260,12 +315,32 @@ def events(request):
             )
             ongoing_roles=ongoing_roles.filter(
                 Q(org__region_name=data["region"]) 
-                | Q(location__region_name=data["region"])
+                | Q(orgloc__region_name=data["region"])
             )
-            future_events=future_events.filter(
+            all_events=all_events.filter(
                 Q(org__region_name=data["region"]) 
                 | Q(orgloc__region_name=data["region"])
-            )                                    
+            )      
+        if data.get("q"):   
+            current_events = current_events.filter(Q(title=data["q"]) 
+                                    | Q(description__icontains=data["q"])
+                                    )      
+            online_events = online_events.filter(Q(title=data["q"]) 
+                                    | Q(description__icontains=data["q"])
+                                    )      
+            online_roles = online_roles.filter(Q(title=data["q"]) 
+                                    | Q(description__icontains=data["q"])
+                                    )      
+            ongoing_events = ongoing_events.filter(Q(title=data["q"]) 
+                                    | Q(description__icontains=data["q"])
+                                    )      
+            ongoing_roles = ongoing_roles.filter(Q(title=data["q"]) 
+                                    | Q(description__icontains=data["q"])
+                                    )      
+            all_events = all_events.filter(Q(title=data["q"]) 
+                                    | Q(description__icontains=data["q"])
+                                    )      
+                          
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
 
@@ -275,7 +350,8 @@ def events(request):
                     "online_roles": online_roles,
                     "ongoing_events": ongoing_events,
                     "ongoing_roles": ongoing_roles,
-                    "future_events": future_events,
+                    "all_events": all_events,
+                    
                     "filter_form": filter_form,
                     "query_params": clean_get,
                     "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
@@ -321,8 +397,8 @@ def event_list(request):
         if data.get("categories"):
             queryset=queryset.filter(categories__in=data["categories"]).distinct()
 
-        if data.get("event_type"):
-            queryset = queryset.filter(event_type=data["event_type"])
+        if data.get("type"):
+            queryset = queryset.filter(type=data["type"])
 
         filter_type = data.get("filter_type")
 
@@ -342,8 +418,8 @@ def event_list(request):
         q=filter_form.cleaned_data.get("q")
         if data.get("q"):
             q=data["q"]
-            queryset =queryset.filter(Q(event_name__icontains=q) 
-                                    | Q(event_description__icontains=q)
+            queryset =queryset.filter(Q(title=q) 
+                                    | Q(description__icontains=q)
                                     | Q(org__org_name__icontains=q)
                                     | Q(orgloc__loc_name__icontains=q)
                                     )
@@ -474,11 +550,14 @@ def role_view(request, role_id=None):
                                 
     if request.method == "POST" and not view_only:
         form= RoleForm(request.POST, instance=role)
-        
+        if not form.is_valid():
+            print(form.errors)
         if form.is_valid():
             role = form.save(commit=False)
-            if not role_id:
-                role.save()
+            print("ROLE ORG:", role.org)
+            role.save()
+            print("SAVED ROLE:", role)
+            print("ROLE ID AFTER SAVE:", role.id)
             messages.success(request, "Role details saved successfully.")
             return redirect("role_view", role_id=role.id)
         else:

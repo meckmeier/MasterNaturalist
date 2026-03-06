@@ -7,14 +7,31 @@
 {% endif %}
 <form method="post" class="event-form">
     {% csrf_token %}
+        {% if not view_only %}
+        <button type ="submit" class="btn btn-primary">Save</button>
+
+
+    {% elif can_edit %}
+        <button type="button"><a href="{% url 'event_edit' event.id %}" class="btn btn-primary">Edit</a></button>
+        
+    {% endif %}
+
     <div class = "form-grid {% if view_only %}view-mode{% endif %}">
+        
+        <div class ="form-field title">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
          <!-- Organization -->
         <div class="form-field">
             {{ form.org.label_tag }}
             {{ form.org }}
             {{ form.org.errors }}
         </div>
-        <div></div>
+        <div><img src="{% static event.region_image %}"
+     class="img-fluid rounded mb-3"
+     alt="Region Image"></div>
         <!-- Location -->
         <div class="form-field">
             {{ form.orgloc.label_tag }}
@@ -31,15 +48,10 @@
             {{ form.orgloc.errors }}
         </div>
         
-        <div class ="form-field title">
-            {{ form.event_name.label_tag }}
-            {{ form.event_name}}
-            {{ form.event_name.errors }}
-        </div>
         <div class ="form-field-full">
-            {{ form.event_description.label_tag }}
-            {{ form.event_description}}
-            {{ form.event_description.errors }} 
+            {{ form.description.label_tag }}
+            {{ form.description}}
+            {{ form.description.errors }} 
         </div>
         <div class="form-field-full">
             <label>{{ form.categories.label }}</label>
@@ -68,9 +80,9 @@
             {% endif %}
         </div>
         <div class ="form-field">
-            {{ form.event_type.label_tag }}
-            {{ form.event_type}}
-            {{ form.event_type.errors }}
+            {{ form.type.label_tag }}
+            {{ form.type}}
+            {{ form.type.errors }}
         </div>
         <div class ="form-field">
             {{ form.no_cost.label_tag }}
@@ -81,9 +93,9 @@
             {{ form.online.errors }}
         </div>
         <div class ="form-field">
-            {{ form.event_url.label_tag }}
-            {{ form.event_url}}
-            {{ form.event_url.errors }}
+            {{ form.url.label_tag }}
+            {{ form.url}}
+            {{ form.url.errors }}
         </div>
 
         <div class="form-field">
@@ -117,14 +129,6 @@
       
 
     </div>
-    {% if not view_only %}
-        <button type ="submit" class="btn btn-primary">Save</button>
-
-
-    {% elif can_edit %}
-        <button type="button"><a href="{% url 'event_edit' event.id %}" class="btn btn-primary">Edit</a></button>
-        
-    {% endif %}
 
 
 </form>

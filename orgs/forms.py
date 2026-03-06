@@ -67,7 +67,7 @@ class EventForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "categories": forms.CheckboxSelectMultiple,
-            "event_description": forms.Textarea(attrs={
+            "description": forms.Textarea(attrs={
                     "rows": 4,
                 }),
         }
@@ -88,18 +88,13 @@ class RoleForm(forms.ModelForm):
 
 
 class EventFilterForm(forms.Form):
-    event_type = forms.ChoiceField(
+    type = forms.ChoiceField(
         choices=[("", "Any"), ("v", "Volunteer Opportunity"), ("t", "Training"), ("m", "Master Naturalist")],
         required=False, 
-        label="Event Type",
+        label="Type",
         widget=forms.Select(attrs={"class":"form-select"})
     )
-    filter_type = forms.ChoiceField(
-        choices=[("a", "All"), ("o", "Online"), ("u", "Upcoming"), ("p", "Past")],
-        required=False,    
-        label="Filter Type",
-        widget=forms.Select(attrs={"class":"form-select"})
-    )
+
 
     org= forms.ModelChoiceField(
         queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
