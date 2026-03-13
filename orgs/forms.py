@@ -12,11 +12,20 @@ class OrgForm(forms.ModelForm):
         widgets = {
             "about": forms.Textarea(attrs={
                 "rows": 5,
-               
             }),
         }
 
-class BaseOrgLocationFormSet(BaseInlineFormSet):
+class LocForm(forms.ModelForm):
+    class Meta:
+        model = Location
+        fields = "__all__"
+        widgets = {
+            "location_about": forms.Textarea(attrs={
+                "rows": 3,
+            }),
+        }
+    
+class BaseLocationFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
         all_names =[]
@@ -40,7 +49,7 @@ class BaseOrgLocationFormSet(BaseInlineFormSet):
                 raise ValidationError(f"Duplicate location name '{loc_name}' is not allowed.")
             all_names.append(normalized_name)
 
-            qs.OrgLocation.objects.filter(
+            qs.Location.objects.filter(
                 physical_location=True,
                 deleted=False,
                 loc_name__iexact=loc_name.strip()
@@ -51,40 +60,15 @@ class BaseOrgLocationFormSet(BaseInlineFormSet):
                 raise ValidationError(f"Location name '{loc_name}' already exists for another organization.")
 
 
-OrgLocationFormSet = inlineformset_factory(
+LocationFormSet = inlineformset_factory(
     Organization,
-    OrgLocation,
+    Location,
     fields = ['id','loc_name', 'region_name','physical_location','org_loc_url', 'contact_email',  'location_about',  'address', 'city_name','county_id', 'state', 'zip_code'],
     extra=0,
     can_delete=True,
-    formset=BaseOrgLocationFormSet,
+    formset=BaseLocationFormSet,
 )
 
-
-class EventForm(forms.ModelForm):
-    class Meta:
-        model = Event
-        fields = "__all__"
-        widgets = {
-            "categories": forms.CheckboxSelectMultiple,
-            "description": forms.Textarea(attrs={
-                    "rows": 4,
-                }),
-        }
-
-
-
-class RoleForm(forms.ModelForm):
-
-    class Meta:
-        model = VolunteerRole
-        fields = "__all__"
-        widgets = {
-            "categories": forms.CheckboxSelectMultiple,
-            "description": forms.Textarea(attrs={
-                    "rows": 4,
-                }),
-        }
 
 
 class EventFilterForm(forms.Form):
@@ -196,6 +180,59 @@ class OrgFilterForm(forms.Form):
             "placeholder":"Search in name, location or description"
         })
     )
+
+class LocFilterForm(forms.Form):
+    org= forms.ModelChoiceField(
+        queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
+        required=False,
+        empty_label="Any",
+        label="Org Name",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )  
+    my_orgs = forms.BooleanField(
+        required=False,
+        label="Show My Favorite Orgs"
+    )
+    has_v = forms.BooleanField(
+        required=False,
+        label="Has Volunteer Opportunities"
+    )
+    has_t = forms.BooleanField(
+        required=False,
+        label="Has Trainings"
+    )
+    county = forms.ModelChoiceField(
+        queryset = County.objects.all().order_by("county_name"),
+        required=False,
+        empty_label="Any",
+        label="County" ,
+        widget=forms.Select(attrs={"class":"form-select"})       
+    )
+    REGION_CHOICES = [
+        ("", "Any"),
+        ("C", "Central"),
+        ("EC", "East Central"),
+        ("NE", "Northeast"),
+        ("NW", "Northwest"),
+        ("SC", "South Central"),
+        ("SE", "Southeast"),
+        ("SW", "Southwest"),
+        ("St", "Statewide"),
+    ]
+    region = forms.ChoiceField(
+        choices=REGION_CHOICES,
+        required=False,
+        label="Region",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            "class":"form-control mr-2",
+            "placeholder":"Search in name, location or description"
+        })
+    )
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
@@ -206,4 +243,35 @@ class ProfileForm(forms.ModelForm):
             "preferred_region": forms.Select(attrs={"class": "form-select"}),
             "include_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
-   
+class ActivityForm(forms.ModelForm):
+    class Meta:
+        model = Activity
+        fields = "__all__"
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+            "categories": forms.CheckboxSelectMultiple(),
+            "expire_date": forms.DateInput(attrs={"type": "date"}),
+            "date_description": forms.TextInput(attrs={"placeholder": "e.g., 'Ongoing weekly'"}),
+        }   
+
+
+
+class SessionForm(forms.ModelForm):
+    class Meta:
+        model = Session
+        fields = "__all__"
+        widgets = {
+            "start": forms.DateInput(attrs={"type": "date"}),
+            "end": forms.DateInput(attrs={"type": "date"}),
+            "format": forms.Select(),
+        }
+        
+SessionFormSet = inlineformset_factory(
+    Activity,
+    Session,
+    form=SessionForm,
+    extra=0,       # number of blank forms shown initially
+    min_num=1,
+    validate_min=True,
+    can_delete=True
+)

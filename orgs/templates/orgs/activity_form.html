@@ -1,0 +1,198 @@
+<!-- templates/activities/add_activity.html -->
+{% extends "orgs/layout.html" %}
+
+
+{% block body %}
+<h2>Activity</h2>
+{%if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<form method="post">
+ {% csrf_token %}
+ {% if can_edit %}
+    {% if view_only %}
+         <button type="button"><a href="{% url 'activity_edit' activity.id %}" class="btn btn-primary">Edit</a></button>        
+    {% else %}
+       <button type ="submit" class="btn btn-primary">
+            Save
+        </button>
+    {% endif %}
+ {% endif %}    
+ {% if activity.org.owner == request.user.profile %}
+    <span class="text-muted">You are the owner of this organization that sponsored this activity.</span>
+ {% endif %}
+
+<fieldset>
+        <legend>What</legend>
+        {{ activity_form.non_field_errors }}
+        <div class = "form-grid {% if view_only %}view-mode{% endif %}">
+        <div class="form-field">
+            {{ activity_form.title.label_tag }}<br>
+            {{ activity_form.title }}
+            {{ activity_form.title.errors }}
+        </div>
+         <div class="form-field">
+            Type:<br>
+            {{ activity_form.activity_type }}
+            {{ activity_form.activity_type.errors }}
+        </div>
+        
+        <div class="form-field">
+            {{ activity_form.org.label_tag }}
+            {{ activity_form.org }}
+            {{ activity_form.org.errors }}
+        </div>
+        <div class="form-field">
+            URL for Activity Details
+            {{ activity_form.activity_url}}
+            {{ activity_form.activity_url.errors}}
+        </div>
+        <div></div>
+        <div class="form-field">
+            {{ activity_form.contact_email.label_tag }}
+            {{ activity_form.contact_email }}
+            {{ activity_form.contact_email.errors }}
+        </div>
+        <div class ="form-field-full">
+            {{ activity_form.description.label_tag }}<br>
+            {{ activity_form.description }}
+            {{ activity_form.description.errors }}
+        </div>
+
+        <div class="form-field">
+            {{ activity_form.date_description.label_tag }}<br>
+            {{ activity_form.date_description }}
+            {{ activity_form.date_description.errors }}
+        </div>
+
+        <div class="form-group">
+            Time<br>
+            {{ activity_form.time_commitment }}
+            {{ activity_form.time_commitment.errors }}
+        </div>
+
+        <div class="form-field">
+            {{ activity_form.expire_date.label_tag }}<br>
+            {{ activity_form.expire_date }}
+            {{ activity_form.expire_date.errors }}
+        </div>
+        <div class="form-field-full">
+            <div class="d-flex flex-wrap gap-2">
+                {% for checkbox in activity_form.categories %}
+                        <div class="form-check form-check-inline">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </fieldset>
+
+    <h3>Sessions</h3>
+    <div class="formset" data-prefix="locations">
+        {% if not view_only %}
+            <button type="button" id="add-btn" class="btn btn_primary">
+            Add Sessions
+        </button>
+        {% endif %}
+
+        {{ session_formset.management_form }}
+        <table class="formset-table {% if view_only %}view-mode{% endif %}">
+            <thead>
+                <tr> 
+                    <th>Format</th>
+                    <th>URL (if online)</th>
+                    <th>Location (if inperson)</th>
+                    <th>Ongoing</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>DELETE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in session_formset %}
+                    <tr class ="formset-row">
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+
+                        
+                        <td>
+                         <span class="field-value">
+                                {{ form.session_format|default:"—" }}  
+                         </span>
+                            {{ form.session_format.errors }}
+                            {{ form.session_format }}
+                        </td>
+                        
+                        <td>
+                         <span class="field-value">
+                                {{ form.session_url|default:"—" }}  
+                         </span>
+                            {{ form.session_url.errors }}
+                            {{ form.session_url }}
+                        </td> 
+                        <td>
+                         <span class="field-value">
+                                {{ form.location|default:"—" }}  
+                         </span>
+                            {{ form.location.errors }}
+                            {{ form.location }}
+                        </td>       
+                        <td> 
+                            {{form.ongoing.errors}}
+                            {{form.ongoing }}
+                            
+                        </td>
+                        <td>
+                         <span class="field-value">
+                                {{ form.start|default:"—" }}  
+                         </span>
+                            {{ form.start.errors }}
+                            {{ form.start }}
+                        </td>       
+                        <td>
+                         <span class="field-value">
+                                {{ form.end|default:"—" }}  
+                         </span>
+                            {{ form.end.errors }}
+                            {{ form.end }}
+                        </td>    
+                        <td>{{form.DELETE}}</td>
+                    </tr>
+            {% empty %}
+                    <tr class="empty-hint">
+                        <td colspan="4">No sessions added.</td>
+                    </tr>
+            {% endfor %}
+                    <tr class="formset-row form-template" style="display:none;">
+                        {% for hidden in session_formset.empty_form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                     <td>{{ form.session_format }}</td>
+                     <td>{{ form.session_url }}</td>
+                     <td>{{ form.location }}</td>
+                     <td>{{ form.start }}</td>
+                     <td>{{ form.end }}</td>
+                        
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+</form>
+
+
+   
+</form>
+
+   
+
+{% endblock %}

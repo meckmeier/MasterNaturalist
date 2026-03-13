@@ -1,0 +1,89 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+        {% if loc.org.owner == request.user.profile %}
+    <p class="text-muted">You are the owner of this organization.</p>
+{% endif %}
+<form method="post" class="loc-form">
+    {% csrf_token %}
+   {{form.id}}
+    <div class = "form-grid {% if view_only %}view-mode{% endif %}">
+        <div class ="form-field title">
+            {{ form.loc_name.label_tag }}
+            {{ form.loc_name}}
+            {{ form.loc_name.errors }}
+        </div>
+        <div class="form-field-full">
+            {{ form.location_about.label_tag}}
+            {{ form.location_about}}
+            {{ form.location_about.errors}}
+        </div>
+        <div class ="form-field">
+            {{ form.org_loc_url.label_tag }}
+            {{ form.org_loc_url}}
+            {{ form.org_loc_url.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.contact_email.label_tag }}
+            {{ form.contact_email}}
+            {{ form.contact_email.errors }}
+        </div>
+         <div class ="form-field">
+            {{ form.region_name.label_tag }}
+            {{ form.region_name}}
+            {{ form.region_name.errors }}
+        </div>
+   
+        <div class ="form-field-full">
+            {{ form.address.label_tag }}
+            {{ form.address}}
+            {{ form.address.errors }} 
+        </div>
+        <div class ="form-field">
+            {{ form.city_name.label_tag }}
+            {{ form.city_name}}
+            {{ form.city_name.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.state.label_tag }}
+            {{ form.state}}
+            {{ form.state.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.zip_code.label_tag }}
+            {{ form.zip_code}}
+            {{ form.zip_code.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.county_id.label_tag }}
+            {{ form.county_id}}
+            {{ form.county_id.errors }}
+        </div>
+         <div class ="form-field">
+            {{ form.org.label_tag }}
+            {{ form.org}}
+            {{ form.org.errors }}
+        </div>
+    </div>
+    <!-- submit button INSIDE the form -->
+    {% if can_edit and not view_only %}
+        <button type="submit" class="btn btn-primary">
+            {% if loc %}Save{% else %}Add{% endif %}
+        </button>
+        <button type="button" id="add-btn" class="btn btn_primary">
+            Add Locations
+        </button>
+    {% endif %}
+
+
+    
+</form>
+
+{% endblock %}

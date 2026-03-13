@@ -71,9 +71,13 @@
     <div class="d-flex align-items-baseline justify-content-between ">
       <div>
         <h4 class="mb-1 fw-semibold">
-        <a href="{% url 'org_view' org.id %}" class="text-decoration-none">
+        {% if user.is_authenticated %}
+       
           {% if q %}{{ org.org_name|highlight:q|safe }}{% else %}{{ org.org_name }}{% endif %}
-        </a></h4>
+         {% else %}
+          {{ org.org_name }}
+          {% endif %}
+          <span class="mt-2 small text-muted"><a href="{% url 'org_view' org.id %}"><i class="bi bi-pencil-fill"></i></a></h4>
       </div>
       <div class="d-flex align-items-center gap-3">
           {% if user.is_authenticated %}
@@ -99,12 +103,12 @@
             <li class="nav-item" role="presentation">
               <button class="nav-link active px-2 py-1" id="v-pills-info-tab{{ org.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-info{{ org.id }}" type="button" role="tab">Info</button>
             </li>
-            {% if org.volunteer_items %}
+            {% if org.volunteer %}
               <li class="nav-item " role="presentation">
                 <button class="nav-link px-2 py-1" id="v-pills-events-tab{{ org.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-events{{ org.id }}" type="button" role="tab">Volunteer</button>
               </li>
             {% endif %}
-            {% if org.training_events  %}
+            {% if org.training  %}
             <li class="nav-item me-2 me-md-0" role="presentation">
               <button class="nav-link px-2 py-1" id="v-pills-trainings-tab{{ org.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-trainings{{ org.id }}" type="button" role="tab">Trainings</button>
             </li>
@@ -113,21 +117,25 @@
         </div>
       </div>
       <!-- Tab Content -->
-      <div class="col-12 col-md-9 order-md-1 tab-content" id="v-pills-tabContent{{ org.id }}">
+      <div class="col-12 col-md-11 order-md-1 tab-content mx-auto" id="v-pills-tabContent{{ org.id }}">
         
         <!-- Info Tab -->
         <div class="tab-pane fade show active" id="v-pills-info{{ org.id }}" role="tabpanel">
           {% if org.about %}
-            <p class="text-secondary">{{ org.about|truncatechars:250 }}</p>
+            <div class="description-block text-secondary">
+              <div class = "desc-short"> {{ org.about|truncatechars:250 }} </div>
+               <div class="desc-full d-none"> {{ org.about|highlight:q|safe }} </div> 
+               {% if not q %} 
+               <div class="desc-toggle"> <span class="toggle-desc small text-muted ms-1"> ▼</span> </div> {% endif %}
+               </div>
+         
           {% endif %}
-
-          
 
           {% if org.locations.all %}
             <div class="mt-2">
               
               {% for loc in org.locations.all %}
-               <a href="{{loc.org_loc_url}}" target="_blank" class="text-decoration-none">{{ loc.loc_name }}</a> {% if loc.county_id %}({{ loc.county_id.county_name }}){% endif %}{% if not forloop.last %}, {% endif %}
+               {{ loc.loc_name }} {% if loc.county_id %}({{ loc.county_id.county_name }}){% endif %}{% if not forloop.last %}, {% endif %}
               {% endfor %}
             </div>
           {% endif %}
@@ -135,42 +143,25 @@
 
         <!-- Events Tab -->
         <div class="tab-pane fade" id="v-pills-events{{ org.id }}" role="tabpanel">
-          <h5 class="fw-semibold">{{ org.org_name }} - Volunteer</h5>
-          {% for event in org.volunteer_items %}
-        
-              <div class="mb-1">
-                <a href="{% url 'event_view' event.id %}" class="text-decoration-none">{{ event.title }} </a>
-                {% if event.orgloc %} at {{ event.orgloc.loc_name }} {% endif %}
-                ({{ event.date|date:"M d" }}{% if event.end_date %}-{{ event.end_date|date:"M d" }}{% endif %})
-              </div>
-            
-          {% empty %}
-            <div class="text-muted">No upcoming volunteer events.</div>
+          {% for each in org.volunteer %}
+              {% include "orgs/_activity_item.html" with e=each q=q source='org'%}
           {% endfor %}
-        </div>
+          </div>
+            
 
         <!-- Trainings Tab -->
         <div class="tab-pane fade" id="v-pills-trainings{{ org.id }}" role="tabpanel">
-          <h5 class="fw-semibold">{{ org.org_name }} - Trainings</h5>
-          {% for event in org.training_events %}
+          
+          {% for each in org.training %}
            
-              <div class="mb-1">
-                <a href="{% url 'event_view' event.id %}" class="text-decoration-none">{{ event.title }} </a>
-                {% if event.orgloc %} at {{ event.orgloc.loc_name }} {% endif %}
-                ({{ event.date|date:"M d" }}{% if event.end_date %}-{{ event.end_date|date:"M d" }}{% endif %})
-              </div>
-            
-          {% empty %}
-            <div class="text-muted">No upcoming trainings.</div>
+               {% include "orgs/_activity_item.html" with e=each q=q source='org'%}
+
           {% endfor %}
-        </div>
-
-      </div>
-    </div>
+          </div>
   </div>
-
+  </div>
+  </div>
 {% endfor %}
-
 <!-- Pagination -->
   <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">

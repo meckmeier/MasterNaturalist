@@ -37,13 +37,16 @@
 
             {% if user.is_authenticated %}
                 {% if request.path != "/eventlist/" %}<li class="nav-item"><a class="nav-link" href="{% url 'events' %}">
-                    Events</a></li>{% endif %}
+                    Activities</a></li>{% endif %}
+                {% if request.path != "/locations/" %}<li class="nav-item"><a class="nav-link" href="{% url 'locations' %}">
+                    Locations</a></li>{% endif %}
                 {% if request.path != "/org_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'org_create' %}">
                     Add Org</a></li>{% endif %}
-                {% if request.path != "/event_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'event_create' %}">
-                    Add Event</a></li>{% endif %}
-                {% if request.path != "/role_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'role_create' %}">
-                    Add Role</a></li>{% endif %}
+                {% if request.path != "/loc_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'loc_create' %}">
+                    Add Location</a></li>{% endif %}    
+                {% if request.path != "/activity_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'activity_create' %}">
+                    Add Activity</a></li>{% endif %}
+
                 
                 {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="/admin/">
                     Admin</a></li>

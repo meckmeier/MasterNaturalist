@@ -61,7 +61,6 @@ class Profile(models.Model):
      # Personalization Toggles
     include_online = models.BooleanField(default=True)
     
-
     def __str__(self):
         return f'Profile of {self.user.username}'
     
@@ -92,12 +91,6 @@ class Organization(models.Model):
     
     def follower_count(self):
         return self.following.count()
-    def upcoming_volunteer_count(self):
-        return self.events.upcoming().filter(event_type='v').count()
-    def upcoming_training_count(self):
-        return self.events.upcoming().filter(event_type='t').count()
-    def upcoming_online_count(self):
-        return self.events.upcoming().filter(online=True).count()
     
     @property
     def region_image(self):
@@ -113,10 +106,10 @@ class FollowOrg(models.Model):
     def __str__(self):
         return f'{self.profile.user.username} follows {self.followOrg.org_name}'
         
-class OrgLocation(models.Model):
-    org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="locations")
+class Location(models.Model):
+    org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
     loc_name= models.CharField(max_length=255)
-    physical_location = models.BooleanField(default=False)
+    physical_location = models.BooleanField(default=True)
     address = models.CharField(max_length=255, default ='', blank=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL, related_name="county")
@@ -132,129 +125,64 @@ class OrgLocation(models.Model):
         ordering = ['loc_name']  # sort by loc_name by default  
 
     def __str__(self):
-        return f"{self.org.org_name}, {self.loc_name}"
-    
-class EventQuerySet(models.QuerySet):
-
-    def active(self):
-        """Not deleted."""
-        return self.filter(deleted=False)
-
-    def upcoming(self):
-        """Upcoming OR currently running events."""
-        today = timezone.now().date()
-
-        return self.active().filter(
-            Q(
-                end_date__isnull=True,
-                date__gte=today
-            ) |
-            Q(
-                end_date__isnull=False,
-                date__lte=today,
-                end_date__gte=today
-            )
-        )
-
-    def past(self):
-        """Events that have finished."""
-        today = timezone.now().date()
-
-        return self.active().filter(
-            Q(end_date__isnull=True, date__lt=today) |
-            Q(end_date__isnull=False, end_date__lt=today)
-        )
-
-    def online(self):
-        return self.active().filter(online=True)
-
-    def all_visible(self):
-        """All non-deleted events."""
-        return self.active()
-    
-class Event(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField(default="", blank=True)
-    type = models.CharField(max_length=1,
-                                  choices=[("v","Volunteer Opportunity"),("t","Training" ), ("m","Master Naturalist")])
-    online = models.BooleanField(default=False)
-    inperson = models.BooleanField(default=True)
-    instructors = models.CharField(max_length=400, blank=True, default="")
-    participant_max = models.IntegerField(default=0, blank=True, null=True)
-    url = models.URLField(max_length=200, default="", blank=True)
-    no_cost = models.BooleanField(default=False)
-    org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="events")
-    orgloc = models.ForeignKey(OrgLocation, on_delete=models.CASCADE, related_name="eventlocations",blank=True, null=True)
-    date_description = models.CharField(max_length=100, default='', blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
-    time_commitment = models.ForeignKey(Commitment, on_delete=models.SET_NULL, related_name="commitments", blank=True, null=True)
-    categories = models.ManyToManyField(EventCategory, blank=True, related_name="events")
-    deleted=models.BooleanField(default=False)
-
-    objects = EventQuerySet.as_manager()
-
-    def __str__(self):
-        return f"{self.title}"
-
+        return f"{self.loc_name}"
     @property
     def region_image(self):
-        # 1️⃣ If event has orgloc, use that region
-        if self.orgloc and self.orgloc.region_name:
-            region = self.orgloc.region_name
-        # 2️⃣ Otherwise fall back to org
-        elif self.org and self.org.region_name:
-            region = self.org.region_name
-        else:
-            region = None
-
         return REGION_IMAGE_MAP.get(
-            region,
+            self.region_name,
             'orgs/images/default.jpg'
         )
 
-class VolunteerRole(models.Model):
-    org = models.ForeignKey(
-        Organization,
-        on_delete=models.CASCADE,
-        related_name="roles"
-    )
-    orgloc = models.ForeignKey(OrgLocation, on_delete=models.CASCADE, related_name="rolelocations",blank=True, null=True)
-
+class Activity(models.Model):
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="activities")
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    time_commitment = models.ForeignKey(
-        Commitment,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    categories = models.ManyToManyField(
-        EventCategory,
-        blank=True,
-        related_name="category_roles"
-    )
-
-    ongoing = models.BooleanField(default=True)
+    activity_type = models.CharField(max_length=1,
+                                  choices=[("v","Volunteer Opportunity"),("t","Training" )])
+    time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
+    categories = models.ManyToManyField(EventCategory, blank=True, related_name="category_activities")
     date_description = models.CharField(max_length=100, default='', blank=True, null=True)
     expire_date = models.DateField(blank=True, null=True)
-    online = models.BooleanField(default=False)
-    deleted = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ["title"]
+    activity_url = models.URLField(max_length=200, default="", blank=True)
+    no_cost = models.BooleanField(default=False)
+    contact_email = models.EmailField(default="", blank=True)
+    migrated_from_event = models.IntegerField(null=True,blank=True)
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.org})"
+
+
+class ActivityQuerySet(models.QuerySet):
+    def volunteer(self):
+        return self.filter(
+            activity_type="v"
+        )
+    def training(self):
+        return self.filter(
+            activity_type="t"
+        )
+
+class Session(models.Model):
+    activity=models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="sessions")
+    session_format = models.CharField(max_length=1 ,
+                              choices=[("o","Online"),("i","InPerson" ),("b","Hybrid")])
+    location = models.ForeignKey( Location, null=True, blank=True, on_delete=models.SET_NULL, related_name="sessions")
+    session_url = models.URLField(max_length=200, default="", blank=True)
+    ongoing = models.BooleanField(default=False)
+    start = models.DateField(null=True, blank=True)
+    end = models.DateField(null=True, blank=True)
+    
+
+    def __str__(self):
+        return f"{self.activity.title} – {self.start}"
     @property
     def region_image(self):
         # 1️⃣ If event has orgloc, use that region
-        if self.orgloc and self.orgloc.region_name:
-            region = self.orgloc.region_name
+        if self.location and self.location.region_name:
+            region = self.location.region_name
         # 2️⃣ Otherwise fall back to org
-        elif self.org and self.org.region_name:
-            region = self.org.region_name
+        elif self.activity.org and self.activity.org.region_name:
+            region = self.activity.org.region_name
         else:
             region = None
 

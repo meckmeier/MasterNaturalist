@@ -80,14 +80,12 @@
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing" type="button" role="tab">Ongoing</button>
     </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All</button>
-    </li>
+
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="online-tab" data-bs-toggle="tab" data-bs-target="#online" type="button" role="tab">Online</button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab">Roles</button>
+      <button class="nav-link" id="expired-tab" data-bs-toggle="tab" data-bs-target="#expired" type="button" role="tab">Past Sessions</button>
     </li>
   </ul>
 
@@ -96,80 +94,45 @@
 
   <!-- Current Events -->
   <div class="tab-pane fade show active" id="current" role="tabpanel">
-    
-    {% for e in current_events %}
-      {% include "orgs/_event_item.html" with event=e q=q %}
+    {% for a in sessions %}
+      {% include "orgs/_session_item.html" with e=a q=q %}
     {% empty %}
-        <p class="text-muted">No current events.</p>
+      <p class="text-muted"> No current activities</p>
     {% endfor %}
+
   </div>  
 
   <!-- Ongoing Events --> 
   <div class="tab-pane fade" id="ongoing" role="tabpanel">
-      <hr>
-       <h4>Ongoing Events</h4>
-    {% for e in ongoing_events %}
-      {% include "orgs/_event_item.html" with event=e %}
+      
+    {% for a in ongoing %}
+      {% include "orgs/_session_item.html" with e=a q=q  %}
     {% empty %}
         <p class="text-muted">No current events.</p>
     {% endfor %}
-      <hr>
-       <h4>Ongoing Roles (undated)</h4>
-    {% for r in ongoing_roles %}
-      {% include "orgs/_role_item.html" with role=r %}
-    
-    {% empty %}
-        <p class="text-muted">No ongoing volunteer roles.</p>
-    {% endfor %}
   </div>  
-  
-  <!-- All Events -->
-  <div class="tab-pane fade" id="all" role="tabpanel">
-      <hr>
-       <h4>Roles</h4>
-        {% for r in ongoing_roles %}
-          {% include "orgs/_role_item.html" with role=r %}
-        {% empty %}
-          <p class="text-muted">No volunteer roles.</p>
-        {% endfor %}
-      <hr>
-       <h4>Events</h4>
-        {% for e in all_events %}
-          {% include "orgs/_event_item.html" with event=e %}
-        {% empty %}
-          <p class="text-muted">No events.</p>
-        {% endfor %}
-    </div>
 
     <!-- Online Events -->
     <div class="tab-pane fade" id="online" role="tabpanel">
-      <hr>
-       <h4>Online Events</h4>
-        {% for e in online_events %}
-          {% include "orgs/_event_item.html" with event=e %}
+     
+        {% for a in online %}
+          {% include "orgs/_session_item.html" with e=a q=q  %}
         {% empty %}
           <p class="text-muted">No online events.</p>
         {% endfor %}
-      <hr>
-       <h4>Online Roles</h4>
-        {% for r in online_roles %}
-          {% include "orgs/_role_item.html" with role=r %}
-        {% empty %}
-          <p class="text-muted">No online volunteer roles.</p>
-        {% endfor %}
-    </div>
-
-    <!-- Volunteer Roles -->
-    <div class="tab-pane fade" id="roles" role="tabpanel">
       
-        {% for r in ongoing_roles %}
-          {% include "orgs/_role_item.html" with role=r %}
-         {% empty %}
-           <p class="text-muted">No volunteer roles.</p>
-         {% endfor %}
-        
     </div>
+  <!-- Past Events -->
+  <div class="tab-pane fade" id="expired" role="tabpanel">
+    {% for a in expired_sessions %}
+      {% include "orgs/_session_item.html" with e=a q=q %}
+    {% empty %}
+      <p class="text-muted"> No past activities</p>
+    {% endfor %}
 
+  </div> 
+   
+</div>
   </div>
 </div>
 

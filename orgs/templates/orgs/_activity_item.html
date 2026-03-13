@@ -1,0 +1,56 @@
+{% load static %}
+{% load highlight %}
+
+ <div class="card shadow-sm mb-3 border-1"  id="activity-{{ e.id }}">
+      <!-- Title row -->
+      <div class="d-flex justify-content-between align-items-start">
+        <h5 class="card-title mb-1">
+          <span><strong>{% if e.activity_type == "t"%}<i class="bi bi-mortarboard"></i>
+            {%else%} <i class="bi bi-tree"></i>{% endif %}</strong></span>
+          
+          {% if q %}{{ e.title|highlight:q|safe  }}{% else %}{{ e.title }}{% endif %}
+           <a href="{% url 'activity_edit' e.id%}"><i class="bi bi-pencil-fill"></i></a> 
+            
+       </h5>
+       </div>
+       <div class="mt-2 small text-muted">
+          {{e.contact_email}} | {{ e.activity_url}}
+        </div>
+      <div class="description-block">
+        <div class = "desc-short">
+          {{ e.description|truncatechars:200 }}
+        </div>
+        <div class="desc-full d-none">
+           {{ e.description|highlight:q|safe }}
+        </div>
+        {% if not q %}
+          <div class="desc-toggle">
+            <span class="toggle-desc small text-muted ms-1">
+                          ▼</span>
+          </div>
+        {% endif %}
+      </div>
+      <!-- Date row -->
+       <div class="mt-2 small text-muted">
+        {% for session in e.sessions.all %}
+          <div>
+            {% if session.start %} {{ session.start }}{% endif %}
+            {% if session.end %}  | {{ session.end }}{% endif %}
+            {% if session.date_description %}  | <em>{{ a.session.date_description }}</em> {% endif %}
+            {% if session.location %} at {{ session.location }} {% endif %}
+            {% if session.session_url %} <a href="{{session.session_url}}"><i class=" bi bi-arrow fs-5 text-info"></i></a>{% endif %}
+            {% if session.session_format != "i" %}
+                    <a href="{{session.session_url}}"><i class = "bi bi-globe fs-5 text-info" title="Online Event"></i></a>
+            {% endif %}
+          </div>
+        {% endfor %}
+        </div>
+        
+        <div>
+
+          <p>{% for cat in e.categories.all %}
+                    <span class="badge bg-secondary me-1">{{cat.name}}</span>
+                {% endfor %}
+                </p>
+        </div>
+    </div> 

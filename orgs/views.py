@@ -24,120 +24,48 @@ def sort_key(x):
         return date.max
     return d
 
-def index(request):
-
-    q = request.GET.get("q","")
-    upcoming_events = Event.objects.upcoming()
-
-    active_locations = OrgLocation.objects.filter(deleted=False)
-
-    queryset = (
-        Organization.objects
-            .filter(deleted=False)
-            .order_by('org_name')
-            .prefetch_related(
-                Prefetch('events', queryset=upcoming_events),
-                Prefetch('locations', queryset=active_locations),
-            )
-    )
-    get_data = request.GET.copy()
-
-    if "org_id" in get_data and "org" not in get_data:
-        get_data["org"]=get_data["org_id"]
-
-    filter_form=OrgFilterForm(get_data or None)
-    if filter_form.is_valid():
-    
-        data = filter_form.cleaned_data
-        today = timezone.now().date()
-
-        if data.get("org"):
-            queryset=queryset.filter(id=data["org"].id)
-
-        if data.get("my_orgs"):
-            followed_orgs = request.user.profile.following_orgs.filter(deleted=False)
-            queryset = queryset.filter(pk__in=followed_orgs)
-
-        if data.get("county") :
-            queryset=queryset.filter(locations__county_id=data["county"]).distinct()
-
-        if data.get("region"):
-            queryset=queryset.filter(region_name=data["region"]).distinct()
-
-        if data.get("q"):
-            queryset =queryset.filter(Q(org_name__icontains=q) 
-                                      | Q(about__icontains=q)
-                                      | Q(locations__loc_name__icontains=q)
-                                      ).distinct()
-        if data.get("has_v"):
-            queryset = queryset.filter(
-                events__type='v',
-                events__deleted=False
-            ).filter(
-                Q(events__end_date__isnull=True, events__date__gte=today) |
-                Q(events__end_date__isnull=False, events__end_date__gte=today)
-            ).distinct()
-
-        if data.get("has_t"):
-            queryset = queryset.filter(
-                events__type='t',
-                events__deleted=False
-            ).filter(
-                Q(events__end_date__isnull=True, events__date__gte=today) |
-                Q(events__end_date__isnull=False, events__end_date__gte=today)
-            ).distinct()
-
-    orgs=Paginator(queryset, 5)
-    page_number = request.GET.get('page')
-    page_obj = orgs.get_page(page_number)
-
-    followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
-    counties = County.objects.all()
-    all_orgs =Organization.objects.filter(deleted=False).order_by("org_name")
-    clean_get = request.GET.copy()
-    clean_get.pop("page", None)
-
-    return render(request, "orgs/index.html",
-                  {
-                    "organizations": page_obj,
-                    "followed_orgs": followed_orgs, 
-                    "q": q,
-                    "counties": counties,
-                     "query_params": clean_get,
-                    "orgs": all_orgs,
-                    "filter_form": filter_form,
-                  } )
 
 def index_dense(request):
 
     q = request.GET.get("q", "")
     today = timezone.now().date()
 
-    
-    active_locations = OrgLocation.objects.filter(deleted=False)
-    volunteer_roles = VolunteerRole.objects.filter(Q(expire_date__gte=today) | Q(expire_date__isnull=True))
+    active_locations = Location.objects.filter(deleted=False)
 
+    volunteer = (
+    Activity.objects
+        .filter(activity_type="v")
+        .prefetch_related(
+            Prefetch(
+             "sessions",
+             queryset=Session.objects.filter(Q(start__gte=today) | Q(start__isnull=True))
+         )
+        ))
+    
+    training = (
+        Activity.objects
+        .filter(activity_type="t")
+        .prefetch_related(
+            Prefetch(
+                "sessions",
+                queryset=Session.objects.filter(Q(start__gte=today) | Q(start__isnull=True))
+            )
+        ))
+    
     queryset = (
         Organization.objects
         .filter(deleted=False)
         .order_by("org_name")
-        .prefetch_related(
-           
-                # Volunteer events (type="v") attached as volunteer_events
+        .prefetch_related(   
             Prefetch(
-                "events",  # must be the related_name from Event -> Organization
-                queryset=Event.objects.upcoming().filter(type="v", deleted=False),
-                to_attr="volunteer_events"  # this is the **attribute you'll use in Python**
+                "activities",  # must match the related_name on model
+                queryset=volunteer,
+                to_attr="volunteer"  # this creates the attribute you reference later
             ),
             Prefetch(
-                "events",  # must be the related_name from Event -> Organization
-                queryset=Event.objects.upcoming().filter(type="t", deleted=False),
-                to_attr="training_events"  # this is the **attribute you'll use in Python**
-            ),
-            Prefetch(
-                "roles",  # must match the related_name on VolunteerRole
-                queryset=volunteer_roles,
-                to_attr="volunteer_roles"  # this creates the attribute you reference later
+                "activities",
+                queryset=training,
+                to_attr="training"
             ),
             Prefetch("locations", queryset=active_locations),
             
@@ -204,20 +132,7 @@ def index_dense(request):
     clean_get.pop("page", None)
 
 
-    for org in page_obj:
-        volunteer_events = getattr(org, "volunteer_events", [])
-        volunteer_roles = getattr(org, "volunteer_roles", [])
-
-        # Combine lists
-        combined = list(volunteer_events) + list(volunteer_roles)
-
-        # Sort by date (Event.date) or expire_date (VolunteerRole.expire_date)
-        org.volunteer_items = sorted(
-            combined,
-            key=lambda x: sort_key(x)
-        )
-        print("volunteer_items:", [i.title for i in getattr(org, "volunteer_items", [])])
-
+    
     return render(
         request,
         "orgs/index_dense.html",
@@ -231,24 +146,125 @@ def index_dense(request):
             "orgs": all_orgs,
         }
     )
+def locations(request):
+    
+    q = request.GET.get("q", "")
+    today = timezone.now().date()
+
+    volunteer = (Session.objects
+        .filter(    Q(activity__expire_date__isnull=True) | Q(activity__expire_date__gte=today),
+                activity__activity_type="v")
+        )
+    training = (Session.objects
+                .filter ( Q(activity__expire_date__isnull=True) | Q(activity__expire_date__gte=today),
+                         activity__activity_type="t")
+        )
+    queryset = (
+        Location.objects
+        .filter(deleted=False)
+        .order_by("loc_name")
+        .prefetch_related(
+            
+            Prefetch(
+                "sessions",  # must match the related_name on model
+                queryset=volunteer,
+                to_attr="volunteer"  # this creates the attribute you reference later
+            ),
+            Prefetch(
+                "sessions",
+                queryset=training,
+                to_attr="training"
+            )
+        ))
+    
+    print("queryset", queryset)   
+    get_data = request.GET.copy()
+
+    if "org_id" in get_data and "org" not in get_data:
+        get_data["org"]=get_data["org_id"]
+
+    filter_form=LocFilterForm(get_data or None)
+    
+    followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
+
+    locs=Paginator(queryset, 5)
+    page_number = request.GET.get('page')
+    page_obj = locs.get_page(page_number)
+
+    followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
+    counties = County.objects.all()
+    all_locs =Location.objects.filter(deleted=False).order_by("loc_name")
+    clean_get = request.GET.copy()
+    clean_get.pop("page", None)
+
+    return render(
+        request,
+        "orgs/locations.html",
+        {
+            "locs": queryset,
+            "q": q,
+            "followed_orgs": followed_orgs,
+            "filter_form": filter_form,
+            "counties": counties,
+            "query_params": clean_get,
+            "orgs": all_locs,
+        }
+    )
 
 def events(request):
     today = timezone.now().date()
-    current_window_end = today + timedelta(days=60)
-
+    
     q = request.GET.get("q", "")
     get_data = request.GET.copy()
+    current_sessions = Session.objects.filter(
+            start__isnull=False,  # ignore sessions without a start date
+            ).filter(
+                Q(start__gte=today) |  # future sessions
+                Q(start__lte=today, end__gte=today) |  # ongoing sessions with an end
+                Q(start__gte=today, end__isnull=True)  # started in the past, no end date
+        
+        ).order_by("start").select_related(
+            "activity",        # follow FK from Session -> Activity
+            "activity__org",   # Activity -> Organization
+            "location"         # Session -> Location
+        ).prefetch_related(
+            "activity__categories"  # m2m from Activity -> categories
+        )
     
-    ongoing_events = Event.objects.filter(date__lte=today).filter( Q(end_date__gte=today) | Q(end_date__isnull=True)).select_related('org', 'orgloc').order_by("date")
-    ongoing_roles = VolunteerRole.objects.filter(Q(expire_date__gte=today) | Q(expire_date__isnull=True)).select_related('org', 'orgloc')
-
-    current_events = Event.objects.filter( date__gt=today,date__lte=current_window_end).select_related('org', 'orgloc').order_by("date")
-
-    all_events = Event.objects.all().select_related('org', 'orgloc').order_by("date")
+    expired_sessions=Session.objects.filter(
+        start__lte =today
+        ).order_by("start").select_related(
+            "activity",        # follow FK from Session -> Activity
+            "activity__org",   # Activity -> Organization
+            "location"         # Session -> Location
+        ).prefetch_related(
+             "activity__categories"  # m2m from Activity -> categories
+        )
     
+    online = Session.objects.filter(
+        Q(end__gte=today) | Q(end__isnull=True),
+        session_format__in=["o","b"],
+        
+            ).order_by("start").select_related(
+                "activity",        # follow FK from Session -> Activity
+                "activity__org",   # Activity -> Organization
+                "location"         # Session -> Location
+            ).prefetch_related(
+                "activity__categories"  # m2m from Activity -> categories
+        )
 
-    online_events = Event.objects.upcoming().filter(online=True).select_related('org', 'orgloc')
-    online_roles = VolunteerRole.objects.filter(online=True).select_related('org', 'orgloc')
+    ongoing = Session.objects.filter(
+        Q(end__gte=today) | Q(end__isnull=True),
+         ongoing=True
+               
+            ).order_by("start").select_related(
+                "activity",        # follow FK from Session -> Activity
+                "activity__org",   # Activity -> Organization
+                "location"         # Session -> Location
+            ).prefetch_related(
+                "activity__categories"  # m2m from Activity -> categories
+        )
+
 
 
     filter_form=EventFilterForm(get_data or None)
@@ -256,102 +272,83 @@ def events(request):
         data = filter_form.cleaned_data
         
         if data.get("categories"):
-            current_events = current_events.filter(categories__in=data["categories"]).distinct()
-            online_events = online_events.filter(categories__in=data["categories"]).distinct()
-            online_roles = online_roles.filter(categories__in=data["categories"]).distinct()
-            ongoing_events = ongoing_events.filter(categories__in=data["categories"]).distinct()
-            ongoing_roles = ongoing_roles.filter(categories__in=data["categories"]).distinct()
-            all_events = all_events.filter(categories__in=data["categories"]).distinct()
+ 
+            current_sessions = current_sessions.filter(categories__in=data["categories"]).distinct()
+            expired_sessions = expired_sessions.filter(categories__in=data["categories"]).distinct()
+            online = online.filter(categories__in=data["categories"]).distinct()
+            ongoing = ongoing.filter(categories__in=data["categories"]).distinct()
 
         if data.get("type"):
-            current_events = current_events.filter(type=data["type"])
-            online_events = online_events.filter(type=data["type"])
-            
-            ongoing_events = ongoing_events.filter(type=data["type"])
-            
-            all_events = all_events.filter(type=data["type"])
+
+            current_sessions = current_sessions.filter(activity__activity_type=data["type"])
+            expired_sessions= expired_sessions.filter(activity__activity_type=data["type"])
+            online = online.filter(activity__activity_type = data["type"])
+            ongoing = ongoing.filter(activity__activity_type = data["type"])
 
         if data.get("county") :
-            current_events=current_events.filter(orgloc__county_id=data["county"])
-            online_events=online_events.filter(orgloc__county_id=data["county"])
-            online_roles=online_roles.filter(orgloc__county_id=data["county"])
-            ongoing_events=ongoing_events.filter(orgloc__county_id=data["county"])
-            ongoing_roles=ongoing_roles.filter(orgloc__county_id=data["county"])
-            all_events=all_events.filter(orgloc__county_id=data["county"])
-        
+            current_sessions = current_sessions.filter(location__county_id=data["county"])
+            expired_sessions=expired_sessions.filter(location__county_id=data["county"])
+            
         if data.get("org"):
-            current_events=current_events.filter(org=data["org"])
-            online_events=online_events.filter(org=data["org"])
-            online_roles=online_roles.filter(org=data["org"])
-            ongoing_events=ongoing_events.filter(org=data["org"])
-            ongoing_roles=ongoing_roles.filter(org=data["org"])
-            all_events=all_events.filter(org=data["org"])
+
+            current_sessions = current_sessions.filter(activity__org=data["org"])
+            expired_sessions = expired_sessions.filter(activity__org=data["org"])
+            online = online.filter(activity__org = data["org"])
+            ongoing = ongoing.filter(activity__org = data["org"])
 
         if data.get("my_orgs"):
             followed_orgs = request.user.profile.following_orgs.all()
-            current_events = current_events.filter(org__in=followed_orgs)
-            online_events = online_events.filter(org__in=followed_orgs)
-            online_roles = online_roles.filter(org__in=followed_orgs)
-            ongoing_events = ongoing_events.filter(org__in=followed_orgs)
-            ongoing_roles = ongoing_roles.filter(org__in=followed_orgs)
-            all_events = all_events.filter(org__in=followed_orgs)
+            
+            current_sessions = current_sessions.filter(activity__org__in=followed_orgs)
+            expired_sessions = expired_sessions.filter(activity__org__in=followed_orgs)
+            online = online.filter(activity__org__in=followed_orgs)
+            ongoing = ongoing.filter(activity__org__in=followed_orgs)     
 
         if data.get("region"):
-            current_events=current_events.filter(
-                Q(org__region_name=data["region"]) 
-                | Q(orgloc__region_name=data["region"])
+            current_sessions = current_sessions.filter(
+                Q(activity__org__region_name=data["region"]) 
+                | Q(location__region_name=data["region"])
             )
-            online_events=online_events.filter(
-                Q(org__region_name=data["region"]) 
-                | Q(orgloc__region_name=data["region"])
+            expired_sessions = expired_sessions.filter(
+                Q(activity__org__region_name=data["region"]) 
+                | Q(location__region_name=data["region"])
             )
-            online_roles=online_roles.filter(
-                Q(org__region_name=data["region"]) 
-                | Q(orgloc__region_name=data["region"])
+            online = online.filter(
+                Q(activity__org__region_name=data["region"]) 
+                | Q(location__region_name=data["region"])
             )
-            ongoing_events=ongoing_events.filter(
-                Q(org__region_name=data["region"]) 
-                | Q(orgloc__region_name=data["region"])
+            ongoing = ongoing.filter(
+               Q(activity__org__region_name=data["region"]) 
+                | Q(location__region_name=data["region"])
             )
-            ongoing_roles=ongoing_roles.filter(
-                Q(org__region_name=data["region"]) 
-                | Q(orgloc__region_name=data["region"])
-            )
-            all_events=all_events.filter(
-                Q(org__region_name=data["region"]) 
-                | Q(orgloc__region_name=data["region"])
-            )      
-        if data.get("q"):   
-            current_events = current_events.filter(Q(title=data["q"]) 
-                                    | Q(description__icontains=data["q"])
-                                    )      
-            online_events = online_events.filter(Q(title=data["q"]) 
-                                    | Q(description__icontains=data["q"])
-                                    )      
-            online_roles = online_roles.filter(Q(title=data["q"]) 
-                                    | Q(description__icontains=data["q"])
-                                    )      
-            ongoing_events = ongoing_events.filter(Q(title=data["q"]) 
-                                    | Q(description__icontains=data["q"])
-                                    )      
-            ongoing_roles = ongoing_roles.filter(Q(title=data["q"]) 
-                                    | Q(description__icontains=data["q"])
-                                    )      
-            all_events = all_events.filter(Q(title=data["q"]) 
-                                    | Q(description__icontains=data["q"])
-                                    )      
+            
+        if data.get("q"):  
+            current_sessions= current_sessions.filter(
+                Q(activity__title=data["q"]) 
+                   | Q(activity__description__icontains=data["q"])
+                 )      
+            expired_sessions = expired_sessions.filter(
+                Q(activity__title=data["q"]) 
+                   | Q(activity__description__icontains=data["q"])
+                 )      
+            online = online.filter(
+                 Q(activity__title=data["q"]) 
+                   | Q(activity__description__icontains=data["q"])
+                 )   
+            ongoing = ongoing .filter(
+                Q(activity__title=data["q"]) 
+                   | Q(activity__description__icontains=data["q"])
+                 )   
+             
                           
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
 
     return render(request, "orgs/events.html",{
-                    "current_events": current_events,
-                    "online_events": online_events,
-                    "online_roles": online_roles,
-                    "ongoing_events": ongoing_events,
-                    "ongoing_roles": ongoing_roles,
-                    "all_events": all_events,
-                    
+                    "sessions" : current_sessions,
+                    "expired_sessions": expired_sessions,
+                    "online": online,
+                    "ongoing": ongoing,
                     "filter_form": filter_form,
                     "query_params": clean_get,
                     "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
@@ -360,87 +357,6 @@ def events(request):
                   } )
 
 
-def event_list(request):
-    
-    q = request.GET.get("q", "")
-    queryset = Event.objects.filter(deleted=False).order_by("date")
-    get_data = request.GET.copy()
-
-    if "org_id" in get_data and "org" not in get_data:
-        get_data["org"]=get_data["org_id"]
-
-    if not get_data.get("filter_type"):
-        get_data["filter_type"] = "u"
-
-    filter_form=EventFilterForm(get_data or None)
- 
-    if filter_form.is_valid():
-        data = filter_form.cleaned_data
-        
-        if data.get("county") :
-            queryset=queryset.filter(orgloc__county_id=data["county"])
-        
-        if data.get("org"):
-            queryset=queryset.filter(org=data["org"])
-
-        if data.get("my_orgs"):
-            followed_orgs = request.user.profile.following_orgs.all()
-            queryset = queryset.filter(org__in=followed_orgs)
-            
-
-        if data.get("region"):
-            queryset=queryset.filter(
-                Q(org__region_name=data["region"]) 
-                | Q(orgloc__region_name=data["region"])
-            )
-       
-        if data.get("categories"):
-            queryset=queryset.filter(categories__in=data["categories"]).distinct()
-
-        if data.get("type"):
-            queryset = queryset.filter(type=data["type"])
-
-        filter_type = data.get("filter_type")
-
-        if  filter_type == "u":
-
-            queryset = queryset.upcoming()
-
-        elif filter_type == "o":
-            queryset = queryset.online()
-
-        elif filter_type == "p":
-            queryset = queryset.past()
-            
-        elif filter_type == "a":
-            queryset = queryset.all_visible()
-        
-        q=filter_form.cleaned_data.get("q")
-        if data.get("q"):
-            q=data["q"]
-            queryset =queryset.filter(Q(title=q) 
-                                    | Q(description__icontains=q)
-                                    | Q(org__org_name__icontains=q)
-                                    | Q(orgloc__loc_name__icontains=q)
-                                    )
-
-
-    events=Paginator(queryset, 5)
-    page_number = request.GET.get('page')
-    page_obj = events.get_page(page_number)
-    orgs= Organization.objects.filter(deleted=False).order_by("org_name")
-   
-    clean_get = request.GET.copy()
-    clean_get.pop("page", None)
-
-    return render(request, "orgs/event_list.html",{
-                    "events": page_obj,
-                    "filter_form": filter_form,
-                    "query_params": clean_get,
-                    "orgs": orgs,
-                    "cats": EventCategory.objects.all(),
-                    "q":q, # i needed to pass this q from teh filter_form so i can highlight the search text in the html
-                  } )
 
 
 def follow_org(request, org_id):
@@ -478,7 +394,7 @@ def org_detail(request, org_id=None, view_only=False):
                                     
     if request.method == "POST" and not view_only:
         form= OrgForm(request.POST, instance=org)
-        loc_formset = OrgLocationFormSet(request.POST, instance=org)
+        loc_formset = LocationFormSet(request.POST, instance=org, prefix="locations")
         
         if request.user.is_authenticated and not can_edit:
              messages.error(request, "You do not have permission to update this record.")
@@ -521,7 +437,7 @@ def org_detail(request, org_id=None, view_only=False):
         
     else:
         form = OrgForm(instance=org)
-        loc_formset = OrgLocationFormSet(instance=org)
+        loc_formset = LocationFormSet(instance=org, prefix="locations")
         
     if view_only:
         for field in form.fields.values():
@@ -536,50 +452,50 @@ def org_detail(request, org_id=None, view_only=False):
                 "can_edit": can_edit})
 
 
-def role_view(request, role_id=None):
+def loc_view(request, loc_id=None):
     can_edit=False 
-    view_only = request.resolver_match.url_name == "role_view"
-    if role_id:
-        role = get_object_or_404(VolunteerRole, id=role_id)
-        if request.user.profile.staff or role.org.owner==request.user.profile:
+    view_only = request.resolver_match.url_name == "loc_view"
+    if loc_id:
+        loc = get_object_or_404(Location, id=loc_id)
+        if request.user.profile.staff or loc.org.owner==request.user.profile:
             can_edit=True
     else:
-        role = None
+        loc = None
         if request.user.is_authenticated:
             can_edit=True
                                 
     if request.method == "POST" and not view_only:
-        form= RoleForm(request.POST, instance=role)
+        form= LocForm(request.POST, instance=loc)
         if not form.is_valid():
             print(form.errors)
         if form.is_valid():
-            role = form.save(commit=False)
-            print("ROLE ORG:", role.org)
-            role.save()
-            print("SAVED ROLE:", role)
-            print("ROLE ID AFTER SAVE:", role.id)
-            messages.success(request, "Role details saved successfully.")
-            return redirect("role_view", role_id=role.id)
+            loc = form.save(commit=False)
+            print("loc org:", loc.org)
+            loc.save()
+            print("SAVED loc:", loc)
+            print("loc ID AFTER SAVE:", loc.id)
+            messages.success(request, "loc details saved successfully.")
+            return redirect("loc_view", loc_id=loc.id)
         else:
             messages.error(request, "there are errors in the form.")
-            print("role form errors",form.errors)
+            print("loc form errors",form.errors)
             print("non field error", form.non_field_errors())
-            return render(request, "orgs/role_form.html", {
-                "role": role,
+            return render(request, "orgs/location_form.html", {
+                "loc": loc,
                 "form": form,
                 "view_only": view_only,
                 "can_edit": can_edit,
              })
         
     else:
-        form = RoleForm(instance=role)
+        form = LocForm(instance=loc)
         
     if view_only:
         for field in form.fields.values():
             field.disabled = True
         
-    return render(request, "orgs/role_form.html", {
-                "role": role,
+    return render(request, "orgs/location_form.html", {
+                "loc": loc,
                 "form": form,
                 "view_only": view_only,
                 "can_edit": can_edit})
@@ -632,16 +548,16 @@ def load_orgloc(request):
     
     if org_id:
         selected_qs =( 
-            OrgLocation.objects
+            Location.objects
             .filter(org_id=org_id, deleted=False)
             .select_related("org")
             .order_by("loc_name"))
     else:
-        selected_qs = OrgLocation.objects.none()
+        selected_qs = Location.objects.none()
     
     # Get locations for the selected org - if you have one
     other_qs=(
-        OrgLocation.objects
+        Location.objects
         .filter( deleted=False)
         .exclude(org_id=org_id)
         .select_related("org")
@@ -726,3 +642,56 @@ def profile_view(request):
 
     return render(request, "orgs/profile.html", {"form": form})
     
+def activity_form_view(request, activity_id=None):
+
+    view_only = request.resolver_match.url_name == "activity_view"
+    can_edit = False
+    tab = "current"
+    if activity_id:
+        activity = get_object_or_404(Activity, id=activity_id)
+        if request.user.profile.staff or activity.org.owner == request.user.profile:
+            can_edit = True
+    else:
+        activity = None
+        if request.user.is_authenticated:
+            can_edit = True
+
+    if request.user.profile.staff:
+        can_edit = True
+
+
+    if request.method == "POST" and not view_only:
+
+        activity_form = ActivityForm(request.POST, instance=activity)
+        
+        if activity_form.is_valid():
+            activity = activity_form.save()
+            session_formset = SessionFormSet(request.POST, instance=activity, prefix="sessions")
+
+            if session_formset.is_valid():
+                activity.save()
+                session_formset.save()
+            
+            print("Session formset errors:", session_formset.errors)
+            print("Management errors:", session_formset.management_form.errors)
+            print("main form errors" , activity_form.errors)
+            return redirect(f"{reverse('events')}#activity-{activity.id}")
+
+
+    else:
+        activity_form = ActivityForm(instance=activity)
+        session_formset = SessionFormSet(instance=activity, prefix="sessions")
+
+
+    if view_only:
+        for field in activity_form.fields.values():
+            field.disabled = True
+
+    print ("can edit", can_edit)
+    return render(request, "orgs/activity_form.html", {
+        "activity": activity,
+        "activity_form": activity_form,
+        "session_formset": session_formset,
+        "can_edit": can_edit,
+        "view_only": view_only,
+    })
