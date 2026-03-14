@@ -122,7 +122,7 @@
         <!-- Info Tab -->
         <div class="tab-pane fade show active" id="v-pills-info{{ org.id }}" role="tabpanel">
           {% if org.about %}
-            <div class="description-block text-secondary">
+            <div class="description-block">
               <div class = "desc-short"> {{ org.about|truncatechars:250 }} </div>
                <div class="desc-full d-none"> {{ org.about|highlight:q|safe }} </div> 
                {% if not q %} 

@@ -36,7 +36,7 @@
             {% if request.path != "/" %}<li class ="nav-item"><a class="nav-link" href="{% url 'index' %}">Orgs</a></li>{% endif %}
 
             {% if user.is_authenticated %}
-                {% if request.path != "/eventlist/" %}<li class="nav-item"><a class="nav-link" href="{% url 'events' %}">
+                {% if request.path != "/activities/" %}<li class="nav-item"><a class="nav-link" href="{% url 'activities' %}">
                     Activities</a></li>{% endif %}
                 {% if request.path != "/locations/" %}<li class="nav-item"><a class="nav-link" href="{% url 'locations' %}">
                     Locations</a></li>{% endif %}

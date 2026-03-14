@@ -79,7 +79,6 @@ class EventFilterForm(forms.Form):
         widget=forms.Select(attrs={"class":"form-select"})
     )
 
-
     org= forms.ModelChoiceField(
         queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
         required=False,

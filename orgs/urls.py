@@ -28,7 +28,7 @@ urlpatterns = [
     path("locs/<int:loc_id>/", views.loc_view, name="loc_view"),
 
     path("eventlist/", views.events, name="events"),
-    path("ajax/load-orgloc/", views.load_orgloc, name="ajax_load_orgloc"),
+    path("activities/", views.activities, name="activities"),
     path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
     path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),

@@ -4,6 +4,17 @@ console.log("FORMSET SCRIPT LOADED");
 // --- run after DOM is ready ---
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded and parsed");
+    const tabButtons = document.querySelectorAll('#eventTabs button[data-bs-toggle="tab"]');
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener('shown.bs.tab', function (event) {
+        // event.target = newly activated tab button
+        const targetId = event.target.getAttribute('data-bs-target'); // e.g. "#online"
+        history.replaceState(null, '', targetId); // updates URL hash without reloading
+        });
+    });
+
+
     // Check if the URL has a hash like #activity-123
     const hash = window.location.hash;
 
@@ -13,7 +24,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
 
-                const tabPane = targetEl.closest(".tab-pane");
+                const tabPane =targetEl.classList.contains("tab-pane")
+                        ? targetEl
+                        : targetEl.closest(".tab-pane");
                 if (tabPane && !tabPane.classList.contains("show", "active")) {
                     const tabId = tabPane.id;
                     const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);

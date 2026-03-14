@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+from datetime import timedelta
 
 region_list = [
     ('C','Central')
@@ -148,9 +149,12 @@ class Activity(models.Model):
     contact_email = models.EmailField(default="", blank=True)
     migrated_from_event = models.IntegerField(null=True,blank=True)
 
+    created = models.DateTimeField(auto_now_add=True) 
     def __str__(self):
         return f"{self.title} ({self.org})"
-
+    @property
+    def is_newly_added(self):
+        return self.created >= timezone.now() - timedelta(days=30)
 
 class ActivityQuerySet(models.QuerySet):
     def volunteer(self):
@@ -162,6 +166,28 @@ class ActivityQuerySet(models.QuerySet):
             activity_type="t"
         )
 
+class SessionQuerySet(models.QuerySet):
+
+    def current(self):
+        today = timezone.now().date()
+
+        return self.filter(
+            Q(start__isnull=True) |
+            Q(start__gte=today) |
+            (Q(start__lt=today) & (Q(end__isnull=True) | Q(end__gte=today)))
+        )
+    def upcoming(self):
+        today = timezone.now().date()
+        return self.filter(start__gte=today)
+
+    def ongoing(self):
+        today = timezone.now().date()
+        return self.filter(
+            start__lt=today
+        ).filter(
+            Q(end__isnull=True) | Q(end__gte=today)
+        )
+    
 class Session(models.Model):
     activity=models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="sessions")
     session_format = models.CharField(max_length=1 ,
@@ -172,9 +198,11 @@ class Session(models.Model):
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
     
+    objects = SessionQuerySet.as_manager()
 
     def __str__(self):
         return f"{self.activity.title} – {self.start}"
+  
     @property
     def region_image(self):
         # 1️⃣ If event has orgloc, use that region
