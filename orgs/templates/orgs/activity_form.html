@@ -14,15 +14,7 @@
 
 <form method="post">
  {% csrf_token %}
- {% if can_edit %}
-    {% if view_only %}
-         <button type="button"><a href="{% url 'activity_edit' activity.id %}" class="btn btn-primary">Edit</a></button>        
-    {% else %}
-       <button type ="submit" class="btn btn-primary">
-            Save
-        </button>
-    {% endif %}
- {% endif %}    
+ 
  {% if activity.org.owner == request.user.profile %}
     <span class="text-muted">You are the owner of this organization that sponsored this activity.</span>
  {% endif %}
@@ -98,11 +90,19 @@
 
     <h3>Sessions</h3>
     <div class="formset" data-prefix="locations">
-        {% if not view_only %}
-            <button type="button" id="add-btn" class="btn btn_primary">
+    {% if can_edit %}
+    {% if view_only %}
+         <button type="button"><a href="{% url 'activity_edit' activity.id %}" class="btn btn-primary">Edit</a></button>        
+    {% else %}
+       <button type ="submit" class="btn btn-primary">
+            Save
+        </button>
+        <button type="button" id="add-btn" class="btn btn_primary">
             Add Sessions
         </button>
-        {% endif %}
+    {% endif %}
+ {% endif %}    
+       
 
         {{ session_formset.management_form }}
         <table class="formset-table {% if view_only %}view-mode{% endif %}">

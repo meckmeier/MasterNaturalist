@@ -8,21 +8,10 @@
         {% endfor %}
     </ul>
 {% endif %}
-     <button type="button"><a href ="{% url 'events' %}?org= {{ org.id }}" class="btn btn-primary">Go to Actvities</a></button>
      
     
-    {% if can_edit %}
-        {% if not view_only %}
-            
-                Check this box if you want to delete this organization: {{form.deleted}}
-            {% if org %}
-                <button type="button"><a href="{% url 'activity_create' %}?org_id={{ org.id }}" class="btn btn-primary">Add Activity</a></button>n>
-                
-            {% endif %}
-            
-        {% else %}
-            <button type="button"><a href="{% url 'org_edit' org.id %}" class="btn btn-primary">Edit</a></button>
-        {% endif %}
+    {% if can_edit and org %}
+         <button type="button"><a href="{% url 'org_edit' org.id %}" class="btn btn-primary">Edit</a></button>
     {% endif %}    {% if org.owner == request.user.profile %}
     <p class="text-muted">You are the owner of this organization.</p>
 {% endif %}
