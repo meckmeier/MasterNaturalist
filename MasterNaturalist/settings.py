@@ -29,9 +29,17 @@ SITE_ID = 1
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
+DEBUG = True
 ALLOWED_HOSTS = ['*']
+# Database
+# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default="postgresql://postgres:password1@localhost:5432/volunteer_db"
+        #default="postgresql://meckmeier:1Lo4vGCrzw6gdg6cHswJtPqqKQ1YnoYG@dpg-d6rbv3buibrs739m123g-a.oregon-postgres.render.com/naturalist_db"
+    )
+}
 
 
 # Application definition
@@ -79,14 +87,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'MasterNaturalist.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-DATABASES = {
-    'default': dj_database_url.config(
-        default="postgresql://postgres:password1@localhost:5432/volunteer_db"
-    )
-}
 
 AUTH_USER_MODEL = 'orgs.User'
 

@@ -1,5 +1,7 @@
 {% load static %}
 {% load highlight %}
+{% load can_edit_filters %}
+
 
  <div class="card shadow-sm mb-3 border-1"  id="activity-{{ e.id }}">
       <!-- Title row -->
@@ -12,7 +14,7 @@
             {%else%} <i class="bi bi-tree" data-bs-toggle="tooltip" title="Volunteer Opportunity"></i>{% endif %}</strong></span>
           
           {% if q %}{{ e.title|highlight:q|safe  }}{% else %}{{ e.title }}{% endif %}
-           <a href="{% url 'activity_edit' e.id%}"><i class="bi bi-pencil-fill" data-bs-toggle="tooltip" title="Edit activity"></i></a> 
+          {% if e|can_edit:request.user %} <a href="{% url 'activity_edit' e.id%}"><i class="bi bi-pencil-fill" data-bs-toggle="tooltip" title="Edit activity"></i></a>{% endif %}
             
        </h5>
        </div>

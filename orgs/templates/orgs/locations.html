@@ -63,6 +63,7 @@
 {% block body %}
 {% load static %}
 {% load highlight %}
+{% load can_edit_filters %}
 {% with query_params.urlencode as query_string %}
 
 <div class="container my-4">
@@ -79,7 +80,8 @@
          {% else %}
           {{ loc.loc_name }}
           {% endif %}
-          <span class="mt-2 small text-muted"><a href="{% url 'loc_edit' loc.id %}"><i class="bi bi-pencil-fill"></i></a></h4>
+          {% if loc|can_edit:request.user %}<span class="mt-2 small text-muted"><a href="{% url 'loc_edit' loc.id %}"><i class="bi bi-pencil-fill"></i></a>{% endif %}
+          </h4>
           
           {% if loc.org %}
             <div class="mt-2 small text-muted">{{loc.org.org_name}}</div>{% endif %}

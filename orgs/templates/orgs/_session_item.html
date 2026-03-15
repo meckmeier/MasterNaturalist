@@ -1,5 +1,6 @@
 {% load static %}
 {% load highlight %}
+{% load can_edit_filters %}
 
  <div class="card shadow-sm mb-3 border-1"  id="activity-{{ e.activity.id }}">
       <!-- Date row -->
@@ -23,7 +24,7 @@
             {% else %} <i class="bi bi-tree" data-bs-toggle="tooltip" title="Volunteer Opportunity"></i>{% endif %}</strong></span>
           
           {% if q %}{{ e.activity.title|highlight:q|safe  }}{% else %}{{ e.activity.title }}{% endif %}
-           <a href="{% url 'activity_edit' e.activity_id%}"><i class="bi bi-pencil-fill"></i></a>
+          {% if e.activity|can_edit:request.user %}<a href="{% url 'activity_edit' e.activity_id%}"><i class="bi bi-pencil-fill"></i></a>{% endif %}
           <div class="mt-2 small text-muted">Sponsored by: {{e.activity.org.org_name}}</div>
          
           

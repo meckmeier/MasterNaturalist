@@ -93,6 +93,11 @@ class Organization(models.Model):
     def follower_count(self):
         return self.following.count()
     
+    def can_edit(self, user):
+        if not user.is_authenticated:
+            return False
+        return user.is_staff or self.owner == user
+    
     @property
     def region_image(self):
         return REGION_IMAGE_MAP.get(
@@ -120,6 +125,7 @@ class Location(models.Model):
     org_loc_url = models.URLField(max_length=200, default="", blank=True)
     location_about = models.TextField(default="", blank=True , null=True)
     contact_email = models.EmailField(default="", blank=True)
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_locs', default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)
 
     class Meta:
@@ -127,6 +133,12 @@ class Location(models.Model):
 
     def __str__(self):
         return f"{self.loc_name}"
+    
+    def can_edit(self, user):
+        if not user.is_authenticated:
+            return False
+        return user.is_staff or self.org.owner == user  or self.owner == user
+    
     @property
     def region_image(self):
         return REGION_IMAGE_MAP.get(
@@ -147,11 +159,19 @@ class Activity(models.Model):
     activity_url = models.URLField(max_length=200, default="", blank=True)
     no_cost = models.BooleanField(default=False)
     contact_email = models.EmailField(default="", blank=True)
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_acts', default="", null=True, blank=True)
+   
     migrated_from_event = models.IntegerField(null=True,blank=True)
 
     created = models.DateTimeField(auto_now_add=True) 
     def __str__(self):
         return f"{self.title} ({self.org})"
+    
+    def can_edit(self, user):
+        if not user.is_authenticated:
+            return False
+        return user.is_staff or self.org.owner == user or self.owner == user
+    
     @property
     def is_newly_added(self):
         return self.created >= timezone.now() - timedelta(days=30)
