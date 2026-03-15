@@ -1,0 +1,2293 @@
+[
+{
+  "model": "orgs.commitment",
+  "pk": 1,
+  "fields": {
+    "time": "1 hour"
+  }
+},
+{
+  "model": "orgs.commitment",
+  "pk": 2,
+  "fields": {
+    "time": "2-4 hours"
+  }
+},
+{
+  "model": "orgs.commitment",
+  "pk": 3,
+  "fields": {
+    "time": "1 day"
+  }
+},
+{
+  "model": "orgs.commitment",
+  "pk": 4,
+  "fields": {
+    "time": "2-4 days"
+  }
+},
+{
+  "model": "orgs.commitment",
+  "pk": 5,
+  "fields": {
+    "time": "5 + days"
+  }
+},
+{
+  "model": "orgs.commitment",
+  "pk": 6,
+  "fields": {
+    "time": "Ongoing"
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 1,
+  "fields": {
+    "name": "Education",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 2,
+  "fields": {
+    "name": "Citizen Science",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 3,
+  "fields": {
+    "name": "Stewardship",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 4,
+  "fields": {
+    "name": "Wildlife",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 5,
+  "fields": {
+    "name": "Aquatic Life",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 6,
+  "fields": {
+    "name": "Ecology",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 7,
+  "fields": {
+    "name": "Geology",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 8,
+  "fields": {
+    "name": "Weather & Climate",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 9,
+  "fields": {
+    "name": "Human Interactions",
+    "description": null
+  }
+},
+{
+  "model": "orgs.eventcategory",
+  "pk": 10,
+  "fields": {
+    "name": "Plants",
+    "description": null
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 1,
+  "fields": {
+    "county_name": "ADAMS",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 2,
+  "fields": {
+    "county_name": "ASHLAND",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 3,
+  "fields": {
+    "county_name": "BARRON",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 4,
+  "fields": {
+    "county_name": "BAYFIELD",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 5,
+  "fields": {
+    "county_name": "BROWN",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 6,
+  "fields": {
+    "county_name": "BUFFALO",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 7,
+  "fields": {
+    "county_name": "BURNETT",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 8,
+  "fields": {
+    "county_name": "CALUMET",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 9,
+  "fields": {
+    "county_name": "CHIPPEWA",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 10,
+  "fields": {
+    "county_name": "CLARK",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 11,
+  "fields": {
+    "county_name": "COLUMBIA",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 12,
+  "fields": {
+    "county_name": "CRAWFORD",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 13,
+  "fields": {
+    "county_name": "DANE",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 14,
+  "fields": {
+    "county_name": "DODGE",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 15,
+  "fields": {
+    "county_name": "DOOR",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 16,
+  "fields": {
+    "county_name": "DOUGLAS",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 17,
+  "fields": {
+    "county_name": "DUNN",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 18,
+  "fields": {
+    "county_name": "EAU CLAIRE",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 19,
+  "fields": {
+    "county_name": "FLORENCE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 20,
+  "fields": {
+    "county_name": "FOND DU LAC",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 21,
+  "fields": {
+    "county_name": "FOREST",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 22,
+  "fields": {
+    "county_name": "GRANT",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 23,
+  "fields": {
+    "county_name": "GREEN",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 24,
+  "fields": {
+    "county_name": "GREEN LAKE",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 25,
+  "fields": {
+    "county_name": "IOWA",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 26,
+  "fields": {
+    "county_name": "IRON",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 27,
+  "fields": {
+    "county_name": "JACKSON",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 28,
+  "fields": {
+    "county_name": "JEFFERSON",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 29,
+  "fields": {
+    "county_name": "JUNEAU",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 30,
+  "fields": {
+    "county_name": "KENOSHA",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 31,
+  "fields": {
+    "county_name": "KEWAUNEE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 32,
+  "fields": {
+    "county_name": "LA CROSSE",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 33,
+  "fields": {
+    "county_name": "LAFAYETTE",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 34,
+  "fields": {
+    "county_name": "LANGLADE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 35,
+  "fields": {
+    "county_name": "LINCOLN",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 36,
+  "fields": {
+    "county_name": "MANITOWOC",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 37,
+  "fields": {
+    "county_name": "MARATHON",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 38,
+  "fields": {
+    "county_name": "MARINETTE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 39,
+  "fields": {
+    "county_name": "MARQUETTE",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 40,
+  "fields": {
+    "county_name": "MENOMINEE",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 41,
+  "fields": {
+    "county_name": "MILWAUKEE",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 42,
+  "fields": {
+    "county_name": "MONROE",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 43,
+  "fields": {
+    "county_name": "OCONTO",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 44,
+  "fields": {
+    "county_name": "ONEIDA",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 45,
+  "fields": {
+    "county_name": "OUTAGAMIE",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 46,
+  "fields": {
+    "county_name": "OZAUKEE",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 47,
+  "fields": {
+    "county_name": "PEPIN",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 48,
+  "fields": {
+    "county_name": "PIERCE",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 49,
+  "fields": {
+    "county_name": "POLK",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 50,
+  "fields": {
+    "county_name": "PORTAGE",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 51,
+  "fields": {
+    "county_name": "PRICE",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 52,
+  "fields": {
+    "county_name": "RACINE",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 53,
+  "fields": {
+    "county_name": "RICHLAND",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 54,
+  "fields": {
+    "county_name": "ROCK",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 55,
+  "fields": {
+    "county_name": "RUSK",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 56,
+  "fields": {
+    "county_name": "SAUK",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 57,
+  "fields": {
+    "county_name": "SAWYER",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 58,
+  "fields": {
+    "county_name": "SHAWANO",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 59,
+  "fields": {
+    "county_name": "SHEBOYGAN",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 60,
+  "fields": {
+    "county_name": "ST. CROIX",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 61,
+  "fields": {
+    "county_name": "Statewide",
+    "region_name": "St"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 62,
+  "fields": {
+    "county_name": "TAYLOR",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 63,
+  "fields": {
+    "county_name": "TREMPEALEAU",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 64,
+  "fields": {
+    "county_name": "VERNON",
+    "region_name": "SW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 65,
+  "fields": {
+    "county_name": "VILAS",
+    "region_name": "NE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 66,
+  "fields": {
+    "county_name": "WALWORTH",
+    "region_name": "SC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 67,
+  "fields": {
+    "county_name": "WASHBURN",
+    "region_name": "NW"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 68,
+  "fields": {
+    "county_name": "WASHINGTON",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 69,
+  "fields": {
+    "county_name": "WAUKESHA",
+    "region_name": "SE"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 70,
+  "fields": {
+    "county_name": "WAUPACA",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 71,
+  "fields": {
+    "county_name": "WAUSHARA",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 72,
+  "fields": {
+    "county_name": "WINNEBAGO",
+    "region_name": "EC"
+  }
+},
+{
+  "model": "orgs.county",
+  "pk": 73,
+  "fields": {
+    "county_name": "WOOD",
+    "region_name": "C"
+  }
+},
+{
+  "model": "orgs.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$hCzQMVhML67CqkAElKNseo$TMgFeoRRXTOelOcoJ0D3jMiF4gMdTZSJfMjL8ndICiY=",
+    "last_login": "2026-03-13T13:18:12.162Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "mary@eckmeier.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-21T21:42:43.575Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "orgs.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$6GkhjwNF51kW2IAIU3u4L1$SBKLTC1NOKKVJh+ZWOXjk0DXrzEjXGAxE9iv+Rnw48w=",
+    "last_login": "2026-03-14T21:31:21.007Z",
+    "is_superuser": true,
+    "username": "mary",
+    "first_name": "Mary",
+    "last_name": "Eckmeier",
+    "email": "mary@eckmeier.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-02-21T21:46:43Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "orgs.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$1emlupYkUBE5bgxuxwfHm3$LE4hCGoxU8x8G4zHnyv5hQJgNR0qE3yhQZ+eITJWgsI=",
+    "last_login": "2026-03-14T21:29:25.356Z",
+    "is_superuser": false,
+    "username": "becky",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-12T15:19:23.304Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "orgs.profile",
+  "pk": 1,
+  "fields": {
+    "user": 2,
+    "bio": "More about me.",
+    "staff": true,
+    "preferred_region": "NW",
+    "include_online": true
+  }
+},
+{
+  "model": "orgs.profile",
+  "pk": 2,
+  "fields": {
+    "user": 1,
+    "bio": "",
+    "staff": true,
+    "preferred_region": "",
+    "include_online": true
+  }
+},
+{
+  "model": "orgs.profile",
+  "pk": 3,
+  "fields": {
+    "user": 4,
+    "bio": "",
+    "staff": false,
+    "preferred_region": "",
+    "include_online": true
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 1,
+  "fields": {
+    "org_name": "Wisconsin State Parks",
+    "org_url": "https://dnr.wisconsin.gov/topic/Parks",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "The Wisconsin State Park System provides places for outdoor recreation and for learning about nature and conservation. State parks, forests, trails and recreation areas see more than 20 million visits a year. Come and join the fun!",
+    "region_name": "St",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 2,
+  "fields": {
+    "org_name": "Natural Resources Foundation",
+    "org_url": "https://www.wisconservation.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "Since 1986, The Natural Resources Foundation of Wisconsin (NRF) has protected Wisconsin’s lands, waters, and wildlife by providing funding, leading partnerships, and connecting all people with nature.",
+    "region_name": "St",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 3,
+  "fields": {
+    "org_name": "University of Wisconsin, Madison",
+    "org_url": "https://www.wisc.edu/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "Provides a variety of programs that support the Master Naturalist program.",
+    "region_name": "SC",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 4,
+  "fields": {
+    "org_name": "Wisconsin Association for Environmental Education",
+    "org_url": "https://www.waee.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "The Wisconsin Association for Environmental Education is a community of individuals and organizations with diverse backgrounds that provides tools and resources to address environmental, health, and social injustices through environmental education to expand access to nature for all people.",
+    "region_name": "C",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 5,
+  "fields": {
+    "org_name": "University of Wisconsin, Stevens Point",
+    "org_url": "",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "",
+    "region_name": "C",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 6,
+  "fields": {
+    "org_name": "Wild Ones",
+    "org_url": "https://wildones.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "Wild Ones promotes native landscapes through education, advocacy, and collaborative action.",
+    "region_name": "St",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 7,
+  "fields": {
+    "org_name": "Wehr Nature Center",
+    "org_url": "https://www.wehrnaturecenter.com/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "Wehr Nature Center is a place where everyone belongs. Open year-round, we offer accessible buildings, trails, and park features designed for visitors of all ages and abilities. Wander our more than five-miles of trails traversing five distinct habitats all within a five-minute walk. Enjoy universally designed exhibits, comfortable restrooms, and hands-on unique programs that bring people together through nature all year round.",
+    "region_name": "SE",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 8,
+  "fields": {
+    "org_name": "Milwaukee Southwest/Wehr chapter of Wild Ones",
+    "org_url": "https://milwaukeesouthwestwehr.wildones.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "The Milwaukee Southwest/Wehr  chapter is an active &  vibrant chapter serving southern Milwaukee and Waukesha Counties. We offer new member support, mentoring, an extensive lending library, excellent programs and field trips, seed exchanges, and native plant sales. We pride ourselves on good communication and quality programming in a supportive, friendly setting.",
+    "region_name": "SE",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 9,
+  "fields": {
+    "org_name": "Schlitz Audubon Nature Center",
+    "org_url": "https://www.schlitzaudubon.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "Located in Milwaukee, Wisconsin, our mission is to conserve our land’s diverse habitats on Lake Michigan and provide meaningful experiences and environmental education for all.",
+    "region_name": "SE",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 10,
+  "fields": {
+    "org_name": "Wisconsin Wetland Association",
+    "org_url": "https://www.wisconsinwetlands.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "We are dedicated to the protection, restoration, and enjoyment of wetlands and associated ecosystems through science-based programs, education, and advocacy.",
+    "region_name": "St",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 11,
+  "fields": {
+    "org_name": "Emerson Elementary School",
+    "org_url": "https://emerson.madison.k12.wi.us/",
+    "in_wisconsin": false,
+    "host": false,
+    "about": "",
+    "region_name": "SC",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 12,
+  "fields": {
+    "org_name": "Badgerland Girl Scouts",
+    "org_url": "https://www.gsbadgerland.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "With your support, they shine. Girl Scouts need a champion. They need a community willing to invest in their dreams. They need a network of alums and supporters cheering them on and showing them what’s possible.",
+    "region_name": "St",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 13,
+  "fields": {
+    "org_name": "Wisconsin State Areas",
+    "org_url": "https://dnr.wisconsin.gov/topic/Lands/WildlifeAreas/alpha",
+    "in_wisconsin": false,
+    "host": false,
+    "about": "All wildlife areas are open to a full range of traditional outdoor recreational uses. These include hunting, fishing, trapping, hiking, nature study and berry picking. Dog training or trialing (hunting dog competitions) may be allowed by permit. A limited number of properties allow additional outdoor recreation at designated locations such as seasonal primitive camping, bicycling, horseback riding and snowmobiling.",
+    "region_name": "St",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 14,
+  "fields": {
+    "org_name": "Oscar Grady Public Library",
+    "org_url": "https://oscargradylibrary.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "Seeking Master Naturalists speakers for library programming at Oscar Grady Public Library in Saukville. Specific topic requests include the Great Lakes watershed, and safe and responsible foraging. Contact Elizabeth Wroblewski, ewroblewski@oscargradylibrary.org or 262-284-6022.",
+    "region_name": "SE",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 15,
+  "fields": {
+    "org_name": "Wisconsin Sea Grant",
+    "org_url": "https://www.seagrant.wisc.edu",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "Wisconsin Sea Grant is a statewide program of basic and applied research, education, outreach and technology transfer dedicated to the stewardship and sustainable use of the nation’s Great Lakes and ocean resources.",
+    "region_name": "St",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 2,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 16,
+  "fields": {
+    "org_name": "US Fish and Wildlife Service",
+    "org_url": "https://www.fws.gov/",
+    "in_wisconsin": false,
+    "host": false,
+    "about": "Working with others to conserve, protect, and enhance fish, wildlife, plants, and their habitats for the continuing benefit of the American people.",
+    "region_name": "St",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 2,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.organization",
+  "pk": 17,
+  "fields": {
+    "org_name": "Eagle Nature Trail",
+    "org_url": "https://www.eaglenaturetrail.org/",
+    "in_wisconsin": true,
+    "host": false,
+    "about": "Preserving the rustic beauty of Eagle through restoration and re-creation of prairie, woodland, and pond ecosystems",
+    "region_name": "NE",
+    "training_url": "",
+    "volunteer_url": "",
+    "owner": 1,
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.followorg",
+  "pk": 4,
+  "fields": {
+    "profile": 1,
+    "followOrg": 12
+  }
+},
+{
+  "model": "orgs.followorg",
+  "pk": 5,
+  "fields": {
+    "profile": 1,
+    "followOrg": 11
+  }
+},
+{
+  "model": "orgs.followorg",
+  "pk": 6,
+  "fields": {
+    "profile": 3,
+    "followOrg": 11
+  }
+},
+{
+  "model": "orgs.followorg",
+  "pk": 7,
+  "fields": {
+    "profile": 3,
+    "followOrg": 8
+  }
+},
+{
+  "model": "orgs.followorg",
+  "pk": 8,
+  "fields": {
+    "profile": 3,
+    "followOrg": 17
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 2,
+  "fields": {
+    "org": 3,
+    "loc_name": "UW Arboretum",
+    "physical_location": true,
+    "address": "1207 Seminole Highway",
+    "city_name": "Madison",
+    "county_id": 13,
+    "region_name": "SC",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://arboretum.wisc.edu/",
+    "location_about": "Widely recognized as the site of historic research in ecological restoration, the Arboretum includes the oldest and most varied collection of restored ecological communities in the world.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 3,
+  "fields": {
+    "org": 5,
+    "loc_name": "Central Wisconsin Environment Station (CWES)",
+    "physical_location": true,
+    "address": "10186 County Road MM",
+    "city_name": "Amherst Junction",
+    "county_id": 50,
+    "region_name": "C",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://www.uwsp.edu/cwes/home/",
+    "location_about": "The Central Wisconsin Environmental Station (CWES) is a 200-acre teaching and learning center located 17 miles east of Stevens Point overlooking glacial Sunset Lake. Since 1975, CWES has been an integral part of the University of Wisconsin – Stevens Point College of Natural Resources Environmental Education and Interpretation program. CWES features two lakes, hiking and snowshoe trails, and Scandinavian-style log cabins. The nearby Iola Winter Sports Club features affordable equipment rentals and over 20 kilometers of groomed cross country skiing trails for an optional Nordic ski adventure during the workshop.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 4,
+  "fields": {
+    "org": 6,
+    "loc_name": "Milwaukee Southwest/Wehr chapter",
+    "physical_location": false,
+    "address": "",
+    "city_name": null,
+    "county_id": 41,
+    "region_name": "SC",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://milwaukeesouthwestwehr.wildones.org/",
+    "location_about": "The Milwaukee Southwest/Wehr  chapter is an active &  vibrant chapter serving southern Milwaukee and Waukesha Counties. We offer new member support, mentoring, an extensive lending library, excellent programs and field trips, seed exchanges, and native plant sales. We pride ourselves on good communication and quality programming in a supportive, friendly setting.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 5,
+  "fields": {
+    "org": 7,
+    "loc_name": "Wehr Nature Center",
+    "physical_location": true,
+    "address": "9701 W. College Ave.",
+    "city_name": "Franklin",
+    "county_id": 41,
+    "region_name": "SE",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://www.wehrnaturecenter.com/",
+    "location_about": "Wehr Nature Center is a place where everyone belongs. Open year-round, we offer accessible buildings, trails, and park features designed for visitors of all ages and abilities. Wander our more than five-miles of trails traversing five distinct habitats all within a five-minute walk. Enjoy universally designed exhibits, comfortable restrooms, and hands-on unique programs that bring people together through nature all year round.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 6,
+  "fields": {
+    "org": 9,
+    "loc_name": "Schlitz Audubon Nature Center",
+    "physical_location": true,
+    "address": "1111 E Brown Deer Rd",
+    "city_name": "Bayside",
+    "county_id": 41,
+    "region_name": "SE",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://www.schlitzaudubon.org/",
+    "location_about": "Once a farm for the Schlitz Brewery draft horses, Schlitz Audubon Nature Center is Milwaukee’s comprehensive nature center. We offer six miles of trails that take visitors through 185 acres of forests, wetlands, restored prairies, ravines, bluffs, and Lake Michigan shoreline.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 7,
+  "fields": {
+    "org": 1,
+    "loc_name": "Hank Aaron State Trail",
+    "physical_location": true,
+    "address": "",
+    "city_name": "West Allis",
+    "county_id": 41,
+    "region_name": "SE",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://dnr.wisconsin.gov/topic/parks/hankaaron",
+    "location_about": "Named in honor of baseball legend Hank Aaron, this trail provides a continuous connection between American Family Field, home of the Milwaukee Brewers, and the Lake Michigan lakefront. The Hank Aaron State Trail also links to famous Milwaukee landmarks such as the Ward Theatre on the grounds of the Historic Soldiers Home, the Wisconsin State Fair Park and the Pettit National Ice Center.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 8,
+  "fields": {
+    "org": 1,
+    "loc_name": "Havenwoods State Forest,",
+    "physical_location": true,
+    "address": "6141 N. Hopkins St.",
+    "city_name": "Milwaukee",
+    "county_id": 41,
+    "region_name": "SE",
+    "state": "WI",
+    "zip_code": "53209",
+    "org_loc_url": "https://dnr.wisconsin.gov/topic/parks/havenwoods",
+    "location_about": "Havenwoods State Forest is Wisconsin’s only urban state forest, featuring 237 acres of grasslands, woods and wetlands in the city of Milwaukee. Hike, run, bike and watch wildlife on over 6 miles of trails. Explore the nature center, the forest's ponds, stroll over the 120-foot bridge or find a bench to sit and relax outdoors.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 9,
+  "fields": {
+    "org": 11,
+    "loc_name": "Emerson Elementary School",
+    "physical_location": true,
+    "address": "2421 E. Johnson St.",
+    "city_name": "Madison",
+    "county_id": 13,
+    "region_name": "SC",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://emerson.madison.k12.wi.us/",
+    "location_about": "",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 10,
+  "fields": {
+    "org": 3,
+    "loc_name": "Upham Woods",
+    "physical_location": true,
+    "address": "N194 County Rd N",
+    "city_name": "Wisconsin Dells",
+    "county_id": 13,
+    "region_name": "SC",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://uphamwoods.extension.wisc.edu/?ss_redir=1",
+    "location_about": "Since 1941, Upham Woods has provided a setting for people of all ages to experience the natural world. With over 300 acres of land and 4 unique ecosystems located just north of Wisconsin Dells on the Wisconsin River, Upham Woods offers the perfect place to learn about and enjoy both the natural and cultural histories of Wisconsin.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 11,
+  "fields": {
+    "org": 12,
+    "loc_name": "Camp Ehawee",
+    "physical_location": true,
+    "address": "Wild Road",
+    "city_name": "Mindoro",
+    "county_id": 32,
+    "region_name": "SW",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "",
+    "location_about": "Camp Ehawee (pronounced e-how-e) was purchased in 1951. Girl Scouts at the time held a competition to name the new camp, and Jacqualine Kramer won with the name \"Camp Ehawee,\" meaning \"Camp of the Laughing Maidens.\" Camp Ehawee is our overnight resident camp and can accommodate a large number of campers and staff.\r\n\r\nCamp Ehawee is full of large trees, creek access, many trails, and an array of sleeping options. This camp property is quite expansive with over 200 acres of land. There truly is a place for everyone at Camp Ehawee. \r\n\r\nEhawee campers canoe on a tributary of the Black River and creek hop at Crystal Creek. This property is also complete with an outdoor amphitheater, heated pool, cabins, hatchet throwing, archery, field sports, sand volleyball, a nature center, trading post, and so much more.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 12,
+  "fields": {
+    "org": 1,
+    "loc_name": "Kohler-Andrae State Park",
+    "physical_location": false,
+    "address": "1020 Beach Park Lane",
+    "city_name": "Sheboygan",
+    "county_id": 59,
+    "region_name": "SE",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://dnr.wisconsin.gov/topic/parks/kohlerandrae",
+    "location_about": "Named for John Michael Kohler and Terry Andrae state parks, Kohler-Andrae is the home of majestic sand dunes, miles of golden beach, shimmering blue Lake Michigan water, whispering pines, an abundance of wildlife and recreational activities. Kohler-Andrae State Park is one of the last natural preserves along the Lake Michigan shore and is open for everyone to explore and enjoy.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 13,
+  "fields": {
+    "org": 13,
+    "loc_name": "George Mead Wildlife Area",
+    "physical_location": true,
+    "address": "Stanton W. Mead Education and Visitor Center, 201517 Cty Hwy S",
+    "city_name": "Milladore",
+    "county_id": 73,
+    "region_name": "C",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://dnr.wisconsin.gov/topic/Lands/WildlifeAreas/mead",
+    "location_about": "Nestled in the Little Eau Pleine River valley, the George W. Mead Wildlife Area encompasses over 33,000 acres of open marshes, hardwood and aspen forests and grasslands. Mead is one of the largest wildlife areas in Wisconsin, comprising the most extensive contiguous state ownership of wildlife lands. Two conifer bog state natural areas showcase the tamarack and black spruce ecosystems on the property.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 14,
+  "fields": {
+    "org": 1,
+    "loc_name": "Richard Bong State Recreation Area",
+    "physical_location": false,
+    "address": "26313 Burlington Rd",
+    "city_name": "Kansasville",
+    "county_id": 30,
+    "region_name": "SE",
+    "state": "WI",
+    "zip_code": "53139",
+    "org_loc_url": "https://dnr.wisconsin.gov/topic/parks/richardbong",
+    "location_about": "Once designated to be a jet fighter base, Richard Bong State Recreation Area is named after Major Richard I. Bong, a Poplar, WI native who was America's leading air ace during World War II. The air base was abandoned three days before concrete was to be poured for a 12,500-foot runway. Local citizens had the foresight to protect this open space for future generations.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 15,
+  "fields": {
+    "org": null,
+    "loc_name": "Minoqua Brewing Tap Room",
+    "physical_location": false,
+    "address": "2927 East Washington Avenue",
+    "city_name": "Madison",
+    "county_id": 13,
+    "region_name": "SC",
+    "state": "WI",
+    "zip_code": "54548",
+    "org_loc_url": "https://www.minocquabrewingcompany.com/pages/madison-tap-room",
+    "location_about": "Hosts Science on Tap events.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 16,
+  "fields": {
+    "org": 16,
+    "loc_name": "National Conservation Training Center",
+    "physical_location": false,
+    "address": "",
+    "city_name": null,
+    "county_id": null,
+    "region_name": "St",
+    "state": "WI",
+    "zip_code": "",
+    "org_loc_url": "https://www.fws.gov/program/national-conservation-training-center",
+    "location_about": "The U.S. Fish and Wildlife Service’s National Conservation Training Center, frequently referred to as NCTC, leads the nation with training and education for natural resource managers to meet the goal of conserving fish, wildlife, plants, and their habitats for the benefit of the American public.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 17,
+  "fields": {
+    "org": 1,
+    "loc_name": "Hausmann Nature Center",
+    "physical_location": false,
+    "address": "W328 W846 County Road C",
+    "city_name": "Delafield",
+    "county_id": 69,
+    "region_name": "NW",
+    "state": "WI",
+    "zip_code": "53018",
+    "org_loc_url": "https://dnr.wisconsin.gov/topic/parks/laphampeak/naturecenter",
+    "location_about": "The Hausmann Nature Center, an architectural masterpiece, was the original 8700-square-foot home of Bernice and Dr. Paul Hausmann. The Hausmanns donated their home to the state of Wisconsin, as it was their wish to convert it into a nature center that would promote environmental education.",
+    "contact_email": "",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.location",
+  "pk": 18,
+  "fields": {
+    "org": 17,
+    "loc_name": "Eagle Nature Trail",
+    "physical_location": false,
+    "address": "820 E. Main Street",
+    "city_name": "Eagle",
+    "county_id": 15,
+    "region_name": "NE",
+    "state": "WI",
+    "zip_code": "53119",
+    "org_loc_url": "https://www.eaglenaturetrail.org/",
+    "location_about": "The Eagle Nature Trail is a 501(c)(3) organization with a mission to provide experiences in nature for the Eagle community. By creating and maintaining a trail that connects the local elementary school to the local library, we offer experiences that provide knowledge about nature and how to care for our natural world.\r\nWe continue to create habitat for our native insects and pollinators as well as local wildlife. People can enjoy leisurely walks, quiet discoveries, restful benches, and small gatherings in the natural setting.\r\nThe trail is a part of the Mukwonago River watershed in the area of the Southern Kettle Moraine, an area known as the Midwest Oak Ecosystem, one of the most endangered ecosystems in the world.",
+    "contact_email": "eaglenaturetrail@gmail.com",
+    "deleted": false
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 35,
+  "fields": {
+    "org": 1,
+    "title": "Customer Service",
+    "description": "Run the Sanderling Nature Center:\r\n• Provide excellent customer service by orienting visitors to the property and local area, disseminating information and materials related to rules and regulations, program schedules, interpretive resources, facilities, and other recreational opportunities\r\n• Assist with guest speakers and school group visits\r\n• Assist with inventorying activity packs, educational materials, and supplies\r\n• Provide minor interior and exterior facility upkeep and maintenance\r\n• Manage sales for merchandise, ice, and/or firewood\r\n• Assist campers and visitors as needed\r\nThis position can be filled by an individual, couple, or duo. Full-time hosts work Wednesday through Sunday, open nature center during public hours and additional evening or morning hours as needed (e.g., special programs, school groups*, etc.). Nature center hours are 12:30pm – 4:30pm Monday through Friday, 10:30am – 4:30pm Saturday and Sunday. They will receive a free campsite while they are hosting – at the designated Nature Center Host site which includes water and electric hook-ups. We are looking for either a full calendar month or half month commitment, (i.e., either the first half of the month or the second half of the month) for full-time hosts. Please contact Katelyn Grissom, Park Manager, katelyn.grissom@wisconsin.gov for more details.",
+    "activity_type": "v",
+    "time_commitment": 4,
+    "date_description": "Dates include May 16-31st; June 3rd-28th (this can either be split in two or be done as one month);",
+    "expire_date": "2026-09-30",
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      1,
+      3
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 36,
+  "fields": {
+    "org": 13,
+    "title": "Kite Festival",
+    "description": "The Mead Kite Festival is an excellent opportunity for those with Wisconsin Bat Ambassador training to reach hundreds of people of all ages that are curious about Wisconsin bats. The Bat Ambassadors will run a table or two with hands-on engaging educational activities. Materials can be provided by the WI Bat Ambassador program, lunch, beverages, and snacks will be provided the day of the program. Located at George W. Mead Wildlife Area, Stanton W. Mead Education and Visitor Center, 201517 Cty Hwy S, Milladore, WI; 20 minutes from WI Rapids, 25 minutes from Stevens Point, and 30 minutes from Wausau. August 22nd, 2026 10:30 am - 3:30 pm. Contact sandra.deroche@wisconsin.gov for more information.",
+    "activity_type": "v",
+    "time_commitment": 2,
+    "date_description": null,
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      1
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 38,
+  "fields": {
+    "org": 1,
+    "title": "Workday Wednesdays",
+    "description": "To assist and/or lead any and all activities at Richard Bong State Recreational Area (RBSRA). Be it as a Steward, a citizen scientist, an educator. This is a general call for help in making RBSRA a better place for the general public. To educate, motivate, excite adults, kids to/of/for the joys of Wisconsin and the outdoors in general. Bong has over 4600 acres of land in Kenosha County and needs leaders to assist and promote. Pick your passion and I will help you make things happen there (and beyond). Get started on Wednesdays, 9 AM at our Visitors Center. We call it Workday Wednesdays. Email bongnaturalistassociation@gmail.com for details or visit bongnaturalistassociation.org",
+    "activity_type": "v",
+    "time_commitment": 2,
+    "date_description": "Ongoing",
+    "expire_date": "2026-09-25",
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      2,
+      1,
+      3
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 39,
+  "fields": {
+    "org": 14,
+    "title": "Library Programming",
+    "description": "Seeking Master Naturalists speakers for library programming at Oscar Grady Public Library in Saukville. Specific topic requests include the Great Lakes watershed, and safe and responsible foraging. Contact Elizabeth Wroblewski, ewroblewski@oscargradylibrary.org or 262-284-6022.",
+    "activity_type": "v",
+    "time_commitment": 2,
+    "date_description": "Ongoing",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      1
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 40,
+  "fields": {
+    "org": 3,
+    "title": "Winter Enrichment Lectures",
+    "description": "Engaging talks on topics ranging from ecological research to natural resources policy to cultural and natural history. Join for as many lectures as you'd like! Visit the Winter Enrichment page for the 2026 schedule: https://arboretum.wisc.edu/learn/adult-education /winter-enrichment/. Lectures are Thursdays at 10-11:30 am, January 15th - February 26th. Registration required, fee is $10 per lecture. Contact anne.pearce@wisc.edu for more information.",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": "Thursdays",
+    "expire_date": "2026-03-12",
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      6,
+      9,
+      10,
+      3,
+      4
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 41,
+  "fields": {
+    "org": 6,
+    "title": "\"Why We Are Wild!\" with Nick Coley",
+    "description": "Nick Coley will delve into how we humans are wired and why we do need nature in our life. He brings in his knowledge of anthropology to make the connections to native plants and their importance not only to our environment, but also to our mental health and health in general.",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": "9:30 am",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": []
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 42,
+  "fields": {
+    "org": 6,
+    "title": "Bumble bee queens, nests, and spring wildflowers",
+    "description": "The presentation will include extensive slow-motion close-up videography to highlight the ecology and reproductive biology of native flowering plants and their bumble bee pollinators.   \r\nContact jaceybonavia+wildones@gmail.com for more information. All events held at Schlitz Audubon Nature Center in Bayside (Milwaukee).",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": null,
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": []
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 43,
+  "fields": {
+    "org": 1,
+    "title": "Bats of Wisconsin",
+    "description": "This will be about a 1.25 hour Power Point presentation and follow-up. Wisconsin DNR Bat Ambassador John Davies presents a slide show on the Bats of Wisconsin. Sorry no live bats. Come learn about the 8 different bats that call Wisconsin their summer home. This presentation will also touch on basic bat facts, how they are under threat and how you can help. John will end with how he, as a Citizen scientist, contributes to the understanding of bats by collecting and submitting data to DNR biologists. At Burlington Public Library, 166 E. Jefferson Street, Burlington, Wisconsin, 6-7:30 pm. Appropriate for ages 10 and up. Please register at https://www.prairielakes.info/meetings/community-calendar/#/events/21diUFFtId/ instances/JDxve3HlsV/.",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": null,
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      2,
+      6,
+      4
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 44,
+  "fields": {
+    "org": 12,
+    "title": "Outdoor Education",
+    "description": "Designed to spark curiosity, deepen ecological awareness, and connect youth with meaningful outdoor experiences. As we build out our enrichment stations, we immediately thought that a falconry experience would be an incredible addition. The opportunity for girls to learn about birds of prey, conservation, and the art and responsibility of falconry would align beautifully with our goals for these programs. Contact harnishn@gsbadgerland.org for more information.",
+    "activity_type": "v",
+    "time_commitment": 3,
+    "date_description": null,
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "harnishn@gsbadgerland.org",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      6,
+      1
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 45,
+  "fields": {
+    "org": 1,
+    "title": "Trail Maintenance",
+    "description": "Opportunities at Hank Aaron State Trail involve removing invasive species from our native prairie beds and giving the chance for the natives to take control. You can also work with staff on removing invasive species throughout the trail and help maintain the native growth. Opportunities to also assist with the planting of native trees, shrubs, and prairie plants also occur during the springtime!",
+    "activity_type": "v",
+    "time_commitment": 2,
+    "date_description": "Various",
+    "expire_date": "2026-11-01",
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      3
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 46,
+  "fields": {
+    "org": 1,
+    "title": "Trail Maintenance",
+    "description": "At the Havenwoods State Forest, help establish native species in our Naturalist Backyard area, our Rain Garden area, and throughout the forest. Work and learn along with forest staff or independently and make a big impact on restoring this forest. There are several different volunteer opportunities available to assist with, please feel free to join and reach out to learn more and we would be happy to have you and help you reach your goals! Looking for around 4 hours per week but can be adjusted. Contact roberto.ayala@wisconsin.gov for more information.",
+    "activity_type": "v",
+    "time_commitment": null,
+    "date_description": "4 hours per week",
+    "expire_date": "2026-11-01",
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      3
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 47,
+  "fields": {
+    "org": 11,
+    "title": "Math/Science Night",
+    "description": "Emerson Elementary School is looking for volunteers for our math/science night. This is an opportunity for elementary school students and their families to participate in activities that highlight the ways math and science show up in our lives, especially in the natural world! This would include hosting a table with an activity or information for families to stop by throughout the 2 hour event. Contact stephmock@gmail.com for more info.",
+    "activity_type": "v",
+    "time_commitment": 2,
+    "date_description": "4:30-6:30pm",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "stephmock@gmail.com",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      1
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 49,
+  "fields": {
+    "org": 5,
+    "title": "Assist with Visiting School Groups",
+    "description": "We're a field station of UWSP that hosts visiting school groups during the school year. These school groups are typically elementary schools, sometimes middle and high schools. We teach environmental education programs like Pond Study, Compass Course, Early Explorers, Lake Study, Fire/Fort Building, etc. Depending on the school and day, we need different numbers of educators for each day. We are looking for volunteer coverage for our ongoing and ever-changing needs for our visiting school groups! Contact Christopher Refsguard.",
+    "activity_type": "v",
+    "time_commitment": 2,
+    "date_description": "Dates in September and October",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      1
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 50,
+  "fields": {
+    "org": 5,
+    "title": "Prescribed Fire for Forest Management",
+    "description": "With this webinar series hosted by Wisconsin Forestry Center, each one has a topic related to forest management. Look for a new video every month and you can view previous webinars as well.",
+    "activity_type": "t",
+    "time_commitment": null,
+    "date_description": null,
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      6,
+      1,
+      9,
+      10,
+      3
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 51,
+  "fields": {
+    "org": 1,
+    "title": "Educational Programming",
+    "description": "The George W. Mead Wildlife Area has an ongoing need for volunteers to assist with educational programming. Volunteers will be responsible for teaching one lesson; the lesson is scripted and all materials will be out and ready upon arrival. Lesson topics include survival strategies, nature hikes, foraging, birding, orienteering, fly tying, and much more. Most lessons are taught outdoors. Groups range in ages, from kindergarten to senior. Contact sandra.deroche@wisconsin.gov for more information.",
+    "activity_type": "t",
+    "time_commitment": null,
+    "date_description": null,
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      1
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 52,
+  "fields": {
+    "org": 3,
+    "title": "Science on Tap",
+    "description": "Science on Tap-Minocqua is the result of a unique partnership among UW-Madison’s Trout Lake Station, UW-Madison’s Kemp Natural Resources Station, the Lakeland-Badger chapter of the Wisconsin Alumni Association, the Minocqua Public Library and the Minocqua Brewing Company and exemplifies the Wisconsin Idea – that the boundaries of the university are the boundaries of the state. ​Due to COVID 19, Science on Tap will be a zoom webinar beginning in October 2020. Find connection information and archives at: http://www.scienceontapminocqua.org/. Please select talks that relate to the subject areas covered in your Master Naturalist training.",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": "On Deman",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      5,
+      2,
+      6,
+      1,
+      7,
+      9,
+      10,
+      3,
+      8,
+      4
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 53,
+  "fields": {
+    "org": 5,
+    "title": "Online Tree ID",
+    "description": "This course will cover field identification techniques for common trees native to the Great Lakes region.  The course will focus on winter and summer identification characteristics including leaves, bark, buds/twigs, and tree form.",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": "On Demand",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      6,
+      10
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 54,
+  "fields": {
+    "org": 15,
+    "title": "The Lake Talks series",
+    "description": "The Lake Talks is a series of free, informal talks in communities along or near the Lake Michigan shoreline, addressing issues of relevance to those communities or the Great Lakes as a whole. Each event includes time for audience interaction and discussion",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": "On Demand",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      5,
+      6,
+      3,
+      8
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 55,
+  "fields": {
+    "org": 15,
+    "title": "The River Talks series",
+    "description": "River Talks is an annual free, informal speaker series about the St. Louis River Estuary in Duluth-Superior and a cooperative project between Wisconsin Sea Grant and the Lake Superior National Estuarine Research Reserve.",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": "On Demand",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      5,
+      6,
+      3
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 56,
+  "fields": {
+    "org": 3,
+    "title": "Under Our Feet Podcast",
+    "description": "Under Our Feet Podcast is hosted and produced by Rudy Molinek who is a PhD student in geoscience at UW-Madison. This podcast focuses on human stories that are intertwined with deep Earth history, primarily season one is about the geology of wisconsin!",
+    "activity_type": "t",
+    "time_commitment": 2,
+    "date_description": "On Demand",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      7,
+      9
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 57,
+  "fields": {
+    "org": 10,
+    "title": "Coffee Breaks",
+    "description": "Hosted by Wisconsin Wetlands Association, the Wetland Coffee Break series will feature brief presentations about wetlands, the plants and animals that call them home, and the many natural benefits they provide to our communities.",
+    "activity_type": "t",
+    "time_commitment": null,
+    "date_description": "Ongoing",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "",
+    "migrated_from_event": null,
+    "created": "2026-01-01T18:08:38Z",
+    "categories": [
+      5,
+      4
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 58,
+  "fields": {
+    "org": 1,
+    "title": "Presenters",
+    "description": "We are looking for master naturalists who are interested in presenting educational programs this spring/summer/fall for children, adults and families at the nature center. We are located inside the Lapham Peak Unit of the Kettle Moraine State Forest on Hwy C in Delafield, WI. We are open two weekends per month April through October. Specific dates for presentations will be agreed upon with individual presenters. Typically programs are one to two hours in length depending on the topic, type of presentation and audience. Most people present once a season but some opt to present multiple times.",
+    "activity_type": "v",
+    "time_commitment": 2,
+    "date_description": "Dates vary",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "Hnc@laphampeakfriends.org",
+    "migrated_from_event": null,
+    "created": "2026-03-14T20:13:27.532Z",
+    "categories": [
+      6,
+      1
+    ]
+  }
+},
+{
+  "model": "orgs.activity",
+  "pk": 59,
+  "fields": {
+    "org": 17,
+    "title": "Trail Maintenance and Children's Activities",
+    "description": "Working on a small nature trail in the village of Eagle: helping with management of prairie, woods and pond areas, including removal of invasives, planting projects, children's activities. Once we establish the plan, hours can be completed independently or we can work together as everyone's schedule allows!  \r\nIf you are interested, please contact Jean Weedman.",
+    "activity_type": "v",
+    "time_commitment": 2,
+    "date_description": "Dates vary",
+    "expire_date": null,
+    "activity_url": "",
+    "no_cost": false,
+    "contact_email": "weedmantandj@aol.com",
+    "migrated_from_event": null,
+    "created": "2026-03-14T20:19:15.500Z",
+    "categories": [
+      1,
+      3
+    ]
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 10,
+  "fields": {
+    "activity": 36,
+    "session_format": "i",
+    "location": 13,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-08-22",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 11,
+  "fields": {
+    "activity": 39,
+    "session_format": "i",
+    "location": null,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-08-22",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 12,
+  "fields": {
+    "activity": 38,
+    "session_format": "i",
+    "location": 14,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-05-01",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 13,
+  "fields": {
+    "activity": 35,
+    "session_format": "i",
+    "location": 12,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-05-15",
+    "end": "2026-05-31"
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 14,
+  "fields": {
+    "activity": 35,
+    "session_format": "i",
+    "location": 12,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-07-01",
+    "end": "2026-07-15"
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 15,
+  "fields": {
+    "activity": 35,
+    "session_format": "i",
+    "location": 12,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-05-15",
+    "end": "2026-05-31"
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 16,
+  "fields": {
+    "activity": 35,
+    "session_format": "i",
+    "location": 12,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-07-01",
+    "end": "2026-07-15"
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 17,
+  "fields": {
+    "activity": 40,
+    "session_format": "i",
+    "location": 2,
+    "session_url": "https://arboretum.wisc.edu/learn/adult-education/winter-enrichment",
+    "ongoing": true,
+    "start": "2026-02-15",
+    "end": "2026-03-12"
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 18,
+  "fields": {
+    "activity": 41,
+    "session_format": "i",
+    "location": 6,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-03-14",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 19,
+  "fields": {
+    "activity": 42,
+    "session_format": "i",
+    "location": 6,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-04-14",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 20,
+  "fields": {
+    "activity": 43,
+    "session_format": "i",
+    "location": 14,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-04-22",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 21,
+  "fields": {
+    "activity": 44,
+    "session_format": "i",
+    "location": 11,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-05-09",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 22,
+  "fields": {
+    "activity": 44,
+    "session_format": "i",
+    "location": 10,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-04-25",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 23,
+  "fields": {
+    "activity": 47,
+    "session_format": "i",
+    "location": null,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-03-12",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 26,
+  "fields": {
+    "activity": 49,
+    "session_format": "i",
+    "location": 3,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-09-01",
+    "end": "2026-10-31"
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 27,
+  "fields": {
+    "activity": 45,
+    "session_format": "i",
+    "location": 13,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-05-01",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 28,
+  "fields": {
+    "activity": 46,
+    "session_format": "i",
+    "location": 8,
+    "session_url": "",
+    "ongoing": false,
+    "start": "2026-05-01",
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 30,
+  "fields": {
+    "activity": 50,
+    "session_format": "o",
+    "location": null,
+    "session_url": "https://www.uwsp.edu/wfc/wisconsin-forestry-center/workshops-trainings/prescribed-fire-webinar-series/",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 31,
+  "fields": {
+    "activity": 51,
+    "session_format": "i",
+    "location": 13,
+    "session_url": "",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 32,
+  "fields": {
+    "activity": 52,
+    "session_format": "b",
+    "location": 15,
+    "session_url": "http://www.scienceontapminocqua.org/",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 33,
+  "fields": {
+    "activity": 53,
+    "session_format": "o",
+    "location": null,
+    "session_url": "https://www.uwsp.edu/wfc/wisconsin-forestry-center/workshops-trainings/tree-identification/",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 34,
+  "fields": {
+    "activity": 54,
+    "session_format": "o",
+    "location": null,
+    "session_url": "https://www.seagrant.wisc.edu/our-work/focus-areas/education/lake-talks/",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 35,
+  "fields": {
+    "activity": 55,
+    "session_format": "o",
+    "location": null,
+    "session_url": "https://www.seagrant.wisc.edu/our-work/focus-areas/education/river-talks-speaker-series/.",
+    "ongoing": false,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 36,
+  "fields": {
+    "activity": 56,
+    "session_format": "o",
+    "location": null,
+    "session_url": "https://www.uofpod.org/episodes/season-1-geology-of-wisconsin",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 37,
+  "fields": {
+    "activity": 57,
+    "session_format": "o",
+    "location": null,
+    "session_url": "https://wisconsinwetlands.org/wetland-coffee-break/",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 38,
+  "fields": {
+    "activity": 58,
+    "session_format": "i",
+    "location": 17,
+    "session_url": "",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+},
+{
+  "model": "orgs.session",
+  "pk": 39,
+  "fields": {
+    "activity": 59,
+    "session_format": "i",
+    "location": 18,
+    "session_url": "",
+    "ongoing": true,
+    "start": null,
+    "end": null
+  }
+}
+]
