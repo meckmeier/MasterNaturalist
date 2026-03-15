@@ -29,7 +29,7 @@ SITE_ID = 1
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 ALLOWED_HOSTS = ['*']
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
