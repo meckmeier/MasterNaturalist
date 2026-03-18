@@ -11,10 +11,12 @@ from django.utils import timezone
 from datetime import date, timedelta
 from django.db.models import Q, Prefetch, F
 from django.contrib import messages
-
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 
 from orgs.models import *
 from .forms import *
+
 def sort_key(x):
     # Use date or expire_date; fallback to far-future
     d = getattr(x, "date", None) or getattr(x, "expire_date", None)
@@ -184,6 +186,9 @@ def locations(request):
 
         if data.get("org"):
             queryset=queryset.filter(org__id=data["org"].id)
+
+        if data.get("loc"):
+            queryset=queryset.filter(id=data["loc"].id)
 
         if data.get("my_orgs"):
             followed_orgs = request.user.profile.following_orgs.filter(deleted=False)
@@ -692,52 +697,66 @@ def profile_view(request):
 
     return render(request, "orgs/profile.html", {"form": form})
     
-def activity_form_view(request, activity_id=None):
-
+def activity_form_view(request, activity_id=None): 
+    
     view_only = request.resolver_match.url_name == "activity_view"
     can_edit = False
-    
+    # is this new or existing activity
     if activity_id:
         activity = get_object_or_404(Activity, id=activity_id)
         if request.user.profile.staff or activity.org.owner == request.user.profile:
             can_edit = True
     else:
-        activity = None
-        if request.user.is_authenticated:
+        activity=Activity()
+        if request.user.is_authenticated or request.user.staff:
             can_edit = True
 
-    if request.user.profile.staff:
-        can_edit = True
-
-
+    #figure out redirect
     if request.method == "POST" and not view_only:
+        org_id= request.POST.get("org")
+        location_id=request.POST.get("locations")
 
         activity_form = ActivityForm(request.POST, instance=activity)
-        
-        if activity_form.is_valid():
-            activity = activity_form.save()
-            session_formset = SessionFormSet(request.POST, instance=activity, prefix="sessions")
+        session_formset = SessionFormSet(request.POST, instance=activity, prefix="sessions")
 
-            if session_formset.is_valid():
-                activity.save()
-                session_formset.save()
-            
+        if activity_form.is_valid() and session_formset.is_valid():
+            activity = activity_form.save()
+            session_formset.instance=activity
+            session_formset.save()
+
             print("Session formset errors:", session_formset.errors)
             print("Management errors:", session_formset.management_form.errors)
             print("main form errors" , activity_form.errors)
-            return redirect(f"{reverse('activities')}#activity-{activity.id}")
+            if location_id:
+                return redirect(f"{reverse('locations')}?#activity-{activity.id}")
+            elif org_id:
+                return redirect(f"{reverse('index_dense')}?org={org_id}")
+            else:
+                return redirect(f"{reverse('activities')}#activity-{activity.id}")
 
-
+    #this is the GET part of the code
     else:
+        org_id = request.GET.get("org")
+        location_id = request.GET.get("location")
+        if org_id:
+                activity.org_id = org_id
+        initial = []
+        if location_id:      
+                initial.append({
+                     "location": location_id
+                     })
+
         activity_form = ActivityForm(instance=activity)
-        session_formset = SessionFormSet(instance=activity, prefix="sessions")
-
-
+        session_formset = SessionFormSet(
+                instance=activity,
+                initial=initial,
+                prefix="sessions"
+            )
+        
     if view_only:
         for field in activity_form.fields.values():
             field.disabled = True
 
-   
     return render(request, "orgs/activity_form.html", {
         "activity": activity,
         "activity_form": activity_form,
@@ -745,3 +764,27 @@ def activity_form_view(request, activity_id=None):
         "can_edit": can_edit,
         "view_only": view_only,
     })
+
+
+def map_view(request):
+
+    locations_qs = Location.objects.filter(
+        state="WI",
+        latitude__isnull=False,
+        longitude__isnull=False
+    ).select_related('county_id')
+
+    locations_json = [
+        {
+            "id": loc.id,
+            "name": loc.loc_name,
+            "latitude": loc.latitude,
+            "longitude": loc.longitude,
+            "county": loc.county_id.county_name if loc.county_id else None,
+        }
+        for loc in locations_qs
+    ]
+
+    context = {"locations": json.dumps(locations_json, cls=DjangoJSONEncoder)}
+    # Render template
+    return render(request, "orgs/map.html", context)

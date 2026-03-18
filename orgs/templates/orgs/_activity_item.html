@@ -4,36 +4,40 @@
 
 
  <div class="card shadow-sm mb-3 border-1"  id="activity-{{ e.id }}">
-      <!-- Title row -->
-      <div class="d-flex justify-content-between align-items-start">
+    <!-- Title row -->
+    <div class="d-flex justify-content-between align-items-start">
         <h5 class="card-title mb-1">
-          
           <span><strong>
             {% if e.is_newly_added %}<i class="bi bi-asterisk" data-bs-toggle="tooltip" title="Newly added activity"></i>{% endif %}
             {% if e.activity_type == "t"%}<i class="bi bi-mortarboard" data-bs-toggle="tooltip" title="Training"></i>
-            {%else%} <i class="bi bi-tree" data-bs-toggle="tooltip" title="Volunteer Opportunity"></i>{% endif %}</strong></span>
+            {%else%} <i class="bi bi-tree" data-bs-toggle="tooltip" title="Volunteer Opportunity"></i>{% endif %}
+          </strong></span>
           
           {% if q %}{{ e.title|highlight:q|safe  }}{% else %}{{ e.title }}{% endif %}
-          {% if e|can_edit:request.user %} <a href="{% url 'activity_edit' e.id%}"><i class="bi bi-pencil-fill" data-bs-toggle="tooltip" title="Edit activity"></i></a>{% endif %}
-            
-       </h5>
-       </div>
-       <div class="mt-2 small text-muted">
-          {% if e.contact_email %}{{e.contact_email}} {% if e.activity_url %}| {{ e.activity_url}}{% endif %}{% endif %}
-        </div>
-      <div class="description-block">
-        <div class = "desc-short">
+          {% if e|can_edit:request.user %} <a href="{% url 'activity_edit' e.id%}"><i class="bi bi-pencil-fill" data-bs-toggle="tooltip" title="Edit activity"></i></a>{% endif %} 
+        </h5>
+    </div>
+    <div class="mt-2 small text-muted">
+      {% if e.contact_email %}
+           | <a href="mailto:{{ e.contact_email }}">{{e.contact_email}}<i class="bi bi-envelope"></i></a>
+      {% endif %}
+      {% if e.activity_url %}| 
+          | <a href="{{ e.activity_url}}"><i class="bi bi-globe"></i></a>
+      {% endif %}
+    </div>
+    <div class="description-block">
+      <div class = "desc-short">
           {{ e.description|truncatechars:200 }}
-        </div>
-        <div class="desc-full d-none">
+      </div>
+      <div class="desc-full d-none">
            {{ e.description|highlight:q|safe }}
-        </div>
-        {% if not q %}
-          <div class="desc-toggle">
+      </div>
+      {% if not q %}
+      <div class="desc-toggle">
             <span class="toggle-desc small text-muted ms-1">
                           ▼</span>
-          </div>
-        {% endif %}
+        </div>
+      {% endif %}
       </div>
       <!-- Date row -->
        <div class="mt-2 small text-muted">

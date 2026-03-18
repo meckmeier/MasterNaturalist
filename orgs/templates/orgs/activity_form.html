@@ -14,7 +14,8 @@
 
 <form method="post">
  {% csrf_token %}
- 
+ <input type="hidden" name="org" value="{{ request.GET.org }}">
+ <input type="hidden" name="location" value="{{ request.GET.location }}">
  {% if activity.org.owner == request.user.profile %}
     <span class="text-muted">You are the owner of this organization that sponsored this activity.</span>
  {% endif %}

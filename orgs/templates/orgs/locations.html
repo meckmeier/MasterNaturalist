@@ -37,6 +37,11 @@
         {{ filter_form.has_t.errors }}
     </div>
     <div class="mb-3">
+      {{filter_form.loc.label_tag}}
+      {{filter_form.loc}}
+      {{filter_form.loc.errors}}
+    </div>
+    <div class="mb-3">
         {{ filter_form.county.label_tag}}
         {{ filter_form.county }}
         {{ filter_form.county.errors }}
@@ -69,7 +74,7 @@
 <div class="container my-4">
 <h1>Locations</h1>
 {% for loc in locs %}
-<div class="card mb-4 border-0 shadow-sm">
+<div class="card mb-4 border-0 shadow-sm" id="loc-{{loc.id}}">
   <div class="card-body">
     <div class="d-flex align-items-baseline justify-content-between ">
       <div>

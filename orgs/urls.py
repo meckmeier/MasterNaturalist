@@ -2,10 +2,13 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 
 from . import views
 urlpatterns = [
     path("", views.index_dense, name="index"),
+    path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),
+    
     path('dense/', views.index_dense, name="index_dense"),
     path("locations/", views.locations, name="locations"),
     path("login", views.login_view, name="login"),
@@ -33,6 +36,7 @@ urlpatterns = [
     path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete" ),
+    path("map/", views.map_view, name="map_view")
 ]
 
 if settings.DEBUG:

@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.timezone import now
 from datetime import timedelta
 
 region_list = [
@@ -30,6 +31,9 @@ class Commitment(models.Model):
 
     def __str__(self):
         return self.time
+
+def one_year_from_now():
+    return now().date() + timedelta(days=365)
 
 class EventCategory(models.Model):
     name=models.CharField(max_length=50, unique=True)
@@ -125,8 +129,11 @@ class Location(models.Model):
     org_loc_url = models.URLField(max_length=200, default="", blank=True)
     location_about = models.TextField(default="", blank=True , null=True)
     contact_email = models.EmailField(default="", blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_locs', default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)
+
 
     class Meta:
         ordering = ['loc_name']  # sort by loc_name by default  
@@ -155,7 +162,7 @@ class Activity(models.Model):
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
     categories = models.ManyToManyField(EventCategory, blank=True, related_name="category_activities")
     date_description = models.CharField(max_length=100, default='', blank=True, null=True)
-    expire_date = models.DateField(blank=True, null=True)
+    expire_date = models.DateField(default=one_year_from_now())
     activity_url = models.URLField(max_length=200, default="", blank=True)
     no_cost = models.BooleanField(default=False)
     contact_email = models.EmailField(default="", blank=True)

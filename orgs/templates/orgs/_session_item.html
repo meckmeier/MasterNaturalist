@@ -41,6 +41,15 @@
                     {% if e.location %}
                           · {{ e.location.loc_name }} | {{e.location.county_id.county_name}}
                       {% endif %}
+                      {% if e.activity.contact_email %}
+                         | <a href="mailto:{{ activity.contact_email }}">{{activity.contact_email}}<i class="bi bi-envelope"></i></a>
+                      {% endif %}
+                      {% if e.activity.activity_url %}| 
+                         | <a href="{{ e.activity.activity_url}}"><i class="bi bi-globe"></i></a>
+                      {% endif %}
+      </div>
+      <div class="mt-2 small text-muted">
+        
       </div>
       <div class="description-block">
         <div class = "desc-short">

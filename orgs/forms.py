@@ -192,6 +192,13 @@ class LocFilterForm(forms.Form):
         required=False,
         label="Show My Favorite Orgs"
     )
+    loc = forms.ModelChoiceField(
+        queryset=Location.objects.filter(deleted=False).order_by ("loc_name"),
+        required=False,
+        empty_label="Any",
+        label="Location Name",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )
     has_v = forms.BooleanField(
         required=False,
         label="Has Volunteer Opportunities"

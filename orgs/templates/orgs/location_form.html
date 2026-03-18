@@ -14,6 +14,13 @@
 <form method="post" class="loc-form">
     {% csrf_token %}
    {{form.id}}
+       <!-- submit button INSIDE the form -->
+    {% if can_edit and not view_only %}
+        <button type="submit" class="btn btn-primary">
+            {% if loc %}Save{% else %}Add{% endif %}
+        </button>
+        <a type="button" class="btn btn-primary" href="{% url 'activity_create' %}?org={{ loc.org_id}}&location={{ loc.id }}">Add Activity</a>
+    {% endif %}
     <div class = "form-grid {% if view_only %}view-mode{% endif %}">
         <div class ="form-field title">
             {{ form.loc_name.label_tag }}
@@ -72,15 +79,7 @@
             {{ form.org.errors }}
         </div>
     </div>
-    <!-- submit button INSIDE the form -->
-    {% if can_edit and not view_only %}
-        <button type="submit" class="btn btn-primary">
-            {% if loc %}Save{% else %}Add{% endif %}
-        </button>
-        <button type="button" id="add-btn" class="btn btn_primary">
-            Add Locations
-        </button>
-    {% endif %}
+
 
 
     

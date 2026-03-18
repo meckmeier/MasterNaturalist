@@ -44,9 +44,7 @@
                     Add Org</a></li>{% endif %}
                 {% if request.path != "/loc_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'loc_create' %}">
                     Add Location</a></li>{% endif %}    
-                {% if request.path != "/activity_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'activity_create' %}">
-                    Add Activity</a></li>{% endif %}
-
+                
                 
                 {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="/admin/">
                     Admin</a></li>
@@ -54,7 +52,12 @@
                 <li class="nav-item">
                     {% block filter_button %}{% endblock %}    
                 </li>    
+
             {% endif %} 
+            <li class = "nav-item">
+                <a class="nav-link" href="{% url 'about' %}">
+                 About</a>
+            </li>
         </ul>
         <!-- RIGHT SIDE -->
         <ul class="navbar-nav ms-auto">
@@ -73,7 +76,7 @@
     </div>
   </div>
 </nav>
-
+{% if not user.is_authenticated %}<em>To access all features including activities and search - please login. </em>{% endif %}
 
 <hr>
   <!-- OFFCANVAS PANEL (global UI) -->
