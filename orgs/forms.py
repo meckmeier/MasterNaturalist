@@ -73,7 +73,7 @@ LocationFormSet = inlineformset_factory(
 
 class EventFilterForm(forms.Form):
     type = forms.ChoiceField(
-        choices=[("", "Any"), ("v", "Volunteer Opportunity"), ("t", "Training"), ("m", "Master Naturalist")],
+        choices=[("", "Any"), ("v", "Volunteer Opportunity"), ("t", "Training")],
         required=False, 
         label="Type",
         widget=forms.Select(attrs={"class":"form-select"})
@@ -148,13 +148,7 @@ class OrgFilterForm(forms.Form):
         required=False,
         label="Has Trainings"
     )
-    county = forms.ModelChoiceField(
-        queryset = County.objects.all().order_by("county_name"),
-        required=False,
-        empty_label="Any",
-        label="County" ,
-        widget=forms.Select(attrs={"class":"form-select"})       
-    )
+   
     REGION_CHOICES = [
         ("", "Any"),
         ("C", "Central"),
