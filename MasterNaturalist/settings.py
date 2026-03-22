@@ -22,18 +22,12 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "postmark.django.EmailBackend"
+POSTMARK_API_KEY = os.environ.get("POSTMARK_API_KEY"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "mary@eckmeier.com")
+EMAIL_TIMEOUT = 10  # seconds
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-PASSWORD_RESET_TIMEOUT = 3600
+PASSWORD_RESET_TIMEOUT = 10
 SITE_ID = 1
 
 # Quick-start development settings - unsuitable for production

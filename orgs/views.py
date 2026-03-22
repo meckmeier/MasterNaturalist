@@ -794,11 +794,14 @@ def map_view(request):
 
 
 def test_email(request):
-    send_mail(
-        "Test Email",
-        "This is a test",
-        "mary.eckmeier@gmail.com",
-        ["mary.eckmeier@gmail.com"],
-        fail_silently=False,
-    )
-    return HttpResponse("Email sent")
+    try:
+        send_mail(
+            "Test Email from Postmark",
+            "This is a test email sent via Postmark.",
+            None,  # uses DEFAULT_FROM_EMAIL
+            ["mary.eckmeier@gmail.com"],  # recipient
+            fail_silently=False,
+        )
+        return HttpResponse("Email sent")
+    except Exception as e:
+            return HttpResponse(f"Error: {str(e)}")
