@@ -791,17 +791,18 @@ def map_view(request):
     return render(request, "orgs/map.html", context)
 
     
-
+from django.core.mail import send_mail
+from django.http import HttpResponse
 
 def test_email(request):
     try:
         send_mail(
-            "Test Email from Postmark",
-            "This is a test email sent via Postmark.",
-            None,  # uses DEFAULT_FROM_EMAIL
-            ["mary.eckmeier@gmail.com"],  # recipient
+            subject="Test Email from Postmark",
+            message="This is a test email via Postmark + Anymail.",
+            from_email=None,  # uses DEFAULT_FROM_EMAIL
+            recipient_list=["mary@eckmeier.com"],
             fail_silently=False,
         )
-        return HttpResponse("Email sent")
+        return HttpResponse("Email sent successfully via Postmark!")
     except Exception as e:
-            return HttpResponse(f"Error: {str(e)}")
+        return HttpResponse(f"Error sending email: {str(e)}")

@@ -19,11 +19,16 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
+print("POSTMARK_API_KEY:", os.environ.get("POSTMARK_API_KEY"))
+print("DEFAULT_FROM_EMAIL:", os.environ.get("DEFAULT_FROM_EMAIL"))
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-EMAIL_BACKEND = "postmark.django.EmailBackend"
-POSTMARK_API_KEY = os.environ.get("POSTMARK_API_KEY"
+EMAIL_BACKEND = "anymail.backends.postmark.EmailBackend"
+ANYMAIL = {
+    "POSTMARK_SERVER_TOKEN": os.environ.get("POSTMARK_API_KEY"),
+}
+
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "mary@eckmeier.com")
 EMAIL_TIMEOUT = 10  # seconds
 
@@ -61,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'anymail',
 ]
 
 MIDDLEWARE = [
