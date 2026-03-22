@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 
 from django.db import IntegrityError
-from django.http import  HttpResponseRedirect, JsonResponse
+from django.http import  HttpResponseRedirect, JsonResponse, HttpResponse
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
@@ -13,6 +13,7 @@ from django.db.models import Q, Prefetch, F
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+from django.core.mail import send_mail
 
 from orgs.models import *
 from .forms import *
@@ -788,3 +789,16 @@ def map_view(request):
     context = {"locations": json.dumps(locations_json, cls=DjangoJSONEncoder)}
     # Render template
     return render(request, "orgs/map.html", context)
+
+    
+
+
+def test_email(request):
+    send_mail(
+        "Test Email",
+        "This is a test",
+        "mary.eckmeier@gmail.com",
+        ["mary.eckmeier@gmail.com"],
+        fail_silently=False,
+    )
+    return HttpResponse("Email sent")

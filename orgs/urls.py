@@ -36,7 +36,8 @@ urlpatterns = [
     path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete" ),
-    path("map/", views.map_view, name="map_view")
+    path("map/", views.map_view, name="map_view"),
+    path("test_email",views.test_email, name="test_email")
 ]
 
 if settings.DEBUG:
