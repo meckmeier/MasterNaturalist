@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
-
+from django.core.mail import send_mail
+from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 
 from django.db import IntegrityError
@@ -26,7 +27,7 @@ def sort_key(x):
     return d
 
 
-def index_dense(request):
+def orgs(request):
 
     q = request.GET.get("q", "")
     today = timezone.now().date()
@@ -123,12 +124,10 @@ def index_dense(request):
     all_orgs =Organization.objects.filter(deleted=False).order_by("org_name")
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
-
-
-    
+ 
     return render(
         request,
-        "orgs/index_dense.html",
+        "orgs/orgs.html",
         {
             "organizations": page_obj,
             "q": q,
@@ -497,7 +496,7 @@ def follow_org(request, org_id):
     if not created:
         follow_relation.delete()
 
-    url = reverse("index");
+    url = reverse("landing");
     query_string = request.META.get('QUERY_STRING', '');
     if query_string:
         url = f"{url}?{query_string}"
@@ -506,7 +505,7 @@ def follow_org(request, org_id):
     if referer:
         return redirect(referer)
     else:
-        return redirect("index")  # fallback
+        return redirect("landing")  # fallback
     
 
 def org_detail(request, org_id=None, view_only=False):
@@ -643,7 +642,7 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("landing"))
         else:
             return render(request, "orgs/login.html", {
                 "message": "Invalid username and/or password."
@@ -654,7 +653,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("landing"))
 
 
 def register(request):
@@ -680,7 +679,7 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        return HttpResponseRedirect(reverse("landing"))
     else:
         return render(request, "orgs/register.html")
     
@@ -731,7 +730,7 @@ def activity_form_view(request, activity_id=None):
             if location_id:
                 return redirect(f"{reverse('locations')}?#activity-{activity.id}")
             elif org_id:
-                return redirect(f"{reverse('index_dense')}?org={org_id}")
+                return redirect(f"{reverse('orgs')}?org={org_id}")
             else:
                 return redirect(f"{reverse('activities')}#activity-{activity.id}")
 
@@ -766,7 +765,6 @@ def activity_form_view(request, activity_id=None):
         "view_only": view_only,
     })
 
-
 def map_view(request):
 
     locations_qs = Location.objects.filter(
@@ -790,9 +788,6 @@ def map_view(request):
     # Render template
     return render(request, "orgs/map.html", context)
 
-    
-from django.core.mail import send_mail
-from django.http import HttpResponse
 
 def test_email(request):
     try:
@@ -806,3 +801,114 @@ def test_email(request):
         return HttpResponse("Email sent successfully via Postmark!")
     except Exception as e:
         return HttpResponse(f"Error sending email: {str(e)}")
+
+def landing(request):
+     return render(
+        request,
+        "orgs/landing.html")
+
+def filter(request):
+    if request.method == "POST":
+        filter_form = FilterForm(request.POST)
+
+        if filter_form.is_valid():
+            county=filter_form.cleaned_data.get("county")
+            filters = {
+                "region": filter_form.cleaned_data.get("region"),
+                "county": county.id if county else None,
+                "city": filter_form.cleaned_data.get("city"),
+                "categories": [c.id for c in filter_form.cleaned_data.get("categories")],
+                "type": filter_form.cleaned_data.get("type"),
+                "org": filter_form.cleaned_data.get("org"),
+                "my_orgs": filter_form.cleaned_data.get("my_orgs"),
+                "q": filter_form.cleaned_data.get("q"),
+            }
+
+            request.session["filters"] = filters
+            print("from filter page", filters)
+
+            return redirect("results")
+
+    else:
+        filter_form = FilterForm()
+
+    return render(request, "orgs/filter.html", {
+        "filter_form": filter_form
+    })
+
+def results(request):
+    today = timezone.now().date()
+    
+    sessions = Session.objects.filter(
+            Q(start__gte=today) |  # future sessions
+            Q(start__lte=today, end__gte=today) |  # ongoing sessions with an end
+            Q(start__isnull=True , ongoing=True)  # started in the past, no end date
+        ).order_by("start").select_related(
+            "activity",        # follow FK from Session -> Activity
+            "activity__org",   # Activity -> Organization
+            "location"         # Session -> Location
+        ).prefetch_related(
+            "activity__categories"  # m2m from Activity -> categories
+        )
+    print(request.session.get("filters"))
+    filters = request.session.get("filters", {})
+    
+    if filters.get("categories"):
+        sessions = sessions.filter(activity__categories__id__in=filters["categories"]).distinct()
+           
+    if filters.get("type"):
+        sessions = sessions.filter(activity__activity_type=filters["type"])
+            
+    if filters.get("county") :
+        sessions = sessions.filter(location__county_id__id=filters["county"])
+            
+    if filters.get("org"):
+        sessions = sessions.filter(activity__org__id=filters["org"])
+
+    if filters.get("my_orgs"):
+        followed_orgs = request.user.profile.following_orgs.all()
+            
+        sessions = sessions.filter(activity__org__in=followed_orgs)
+           
+    if filters.get("region"):
+        sessions = sessions.filter(
+            Q(activity__org__region_name=filters["region"]) 
+            | Q(location__region_name=filters["region"])
+        )
+                  
+    if filters.get("q"):  
+        
+        sessions= sessions.filter(
+            Q(activity__title=filters["q"]) 
+                | Q(activity__description__icontains=filters["q"])
+                )      
+    q=filters.get("q")
+    clean_get = request.GET.copy()
+    for p in ["page", "curr_page", "onl_page","ong_page"]:
+        clean_get.pop(p, None)
+    now = timezone.now()
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+
+    # Current: future start dates, sorted by start ascending
+    upcoming_sessions = sessions.filter(start__gt=now).order_by('start')
+    
+    # New: recently created, sorted by created_on descending
+    new_sessions = sessions.filter(activity__created__gte=thirty_days_ago).order_by('-activity__created', F('start').asc(nulls_first=True))
+    
+    # Ongoing: start <= now <= end, sorted by start ascending
+    ongoing_sessions = sessions.filter(Q(start__lt=now, end__lt=now) | Q(ongoing=True)).order_by('start')
+
+
+    # For client-side tab segmentation, pass the whole filtered queryset
+    return render(request, "orgs/results.html",{
+                    "upcoming" : upcoming_sessions,
+                    "new": new_sessions,
+                    "ongoing": ongoing_sessions,
+                    "query_params": clean_get,
+                    "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
+                    "cats": EventCategory.objects.all(),
+                    "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
+                  } )
+
+    
+    

@@ -69,7 +69,61 @@ LocationFormSet = inlineformset_factory(
     formset=BaseLocationFormSet,
 )
 
-
+class FilterForm(forms.Form):
+    type = forms.ChoiceField(
+        choices=[("", "Any"), ("v", "Volunteer Opportunity"), ("t", "Training")],
+        required=False, 
+        label="Type",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )
+    org= forms.ModelChoiceField(
+        queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
+        required=False,
+        empty_label="Any",
+        label="Org Name",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )  
+    my_orgs = forms.BooleanField(
+        required=False,
+        label="Show events for My Favorite Orgs"
+    )
+    county = forms.ModelChoiceField(
+        queryset = County.objects.all().order_by("county_name"),
+        required=False,
+        empty_label="Any",
+        label="County" ,
+        widget=forms.Select(attrs={"class":"form-select"})       
+    )
+    REGION_CHOICES = [
+        ("", "Any"),
+        ("C", "Central"),
+        ("EC", "East Central"),
+        ("NE", "Northeast"),
+        ("NW", "Northwest"),
+        ("SC", "South Central"),
+        ("SE", "Southeast"),
+        ("SW", "Southwest"),
+        ("St", "Statewide"),
+    ]
+    region = forms.ChoiceField(
+        choices=REGION_CHOICES,
+        required=False,
+        label="Region",
+        widget=forms.Select(attrs={"class":"form-select"})
+    )
+    q = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            "class":"form-control mr-2",
+            "placeholder":"Search in org, location, event or description"
+        })
+    )
+    categories = forms.ModelMultipleChoiceField(
+        queryset=EventCategory.objects.all().order_by("name"),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="Event Categories"
+    )
 
 class EventFilterForm(forms.Form):
     type = forms.ChoiceField(

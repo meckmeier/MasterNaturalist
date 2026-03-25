@@ -39,11 +39,6 @@
         {{ filter_form.has_t.errors }}
     </div>
     <div class="mb-3">
-        {{ filter_form.county.label_tag}}
-        {{ filter_form.county }}
-        {{ filter_form.county.errors }}
-    </div>
-    <div class="mb-3">
         {{ filter_form.region.label_tag}}
         {{ filter_form.region }}
         {{ filter_form.region.errors }}
@@ -56,7 +51,7 @@
     
     <div class="d-flex gap-2">
         <button type = "submit" class="btn btn-primary">Apply</button>
-        <a href="{% url 'index'%}" class ="btn btn-outline-secondary">Clear</a>
+        <a href="{% url 'orgs'%}" class ="btn btn-outline-secondary">Clear</a>
     </div>
 </form>
 {% endblock %}

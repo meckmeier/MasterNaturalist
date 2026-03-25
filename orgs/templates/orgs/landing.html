@@ -1,0 +1,24 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+<div class="container my-4">
+
+    <h1>Under the Canopy</h1>
+Helping users find their connection to nature-based organizations and volunteer opportunities.
+
+Here you can find links to volunteer activities, training sessions, even paid opportunities.
+
+{% if user.is_authenticated%}
+<button><a class="nav-link" href="{% url 'filter' %}">
+                    Find Activities</a></button>
+
+<button><a class="nav-link" href="{% url 'orgs' %}">
+                    Browse Organizations</a></button>
+                    
+
+{%else%}
+<a class="nav-link" href="{% url 'login' %}">Login</a> (or <a class="nav-link" href="{% url 'register' %}">
+                    Register here</a>) to gain full advantage of this system to connect you to your natural world.
+
+{%endif%}
+</div>
+{% endblock %}

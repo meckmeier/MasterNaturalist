@@ -6,10 +6,12 @@ from django.views.generic import TemplateView
 
 from . import views
 urlpatterns = [
-    path("", views.index_dense, name="index"),
+    path("",  views.landing, name="landing"),
+    path("filter/", views.filter, name="filter"),
+    path("results/", views.results, name="results"),
     path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),
     
-    path('dense/', views.index_dense, name="index_dense"),
+    path('orgs/', views.orgs, name="orgs"),
     path("locations/", views.locations, name="locations"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
@@ -30,13 +32,11 @@ urlpatterns = [
     path("locs/<int:loc_id>/edit/", views.loc_view, name="loc_edit"),
     path("locs/<int:loc_id>/", views.loc_view, name="loc_view"),
 
-    path("eventlist/", views.events, name="events"),
-    path("activities/", views.activities, name="activities"),
     path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
     path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete" ),
-    path("map/", views.map_view, name="map_view"),
+    path("map/", views.map_view, name="map"),
     path("test_email",views.test_email, name="test_email")
 ]
 
