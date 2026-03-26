@@ -97,10 +97,20 @@ class Organization(models.Model):
     def follower_count(self):
         return self.following.count()
     
+    def user_can_edit(self, user):
+        return self.OrgManager_set.filter(
+            user=user,
+            role__in=["owner", "admin", "editor"]
+            ).exists() or user.is_staff
+    
     def can_edit(self, user):
         if not user.is_authenticated:
             return False
-        return user.is_staff or self.owner == user
+        return (
+            user.profile.staff
+            or self.owner == user
+            or self.orgmanager_set.filter(user=user).exists()
+    )
     
     @property
     def region_image(self):
@@ -115,7 +125,24 @@ class FollowOrg(models.Model):
 
     def __str__(self):
         return f'{self.profile.user.username} follows {self.followOrg.org_name}'
-        
+
+class OrgManager(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='managers')   
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='managed')
+    ROLE_CHOICES = [
+        ("owner", "Owner"),
+        ("admin", "Admin"),
+        ("editor", "Editor"),
+    ]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+
+    class Meta:
+        unique_together = ("profile", "org")
+
+    def __str__(self):
+        return f'{self.profile.user.username} manages {self.org.org_name}'
+    
+
 class Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
     loc_name= models.CharField(max_length=255)

@@ -138,59 +138,7 @@ def orgs(request):
             "orgs": all_orgs,
         }
     )
-def org_mgmt(request):
-    today = timezone.now().date()
-    active_locations = Location.objects.filter(deleted=False)
 
-    volunteer = (
-    Activity.objects
-        .filter( Q(expire_date__isnull=True) | Q(expire_date__gte=today), activity_type="v")
-        .prefetch_related(
-            Prefetch(
-             "sessions",
-             queryset=Session.objects.current().order_by("start")
-         )
-        ))
-    
-    training = (
-        Activity.objects
-        .filter( Q(expire_date__isnull=True) | Q(expire_date__gte=today), activity_type="t")
-        .prefetch_related(
-            Prefetch(
-                "sessions",
-                queryset=Session.objects.current().order_by("start")
-            )
-        ))
-    
-    orgs = (
-        Organization.objects
-        .filter(deleted=False, owner=request.user.profile)
-        .order_by("org_name")
-        .prefetch_related(   
-            Prefetch(
-                "activities",  # must match the related_name on model
-                queryset=volunteer,
-                to_attr="volunteer"  # this creates the attribute you reference later
-            ),
-            Prefetch(
-                "activities",
-                queryset=training,
-                to_attr="training"
-            ),
-            Prefetch("locations", queryset=active_locations),
-            
-        )
-    )
-        
-
-    return render(
-        request,
-        "orgs/org_mgmt.html",
-        {
-            "organizations": orgs,
-            "q":""
-        }
-    )
 def locations(request):
     
     q = request.GET.get("q", "")
@@ -566,8 +514,8 @@ def org_detail(request, org_id=None, view_only=False):
     view_only = request.resolver_match.url_name == "org_view"
     if org_id:
         org = get_object_or_404(Organization, id=org_id)
-        if request.user.profile.staff or org.owner==request.user.profile:
-            can_edit=True
+        if org.can_edit(request.user):
+            can_edit = True
     else:
         org = None
         if request.user.is_authenticated:
@@ -577,7 +525,7 @@ def org_detail(request, org_id=None, view_only=False):
         form= OrgForm(request.POST, instance=org)
         loc_formset = LocationFormSet(request.POST, instance=org, prefix="locations")
         
-        if request.user.is_authenticated and not can_edit:
+        if not org.can_edit(request.user):
              messages.error(request, "You do not have permission to update this record.")
              return render(request, "orgs/org_detail.html", {
                 "org": org,
@@ -669,8 +617,13 @@ def loc_view(request, loc_id=None):
              })
         
     else:
+        org_id = request.GET.get("org")
+        if org_id:
+            loc = Location(org_id=org_id)  # create a new instance with the org set
+        else:
+            loc = Location()  # fallback if no org_id
+
         form = LocForm(instance=loc)
-        
     if view_only:
         for field in form.fields.values():
             field.disabled = True
@@ -984,5 +937,45 @@ def results(request):
 
                   } )
 
+def org_mgmt(request):
+    active_locations=Location.objects.filter(deleted=False)
+    activities=Activity.objects.all()
+        
     
-    
+    if not request.user.is_authenticated:
+        return redirect("login")
+    if request.user.profile.staff:
+        orgs = Organization.objects.all().prefetch_related(
+            Prefetch(
+                "locations", 
+                queryset=active_locations,
+                to_attr="active_locs"  # optional: lets you access org.active_locs
+            ),
+            Prefetch(
+                "activities",
+                queryset=activities,
+                to_attr="active_activities"  # optional: access as org.active_activities
+            )
+            )
+    else:
+
+        orgs = (
+            Organization.objects
+            .filter(managed__profile=request.user.profile)
+            .distinct()
+            .prefetch_related(
+                Prefetch(
+                    "locations",
+                    queryset=active_locations,
+                    to_attr="active_locs"  # optional: access as org.active_locs in template
+                ),
+            Prefetch(
+                "activities",
+                queryset=activities,
+                to_attr="active_activities"  # optional: access as org.active_activities
+            )
+            )
+        )
+    return render(request, "orgs/org_mgmt.html", {
+        "organizations": orgs
+    })
