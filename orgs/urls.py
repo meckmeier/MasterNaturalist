@@ -10,8 +10,9 @@ urlpatterns = [
     path("filter/", views.filter, name="filter"),
     path("results/", views.results, name="results"),
     path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),
-    
+   
     path('orgs/', views.orgs, name="orgs"),
+    path('org_mgmt/', views.org_mgmt, name='org_mgmt'),
     path("locations/", views.locations, name="locations"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),

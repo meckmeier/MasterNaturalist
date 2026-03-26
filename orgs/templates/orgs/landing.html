@@ -3,11 +3,14 @@
 <div class="container my-4">
 
     <h1>Under the Canopy</h1>
-Helping users find their connection to nature-based organizations and volunteer opportunities.
+<p>Helping users find their connection to nature-based organizations and volunteer opportunities.</p>
 
-Here you can find links to volunteer activities, training sessions, even paid opportunities.
+<p>Here you can find links to volunteer activities, training sessions, even paid opportunities.</p>
+
 
 {% if user.is_authenticated%}
+<button><a class="nav-link" href="{% url 'results' %}">
+    What's New</a></button>
 <button><a class="nav-link" href="{% url 'filter' %}">
                     Find Activities</a></button>
 

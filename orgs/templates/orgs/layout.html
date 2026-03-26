@@ -40,16 +40,16 @@
             
 
             {% if user.is_authenticated %}
-                {% if request.path != "/results/" %}<li class="nav-item"><a class="nav-link" href="{% url 'filter' %}">
+                {% if request.path != "/filter/" %}<li class="nav-item"><a class="nav-link" href="{% url 'filter' %}">
                     Find Activities</a></li>{% endif %}
                 {% if request.path != "/orgs/" %}<li class ="nav-item"><a class="nav-link" href="{% url 'orgs' %}">
                     Browse Orgs</a></li>{% endif %}
                 {% if request.path != "/map/" %}<li class="nav-item"><a class="nav-link" href="{% url 'map' %}">
                     Map</a></li>{% endif %}
-                {% if request.path != "/org_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'org_create' %}">
-                    Add Org</a></li>{% endif %}
-                {% if request.path != "/loc_create/" %}<li class="nav-item"><a class="nav-link" href="{% url 'loc_create' %}">
-                    Add Location</a></li>{% endif %}    
+
+                {% if request.path != "/org_mgmt/" %}<li class="nav-item"><a class="nav-link" href="{% url 'org_mgmt' %}">
+                    Organization Management</a></li>{% endif %}
+         
                 
                 
                 {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="/admin/">

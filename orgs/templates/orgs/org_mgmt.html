@@ -1,0 +1,50 @@
+{% extends "orgs/layout.html" %}
+{% load static %}
+{% block body %}
+
+
+ <h1>Managing your organizations</h1>
+ <p>Use this page to manage organizations you are authorized to edit.</p>
+
+ {% for org in organizations %}
+<div class="container my-4">
+ <div class="card mb-4 border-0 shadow-sm orgcard" id="org-{{org.id}}">
+  <div class="card-body">
+    <div class="d-flex align-items-baseline justify-content-between cardtitle">
+      <div><h4 class="mb-1 fw-semibold">
+       {{ org.org_name }}
+     
+            <span class="mt-2 small text-muted">
+              <a href="{% url 'org_view' org.id %}"><i class="bi bi-pencil-fill"></i></a></span>
+
+      </h4></div>
+      <div>
+          <a href="{{ org.org_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe"></i> </a>
+          <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="height:30px; width:auto;">
+      </div>
+    </div>
+    <div class="col-12 col-md-11 order-md-1 tab-content mx-auto" id="v-pills-tabContent{{ org.id }}">
+           {{ org.about }} 
+              
+            <div class="mt-2">              
+              {% if org.locations.exists %}
+              <div class="mt-2 small text-muted">
+                {% for loc in org.locations.all %}
+                  {{ loc.loc_name }}{% if loc.county_id %} ({{ loc.county_id.county_name }}){% endif %}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            </div> 
+        </div>
+
+       
+  </div> <!-- tabcontent-->
+  <button><a href="{% url 'loc_create'%}?org={{org.id}}">Add Locations</a></button>
+  <button><a href="{% url 'activity_create'%}&org={{org.id}}">Add Activities</a></button>
+ </div> <!--cardbody-->
+
+ {% endfor %}
+
+</div>
+{% endblock %}

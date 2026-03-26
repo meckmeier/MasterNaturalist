@@ -11,13 +11,11 @@
   <ul class="nav nav-tabs mb-3" id="activityTabs" role="tablist">
 
   <li class="nav-item">
-    <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">Upcoming</button>
+    <button class="nav-link active" id="new-tab" data-bs-toggle="tab" data-bs-target="#new"  type="button" role="tab">Newly Added</button>
   </li>
-
   <li class="nav-item">
-    <button class="nav-link " id="new-tab" data-bs-toggle="tab" data-bs-target="#new"  type="button" role="tab">Newly Added</button>
+    <button class="nav-link " id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">Upcoming</button>
   </li>
-  
   <li class="nav-item">
     <button class="nav-link " id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing"  type="button" role="tab">Ongoing</button>
   </li>
@@ -27,17 +25,8 @@
 <!-- Tabs content -->
 <div class="tab-content" id="activityTabsContent">
 
-  <!-- Current -->
-   <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
-    {% for a in upcoming %}
-      {% include "orgs/_session_item.html" with e=a q=q %} 
-    {% empty %}
-      <p class="text-muted">No current activities</p>
-    {% endfor %}
-    </div>
-
-  <!-- Online -->
-   <div class="tab-pane fade" id="new" role="tabpanel">
+    <!-- What's new -->
+   <div class="tab-pane fade show active" id="new" role="tabpanel">
 
     {% for a in new %}
       {% include "orgs/_session_item.html" with e=a q=q %}
@@ -46,8 +35,16 @@
     {% endfor %}
     
   </div>
+  <!-- Upcoming -->
+   <div class="tab-pane fade" id="upcoming" role="tabpanel">
+    {% for a in upcoming %}
+      {% include "orgs/_session_item.html" with e=a q=q %} 
+    {% empty %}
+      <p class="text-muted">No current activities</p>
+    {% endfor %}
+    </div>
 
-    <!-- Ongoing -->
+    <!-- Online -->
   <div class="tab-pane fade" id="ongoing" role="tabpanel">
     {% for a in ongoing %}
       {% if not a.start %}{% include "orgs/_session_item.html" with e=a q=q %}{% endif %}

@@ -19,11 +19,13 @@
  {% if activity.org.owner == request.user.profile %}
     <span class="text-muted">You are the owner of this organization that sponsored this activity.</span>
  {% endif %}
-
+{% if view_only %}
+         <button type="button"><a href="{% url 'activity_edit' activity.id %}" class="btn btn-primary">Edit</a></button>        
+         {%endif%}
 <fieldset>
         <legend>What</legend>
         {{ activity_form.non_field_errors }}
-        <div class = "form-grid {% if view_only %}view-mode{% endif %}">
+    <div class = "form-grid {% if view_only %}view-mode{% endif %}">
         <div class="form-field">
             {{ activity_form.title.label_tag }}<br>
             {{ activity_form.title }}
@@ -34,7 +36,6 @@
             {{ activity_form.activity_type }}
             {{ activity_form.activity_type.errors }}
         </div>
-        
         <div class="form-field">
             {{ activity_form.org.label_tag }}
             {{ activity_form.org }}
@@ -47,7 +48,7 @@
         </div>
         <div></div>
         <div class="form-field">
-            {{ activity_form.contact_email.label_tag }}
+            Activity contact:<br>
             {{ activity_form.contact_email }}
             {{ activity_form.contact_email.errors }}
         </div>
@@ -56,14 +57,32 @@
             {{ activity_form.description }}
             {{ activity_form.description.errors }}
         </div>
+            {% for group, cats in grouped_categories.items %}
+       {% if group == "content"%}<div class="form-field-full">
+        {% elif group == "approved" %}<div></div><div class="form-field">
+        {% else %}<div class="form-field">{%endif%}
 
+            {% for cat in cats %}
+                <div style="display:inline-block; margin-right:12px;">
+                    <input type="checkbox" id="cat_{{ cat.id }}" value="{{ cat.id }}"
+                           {% if cat in activity_form.instance.categories.all %}checked{% endif %}>
+                    <label for="cat_{{ cat.id }}">{{ cat.name }}</label>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% endfor %}
+
+        <div class ="form-field-full">
+           <legend>WHEN</legend>
+        </div>
         <div class="form-field">
             {{ activity_form.date_description.label_tag }}<br>
             {{ activity_form.date_description }}
             {{ activity_form.date_description.errors }}
         </div>
 
-        <div class="form-group">
+        <div class="form-field">
             Time<br>
             {{ activity_form.time_commitment }}
             {{ activity_form.time_commitment.errors }}
@@ -74,30 +93,15 @@
             {{ activity_form.expire_date }}
             {{ activity_form.expire_date.errors }}
         </div>
-        <div class="form-field-full">
-            <div class="d-flex flex-wrap gap-2">
-                {% for checkbox in activity_form.categories %}
-                        <div class="form-check form-check-inline">
-                            {{ checkbox.tag }}
-                            <label class="form-check-label" for="{{ checkbox.id_for_label }}">
-                                {{ checkbox.choice_label }}
-                            </label>
-                        </div>
-                {% endfor %}
-            </div>
-        </div>
+
 
     </fieldset>
 
-    <h3>Sessions</h3>
+    <legend>WHERE</legend>
     <div class="formset" data-prefix="locations">
     {% if can_edit %}
-    {% if view_only %}
-         <button type="button"><a href="{% url 'activity_edit' activity.id %}" class="btn btn-primary">Edit</a></button>        
-    {% else %}
-       <button type ="submit" class="btn btn-primary">
-            Save
-        </button>
+    {% if not view_only %}
+        
         <button type="button" id="add-btn" class="btn btn_primary">
             Add Sessions
         </button>
@@ -188,6 +192,10 @@
             </tbody>
         </table>
     </div>
+    
+       <button type ="submit" class="btn btn-primary">
+            Save
+        </button>
 </form>
 
 

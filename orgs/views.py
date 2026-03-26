@@ -138,6 +138,59 @@ def orgs(request):
             "orgs": all_orgs,
         }
     )
+def org_mgmt(request):
+    today = timezone.now().date()
+    active_locations = Location.objects.filter(deleted=False)
+
+    volunteer = (
+    Activity.objects
+        .filter( Q(expire_date__isnull=True) | Q(expire_date__gte=today), activity_type="v")
+        .prefetch_related(
+            Prefetch(
+             "sessions",
+             queryset=Session.objects.current().order_by("start")
+         )
+        ))
+    
+    training = (
+        Activity.objects
+        .filter( Q(expire_date__isnull=True) | Q(expire_date__gte=today), activity_type="t")
+        .prefetch_related(
+            Prefetch(
+                "sessions",
+                queryset=Session.objects.current().order_by("start")
+            )
+        ))
+    
+    orgs = (
+        Organization.objects
+        .filter(deleted=False, owner=request.user.profile)
+        .order_by("org_name")
+        .prefetch_related(   
+            Prefetch(
+                "activities",  # must match the related_name on model
+                queryset=volunteer,
+                to_attr="volunteer"  # this creates the attribute you reference later
+            ),
+            Prefetch(
+                "activities",
+                queryset=training,
+                to_attr="training"
+            ),
+            Prefetch("locations", queryset=active_locations),
+            
+        )
+    )
+        
+
+    return render(
+        request,
+        "orgs/org_mgmt.html",
+        {
+            "organizations": orgs,
+            "q":""
+        }
+    )
 def locations(request):
     
     q = request.GET.get("q", "")
@@ -757,13 +810,24 @@ def activity_form_view(request, activity_id=None):
         for field in activity_form.fields.values():
             field.disabled = True
 
+    categories = EventCategory.objects.all().order_by("name")
+
+    grouped_categories = {}
+
+    for cat in categories:
+        group = cat.category_class or "Other"
+        grouped_categories.setdefault(group, []).append(cat)
+
+   
     return render(request, "orgs/activity_form.html", {
         "activity": activity,
         "activity_form": activity_form,
         "session_formset": session_formset,
         "can_edit": can_edit,
         "view_only": view_only,
-    })
+        "activity_form": activity_form,
+        "grouped_categories": grouped_categories,
+        })
 
 def map_view(request):
 
@@ -832,8 +896,17 @@ def filter(request):
     else:
         filter_form = FilterForm()
 
+    categories = EventCategory.objects.all().order_by("name")
+
+    grouped_categories = {}
+
+    for cat in categories:
+        group = cat.category_class or "Other"
+        grouped_categories.setdefault(group, []).append(cat)
+
     return render(request, "orgs/filter.html", {
-        "filter_form": filter_form
+        "filter_form": filter_form,
+        "grouped_categories": grouped_categories
     })
 
 def results(request):
@@ -908,6 +981,7 @@ def results(request):
                     "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
                     "cats": EventCategory.objects.all(),
                     "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
+
                   } )
 
     

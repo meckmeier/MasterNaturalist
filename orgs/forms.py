@@ -329,3 +329,36 @@ SessionFormSet = inlineformset_factory(
     validate_min=True,
     can_delete=True
 )
+class GroupedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
+    def optgroups(self, name, value, attrs=None):
+        groups = {}
+
+        for option_value, option_label in self.choices:
+            category = self.choices.queryset.get(pk=option_value)
+            group_name = category.category_class or "Other"
+
+            if group_name not in groups:
+                groups[group_name] = []
+
+            groups[group_name].append((option_value, option_label))
+
+        optgroups = []
+
+        for index, (group_name, group_choices) in enumerate(groups.items()):
+            subgroup = []
+            for subindex, (option_value, option_label) in enumerate(group_choices):
+                selected = str(option_value) in value if value else False
+
+                subgroup.append(self.create_option(
+                    name,
+                    option_value,
+                    option_label,
+                    selected,
+                    index,
+                    subindex=subindex,
+                    attrs=attrs,
+                ))
+
+            optgroups.append((group_name.title(), subgroup, index))
+
+        return optgroups

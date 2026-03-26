@@ -38,7 +38,7 @@ def one_year_from_now():
 class EventCategory(models.Model):
     name=models.CharField(max_length=50, unique=True)
     description=models.CharField(max_length=200, blank=True, null=True)
-
+    category_class = models.CharField(max_length=200, blank=True, null=True)
     class Meta:
         ordering =["name"]
 
