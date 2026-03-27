@@ -146,7 +146,7 @@ class OrgManager(models.Model):
 
 class Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
-    loc_name= models.CharField(max_length=255)
+    loc_name= models.CharField(max_length=255, unique=True)
     physical_location = models.BooleanField(default=True)
     address = models.CharField(max_length=255, default ='', blank=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )
