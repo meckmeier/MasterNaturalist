@@ -1,0 +1,15 @@
+{% extends "orgs/layout.html" %}
+{% load static %}
+
+{% for profile in profiles %}
+    <div>
+        {{ profile.user.username }}
+
+        <form method="post" action="{% url 'add_manager' %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="org_id" value="{{ org.id }}">
+            <input type="hidden" name="profile_id" value="{{ profile.id }}">
+            <button class="btn btn-sm btn-outline-primary">Add</button>
+        </form>
+    </div>
+{% endfor %}

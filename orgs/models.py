@@ -77,7 +77,7 @@ class Profile(models.Model):
         return self.following.count()
     
 class Organization(models.Model):
-    org_name = models.CharField(max_length=255)
+    org_name = models.CharField(max_length=255, unique=True)
     org_url = models.URLField(max_length=200, default="", blank=True)
     in_wisconsin = models.BooleanField(default=True)
     host = models.BooleanField(default=False)
@@ -111,6 +111,7 @@ class Organization(models.Model):
             or self.owner == user
             or self.orgmanager_set.filter(user=user).exists()
     )
+
     
     @property
     def region_image(self):
@@ -134,7 +135,7 @@ class OrgManager(models.Model):
         ("admin", "Admin"),
         ("editor", "Editor"),
     ]
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="editor")
 
     class Meta:
         unique_together = ("profile", "org")
@@ -145,7 +146,7 @@ class OrgManager(models.Model):
 
 class Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
-    loc_name= models.CharField(max_length=255)
+    loc_name= models.CharField(max_length=255, unique=True)
     physical_location = models.BooleanField(default=True)
     address = models.CharField(max_length=255, default ='', blank=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )

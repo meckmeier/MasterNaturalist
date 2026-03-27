@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 
 from django.db import IntegrityError
-from django.http import  HttpResponseRedirect, JsonResponse, HttpResponse
+from django.http import  HttpResponseRedirect,  HttpResponse
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.core.mail import send_mail
-
+from django.views.decorators.http import require_POST
 from orgs.models import *
 from .forms import *
 
@@ -525,22 +525,19 @@ def org_detail(request, org_id=None, view_only=False):
         form= OrgForm(request.POST, instance=org)
         loc_formset = LocationFormSet(request.POST, instance=org, prefix="locations")
         
-        if not org.can_edit(request.user):
-             messages.error(request, "You do not have permission to update this record.")
-             return render(request, "orgs/org_detail.html", {
-                "org": org,
-                "events": [],
-                "form": form,
-                "view_only": view_only,
-                "loc_formset": loc_formset,
-                "can_edit": can_edit,
-             })
+        
       
         if form.is_valid() and loc_formset.is_valid():
             org = form.save(commit=False)
             if not org_id:
                 org.owner = request.user.profile
             org.save()
+            if not OrgManager.objects.filter(org=org, profile=request.user.profile).exists():
+                OrgManager.objects.create(
+                    org=org,
+                    profile=request.user.profile,
+                    role='owner'  # if you added the role field
+                )
             loc_formset.instance = org
             loc_formset.save()
             messages.success(request, "Organization details saved successfully.")
@@ -940,10 +937,11 @@ def results(request):
 def org_mgmt(request):
     active_locations=Location.objects.filter(deleted=False)
     activities=Activity.objects.all()
-        
+    managers_qs=OrgManager.objects.all().select_related("profile__user")    
     
     if not request.user.is_authenticated:
         return redirect("login")
+    
     if request.user.profile.staff:
         orgs = Organization.objects.all().prefetch_related(
             Prefetch(
@@ -955,6 +953,11 @@ def org_mgmt(request):
                 "activities",
                 queryset=activities,
                 to_attr="active_activities"  # optional: access as org.active_activities
+            ),
+            Prefetch(
+                "managed",
+                queryset=managers_qs,
+                to_attr="prefetch_mgrs"
             )
             )
     else:
@@ -973,9 +976,39 @@ def org_mgmt(request):
                 "activities",
                 queryset=activities,
                 to_attr="active_activities"  # optional: access as org.active_activities
+            ),
+            Prefetch(
+                "managed",
+                queryset=managers_qs,
+                to_attr="prefetch_mgrs"
             )
             )
         )
+    print ("orgs", orgs)
     return render(request, "orgs/org_mgmt.html", {
         "organizations": orgs
     })
+
+def manager_add_page(request):
+    org_id = request.GET.get("org")
+    org = get_object_or_404(Organization, id=org_id)
+
+    profiles = Profile.objects.select_related("user").all()
+    print("profiles", profiles)
+    return render(request, "orgs/add_mgr.html", {
+        "org": org,
+        "profiles": profiles
+    })
+
+@require_POST
+def add_manager(request):
+    org_id = request.POST.get("org_id")
+    profile_id = request.POST.get("profile_id")
+
+    org = get_object_or_404(Organization, id=org_id)
+    profile = get_object_or_404(Profile, id=profile_id)
+
+    # prevent duplicates
+    OrgManager.objects.get_or_create(org=org, profile=profile)
+
+    return redirect("org_mgmt")

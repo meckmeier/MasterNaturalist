@@ -1,0 +1,22 @@
+
+{% extends "orgs/layout.html" %}
+{% load static %}
+{% block body %}
+<h2>add managers</h2>
+<form method="post" action="{% url 'add_manager' %}">
+    {% csrf_token %}
+    <input type="hidden" name="org_id" value="{{ org.id }}">
+
+    <select name="profile_id" class="form-select">
+        {% for profile in profiles %}
+            <option value="{{ profile.id }}">
+                {{ profile.user.username }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="btn btn-primary btn-sm mt-2">
+        Add Manager
+    </button>
+</form>
+{%endblock%}

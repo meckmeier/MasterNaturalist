@@ -7,3 +7,4 @@ class OrgsConfig(AppConfig):
 
     def ready(self):
         import orgs.signals  # Import signals to ensure they are registered
+        

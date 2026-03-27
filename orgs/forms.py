@@ -362,3 +362,13 @@ class GroupedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
             optgroups.append((group_name.title(), subgroup, index))
 
         return optgroups
+class OrgManagerForm(forms.ModelForm):
+    class Meta:
+        model = OrgManager
+        fields = ["profile", "role"]  # org is set in view
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # optional: nicer labels
+        self.fields["profile"].label = "User"

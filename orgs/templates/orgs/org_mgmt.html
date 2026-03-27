@@ -15,7 +15,7 @@
     <!-- Locations & Activities side by side -->
     <div class="row">
         <!-- Locations -->
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Locations</span>
@@ -35,7 +35,7 @@
         </div>
 
         <!-- Activities -->
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Activities</span>
@@ -52,6 +52,29 @@
                     {% endfor %}
                 </ul>
             </div>
+        </div>
+
+         <!-- Managers -->
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Managers</span>
+                    <a href="{% url 'manager_add_page' %}?org={{ org.id }}" class="btn btn-sm btn-primary">
+                    Add Manager</a>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for mgr in org.prefetch_mgrs %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ mgr.profile.user.username }} 
+                           
+                        </li>
+                        
+                    {% empty %}
+                        <li class="list-group-item">No Managers yet</li>
+                    {% endfor %}
+                </ul>
+            </div>
+           
         </div>
     </div>
 
