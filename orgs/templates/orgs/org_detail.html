@@ -16,13 +16,13 @@
    {{form.id}}
     <!-- submit button INSIDE the form -->
     {% if can_edit and not view_only %}
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="mybtn">
             {% if org %}Save{% else %}Add{% endif %}
         </button>
-        <button type="button" id="add-btn" class="btn btn_primary">
+        <button type="button" id="add-btn" class="mybtn">
             Add Locations
         </button>
-        <a href="{% url 'activity_create' %}?org={{ org.id }}" class="btn btn-sm btn-primary">
+        <a href="{% url 'activity_create' %}?org={{ org.id }}" class="button-link">
                 Add Activity
         </a>
     {% endif %}

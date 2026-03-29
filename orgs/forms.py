@@ -307,9 +307,26 @@ class ActivityForm(forms.ModelForm):
             "expire_date": forms.DateInput(attrs={"type": "date"}),
             "date_description": forms.TextInput(attrs={"placeholder": "e.g., 'Ongoing weekly'"}),
         }   
+    def clean(self):   
+        cleaned_data = super().clean()
+        url = cleaned_data.get("activity_url")
+        email = cleaned_data.get("contact_email")
 
+        if not url and not email:
+            message = "Provide either a URL or a contact email."
+            self.add_error('activity_url', message)
+            self.add_error('contact_email', message)
 
+        return cleaned_data
+    def possible_duplicate(self):
+        title = self.cleaned_data.get("title")
+        org = self.cleaned_data.get("org")
 
+        return Activity.objects.filter(
+            org=org,
+            title__iexact=title
+        ).exists()
+    
 class SessionForm(forms.ModelForm):
     class Meta:
         model = Session

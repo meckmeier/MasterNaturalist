@@ -2,25 +2,30 @@
 {% block body %}
 <div class="container my-4">
 
-    <h1>Under the Canopy</h1>
-<p>Helping users find their connection to nature-based organizations and volunteer opportunities.</p>
-
-<p>Here you can find links to volunteer activities, training sessions, even paid opportunities.</p>
-
+<h1>Canopy Over Wisconsin</h1>
 
 {% if user.is_authenticated%}
-<button><a class="nav-link" href="{% url 'results' %}">
-    What's New</a></button>
-<button><a class="nav-link" href="{% url 'filter' %}">
-                    Find Activities</a></button>
+<p>Organized into a directory of nature based organizations - or a search feature to find volunteer or training opportunities today.
+    </p>
+<a  class="button-link" href="{% url 'results' %}">
+    What's New</a>
+<a class="button-link" href="{% url 'filter' %}">
+    Find Activities</a>
+<a class="button-link" href="{% url 'orgs' %}">
+    Browse Organizations</a>
 
-<button><a class="nav-link" href="{% url 'orgs' %}">
-                    Browse Organizations</a></button>
-                    
+    <p>If you are an organization and need to manage your org, locations or add new activities:</p>
+    <a class="button-link-2nd" href="{% url 'org_mgmt' %}">
+    Manage Organizations</a>
 
 {%else%}
-<a class="nav-link" href="{% url 'login' %}">Login</a> (or <a class="nav-link" href="{% url 'register' %}">
-                    Register here</a>) to gain full advantage of this system to connect you to your natural world.
+<p>This website was designed to help Wisconsin Master Naturalists find volunteer and training opportunities. 
+    </p>
+    
+    <a class="button-lnk" href="{% url 'register' %}">
+    Click here to get started</a>
+    Already have a login -> <a class="button-link" href="{% url 'login' %}">Login</a>
+     to gain full advantage of this system to connect you to your natural world.
 
 {%endif%}
 </div>

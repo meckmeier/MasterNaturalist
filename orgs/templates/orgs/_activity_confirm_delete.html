@@ -1,0 +1,16 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+
+<h3>Delete Activity</h3>
+
+<p>
+  Are you sure you want to delete:
+  <strong>{{ activity.title }}</strong>?
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Yes, delete</button>
+  <a href="{% url 'org_mgmt' %}#org-{{ activity.org.id }}">Cancel</a>
+</form>
+{% endblock %}

@@ -31,6 +31,7 @@ urlpatterns = [
     path("activity/new/", views.activity_form_view, name="activity_create"),
     path("activity/<int:activity_id>/", views.activity_form_view, name="activity_view"),
     path("activity/<int:activity_id>/edit", views.activity_form_view, name="activity_edit"),
+    path("activity/<int:activity_id>/delete/", views.activity_delete, name="activity_delete"),
 
     path("locs/new/", views.loc_view, name="loc_create"),
     path("locs/<int:loc_id>/edit/", views.loc_view, name="loc_edit"),
