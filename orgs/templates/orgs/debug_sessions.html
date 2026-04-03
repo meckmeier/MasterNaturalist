@@ -1,0 +1,40 @@
+<h1>Session Debug</h1>
+
+<p>
+    <a href="?">All</a> |
+    <a href="?active=1">Active</a> |
+    <a href="?active=1&upcoming=1">Active + Upcoming</a> |
+    <a href="?active=1&ongoing=1">Active + Ongoing</a> |
+    <a href="?new=1">New</a> |
+    <a href="?bad=1">🚨 Show Problems</a>
+</p>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>ID</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Session Deleted</th>
+        <th>Activity Deleted</th>
+        <th>Org Deleted</th>
+        <th>Activity</th>
+        <th>Org</th>
+    </tr>
+
+    {% for s in sessions %}
+    <tr style="
+        {% if s.deleted or s.activity.deleted or s.activity.org.deleted %}
+            background-color: #ffdddd;
+        {% endif %}
+    ">
+        <td>{{ s.id }}</td>
+        <td>{{ s.start }}</td>
+        <td>{{ s.end }}</td>
+        <td>{{ s.deleted }}</td>
+        <td>{{ s.activity.deleted }}</td>
+        <td>{{ s.activity.org.deleted }}</td>
+        <td>{{ s.activity }}</td>
+        <td>{{ s.activity.org }}</td>
+    </tr>
+    {% endfor %}
+</table>

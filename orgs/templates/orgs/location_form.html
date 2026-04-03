@@ -17,7 +17,7 @@
         <button type="submit" class="mybtn">
             {% if loc %}Save{% else %}Add{% endif %}
         </button>
-        <a class="button-link" href="{% url 'activity_create' %}?org={{ loc.org_id}}&location={{ loc.id }}">Add Activity</a>
+        
     {% endif %}
     <div class = "form-grid {% if view_only %}view-mode{% endif %}">
         <div class ="form-field title">
@@ -30,20 +30,23 @@
             {{ form.location_about}}
             {{ form.location_about.errors}}
         </div>
+       
         <div class ="form-field">
             {{ form.org_loc_url.label_tag }}
             {{ form.org_loc_url}}
             {{ form.org_loc_url.errors }}
-        </div>
-        <div class ="form-field">
             {{ form.contact_email.label_tag }}
             {{ form.contact_email}}
             {{ form.contact_email.errors }}
         </div>
+         <div></div>
          <div class ="form-field">
             {{ form.region_name.label_tag }}
             {{ form.region_name}}
             {{ form.region_name.errors }}
+            {{ form.county_id.label_tag }}
+            {{ form.county_id}}
+            {{ form.county_id.errors }}
         </div>
    
         <div class ="form-field-full">
@@ -66,21 +69,24 @@
             {{ form.zip_code}}
             {{ form.zip_code.errors }}
         </div>
-        <div class ="form-field">
-            {{ form.county_id.label_tag }}
-            {{ form.county_id}}
-            {{ form.county_id.errors }}
-        </div>
+
          <div class ="form-field">
             {{ form.org.label_tag }}
             {{ form.org}}
             {{ form.org.errors }}
         </div>
     </div>
-Entered by: {{form.owner}}
 
-
-    
 </form>
+  <p>Created :
+{% if loc.created_by %}
+  {{ loc.created_by }}
+  /{{ loc.created_at }}
+{% endif %}</p>
 
+<p>Last updated by: 
+{% if loc.updated_by %}
+  {{ loc.updated_by }} |
+   {{ loc.updated_at }}
+{% endif %}
 {% endblock %}

@@ -1,0 +1,61 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<h2>Review Staged Data</h2>
+
+{% if errors %}
+    <div style="color:red;">
+        <h3>Errors:</h3>
+        <ul>
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Skip?</th>
+                <th>#</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>City</th>
+                <th>Location</th>
+                <th>Address</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in staged_rows %}
+            <tr {% if row.status == "skipped" %} style="background-color:#fdd;" {% endif %}>
+                <td>
+                    <input type="checkbox" name="skip_row" value="{{ row.id }}" {% if row.status == "skipped" %} checked {% endif %}>
+                </td>
+                <td>{{ row.row_number }}</td>
+                <td>{{ row.title }}</td>
+                <td>{{ row.description }}</td>
+                <td>{{ row.city }}</td>
+                <td>{{ row.location_name }}</td>
+                <td>{{ row.address }}</td>
+                <td>{{ row.date }}</td>
+                <td>{{ row.status }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Update Skipped Rows</button>
+</form>
+
+<a href="{% url 'upload_commit' upload.id %}">Commit Valid Rows to Final Tables</a>
+{% endblock %}

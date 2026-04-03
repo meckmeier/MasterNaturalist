@@ -9,6 +9,7 @@
     <!-- Organization Name -->
     <h4 class="card-title">{{ org.org_name }}<a href="{% url 'org_edit' org.id %}" title="manage organization details"><i class="bi bi-pencil"></i></a>
     </h4>
+    <a href="{% url 'upload_csv' org.id%}" class="mybtn">Upload Activities</a>
     <!-- Description -->
     <p class="card-text mb-4">{{ org.about|truncatewords:30 }}</p>
 
@@ -22,7 +23,7 @@
                     <a href="{% url 'loc_create' %}?org={{ org.id }}" title="Add location"><i class="bi bi-plus-circle"></i></a>
                 </div>
                 <ul class="list-group list-group-flush">
-                    {% for loc in org.locations.all %}
+                    {% for loc in org.pre_locs %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             {{ loc.loc_name }} | {{ loc.county_id.county_name }}
                             <a href="{% url 'loc_edit' loc.id %}" title="edit location"><i class="bi bi-pencil"></i></a>
@@ -43,7 +44,7 @@
                     
                 </div>
                 <ul class="list-group list-group-flush">
-                    {% for act in org.activities.all %}
+                    {% for act in org.pre_activities %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             {{ act.title }} | {{ act.date_description }}
                             <a href="{% url 'activity_edit' act.id %}" title="edit activity"><i class="bi bi-pencil"></i></a>
@@ -65,7 +66,7 @@
                     <i class="bi bi-plus-circle"></i></a>
                 </div>
                 <ul class="list-group list-group-flush">
-                    {% for mgr in org.prefetch_mgrs %}
+                    {% for mgr in org.pre_mgrs %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             {{ mgr.profile.user.username }} 
                            

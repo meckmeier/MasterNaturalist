@@ -1,4 +1,4 @@
-<!-- templates/activities/add_activity.html -->
+<!-- templates/activities/activity.html -->
 {% extends "orgs/layout.html" %}
 
 
@@ -16,7 +16,8 @@
  {% csrf_token %}
  <input type="hidden" name="org" value="{{ request.GET.org }}">
  <input type="hidden" name="location" value="{{ request.GET.location }}">
- 
+ <input type="hidden" name="next" value="{{ request.GET.next|default:request.get_full_path }}">
+    
 {% if view_only %}
          <a class="button-link" href="{% url 'activity_edit' activity.id %}">Edit</a>        
          {%endif%}
@@ -36,6 +37,7 @@
        <button type ="submit" class="mybtn">
             Save
         </button>
+
 {% endif %}
 <fieldset>
        <div class="error-text"> {{ activity_form.non_field_errors }}</div>
@@ -45,6 +47,9 @@
             {{ activity_form.title }}
             <span class="error-text">{{ activity_form.title.errors }}</span>
         </div>
+
+         
+      
          <div class="form-field">
             Type:<br>
             {{ activity_form.activity_type }}
@@ -69,16 +74,8 @@
         <div class="form-field-full">
             <legend>WHERE - if an in-person event</legend>
     <div class="formset" data-prefix="locations">
-    {% if can_edit %}
-    {% if not view_only %}
-        
-        <button type="button" id="add-btn" class="mybtn">
-            Add Sessions
-        </button>
-    {% endif %}
- {% endif %}    
+    
        
-
         {{ session_formset.management_form }}
         <table class="formset-table {% if view_only %}view-mode{% endif %}">
             <thead>
@@ -152,16 +149,24 @@
                         {% for hidden in session_formset.empty_form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
-                     <td>{{ form.session_format }}</td>
-                     <td>{{ form.session_url }}</td>
-                     <td>{{ form.location }}</td>
-                     <td>{{ form.start }}</td>
-                     <td>{{ form.end }}</td>
-                        
+                     <td>{{ session_formset.empty_form.session_format }}</td>
+                     <td>{{ session_formset.empty_form.session_url }}</td>
+                     <td>{{ session_formset.empty_form.location }}</td>
+                     <td>{{ session_formset.empty_form.ongoing }}</td>
+                     <td>{{ session_formset.empty_form.start }}</td>
+                     <td>{{ session_formset.empty_form.end }}</td>
+                    <td>{{session_formset.empty_form.DELETE}}</td>
                     </tr>
             </tbody>
         </table>
     </div>
+    {% if can_edit %}
+    {% if not view_only %}
+        <button type="button" id="add-btn" class="mybtn">
+            Add Sessions
+        </button>
+    {% endif %}
+ {% endif %}    
     </div>
     <div class ="form-field-full">
            <legend>WHEN - you can describe dates for display. </legend>
@@ -189,34 +194,43 @@
             {{ activity_form.description }}
             {{ activity_form.description.errors }}
         </div>
-            {% for group, cats in grouped_categories.items %}
-            {% if group == "content"%}<div class="form-field-full">
-            {% elif group == "approved" %}<div></div><div class="form-field">
-            {% else %}<div class="form-field">{%endif%}
+       
 
-            {% for cat in cats %}
-                <div style="display:inline-block; margin-right:12px;">
-                    <input type="checkbox" id="cat_{{ cat.id }}" value="{{ cat.id }}"
-                           {% if cat in activity_form.instance.categories.all %}checked{% endif %}>
-                    <label for="cat_{{ cat.id }}">{{ cat.name }}</label>
-                </div>
-            {% endfor %}
+{% for group, choices in activity_form.fields.categories.choices %}
+{% if group in "content" %}<div class="form-field-full">
+    {% else %}<div class="form-field">{% endif %}
+   
+
+    {% for value, label in choices %}
+        <div style="display:inline-block; margin-right:12px;">
+            <input type="checkbox"
+                   name="{{ activity_form.categories.html_name }}"  {# correct name #}
+                   value="{{ value }}"
+                   id="cat_{{ value }}"
+                   {% if value|stringformat:"s" in activity_form.initial.categories %}checked{% endif %}>
+            <label for="cat_{{ value }}">{{ label }}</label>
         </div>
-
-            {% endfor %}
+    {% endfor %}
+</div>
+{% endfor %}
 
         
 
     </fieldset>
 
-    
-   Entered by: {{activity_form.owner}} 
 </form>
-
-
-   
 </form>
+<hr>
+<p>Created :
+{% if activity.created_by %}
+  {{ activity.created_by }}
+  /{{ activity.created_at }}
+{% endif %}</p>
 
-   
-
+<p>Last updated by: 
+{% if activity.updated_by %}
+  {{ activity.updated_by }} |
+   {{ activity.updated_at }}
+{% endif %}
+</p>
 {% endblock %}

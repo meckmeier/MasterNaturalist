@@ -1,0 +1,24 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}    
+    </ul>
+{% endif %} 
+<h2>Upload Data</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div>
+        <label for="file">Choose CSV or Excel file:</label><br>
+        {{ form.file }}
+    </div>
+
+    <br>
+
+    <button type="submit">Upload</button>
+</form>
+{% endblock %}

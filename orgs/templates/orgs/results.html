@@ -47,7 +47,7 @@
     <!-- Online -->
   <div class="tab-pane fade" id="ongoing" role="tabpanel">
     {% for a in ongoing %}
-      {% if not a.start %}{% include "orgs/_session_item.html" with e=a q=q %}{% endif %}
+      {% include "orgs/_session_item.html" with e=a q=q %}
     {% empty %}
       <p class="text-muted">No ongoing events</p>
     {% endfor %}

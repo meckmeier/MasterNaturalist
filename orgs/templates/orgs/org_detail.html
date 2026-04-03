@@ -19,12 +19,6 @@
         <button type="submit" class="mybtn">
             {% if org %}Save{% else %}Add{% endif %}
         </button>
-        <button type="button" id="add-btn" class="mybtn">
-            Add Locations
-        </button>
-        <a href="{% url 'activity_create' %}?org={{ org.id }}" class="button-link">
-                Add Activity
-        </a>
     {% endif %}
     <div class = "form-grid {% if view_only %}view-mode{% endif %}">
         <div class ="form-field title">
@@ -41,6 +35,7 @@
             {{ form.in_wisconsin.label_tag }}
             {{ form.in_wisconsin}}
             {{ form.in_wisconsin.errors }}
+            
         </div>
          <div class ="form-field">
             {{ form.region_name.label_tag }}
@@ -52,70 +47,36 @@
             {{ form.about}}
             {{ form.about.errors }} 
         </div>
+        <div class="form-field">
+            {{ form.volunteer_url.label_tag }}
+            {{ form.volunteer_url }}
+            {{ form.volunteer_url.errors }}
+        </div>
+        <div class="form-field">
+            Master Naturalist Host
+            {{ form.host}}
+            {{ form.host.errors }}
+        </div>
+        <div class="form-field">
+            {{ form.training_url.label_tag }}
+            {{ form.training_url }}
+            {{ form.training_url.errors }}
+        </div>
     </div>
+       
+    <p>Created :
+{% if org.created_by %}
+  {{ org.created_by }}
+  /{{ org.created_at }}
+{% endif %}</p>
 
+<p>Last updated by: 
+{% if org.updated_by %}
+  {{ org.updated_by }} |
+   {{ org.updated_at }}
+{% endif %}
+    
 
-
-    <h3>Locations</h3>
-    <div class="formset" data-prefix="locations">
-
-
-        {{ loc_formset.management_form }}
-        <table class="formset-table {% if view_only %}view-mode{% endif %}">
-            <thead>
-                <tr> 
-                    <th>Name</th>
-                    <th>Region</th>
-                    <th>Has Physical Location</th>
-                    <th>URL</th>
-                    <th>Contact Email</th>
-                    <th>About</th>
-                    <th>Address</th>
-                    <th>City</th>
-                    <th>County</th>
-                    <th>State</th>
-                    <th>Zip Code</th>
-                    <th>DELETE</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for form in loc_formset %}
-                    <tr class ="formset-row">
-                        {% for hidden in form.hidden_fields %}
-                            {{ hidden }}
-                        {% endfor %}
-
-                        {% for each in form.visible_fields %}
-                        <td>
-                         <span class="field-value">
-                              {% if each.name == "county_id" %}
-                                {{ form.instance.county_id|default:"—" }}
-                            {% else %}
-                                {{ each.value|default:"—" }}
-                            {% endif %}
-                         </span>
-                            {{ each.errors }}
-                            {{ each }}
-                        </td>
-                        {% endfor %}               
-                    </tr>
-            {% empty %}
-                    <tr class="empty-hint">
-                        <td colspan="4">No locations added.</td>
-                    </tr>
-            {% endfor %}
-                    <tr class="formset-row form-template" style="display:none;">
-                        {% for hidden in loc_formset.empty_form.hidden_fields %}
-                            {{ hidden }}
-                        {% endfor %}
-
-                        {% for each in loc_formset.empty_form.visible_fields %}
-                            <td>{{ each }}</td>
-                        {% endfor %}
-                    </tr>
-            </tbody>
-        </table>
-    </div>
 </form>
 
 {% endblock %}

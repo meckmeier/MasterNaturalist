@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from django.core.exceptions import ValidationError
-
+from collections import defaultdict
 from .models import *
 
 class OrgForm(forms.ModelForm):
@@ -18,7 +18,7 @@ class OrgForm(forms.ModelForm):
 class LocForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = "__all__"
+        fields = ["org", "loc_name", "physical_location", "address", "city_name", "county_id", "region_name", "state", "zip_code", "org_loc_url", "location_about", "contact_email"]
         widgets = {
             "location_about": forms.Textarea(attrs={
                 "rows": 3,
@@ -298,15 +298,35 @@ class ProfileForm(forms.ModelForm):
             "include_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 class ActivityForm(forms.ModelForm):
+    categories = forms.ModelMultipleChoiceField(
+        queryset=EventCategory.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple
+    )
+
     class Meta:
         model = Activity
-        fields = "__all__"
+        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "expire_date", "activity_url", "no_cost", "contact_email"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
-            "categories": forms.CheckboxSelectMultiple(),
             "expire_date": forms.DateInput(attrs={"type": "date"}),
             "date_description": forms.TextInput(attrs={"placeholder": "e.g., 'Ongoing weekly'"}),
-        }   
+             "deleted": forms.CheckboxInput(attrs={"style": "display:none;"})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        grouped = defaultdict(list)
+
+        # ✅ use the existing queryset (important habit)
+        for cat in self.fields['categories'].queryset:
+            grouped[cat.category_class].append((cat.id, cat.name))
+
+        # ✅ Django-native grouped choices
+        self.fields['categories'].choices = [
+            (group, choices) for group, choices in grouped.items()
+        ]
     def clean(self):   
         cleaned_data = super().clean()
         url = cleaned_data.get("activity_url")
@@ -389,3 +409,8 @@ class OrgManagerForm(forms.ModelForm):
 
         # optional: nicer labels
         self.fields["profile"].label = "User"
+
+class UploadFileForm(forms.ModelForm):
+    class Meta:
+        model = ActivityUpload
+        fields = ["file"]

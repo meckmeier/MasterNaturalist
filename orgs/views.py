@@ -1,10 +1,11 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .utils import update_new_fields
 from django.core.mail import send_mail
-from django.http import HttpResponse
-from django.contrib.auth import authenticate, login, logout
 
+from django.contrib.auth import authenticate, login, logout
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.db import IntegrityError
-from django.http import  HttpResponseRedirect,  HttpResponse
+from django.http import  HttpResponseRedirect,  HttpResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
@@ -14,8 +15,12 @@ from django.db.models import Q, Prefetch, F
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 import json
-from django.core.mail import send_mail
+import pandas as pd
+from .services.csv_importer import CSVImporter
+
+
 from django.views.decorators.http import require_POST
+from collections import defaultdict
 from orgs.models import *
 from .forms import *
 
@@ -26,49 +31,158 @@ def sort_key(x):
         return date.max
     return d
 
+def landing(request):
+     # view only shows the main landing page. all info is rendered in the html page.
+     return render(
+        request,
+        "orgs/landing.html")
+
+def filter(request):
+    # main activity filter page - 
+    if request.method == "POST":
+        filter_form = FilterForm(request.POST)
+
+        if filter_form.is_valid():
+            county=filter_form.cleaned_data.get("county")
+            filters = {
+                "region": filter_form.cleaned_data.get("region"),
+                "county": county.id if county else None,
+                "city": filter_form.cleaned_data.get("city"),
+                "categories": [c.id for c in filter_form.cleaned_data.get("categories")],
+                "type": filter_form.cleaned_data.get("type"),
+                "org": filter_form.cleaned_data.get("org"),
+                "my_orgs": filter_form.cleaned_data.get("my_orgs"),
+                "q": filter_form.cleaned_data.get("q"),
+            }
+
+            request.session["filters"] = filters
+            #print("from filter page", filters)
+
+            return redirect("results")
+
+    else:
+        filter_form = FilterForm()
+
+    categories = EventCategory.objects.all().order_by("name")
+
+    grouped_categories = {}
+
+    for cat in categories:
+        group = cat.category_class or "Other"
+        grouped_categories.setdefault(group, []).append(cat)
+
+    return render(request, "orgs/filter.html", {
+        "filter_form": filter_form,
+        "grouped_categories": grouped_categories
+    })
+
+def results(request):
+    # activities results... should i change this so we know what it is?
+   
+    sessions = Session.objects.current().select_related(
+            "activity",        # follow FK from Session -> Activity
+            "activity__org",   # Activity -> Organization
+            "location"         # Session -> Location
+        ).prefetch_related(
+            "activity__categories"  # m2m from Activity -> categories
+        )
+    #print(request.session.get("filters"))
+    filters = request.session.get("filters", {})
+    
+    if filters.get("categories"):
+        sessions = sessions.filter(activity__categories__id__in=filters["categories"]).distinct()
+           
+    if filters.get("type"):
+        sessions = sessions.filter(activity__activity_type=filters["type"])
+            
+    if filters.get("county") :
+        sessions = sessions.filter(location__county_id__id=filters["county"])
+            
+    if filters.get("org"):
+        sessions = sessions.filter(activity__org__id=filters["org"])
+
+    if filters.get("my_orgs"):
+        followed_orgs = request.user.profile.following_orgs.all()
+            
+        sessions = sessions.filter(activity__org__in=followed_orgs)
+           
+    if filters.get("region"):
+        sessions = sessions.filter(
+            Q(activity__org__region_name=filters["region"]) 
+            | Q(location__region_name=filters["region"])
+        )
+                  
+    if filters.get("q"):  
+        
+        sessions= sessions.filter(
+            Q(activity__title=filters["q"]) 
+                | Q(activity__description__icontains=filters["q"])
+                )      
+    q=filters.get("q")
+    clean_get = request.GET.copy()
+    for p in ["page", "curr_page", "onl_page","ong_page"]:
+        clean_get.pop(p, None)
+    
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+
+    # Current: future start dates, sorted by start ascending
+    upcoming_sessions = sessions.upcoming().order_by('start')
+    
+    # New: recently created, sorted by created_on descending
+    new_sessions = sessions.filter(activity__created_at__gte=thirty_days_ago).order_by('-activity__created_at', F('start').asc(nulls_first=True))
+    
+    # Ongoing: start <= now <= end, sorted by start ascending
+    ongoing_sessions = sessions.ongoing().order_by('activity__title')
+    #print("ongoing sessions", ongoing_sessions)
+
+    # For client-side tab segmentation, pass the whole filtered queryset
+    return render(request, "orgs/results.html",{
+                    "upcoming" : upcoming_sessions,
+                    "new": new_sessions,
+                    "ongoing": ongoing_sessions,
+                    "query_params": clean_get,
+                    "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
+                    "cats": EventCategory.objects.all(),
+                    "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
+
+                  } )
+
 def orgs(request):
-
+    # view that runs the org list - this page has it's own filter page.
     q = request.GET.get("q", "")
-    today = timezone.now().date()
+    locations_qs = Location.objects.active()
 
-    active_locations = Location.objects.filter(deleted=False)
-
-    volunteer = (
-    Activity.objects
-        .filter( Q(expire_date__isnull=True) | Q(expire_date__gte=today), activity_type="v")
-        .prefetch_related(
+    volunteer_qs = (
+    Activity.objects.volunteer().prefetch_related(
             Prefetch(
              "sessions",
              queryset=Session.objects.current().order_by("start")
          )
         ))
     
-    training = (
-        Activity.objects
-        .filter( Q(expire_date__isnull=True) | Q(expire_date__gte=today), activity_type="t")
-        .prefetch_related(
+    training_qs = (
+        Activity.objects.training().prefetch_related(
             Prefetch(
                 "sessions",
                 queryset=Session.objects.current().order_by("start")
             )
         ))
     
-    queryset = (
-        Organization.objects
-        .filter(deleted=False)
+    org_queryset = (
+        Organization.objects.active()
         .order_by("org_name")
         .prefetch_related(   
             Prefetch(
                 "activities",  # must match the related_name on model
-                queryset=volunteer,
-                to_attr="volunteer"  # this creates the attribute you reference later
+                queryset=volunteer_qs,
+                to_attr="pre_volunteer"  # this creates the attribute you reference later
             ),
             Prefetch(
                 "activities",
-                queryset=training,
-                to_attr="training"
+                queryset=training_qs,
+                to_attr="pre_training"
             ),
-            Prefetch("locations", queryset=active_locations),
+            Prefetch("locations", queryset=locations_qs, to_attr="pre_locs"),
             
         )
     )
@@ -82,48 +196,48 @@ def orgs(request):
     if filter_form.is_valid():
     
         data = filter_form.cleaned_data
-        today = timezone.now().date()
-
         if data.get("org"):
-            queryset=queryset.filter(id=data["org"].id)
+            org_queryset=org_queryset.filter(id=data["org"].id)
 
         if data.get("my_orgs"):
-            followed_orgs = request.user.profile.following_orgs.filter(deleted=False)
-            queryset = queryset.filter(pk__in=followed_orgs)
+            followed_orgs = request.user.profile.following_orgs.active()
+            org_queryset = org_queryset.filter(pk__in=followed_orgs)
 
         if data.get("county") :
-            queryset=queryset.filter(locations__county_id=data["county"]).distinct()
+            org_queryset=org_queryset.filter(locations__county_id=data["county"]).distinct()
 
         if data.get("region"):
-            queryset=queryset.filter(region_name=data["region"]).distinct()
+            org_queryset=org_queryset.filter(region_name=data["region"]).distinct()
 
         if data.get("q"):
-            queryset =queryset.filter(Q(org_name__icontains=q) 
+            org_queryset =org_queryset.filter(Q(org_name__icontains=q) 
                                       | Q(about__icontains=q)
                                       | Q(locations__loc_name__icontains=q)
                                       ).distinct()
         if data.get("has_v"):
-            queryset = queryset.filter(
-                activities__in=volunteer
+            org_queryset = org_queryset.filter(
+                activities__in=volunteer_qs
             ).distinct()
 
         if data.get("has_t"):
-            queryset = queryset.filter(
-                activities__in=training
+            org_queryset = org_queryset.filter(
+                activities__in=training_qs
                 ).distinct()
     
-    followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
-
-    orgs=Paginator(queryset, 5)
+    orgs=Paginator(org_queryset, 5)
     page_number = request.GET.get('page')
     page_obj = orgs.get_page(page_number)
 
     followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
     counties = County.objects.all()
-    all_orgs =Organization.objects.filter(deleted=False).order_by("org_name")
+    all_orgs =Organization.objects.active().order_by("org_name")
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
- 
+
+    #this is code to test the prefetch data sets.
+    # for org in org_queryset[:5]:  # just first few
+    #    print(org.org_name, getattr(org, 'pre_volunteer', []))
+
     return render(
         request,
         "orgs/orgs.html",
@@ -138,6 +252,205 @@ def orgs(request):
         }
     )
 
+def follow_org(request, org_id):
+    #utility that adds an org to the orgFollowers table or removes it if it is there.
+    # once done it returns from where it was called.
+    next_url = request.POST.get("next") or request.GET.get("next")
+    org = Organization.objects.get(id=org_id)
+    profile = Profile.objects.get(user=request.user)
+    follow_relation, created = FollowOrg.objects.get_or_create(profile=profile, followOrg=org)
+    
+    if not created:
+        follow_relation.delete()
+
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts=None):
+        return redirect(next_url)
+    else:
+        return redirect("landing")  # fallback
+
+def org_mgmt(request):
+    # managing YOUR organizations - this is where you can edit them, add activities, etc.
+    managers_qs=OrgManager.objects.all().select_related("profile__user")    
+    
+    if not request.user.is_authenticated:
+        return redirect("login")
+    
+    # staff gets to see all the organizations
+    if request.user.profile.staff:
+        orgs = Organization.objects.active().prefetch_related(
+            Prefetch(
+                "locations", 
+                queryset=Location.objects.active(),
+                to_attr="pre_locs"  # optional: lets you access org.active_locs
+            ),
+            Prefetch(
+                "activities",
+                queryset=Activity.objects.active(),
+                to_attr="pre_activities"  # optional: access as org.active_activities
+            ),
+            Prefetch(
+                "managed",
+                queryset=managers_qs,
+                to_attr="pre_mgrs"
+            )
+            )
+    # if you are not staff, you have to be in the OrgManagers table to see the org on this page.
+    else:
+        orgs = (
+            Organization.objects.active()
+            .filter(managed__profile=request.user.profile)
+            .distinct()
+            .prefetch_related(
+                Prefetch(
+                    "locations",
+                    queryset=Location.objects.active(),
+                    to_attr="pre_locs"  # optional: access as org.active_locs in template
+                ),
+            Prefetch(
+                "activities",
+                queryset=Activity.objects.active(),
+                to_attr="pre_activities"  # optional: access as org.active_activities
+            ),
+            Prefetch(
+                "managed",
+                queryset=managers_qs,
+                to_attr="pre_mgrs"
+            )
+            )
+        )
+
+    return render(request, "orgs/org_mgmt.html", {
+        "organizations": orgs
+    })
+
+def org_detail(request, org_id=None, view_only=False):
+    #edit a single organization - only the organization fields.
+    # in theory you should be in a can_edit state if you are on this page, but this just double checks it.
+
+    can_edit=False
+
+    # if there is an org_id then you are editing an existing org.
+    if org_id:
+        org = get_object_or_404(Organization, id=org_id)
+        if org.can_edit(request.user):
+            can_edit = True
+    #if no org_id then you are creating a new one.
+    else:
+        org = None
+        if request.user.is_authenticated:
+            can_edit=True
+                                    
+    if request.method == "POST" and not view_only:
+        form= OrgForm(request.POST, instance=org)
+        
+
+        if form.is_valid() :
+            org = form.save(commit=False)
+            if not org_id:
+                org.owner = request.user.profile
+            if not org.created_by:
+                org.created_by = request.user.profile
+            org.updated_by = request.user.profile
+            org.save()
+            if not OrgManager.objects.filter(org=org, profile=request.user.profile).exists():
+                OrgManager.objects.create(
+                    org=org,
+                    profile=request.user.profile,
+                    role='owner'  # if you added the role field
+                )
+            
+            # once you have finished editing your organization record, you should go back to the org dashboard.
+            return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
+        else:
+            messages.error(request, "there are errors in the form.")
+            print("org form errors",form.errors)
+            print("loc formset errors", loc_formset.errors)
+            #print("non field error", form.non_field_errors())
+            #print("FORMSET is_valid:", loc_formset.is_valid())
+            #print("FORMSET non_form_errors:", loc_formset.non_form_errors())
+            #print("MANAGEMENT errors:", loc_formset.management_form.errors)
+            #print("TOTAL_FORMS:", request.POST.get("locations-TOTAL_FORMS"))
+            #print("INITIAL_FORMS:", request.POST.get("locations-INITIAL_FORMS"))
+            #if the forms are not valid - stay on the org_detail page.
+            return render(request, "orgs/org_detail.html", {
+                "org": org,
+                "events": [],
+                "form": form,
+                "view_only": view_only,
+                "can_edit": can_edit,
+            })
+        
+    else:
+        form = OrgForm(instance=org)
+        
+    if view_only:
+        for field in form.fields.values():
+            field.disabled = True
+    # if it's just a get then display the org_detail form.    
+    return render(request, "orgs/org_detail.html", {
+                "org": org,
+                "events": [],
+                "form": form,
+                "view_only": view_only,
+                "can_edit": can_edit})
+
+def loc_detail(request, loc_id=None):
+    if loc_id:
+        loc=get_object_or_404(Location, id=loc_id)
+    else:
+        loc = None
+
+    can_edit = True
+    view_only = request.resolver_match.url_name == "loc_view"
+    org_id = request.GET.get("org")
+    
+    if request.method == "POST" and can_edit and not view_only:
+        if loc is None:
+            form=LocForm(request.POST)  
+        else:
+            form= LocForm(request.POST, instance=loc) 
+             
+        if not form.is_valid():
+            print(form.errors)
+        
+        if form.is_valid():
+            loc = form.save(commit=False)
+            if not loc.owner:
+                loc.owner = request.user.profile
+            if not loc.created_by:
+                loc.created_by = request.user.profile
+
+            loc.updated_by = request.user.profile
+            loc.save()
+            org_id=loc.org.id
+            return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
+        else:
+            messages.error(request, "there are errors in the form.")
+            return render(request, "orgs/location_form.html", {
+                "loc": loc,
+                "form": form,
+                "view_only": view_only,
+                "can_edit": can_edit,
+             })
+        
+    else:
+        if loc:  # editing existing
+            form = LocForm(instance=loc)
+        else:  # creating new
+            org_id = request.GET.get("org")
+            loc = Location(org_id=org_id) if org_id else Location()
+            form = LocForm(instance=loc)
+                
+    if view_only:
+        for field in form.fields.values():
+            field.disabled = True
+        
+    return render(request, "orgs/location_form.html", {
+                "loc": loc,
+                "form": form,
+                "view_only": view_only,
+                "can_edit": can_edit})
+    
 def locations(request):
     
     q = request.GET.get("q", "")
@@ -241,58 +554,21 @@ def locations(request):
         }
     )
 
-def activities(request):
+def xactivities(request):
     today = timezone.now().date()
     
     q = request.GET.get("q", "")
-    get_data = request.GET.copy()
-    sessions = Session.objects.filter(
-            Q(start__gte=today) |  # future sessions
-            Q(start__lte=today, end__gte=today) |  # ongoing sessions with an end
-            Q(start__isnull=True , ongoing=True)  # started in the past, no end date
-        ).order_by("start").select_related(
+    #get_data = request.GET.copy()
+    sessions = Session.objects.current().select_related(
             "activity",        # follow FK from Session -> Activity
             "activity__org",   # Activity -> Organization
             "location"         # Session -> Location
         ).prefetch_related(
-            "activity__categories"  # m2m from Activity -> categories
-        )
+            "activity__categories")
+    upcoming_sessions= sessions.upcoming().order_by("start")
+    ongoing_sessions= sessions.ongoing().order_by("start")
+    new_sessions = sessions.filter(activity__created_at__gte=today - timedelta(days=30)).order_by('-activity__created_at', F('start').asc(nulls_first=True))
     
-
-
-    filter_form=EventFilterForm(get_data or None)
-    if filter_form.is_valid():
-        data = filter_form.cleaned_data
-        
-        if data.get("categories"):
-            sessions = sessions.filter(activity__categories__in=data["categories"]).distinct()
-           
-        if data.get("type"):
-            sessions = sessions.filter(activity__activity_type=data["type"])
-            
-        if data.get("county") :
-            sessions = sessions.filter(location__county_id=data["county"])
-            
-        if data.get("org"):
-            sessions = sessions.filter(activity__org=data["org"])
-
-        if data.get("my_orgs"):
-            followed_orgs = request.user.profile.following_orgs.all()
-            
-            sessions = sessions.filter(activity__org__in=followed_orgs)
-           
-        if data.get("region"):
-            sessions = sessions.filter(
-                Q(activity__org__region_name=data["region"]) 
-                | Q(location__region_name=data["region"])
-            )
-                  
-        if data.get("q"):  
-            sessions= sessions.filter(
-                Q(activity__title=data["q"]) 
-                   | Q(activity__description__icontains=data["q"])
-                 )      
- 
 
     clean_get = request.GET.copy()
     for p in ["page", "curr_page", "onl_page","ong_page"]:
@@ -304,7 +580,7 @@ def activities(request):
     upcoming_sessions = sessions.filter(start__gt=now).order_by('start')
     
     # New: recently created, sorted by created_on descending
-    new_sessions = sessions.filter(activity__created__gte=thirty_days_ago).order_by('-activity__created', F('start').asc(nulls_first=True))
+    new_sessions = sessions.filter(activity__created_at__gte=thirty_days_ago).order_by('-activity__created_at', F('start').asc(nulls_first=True))
     
     # Ongoing: start <= now <= end, sorted by start ascending
     ongoing_sessions = sessions.filter(Q(start__lt=now, end__lt=now) | Q(ongoing=True)).order_by('start')
@@ -315,156 +591,17 @@ def activities(request):
                     "upcoming" : upcoming_sessions,
                     "new": new_sessions,
                     "ongoing": ongoing_sessions,
-                    "filter_form": filter_form,
+           
                     "query_params": clean_get,
                     "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
                     "cats": EventCategory.objects.all(),
                     "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
                   } )
 
-def follow_org(request, org_id):
 
-    org = Organization.objects.get(id=org_id)
-    profile = Profile.objects.get(user=request.user)
-    follow_relation, created = FollowOrg.objects.get_or_create(profile=profile, followOrg=org)
     
-    if not created:
-        follow_relation.delete()
 
-    url = reverse("landing");
-    query_string = request.META.get('QUERY_STRING', '');
-    if query_string:
-        url = f"{url}?{query_string}"
-    
-    referer = request.META.get('HTTP_REFERER', None)
-    if referer:
-        return redirect(referer)
-    else:
-        return redirect("landing")  # fallback
-    
-def org_detail(request, org_id=None, view_only=False):
-    can_edit=False 
-    view_only = request.resolver_match.url_name == "org_view"
-    if org_id:
-        org = get_object_or_404(Organization, id=org_id)
-        if org.can_edit(request.user):
-            can_edit = True
-    else:
-        org = None
-        if request.user.is_authenticated:
-            can_edit=True
-                                    
-    if request.method == "POST" and not view_only:
-        form= OrgForm(request.POST, instance=org)
-        loc_formset = LocationFormSet(request.POST, instance=org, prefix="locations")
 
-        if form.is_valid() and loc_formset.is_valid():
-            org = form.save(commit=False)
-            if not org_id:
-                org.owner = request.user.profile
-            org.save()
-            if not OrgManager.objects.filter(org=org, profile=request.user.profile).exists():
-                OrgManager.objects.create(
-                    org=org,
-                    profile=request.user.profile,
-                    role='owner'  # if you added the role field
-                )
-            loc_formset.instance = org
-            loc_formset.save()
-            
-            return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
-        else:
-            messages.error(request, "there are errors in the form.")
-            print("org form errors",form.errors)
-            print("loc formset errors", loc_formset.errors)
-            print("non field error", form.non_field_errors())
-            print("FORMSET is_valid:", loc_formset.is_valid())
-            print("FORMSET non_form_errors:", loc_formset.non_form_errors())
-            print("MANAGEMENT errors:", loc_formset.management_form.errors)
-            print("TOTAL_FORMS:", request.POST.get("locations-TOTAL_FORMS"))
-            print("INITIAL_FORMS:", request.POST.get("locations-INITIAL_FORMS"))
-
-            return render(request, "orgs/org_detail.html", {
-                "org": org,
-                "events": [],
-                "form": form,
-                "view_only": view_only,
-                "loc_formset": loc_formset,
-                "can_edit": can_edit,
-            })
-        
-    else:
-        form = OrgForm(instance=org)
-        loc_formset = LocationFormSet(instance=org, prefix="locations")
-        
-    if view_only:
-        for field in form.fields.values():
-            field.disabled = True
-        
-    return render(request, "orgs/org_detail.html", {
-                "org": org,
-                "events": [],
-                "form": form,
-                "view_only": view_only,
-                "loc_formset": loc_formset,
-                "can_edit": can_edit})
-
-def loc_view(request, loc_id=None):
-    is_new = loc_id is None
-    can_edit=True 
-    view_only = request.resolver_match.url_name == "loc_view"
-    org_id = request.GET.get("org")
-
-    if loc_id:
-        loc = get_object_or_404(Location, id=loc_id)     
-    else:
-        loc = None
-        
-                                
-    if request.method == "POST":
-        if is_new:
-            form=LocForm(request.POST)
-        else:
-            form= LocForm(request.POST, instance=loc)
-        
-        if not form.is_valid():
-            print(form.errors)
-        
-        if form.is_valid():
-            loc = form.save(commit=False)
-            if not loc.owner:
-                loc.owner = request.user.profile
-            loc.save()
-            org_id=loc.org.id
-            return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
-        else:
-            messages.error(request, "there are errors in the form.")
-            return render(request, "orgs/location_form.html", {
-                "loc": loc,
-                "form": form,
-                "view_only": view_only,
-                "can_edit": can_edit,
-             })
-        
-    else:
-        org_id = request.GET.get("org")
-        if is_new:
-            if org_id:
-                loc = Location(org_id=org_id)  # create a new instance with the org set
-            else:
-                loc = Location()  # fallback if no org_id
-        else:
-            form = LocForm(instance=loc)
-    
-    if view_only:
-        for field in form.fields.values():
-            field.disabled = True
-        
-    return render(request, "orgs/location_form.html", {
-                "loc": loc,
-                "form": form,
-                "view_only": view_only,
-                "can_edit": can_edit})
 
 def login_view(request):
     if request.method == "POST":
@@ -530,18 +667,22 @@ def profile_view(request):
 
     return render(request, "orgs/profile.html", {"form": form})
     
-def activity_form_view(request, activity_id=None): 
+def activity_detail(request, activity_id=None): 
+    next_url = request.POST.get("next")
     is_new = activity_id is None
     confirm = request.POST.get("confirm_duplicate")
     view_only = request.resolver_match.url_name == "activity_view"
     can_edit = False
     categories = EventCategory.objects.all().order_by("name")
 
-    grouped_categories = {}
+    grouped_categories = defaultdict(list)
+    grouped_ids ={}
 
     for cat in categories:
         group = cat.category_class or "Other"
         grouped_categories.setdefault(group, []).append(cat)
+    for group, cats in grouped_categories.items():
+        grouped_ids[group] = [str(cat.id) for cat in cats]
 
     # is this new or existing activity
     if activity_id:
@@ -563,33 +704,48 @@ def activity_form_view(request, activity_id=None):
 
         if activity_form.is_valid() and session_formset.is_valid():
             activity = activity_form.save(commit=False)
+
             #if activity is NEW
             if is_new:
                 activity.owner = request.user.profile
                 if activity_form.possible_duplicate() and not confirm:
-
                     return render(request, "orgs/activity_form.html", {
                         "activity": activity,
                         "activity_form": activity_form,
                         "session_formset": session_formset,
                         "can_edit": can_edit,
                         "view_only": view_only,
-                        "grouped_categories": grouped_categories,
                         "duplicate_warning": True
                     })
             #if there is no owner
             if not activity.owner:
                 activity.owner = request.user.profile
+            if not activity.created_by:
+                activity.created_by = request.user.profile
+            activity.updated_by = request.user.profile
 
             activity = activity_form.save()
-            session_formset.instance=activity
-            session_formset.save()
+            
+            # Save Sessions with metadata
+            sessions = session_formset.save(commit=False)
+            for s in sessions:
+                if not s.created_by:
+                    s.created_by = request.user.profile
+                s.updated_by = request.user.profile
+                s.activity = activity  # ensure relation
+                s.save()
 
+            # Handle any deleted sessions
+            for s in session_formset.deleted_objects:
+                s.delete()
+            
+        else:
             print("Session formset errors:", session_formset.errors)
             print("Management errors:", session_formset.management_form.errors)
             print("main form errors" , activity_form.errors)
          
-            return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
+        #next_url = request.POST.get("next")
+        return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
 
 
     #this is the GET part of the code
@@ -623,7 +779,6 @@ def activity_form_view(request, activity_id=None):
         "session_formset": session_formset,
         "can_edit": can_edit,
         "view_only": view_only,
-        "grouped_categories": grouped_categories,
          "duplicate_warning": False
         })
 
@@ -632,7 +787,9 @@ def activity_delete(request,activity_id=None):
 
     if request.method == "POST":
         org_id = activity.org.id
-        activity.delete()
+        activity.deleted=True
+        activity.deleted_at=timezone.now()
+        activity.save()
         return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
 
     return render(request, "orgs/_activity_confirm_delete.html", {
@@ -676,185 +833,23 @@ def test_email(request):
     except Exception as e:
         return HttpResponse(f"Error sending email: {str(e)}")
 
-def landing(request):
-     return render(
-        request,
-        "orgs/landing.html")
+def superuser_required(user):
+    return user.is_superuser
 
-def filter(request):
-    if request.method == "POST":
-        filter_form = FilterForm(request.POST)
-
-        if filter_form.is_valid():
-            county=filter_form.cleaned_data.get("county")
-            filters = {
-                "region": filter_form.cleaned_data.get("region"),
-                "county": county.id if county else None,
-                "city": filter_form.cleaned_data.get("city"),
-                "categories": [c.id for c in filter_form.cleaned_data.get("categories")],
-                "type": filter_form.cleaned_data.get("type"),
-                "org": filter_form.cleaned_data.get("org"),
-                "my_orgs": filter_form.cleaned_data.get("my_orgs"),
-                "q": filter_form.cleaned_data.get("q"),
-            }
-
-            request.session["filters"] = filters
-            print("from filter page", filters)
-
-            return redirect("results")
-
-    else:
-        filter_form = FilterForm()
-
-    categories = EventCategory.objects.all().order_by("name")
-
-    grouped_categories = {}
-
-    for cat in categories:
-        group = cat.category_class or "Other"
-        grouped_categories.setdefault(group, []).append(cat)
-
-    return render(request, "orgs/filter.html", {
-        "filter_form": filter_form,
-        "grouped_categories": grouped_categories
-    })
-
-def results(request):
-    today = timezone.now().date()
-    
-    sessions = Session.objects.filter(
-            Q(start__gte=today) |  # future sessions
-            Q(start__lte=today, end__gte=today) |  # ongoing sessions with an end
-            Q(start__isnull=True , ongoing=True)  # started in the past, no end date
-        ).order_by("start").select_related(
-            "activity",        # follow FK from Session -> Activity
-            "activity__org",   # Activity -> Organization
-            "location"         # Session -> Location
-        ).prefetch_related(
-            "activity__categories"  # m2m from Activity -> categories
-        )
-    print(request.session.get("filters"))
-    filters = request.session.get("filters", {})
-    
-    if filters.get("categories"):
-        sessions = sessions.filter(activity__categories__id__in=filters["categories"]).distinct()
-           
-    if filters.get("type"):
-        sessions = sessions.filter(activity__activity_type=filters["type"])
-            
-    if filters.get("county") :
-        sessions = sessions.filter(location__county_id__id=filters["county"])
-            
-    if filters.get("org"):
-        sessions = sessions.filter(activity__org__id=filters["org"])
-
-    if filters.get("my_orgs"):
-        followed_orgs = request.user.profile.following_orgs.all()
-            
-        sessions = sessions.filter(activity__org__in=followed_orgs)
-           
-    if filters.get("region"):
-        sessions = sessions.filter(
-            Q(activity__org__region_name=filters["region"]) 
-            | Q(location__region_name=filters["region"])
-        )
-                  
-    if filters.get("q"):  
-        
-        sessions= sessions.filter(
-            Q(activity__title=filters["q"]) 
-                | Q(activity__description__icontains=filters["q"])
-                )      
-    q=filters.get("q")
-    clean_get = request.GET.copy()
-    for p in ["page", "curr_page", "onl_page","ong_page"]:
-        clean_get.pop(p, None)
-    now = timezone.now()
-    thirty_days_ago = timezone.now() - timedelta(days=30)
-
-    # Current: future start dates, sorted by start ascending
-    upcoming_sessions = sessions.filter(start__gt=now).order_by('start')
-    
-    # New: recently created, sorted by created_on descending
-    new_sessions = sessions.filter(activity__created__gte=thirty_days_ago).order_by('-activity__created', F('start').asc(nulls_first=True))
-    
-    # Ongoing: start <= now <= end, sorted by start ascending
-    ongoing_sessions = sessions.filter(Q(start__lt=now, end__lt=now) | Q(ongoing=True)).order_by('start')
+@user_passes_test(superuser_required)
+def run_backfill(request):
+    update_new_fields()
+    return HttpResponse("Backfill complete")
 
 
-    # For client-side tab segmentation, pass the whole filtered queryset
-    return render(request, "orgs/results.html",{
-                    "upcoming" : upcoming_sessions,
-                    "new": new_sessions,
-                    "ongoing": ongoing_sessions,
-                    "query_params": clean_get,
-                    "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
-                    "cats": EventCategory.objects.all(),
-                    "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
 
-                  } )
-
-def org_mgmt(request):
-    active_locations=Location.objects.filter(deleted=False)
-    activities=Activity.objects.all()
-    managers_qs=OrgManager.objects.all().select_related("profile__user")    
-    
-    if not request.user.is_authenticated:
-        return redirect("login")
-    
-    if request.user.profile.staff:
-        orgs = Organization.objects.all().prefetch_related(
-            Prefetch(
-                "locations", 
-                queryset=active_locations,
-                to_attr="active_locs"  # optional: lets you access org.active_locs
-            ),
-            Prefetch(
-                "activities",
-                queryset=activities,
-                to_attr="active_activities"  # optional: access as org.active_activities
-            ),
-            Prefetch(
-                "managed",
-                queryset=managers_qs,
-                to_attr="prefetch_mgrs"
-            )
-            )
-    else:
-
-        orgs = (
-            Organization.objects
-            .filter(managed__profile=request.user.profile)
-            .distinct()
-            .prefetch_related(
-                Prefetch(
-                    "locations",
-                    queryset=active_locations,
-                    to_attr="active_locs"  # optional: access as org.active_locs in template
-                ),
-            Prefetch(
-                "activities",
-                queryset=activities,
-                to_attr="active_activities"  # optional: access as org.active_activities
-            ),
-            Prefetch(
-                "managed",
-                queryset=managers_qs,
-                to_attr="prefetch_mgrs"
-            )
-            )
-        )
-    print ("orgs", orgs)
-    return render(request, "orgs/org_mgmt.html", {
-        "organizations": orgs
-    })
 
 def manager_add_page(request):
     org_id = request.GET.get("org")
     org = get_object_or_404(Organization, id=org_id)
 
     profiles = Profile.objects.select_related("user").all()
-    print("profiles", profiles)
+    #print("profiles", profiles)
     return render(request, "orgs/add_mgr.html", {
         "org": org,
         "profiles": profiles
@@ -872,3 +867,159 @@ def add_manager(request):
     OrgManager.objects.get_or_create(org=org, profile=profile)
 
     return redirect("org_mgmt")
+
+def debug_sessions(request):
+    today = timezone.now().date()
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+
+    qs = Session.objects.current().select_related(
+        "activity", "activity__org"
+    )
+
+    # Toggle filters via URL params
+    if request.GET.get("active") == "1":
+        qs = qs.filter(
+            deleted=False,
+            activity__deleted=False,
+            activity__org__deleted=False
+        )
+
+    if request.GET.get("upcoming") == "1":
+        qs = qs.filter(start__gte=today)
+
+    if request.GET.get("ongoing") == "1":
+        qs = qs.filter(
+            start__lte=today
+        ).filter(
+            Q(end__isnull=True) | Q(end__gte=today)
+        )
+    if request.GET.get("new") == "1":
+        qs = qs.filter(activity__created_at__gte=thirty_days_ago).order_by('-activity__created_at', F('start').asc(nulls_first=True))
+
+    # Optional: show only "bad" rows
+    if request.GET.get("bad") == "1":
+        qs = qs.filter(
+            Q(deleted=True) |
+            Q(activity__deleted=True) |
+            Q(activity__org__deleted=True)
+        )
+
+    qs = qs.order_by("start")
+
+    return render(request, "orgs/debug_sessions.html", {
+        "sessions": qs,
+        "today": today
+    })
+
+@login_required
+def upload_csv(request, org_id):
+    org = get_object_or_404(Organization, id=org_id)
+
+    if not (request.user.profile in org.managed.all() or request.user.profile.staff):
+        return HttpResponseForbidden()
+    
+    if request.method == "POST":
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            upload = form.save(commit=False)
+            upload.organization =org
+            upload.uploaded_by = request.user
+            upload.save()
+            return redirect("upload_map", upload_id=upload.id)
+    else:
+        form = UploadFileForm()
+    return render(request, "orgs/upload.html", {"form": form})
+
+# Step 1: Map columns
+def upload_map(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+    
+    # Read first row to show column headers
+    df = pd.read_csv(upload.file) if upload.file.name.endswith(".csv") else pd.read_excel(upload.file, engine="openpyxl")
+    first_row = list(df.columns)
+
+    if request.method == "POST":
+        # Example: user-submitted mapping comes as mapping_ColumnName fields
+        mapping = {}
+        for col in first_row:
+            field = request.POST.get(f"mapping_{col}")
+            if field:
+                mapping[field] = col
+
+        # Save mapping in session (or a model if you prefer)
+        request.session[f"mapping_{upload_id}"] = mapping
+        print("Received mapping:", mapping)  # Debug log
+        # Update upload status
+        upload.status = "mapped"
+        upload.save()
+
+        # Redirect to staging step
+        return redirect("upload_stage", upload_id=upload.id)
+
+    # GET request → show mapping form
+    return render(request, "orgs/upload_map.html", {"upload": upload, "columns": first_row})
+
+# Step 2: Stage data
+def upload_stage(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+    
+    
+    # Example: you would get mapping from previous step
+    mapping = request.session.get(f"mapping_{upload_id}")
+    if not mapping:
+        return redirect("upload_map", upload_id=upload.id)
+    print ("Using mapping for staging:", mapping)  # Debug log
+    importer = CSVImporter(upload, mapping=mapping)
+    importer.read()
+    importer.normalize()
+    importer.validate()
+
+    if importer.errors:
+        # You could show errors or redirect to review page
+        request.session[f"errors_{upload_id}"] = importer.errors
+        return redirect("upload_review", upload_id=upload.id)
+
+    importer.process()
+    upload.status = "staged"
+    upload.save()
+
+    return redirect("upload_review", upload_id=upload.id)
+
+# Step 3: Review / cleanup
+def upload_review(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+    
+    # Fetch all staged rows
+    staged_rows = StagingActivity.objects.filter(upload=upload)
+    
+    # Fetch any errors from the staging process (from session)
+    errors = request.session.pop(f"errors_{upload_id}", [])
+
+    if request.method == "POST":
+        # Handle row skipping
+        skip_ids = request.POST.getlist("skip_row")
+        StagingActivity.objects.filter(id__in=skip_ids).update(status="skipped")
+        return redirect("upload_commit", upload_id=upload.id)
+
+    return render(request, "orgs/upload_review.html", {
+        "upload": upload,
+        "staged_rows": staged_rows,
+        "errors": errors
+    })
+# Step 4: Commit to final tables
+def upload_commit(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+    staged_rows = StagingActivity.objects.filter(upload=upload, status="valid")
+    
+    # Implement logic to insert into your final Activity/Location tables here
+    # e.g., for row in staged_rows: Activity.objects.create(...)
+
+    upload.processed = True
+    upload.status = "completed"
+    upload.save()
+    return redirect("upload_success")
+
+# Success page
+def upload_success(request):
+    return render(request, "orgs/upload_success.html")
+

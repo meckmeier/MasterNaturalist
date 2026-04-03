@@ -26,6 +26,7 @@ REGION_IMAGE_MAP = {
         'EC': 'orgs/images/CE.jpg',
         'St': 'orgs/images/St.jpg',
     }
+   
 class Commitment(models.Model):
     time= models.CharField(max_length=50)
 
@@ -67,7 +68,7 @@ class Profile(models.Model):
     include_online = models.BooleanField(default=True)
     
     def __str__(self):
-        return f'Profile of {self.user.username}'
+        return f'{self.user.username}'
     
     @property
     def following_orgs(self):
@@ -76,6 +77,10 @@ class Profile(models.Model):
     def following_count(self):
         return self.following.count()
     
+class OrgQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(deleted=False)
+
 class Organization(models.Model):
     org_name = models.CharField(max_length=255, unique=True)
     org_url = models.URLField(max_length=200, default="", blank=True)
@@ -85,8 +90,16 @@ class Organization(models.Model):
     region_name = models.CharField(max_length =100, choices = region_list, default='', blank=True)
     training_url = models.URLField(max_length=200, default="", blank=True)
     volunteer_url = models.URLField(max_length=200, default="", blank=True)
-    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_orgs', default="", null=True, blank=True)
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_orgs', null=True, blank=True)
     deleted=models.BooleanField(default=False)
+    deleted_at = models.DateTimeField( null=True, blank=True)
+    created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, blank=True, null=True, related_name="created_orgs")
+    created_at =models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_orgs")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects=OrgQuerySet().as_manager() 
+    all_objects= models.Manager()
 
     class Meta:
         ordering = ["org_name"]
@@ -96,23 +109,17 @@ class Organization(models.Model):
     
     def follower_count(self):
         return self.following.count()
-    
-    def user_can_edit(self, user):
-        return self.OrgManager_set.filter(
-            user=user,
-            role__in=["owner", "admin", "editor"]
-            ).exists() or user.is_staff
+
     
     def can_edit(self, user):
         if not user.is_authenticated:
             return False
         return (
             user.profile.staff
-            or self.owner == user
-            or self.orgmanager_set.filter(user=user).exists()
+            or self.orgmanager_set.filter(user=user.profile,
+                                          role__in=["owner","admin","editor"]).exists()
     )
 
-    
     @property
     def region_image(self):
         return REGION_IMAGE_MAP.get(
@@ -143,7 +150,12 @@ class OrgManager(models.Model):
     def __str__(self):
         return f'{self.profile.user.username} manages {self.org.org_name}'
     
+class LocationQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(deleted=False,
+                           org__deleted=False)
 
+        
 class Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
     loc_name= models.CharField(max_length=255, unique=True)
@@ -161,6 +173,14 @@ class Location(models.Model):
     longitude = models.FloatField(null=True, blank=True)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_locs', default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField( null=True, blank=True)
+    created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="created_locations")
+    created_at =models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="updated_locations")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = LocationQuerySet().as_manager()       # default behavior
+    all_objects = models.Manager()
 
 
     class Meta:
@@ -172,7 +192,11 @@ class Location(models.Model):
     def can_edit(self, user):
         if not user.is_authenticated:
             return False
-        return user.is_staff or self.org.owner == user  or self.owner == user
+        return (
+            user.profile.staff
+            or self.org.orgmanager_set.filter(user=user.profile,
+                                          role__in=["owner","admin","editor"]).exists()
+    )
     
     @property
     def region_image(self):
@@ -180,7 +204,20 @@ class Location(models.Model):
             self.region_name,
             'orgs/images/default.jpg'
         )
-
+    
+class ActivityQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(deleted=False,
+                           org__deleted=False)
+    def volunteer(self):
+        return self.active().filter(
+            activity_type="v"
+        )
+    def training(self):
+        return self.active().filter(
+            activity_type="t"
+        )
+    
 class Activity(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="activities")
     title = models.CharField(max_length=100)
@@ -195,49 +232,56 @@ class Activity(models.Model):
     no_cost = models.BooleanField(default=False)
     contact_email = models.EmailField(default="", blank=True)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_acts', default="", null=True, blank=True)
-   
-    migrated_from_event = models.IntegerField(null=True,blank=True)
+    deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_activities")
+    created_at =models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_activities")
+    updated_at = models.DateTimeField(auto_now=True)
 
-    created = models.DateTimeField(auto_now_add=True) 
+    objects = ActivityQuerySet().as_manager()       # default behavior
+    all_objects = models.Manager()
+
     def __str__(self):
         return f"{self.title} ({self.org})"
     
     def can_edit(self, user):
         if not user.is_authenticated:
             return False
-        return user.is_staff or self.org.owner == user or self.owner == user
+        return (
+            user.profile.staff
+            or self.org.orgmanager_set.filter(user=user.profile,
+                                          role__in=["owner","admin","editor"]).exists()
+    )
     
     @property
     def is_newly_added(self):
-        return self.created >= timezone.now() - timedelta(days=30)
+        return self.created_at >= timezone.now() - timedelta(days=30)
 
-class ActivityQuerySet(models.QuerySet):
-    def volunteer(self):
-        return self.filter(
-            activity_type="v"
-        )
-    def training(self):
-        return self.filter(
-            activity_type="t"
-        )
+
 
 class SessionQuerySet(models.QuerySet):
-
+    def active(self):
+        return self.filter(
+            deleted=False,
+            activity__deleted=False,
+            activity__org__deleted=False
+        )
     def current(self):
         today = timezone.now().date()
 
-        return self.filter(
+        return self.active().filter(
             Q(start__isnull=True) |
             Q(start__gte=today) |
             (Q(start__lt=today) & (Q(end__isnull=True) | Q(end__gte=today)))
         )
     def upcoming(self):
         today = timezone.now().date()
-        return self.filter(start__gte=today)
+        return self.active().filter(start__gte=today )
 
     def ongoing(self):
         today = timezone.now().date()
-        return self.filter(
+        return self.active().filter(
             start__lt=today
         ).filter(
             Q(end__isnull=True) | Q(end__gte=today)
@@ -252,8 +296,15 @@ class Session(models.Model):
     ongoing = models.BooleanField(default=False)
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
-    
+    deleted=models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_sessions")
+    created_at =models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_sessions")
+    updated_at = models.DateTimeField(auto_now=True)
+
     objects = SessionQuerySet.as_manager()
+    all_objects = models.Manager()
 
     def __str__(self):
         return f"{self.activity.title} – {self.start}"
@@ -273,3 +324,37 @@ class Session(models.Model):
             region,
             'orgs/images/default.jpg'
         )
+class ActivityUpload(models.Model):
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="uploads", blank=True, null=True)
+    file = models.FileField(upload_to="uploads/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    processed = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, default="pending")  # pending, processed, failed
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.file.name} ({self.uploaded_at})"
+    
+class StagingActivity(models.Model):
+    upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
+    row_number = models.IntegerField()
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
+    location_name = models.CharField(max_length=255, null=True, blank=True)
+    address = models.CharField(max_length=255, null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
+    activity_type = models.CharField(max_length=1,
+                                  choices=[("v","Volunteer Opportunity"),("t","Training" )])
+    time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
+    date_description = models.CharField(max_length=100, default='', blank=True, null=True)
+    expire_date = models.DateField(default=one_year_from_now())
+    activity_url = models.URLField(max_length=200, default="", blank=True)
+    no_cost = models.BooleanField(default=False)
+    contact_email = models.EmailField(default="", blank=True)
+    status = models.CharField(max_length=50, default="pending")  # pending, valid, warning, error
+
+    def __str__(self):
+        return f"Row {self.row_number} - {self.title or 'No Title'}"

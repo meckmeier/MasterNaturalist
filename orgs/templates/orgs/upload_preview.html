@@ -1,0 +1,40 @@
+{% extends "orgs/layout.html" %}
+{%block body %}
+<h2>Upload Preview</h2>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirm Import</button>
+</form>
+{% if errors %}
+    <div style="color: red;">
+        <h3>Errors:</h3>
+        <ul>
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+{% if preview %}
+    <h3>Sample Data:</h3>
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                {% for key in preview.0.keys %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in preview %}
+                <tr>
+                    {% for value in row.values %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}
