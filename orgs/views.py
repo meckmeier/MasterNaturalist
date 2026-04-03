@@ -826,7 +826,7 @@ def test_email(request):
             subject="Test Email from Postmark",
             message="This is a test email via Postmark + Anymail.",
             from_email=None,  # uses DEFAULT_FROM_EMAIL
-            recipient_list=["mary@eckmeier.com"],
+            recipient_list=["mary.eckmeier@gmail.com"],
             fail_silently=False,
         )
         return HttpResponse("Email sent successfully via Postmark!")
