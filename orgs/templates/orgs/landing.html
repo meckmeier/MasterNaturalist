@@ -7,15 +7,15 @@
 {% if user.is_authenticated%}
 <p>Organized into a directory of nature based organizations - or a search feature to find volunteer or training opportunities today.
     </p>
-<a  class="button-link" href="{% url 'results' %}">
+<a  class="mybutton-link" href="{% url 'results' %}">
     What's New</a>
-<a class="button-link" href="{% url 'filter' %}">
+<a class="mybutton-link" href="{% url 'filter' %}">
     Find Activities</a>
-<a class="button-link" href="{% url 'orgs' %}">
+<a class="mybutton-link" href="{% url 'orgs' %}">
     Browse Organizations</a>
 
     <p>If you are an organization and need to manage your org, locations or add new activities:</p>
-    <a class="button-link-2nd" href="{% url 'org_mgmt' %}">
+    <a class="mybutton-link-2nd" href="{% url 'org_mgmt' %}">
     Manage Organizations</a>
 
 {%else%}

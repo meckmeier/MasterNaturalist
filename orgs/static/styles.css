@@ -201,7 +201,7 @@ img{
 .mybtn:hover{
     background-color: #0056b3;   /* Darker blue on hover */
 }
-a.button-link {
+a.mybutton-link {
     display: inline-block;       /* Makes it behave like a button */
     padding: 5px 10px;          /* Space inside the button */
     background-color: #1dc72b;   /* Button background color */
@@ -213,7 +213,7 @@ a.button-link {
     font-size: 1rem;
     transition: background-color 0.3s ease; /* Smooth hover effect */
 }
-a.button-link-2nd{
+a.mybutton-link-2nd{
     background-color: #1d9fc773;   /* Button background color */
     display: inline-block;       /* Makes it behave like a button */
     padding: 5px 10px;          /* Space inside the button */
@@ -227,7 +227,7 @@ a.button-link-2nd{
 
 }
 /* Hover effect */
-a.button-link:hover {
+a.mybutton-link:hover {
     background-color: #0056b3;   /* Darker blue on hover */
 }
 a.button-link-2nd:hover {
