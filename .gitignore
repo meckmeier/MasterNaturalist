@@ -1,3 +1,5 @@
+#don't commit your .env file as it stores your development environment variables.
+
 .env
 
 # =====================
@@ -8,6 +10,9 @@ __pycache__/              # compiled Python files
 *.py[cod]                 # .pyc, .pyo, .pyd
 *.pyo
 *$py.class
+
+# Optional: Ignore Django staticfiles output
+staticfiles/
 
 # =====================
 # Django specific
@@ -44,4 +49,4 @@ Thumbs.db
 *.csv
 *.xlsx
 *.h5
-*.hdf5
+*.hdf5-e "venv/\nstaticfiles/\n__pycache__/\n*.py[cod]" 
