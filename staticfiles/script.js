@@ -39,32 +39,31 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     console.log("finished with hash code")
-    
-    const addBtn = document.getElementById("add-btn");
-    console.log("Add button:", addBtn);
-    if (addBtn) {
-        addBtn.addEventListener("click", function () {
-            const container = document.querySelector(".formset");
-            const totalForms = document.querySelector("[id$='-TOTAL_FORMS']");
-            const template = document.querySelector(".form-template");
-            const tbody = document.querySelector(".formset-table tbody");
-            console.log("Add button clicked", { container, totalForms, template, tbody });
+});
+    document.addEventListener("click", function(e) {
+    if (e.target && e.target.id === "add-btn") {
+        const container = document.querySelector(".formset");
+        const totalForms = document.querySelector("[id$='-TOTAL_FORMS']");
+        const template = document.querySelector(".form-template");
+        const tbody = document.querySelector(".formset-table tbody");
+        console.log("Add button clicked", { container, totalForms, template, tbody });
 
-            if (!container || !totalForms || !template || !tbody) return;
+        if (!container || !totalForms || !template || !tbody) return;
 
-            const emptyHint = document.querySelector(".empty-hint");
-            if (emptyHint) emptyHint.remove();
+        const emptyHint = document.querySelector(".empty-hint");
+        if (emptyHint) emptyHint.remove();
 
-            const formIndex = parseInt(totalForms.value);
-            const newRow = template.cloneNode(true);
-            newRow.style.display = "";
-            newRow.classList.remove("form-template");
-            newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, formIndex);
+        const formIndex = parseInt(totalForms.value);
+        const newRow = template.cloneNode(true);
+        newRow.style.display = "table-row";
+        newRow.classList.remove("form-template");
+        newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, formIndex);
 
-            tbody.appendChild(newRow);
-            totalForms.value = formIndex + 1;
-        });
+        tbody.appendChild(newRow);
+        totalForms.value = formIndex + 1;
     }
+});
+
     console.log("finished with add button")
     document.addEventListener("click", function (e) {
 
@@ -84,4 +83,4 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     });
-});
+
