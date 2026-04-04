@@ -1,26 +1,19 @@
 #don't commit your .env file as it stores your development environment variables.
 
 .env
-
-# =====================
-# Python / Virtualenv
-# =====================
-venv/                     # your virtual environment
-__pycache__/              # compiled Python files
-*.py[cod]                 # .pyc, .pyo, .pyd
+# ignore the virtual environment.
+venv/
+__pycache__/
+*.py[cod]
 *.pyo
 *$py.class
 
-# Optional: Ignore Django staticfiles output
-staticfiles/
-
-# =====================
 # Django specific
-# =====================
-*.log                     # log files
-*.sqlite3                 # local SQLite DBs
-media/                     # user-uploaded files
-staticfiles/               # collected static files
+
+*.log
+*.sqlite3
+media/
+staticfiles/
 
 # Ignore compiled Python inside migrations only
 **/migrations/__pycache__/
@@ -28,23 +21,23 @@ staticfiles/               # collected static files
 # Ignore local settings if you use them for secrets
 local_settings.py
 
-# =====================
+
 # IDE / Editor
-# =====================
+
 .vscode/
 .idea/
 *.sublime-workspace
 *.sublime-project
 
-# =====================
+
 # OS
-# =====================
+
 .DS_Store
 Thumbs.db
 
-# =====================
+
 # Jupyter / Data files
-# =====================
+
 .ipynb_checkpoints/
 *.csv
 *.xlsx

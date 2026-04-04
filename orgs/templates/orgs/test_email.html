@@ -1,0 +1,24 @@
+<h2>Send Test Email</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label for="sendto">Send To:</label>
+    <input type="email" name="sendto" value="{{ sendto }}" required>
+
+    <button type="submit">Send Email</button>
+</form>
+
+<hr>
+
+{% if success %}
+    <p style="color: green;">
+        Email successfully sent to {{ sendto }}!
+    </p>
+{% endif %}
+
+{% if error %}
+    <p style="color: red;">
+        Error sending email: {{ error }}
+    </p>
+{% endif %}

@@ -821,17 +821,31 @@ def map_view(request):
 
 
 def test_email(request):
-    try:
-        send_mail(
-            subject="Test Email from Postmark",
-            message="This is a test email via Postmark + Anymail.",
-            from_email=None,  # uses DEFAULT_FROM_EMAIL
-            recipient_list=["mary.eckmeier@gmail.com"],
-            fail_silently=False,
-        )
-        return HttpResponse("Email sent successfully via Postmark!")
-    except Exception as e:
-        return HttpResponse(f"Error sending email: {str(e)}")
+    context = {}
+
+    if request.method == "POST":
+        sendto = request.POST.get("sendto")
+
+        try:
+            send_mail(
+                subject="Test Email from Postmark",
+                message="This is a test email via Postmark + Anymail.",
+                from_email=None,  # uses DEFAULT_FROM_EMAIL
+                recipient_list=[sendto],
+                fail_silently=False,
+            )
+            context["success"] = True
+            context["sendto"] = sendto
+
+        except Exception as e:
+            context["error"] = str(e)
+            context["sendto"] = sendto
+
+    else:
+        # default value for first load
+        context["sendto"] = "mary.eckmeier@gmail.com"
+
+    return render(request, "test_email.html", context)
 
 def superuser_required(user):
     return user.is_superuser
