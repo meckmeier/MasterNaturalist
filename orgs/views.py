@@ -845,7 +845,7 @@ def test_email(request):
         # default value for first load
         context["sendto"] = "mary.eckmeier@gmail.com"
 
-    return render(request, "test_email.html", context)
+    return render(request, "orgs/test_email.html", context)
 
 def superuser_required(user):
     return user.is_superuser
