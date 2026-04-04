@@ -32,7 +32,7 @@ ANYMAIL = {
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "mary@eckmeier.com")
 EMAIL_TIMEOUT = 10  # seconds
 
-PASSWORD_RESET_TIMEOUT = 10
+PASSWORD_RESET_TIMEOUT = 60*60*24
 SITE_ID = 1
 
 # Quick-start development settings - unsuitable for production
