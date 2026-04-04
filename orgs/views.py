@@ -554,55 +554,6 @@ def locations(request):
         }
     )
 
-def xactivities(request):
-    today = timezone.now().date()
-    
-    q = request.GET.get("q", "")
-    #get_data = request.GET.copy()
-    sessions = Session.objects.current().select_related(
-            "activity",        # follow FK from Session -> Activity
-            "activity__org",   # Activity -> Organization
-            "location"         # Session -> Location
-        ).prefetch_related(
-            "activity__categories")
-    upcoming_sessions= sessions.upcoming().order_by("start")
-    ongoing_sessions= sessions.ongoing().order_by("start")
-    new_sessions = sessions.filter(activity__created_at__gte=today - timedelta(days=30)).order_by('-activity__created_at', F('start').asc(nulls_first=True))
-    
-
-    clean_get = request.GET.copy()
-    for p in ["page", "curr_page", "onl_page","ong_page"]:
-        clean_get.pop(p, None)
-    now = timezone.now()
-    thirty_days_ago = timezone.now() - timedelta(days=30)
-
-    # Current: future start dates, sorted by start ascending
-    upcoming_sessions = sessions.filter(start__gt=now).order_by('start')
-    
-    # New: recently created, sorted by created_on descending
-    new_sessions = sessions.filter(activity__created_at__gte=thirty_days_ago).order_by('-activity__created_at', F('start').asc(nulls_first=True))
-    
-    # Ongoing: start <= now <= end, sorted by start ascending
-    ongoing_sessions = sessions.filter(Q(start__lt=now, end__lt=now) | Q(ongoing=True)).order_by('start')
-
-
-    # For client-side tab segmentation, pass the whole filtered queryset
-    return render(request, "orgs/activities.html",{
-                    "upcoming" : upcoming_sessions,
-                    "new": new_sessions,
-                    "ongoing": ongoing_sessions,
-           
-                    "query_params": clean_get,
-                    "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
-                    "cats": EventCategory.objects.all(),
-                    "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
-                  } )
-
-
-    
-
-
-
 def login_view(request):
     if request.method == "POST":
 
