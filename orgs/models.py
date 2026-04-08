@@ -434,7 +434,7 @@ class RawLoadData(models.Model):
 
 class Pending_Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True, related_name="pending_locations")
-    loc_name= models.CharField(max_length=255, unique=True)
+    loc_name= models.CharField(max_length=255)
     physical_location = models.BooleanField(default=True)
     address = models.CharField(max_length=255, default ='', blank=True, null=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )
