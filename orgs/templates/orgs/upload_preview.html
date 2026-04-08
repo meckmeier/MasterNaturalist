@@ -3,7 +3,7 @@
 <h2>Upload Preview</h2>
 <form method="post">
     {% csrf_token %}
-    <button type="submit">Confirm Import</button>
+    <button type="submit" class="me-btn">Confirm Import</button>
 </form>
 {% if errors %}
     <div style="color: red;">

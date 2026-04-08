@@ -61,8 +61,8 @@
   <button id="mapViewBtn">Map View</button>
 </div>
     <div class="d-flex gap-2">
-        <button type = "submit" class="mybtn">Apply</button>
-        <a href="{% url 'locations'%}" class ="button-link">Clear</a>
+        <button type = "submit" class="mebtn">Apply</button>
+        <a href="{% url 'locations'%}" class ="me-button-link">Clear</a>
     </div>
 </form>
 {% endblock %}
@@ -76,14 +76,14 @@
 
 <div id="listContainer">
 
-<div class="container my-4">
+<div class="me-page">
 <h1>Locations</h1>
 {% for loc in locs %}
-<div class="card mb-4 border-0 shadow-sm" id="loc-{{loc.id}}">
-  <div class="card-body">
-    <div class="d-flex align-items-baseline justify-content-between ">
-      <div>
-        <h4 class="mb-1 fw-semibold">
+<div class="me-card" id="loc-{{loc.id}}">
+  <div class="me-card-header">
+    <div class="me-card-header-left">
+      <div class="me-card-title-row">
+        
         {% if user.is_authenticated %}
         
           {% if q %}{{ loc.loc_name|highlight:q|safe }}{% else %}{{ loc.loc_name }}{% endif %}
@@ -91,13 +91,13 @@
           {{ loc.loc_name }}
           {% endif %}
           {% if loc|can_edit:request.user %}<span class="mt-2 small text-muted"><a href="{% url 'loc_edit' loc.id %}"><i class="bi bi-pencil-fill"></i></a>{% endif %}
-          </h4>
+          </div>
           
           {% if loc.org %}
-            <div class="mt-2 small text-muted">{{loc.org.org_name}}</div>{% endif %}
+            <div class="me-card-sponsor"">{{loc.org.org_name}}</div>{% endif %}
       </div>
       
-      <div class="d-flex align-items-center gap-3">
+      <div class="me-card-header-right">
           {% if user.is_authenticated and loc.org %}
   
             <a href="{% url 'follow_org' loc.org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-sm">
@@ -112,7 +112,7 @@
           <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:30px; width:auto;">
       </div>
     </div>
-  <div class="row">
+  <div >
       <!-- Tabs Column (vertical on md+, horizontal on mobile) -->
       <div class="col-12 mb-3">
         <div class="d-flex d-md-block justify-content-start justify-content-md-end">
@@ -144,12 +144,10 @@
         {{loc.address}}, {{loc.city_name}} | {{loc.county_id.county_name}} 
         
           {% if loc.location_about %}
-          <div class="description-block text-secondary"></p>
-            <div class = "desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
-            <div class="desc-full d-none"> {{ loc.location_about|highlight:q|safe }} </div>
-             {% if not q %} 
-             <div class="desc-toggle"> <span class="toggle-desc small text-muted ms-1"> ▼</span> </div> 
-             {% endif %} 
+          <div class="me-description-block"></p>
+            <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
+            <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>
+             
             </div>
             
           {% endif %}

@@ -1,4 +1,4 @@
-
+import re
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.utils.timezone import now
 from datetime import timedelta
 
+# fixed lists:
+#-------------------------------------------------------    
 region_list = [
     ('C','Central')
     ,('EC', 'East Central')
@@ -26,15 +28,54 @@ REGION_IMAGE_MAP = {
         'EC': 'orgs/images/CE.jpg',
         'St': 'orgs/images/St.jpg',
     }
-   
+
+ADDRESS_MAP = {
+    "street": "st",
+    "st.": "st",
+    "road": "rd",
+    "avenue": "ave",
+    "drive": "dr",
+    "lane": "ln",
+    "boulevard": "blvd",
+    "court": "ct",
+}
+# functions to help with matching and loading locations
+#-------------------------------------------------------
+
+def normalize_text(val):
+    if not val:
+        return ""
+    val = val.lower().strip()
+    val = re.sub(r"\s+", " ", val)
+    return val
+
+def normalize_address(addr):
+    if not addr:
+        return ""
+
+    addr = addr.lower().strip()
+    addr = re.sub(r"[.,]", "", addr)
+
+    for k, v in ADDRESS_MAP.items():
+        addr = addr.replace(k, v)
+
+    # remove unit info
+    addr = re.sub(r"(apt|suite|ste|#)\s*\w+", "", addr)
+
+    addr = re.sub(r"\s+", " ", addr)
+    return addr.strip()
+
+def one_year_from_now():
+    return now().date() + timedelta(days=365)
+
+#actual classes for models
+#-------------------------------------------------------
+
 class Commitment(models.Model):
     time= models.CharField(max_length=50)
 
     def __str__(self):
         return self.time
-
-def one_year_from_now():
-    return now().date() + timedelta(days=365)
 
 class EventCategory(models.Model):
     name=models.CharField(max_length=50, unique=True)
@@ -116,7 +157,7 @@ class Organization(models.Model):
             return False
         return (
             user.profile.staff
-            or self.orgmanager_set.filter(user=user.profile,
+            or self.managed.filter(profile=user.profile,
                                           role__in=["owner","admin","editor"]).exists()
     )
 
@@ -158,20 +199,20 @@ class LocationQuerySet(models.QuerySet):
         
 class Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
-    loc_name= models.CharField(max_length=255, unique=True)
+    loc_name= models.CharField(max_length=255)
     physical_location = models.BooleanField(default=True)
-    address = models.CharField(max_length=255, default ='', blank=True)
+    address = models.CharField(max_length=255, default ='', blank=True, null=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL, related_name="county")
     region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     org_loc_url = models.URLField(max_length=200, default="", blank=True)
-    location_about = models.TextField(default="", blank=True , null=True)
+    location_about = models.TextField(default="", blank=True )
     contact_email = models.EmailField(default="", blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
-    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_locs', default="", null=True, blank=True)
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_locs',  null=True, blank=True)
     deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField( null=True, blank=True)
     created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="created_locations")
@@ -179,9 +220,34 @@ class Location(models.Model):
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="updated_locations")
     updated_at = models.DateTimeField(auto_now=True)
 
+     # 👇 MACHINE FIELDS
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    norm_loc_name = models.CharField(max_length=255, blank=True)
+    norm_address = models.CharField(max_length=255, blank=True)
+    norm_city = models.CharField(max_length=100, blank=True)
+    norm_state = models.CharField(max_length=2, blank=True)
+
+    fingerprint = models.CharField(max_length=500, unique=True, blank=True, null=True, db_index=True)
+
     objects = LocationQuerySet().as_manager()       # default behavior
     all_objects = models.Manager()
 
+    def build_fingerprint(self):
+        return f"{self.norm_loc_name}|{self.norm_address}|{self.norm_city}|{self.norm_state}"
+    
+    def save(self, *args, **kwargs):
+        # 👇 ALWAYS populate normalized fields
+        self.norm_loc_name = normalize_text(self.loc_name)
+        self.norm_city = self.norm_city = normalize_text(self.city_name or "")
+        self.norm_state = normalize_text(self.state or "wi")
+        self.norm_address = normalize_address(self.address or "")
+
+        # 👇 build fingerprint
+        self.fingerprint = self.build_fingerprint()
+
+        super().save(*args, **kwargs)
+    
 
     class Meta:
         ordering = ['loc_name']  # sort by loc_name by default  
@@ -194,7 +260,7 @@ class Location(models.Model):
             return False
         return (
             user.profile.staff
-            or self.org.orgmanager_set.filter(user=user.profile,
+            or self.org.managed.filter(profile=user.profile,
                                           role__in=["owner","admin","editor"]).exists()
     )
     
@@ -250,7 +316,7 @@ class Activity(models.Model):
             return False
         return (
             user.profile.staff
-            or self.org.orgmanager_set.filter(user=user.profile,
+            or self.org.managed.filter(profile=user.profile,
                                           role__in=["owner","admin","editor"]).exists()
     )
     
@@ -282,7 +348,7 @@ class SessionQuerySet(models.QuerySet):
     def ongoing(self):
         today = timezone.now().date()
         return self.active().filter(
-            start__lt=today
+            Q(start__lt=today)|Q(start__isnull=True)
         ).filter(
             Q(end__isnull=True) | Q(end__gte=today)
         )
@@ -324,6 +390,7 @@ class Session(models.Model):
             region,
             'orgs/images/default.jpg'
         )
+
 class ActivityUpload(models.Model):
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="uploads", blank=True, null=True)
@@ -334,9 +401,9 @@ class ActivityUpload(models.Model):
     notes = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.file.name} ({self.uploaded_at})"
+        return f"{self.file.name} ({self.uploaded_at}, {self.id})"
     
-class StagingActivity(models.Model):
+class RawLoadData(models.Model):
     upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
     row_number = models.IntegerField()
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True)
@@ -358,3 +425,108 @@ class StagingActivity(models.Model):
 
     def __str__(self):
         return f"Row {self.row_number} - {self.title or 'No Title'}"
+
+
+class Pending_Location(models.Model):
+    org = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True, related_name="pending_locations")
+    loc_name= models.CharField(max_length=255, unique=True)
+    physical_location = models.BooleanField(default=True)
+    address = models.CharField(max_length=255, default ='', blank=True, null=True)
+    city_name = models.CharField(max_length=255, blank=True,null=True )
+    county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL)
+    region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
+    state = models.CharField(max_length=100, default='WI', blank=True)
+    zip_code = models.CharField(max_length=20, blank=True)
+    org_loc_url = models.URLField(max_length=200, default="", blank=True)
+    location_about = models.TextField(default="", blank=True )
+    contact_email = models.EmailField(default="", blank=True)
+    
+    created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="created_pending_locations")
+    created_at =models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="updated_pending_locations"  )
+    updated_at = models.DateTimeField(auto_now=True)
+    source_upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
+    processing_status = models.CharField(max_length=20, default="pending")  # pending, approved, rejected
+    real_location = models.ForeignKey(
+        Location, null=True, blank=True, on_delete=models.SET_NULL
+    )  # points to production if this is a match
+
+     # 👇 MACHINE FIELDS
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    norm_loc_name = models.CharField(max_length=255, blank=True)
+    norm_address = models.CharField(max_length=255, blank=True)
+    norm_city = models.CharField(max_length=100, blank=True)
+    norm_state = models.CharField(max_length=2, blank=True)
+
+    fingerprint = models.CharField(max_length=500, unique=True, blank=True)
+
+    def build_fingerprint(self):
+        return f"{self.norm_loc_name}|{self.norm_address}|{self.norm_city}|{self.norm_state}"
+    
+    def save(self, *args, **kwargs):
+        # 👇 ALWAYS populate normalized fields
+        self.norm_loc_name = normalize_text(self.loc_name)
+        self.norm_city = normalize_text(self.city_name)
+        self.norm_state = normalize_text(self.state)
+        self.norm_address = normalize_address(self.address)
+
+        # 👇 build fingerprint
+        self.fingerprint = self.build_fingerprint()
+
+        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"{self.loc_name} ({self.org})"
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["fingerprint"],
+                name="unique_pending_location_fp"
+            )
+        ]
+    
+
+
+class Pending_Activity(models.Model):
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="pending_activities")
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    activity_type = models.CharField(max_length=1,
+                                  choices=[("v","Volunteer Opportunity"),("t","Training" )])
+    time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
+    categories = models.ManyToManyField(EventCategory, blank=True)
+    date_description = models.CharField(max_length=100, default='', blank=True, null=True)
+    expire_date = models.DateField(default=one_year_from_now())
+    activity_url = models.URLField(max_length=200, default="", blank=True)
+    no_cost = models.BooleanField(default=False)
+    contact_email = models.EmailField(default="", blank=True)
+    created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_pending_activities")
+    created_at =models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_pending_activities")
+    updated_at = models.DateTimeField(auto_now=True)
+    source_upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
+    processing_status = models.CharField(max_length=20, default="pending")  # pending, approved, rejected
+    
+    def __str__(self):
+        return f"{self.title} ({self.org})"
+
+class Pending_Session(models.Model):
+    activity=models.ForeignKey(Pending_Activity, on_delete=models.CASCADE, related_name="pending_sessions")
+    session_format = models.CharField(max_length=1 ,
+                              choices=[("o","Online"),("i","InPerson" ),("b","Hybrid")])
+    location = models.ForeignKey( Pending_Location, null=True, blank=True, on_delete=models.SET_NULL, related_name="pending_sessions")
+    session_url = models.URLField(max_length=200, default="", blank=True)
+    ongoing = models.BooleanField(default=False)
+    start = models.DateField(null=True, blank=True)
+    end = models.DateField(null=True, blank=True)
+    deleted=models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_pending_sessions")
+    created_at =models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_pending_sessions"   )
+    updated_at = models.DateTimeField(auto_now=True)
+    processing_status = models.CharField(max_length=20, default="pending")  # pending, approved, rejected
+    
+    def __str__(self):
+        return f"{self.activity.title} – {self.start}"  

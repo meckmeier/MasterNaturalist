@@ -1,30 +1,30 @@
 {% extends "orgs/layout.html" %}
 {% block body %}
-<div class="container my-4">
+<div class="me-page">
 
 <h1>Wild Paths - Wisconsin</h1>
 
 {% if user.is_authenticated%}
 <p>Organized into a directory of nature based organizations - or a search feature to find volunteer or training opportunities today.
     </p>
-<a  class="mybutton-link" href="{% url 'results' %}">
+<a  class="me-button-link" href="{% url 'results' %}">
     What's New</a>
-<a class="mybutton-link" href="{% url 'filter' %}">
+<a class="me-button-link" href="{% url 'filter' %}">
     Find Activities</a>
-<a class="mybutton-link" href="{% url 'orgs' %}">
+<a class="me-button-link" href="{% url 'orgs' %}">
     Browse Organizations</a>
 
     <p>If you are an organization and need to manage your org, locations or add new activities:</p>
-    <a class="mybutton-link-2nd" href="{% url 'org_mgmt' %}">
+    <a class="me-button-link-2nd" href="{% url 'org_mgmt' %}">
     Manage Organizations</a>
 
 {%else%}
 <p>This website was designed to help Wisconsin Master Naturalists find volunteer and training opportunities. 
     </p>
     
-    <a class="button-lnk" href="{% url 'register' %}">
+    <a class="me-button-link" href="{% url 'register' %}">
     Click here to get started</a>
-    Already have a login -> <a class="button-link" href="{% url 'login' %}">Login</a>
+    Already have a login -> <a class="me-button-link" href="{% url 'login' %}">Login</a>
      to gain full advantage of this system to connect you to your natural world.
 
 {%endif%}

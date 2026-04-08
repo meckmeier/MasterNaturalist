@@ -2,7 +2,7 @@
 
 import pandas as pd
 from datetime import datetime
-from orgs.models import StagingActivity
+from orgs.models import RawLoadData
 
 class CSVImporter:
     def __init__(self, upload, mapping=None):
@@ -54,7 +54,7 @@ class CSVImporter:
 
     # Step 4: process → insert into staging
     def process(self):
-        StagingActivity.objects.filter(upload=self.upload).delete()
+        RawLoadData.objects.filter(upload=self.upload).delete()
         if self.df is None or self.df.empty:
             return
 
@@ -74,7 +74,7 @@ class CSVImporter:
                         self.errors.append(f"Row {i+1}: Invalid date format {date_val}")
                         date_val = None
             try:
-                 StagingActivity.objects.create(
+                 RawLoadData.objects.create(
                     upload=self.upload,
                     row_number=i + 1,
                     organization=self.upload.organization,

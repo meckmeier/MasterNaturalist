@@ -94,3 +94,10 @@ def update_new_fields():
             sess.updated_by = sess.created_by   
             sess.updated_at = default_date
         sess.save()
+
+def resaveLocations():
+    # to call from the:  python manage.py shell
+    # >>> from orgs.utils import resaveLocations
+    # >>> resaveLocations()
+    for loc in Location.objects.all():
+        loc.save()

@@ -18,7 +18,7 @@ class OrgForm(forms.ModelForm):
 class LocForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ["org", "loc_name", "physical_location", "address", "city_name", "county_id", "region_name", "state", "zip_code", "org_loc_url", "location_about", "contact_email"]
+        fields = [ "loc_name", "physical_location", "address", "city_name", "county_id", "region_name", "state", "zip_code", "org_loc_url", "location_about", "contact_email"]
         widgets = {
             "location_about": forms.Textarea(attrs={
                 "rows": 3,

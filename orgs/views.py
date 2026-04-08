@@ -1,3 +1,5 @@
+from urllib import request
+
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .utils import update_new_fields
 from django.core.mail import send_mail
@@ -17,7 +19,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 import pandas as pd
 from .services.csv_importer import CSVImporter
-
+from django.db import transaction
 
 from django.views.decorators.http import require_POST
 from collections import defaultdict
@@ -30,6 +32,7 @@ def sort_key(x):
     if d is None:
         return date.max
     return d
+
 
 def landing(request):
      # view only shows the main landing page. all info is rendered in the html page.
@@ -395,36 +398,39 @@ def org_detail(request, org_id=None, view_only=False):
                 "can_edit": can_edit})
 
 def loc_detail(request, loc_id=None):
-    if loc_id:
-        loc=get_object_or_404(Location, id=loc_id)
-    else:
-        loc = None
-
+    loc=get_object_or_404(Location, id=loc_id) if loc_id else None
+    view_only= request.resolver_match.url_name =="loc_view"
     can_edit = True
-    view_only = request.resolver_match.url_name == "loc_view"
-    org_id = request.GET.get("org")
+    
+
+    org_on_url = request.GET.get("org")
+    
+    if not org_on_url and not loc:
+        messages.error(request, "Organization context is required to create a new location")
+        return redirect(reverse("org_mgmt"))
     
     if request.method == "POST" and can_edit and not view_only:
-        if loc is None:
-            form=LocForm(request.POST)  
-        else:
-            form= LocForm(request.POST, instance=loc) 
-             
-        if not form.is_valid():
-            print(form.errors)
+        form= LocForm(request.POST, instance=loc) 
         
         if form.is_valid():
-            loc = form.save(commit=False)
-            if not loc.owner:
+            if loc is None:
+                loc = form.save(commit=False)  # get the unsaved Location instance
+                loc.org_id = org_on_url
                 loc.owner = request.user.profile
-            if not loc.created_by:
                 loc.created_by = request.user.profile
-
-            loc.updated_by = request.user.profile
-            loc.save()
-            org_id=loc.org.id
-            return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
+                loc.updated_by = request.user.profile
+                loc.save()
+                messages.success(request, f"Location '{loc.loc_name}' saved successfully!")
+                return redirect(f"{reverse('org_mgmt')}#org-{loc.org.id}")
+            else:
+                loc = form.save(commit=False)
+                loc.updated_by = request.user.profile
+                loc.save()
+                messages.success(request, f"Location '{loc.loc_name}' updated successfully!")
+                return redirect(f"{reverse('org_mgmt')}#org-{loc.org.id}")
+            
         else:
+            print("loc form errors",form.errors)
             messages.error(request, "there are errors in the form.")
             return render(request, "orgs/location_form.html", {
                 "loc": loc,
@@ -437,8 +443,8 @@ def loc_detail(request, loc_id=None):
         if loc:  # editing existing
             form = LocForm(instance=loc)
         else:  # creating new
-            org_id = request.GET.get("org")
-            loc = Location(org_id=org_id) if org_id else Location()
+            
+            loc = Location(org_id=org_on_url) if org_on_url else Location()
             form = LocForm(instance=loc)
                 
     if view_only:
@@ -449,7 +455,8 @@ def loc_detail(request, loc_id=None):
                 "loc": loc,
                 "form": form,
                 "view_only": view_only,
-                "can_edit": can_edit})
+                "can_edit": can_edit,
+               })
     
 def locations(request):
     
@@ -880,7 +887,7 @@ def debug_sessions(request):
 def upload_csv(request, org_id):
     org = get_object_or_404(Organization, id=org_id)
 
-    if not (request.user.profile in org.managed.all() or request.user.profile.staff):
+    if not (OrgManager.objects.filter(org=org, profile=request.user.profile).exists()  or request.user.profile.staff):
         return HttpResponseForbidden()
     
     if request.method == "POST":
@@ -955,7 +962,7 @@ def upload_review(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
     # Fetch all staged rows
-    staged_rows = StagingActivity.objects.filter(upload=upload)
+    staged_rows = RawLoadData.objects.filter(upload=upload)
     
     # Fetch any errors from the staging process (from session)
     errors = request.session.pop(f"errors_{upload_id}", [])
@@ -963,7 +970,7 @@ def upload_review(request, upload_id):
     if request.method == "POST":
         # Handle row skipping
         skip_ids = request.POST.getlist("skip_row")
-        StagingActivity.objects.filter(id__in=skip_ids).update(status="skipped")
+        RawLoadData.objects.filter(id__in=skip_ids).update(status="skipped")
         return redirect("upload_commit", upload_id=upload.id)
 
     return render(request, "orgs/upload_review.html", {
@@ -974,7 +981,7 @@ def upload_review(request, upload_id):
 # Step 4: Commit to final tables
 def upload_commit(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
-    staged_rows = StagingActivity.objects.filter(upload=upload, status="valid")
+    staged_rows = RawLoadData.objects.filter(upload=upload, status="valid")
     
     # Implement logic to insert into your final Activity/Location tables here
     # e.g., for row in staged_rows: Activity.objects.create(...)
@@ -982,9 +989,114 @@ def upload_commit(request, upload_id):
     upload.processed = True
     upload.status = "completed"
     upload.save()
-    return redirect("upload_success")
+    return redirect("upload_processing", upload_id=upload.id)
 
 # Success page
 def upload_success(request):
     return render(request, "orgs/upload_success.html")
 
+def normalize(text):
+    return text.strip().lower() if text else ""
+
+def upload_processing(request, upload_id):
+    #Purpose: Take the raw rows and map them into your four pending tables:
+    #Location_Pending
+    #Session_Pending
+    #Activity_Pending
+    print("Starting processing for upload:", upload_id)
+    upload_info = get_object_or_404(ActivityUpload, id=upload_id)
+    rows = RawLoadData.objects.filter(upload_id=upload_id)
+
+    for row in rows:
+        with transaction.atomic():
+            print(f"Processing row {row.id}")
+
+            # -----------------------------
+            # Normalize
+            # -----------------------------
+            lkp_loc_name = normalize(row.location_name)
+            lkp_city = normalize(row.city)
+            lkp_address = normalize(row.address)
+            lkp_title = normalize(row.title)
+
+            # -----------------------------
+            # 1. Check Pending_Location FIRST
+            # -----------------------------
+            pending_location = Pending_Location.objects.filter(
+                loc_name__iexact=lkp_loc_name,
+                city_name__iexact=lkp_city,
+                address__iexact=lkp_address
+            ).first()
+
+            if pending_location:
+                # ✅ Already staged — reuse it
+                pass
+
+            else:
+                # -----------------------------
+                # 2. Check real Location
+                # -----------------------------
+                matched_location = Location.objects.filter(
+                    loc_name__iexact=lkp_loc_name,
+                    city_name__iexact=lkp_city
+                    
+                ).first()
+
+                # -----------------------------
+                # 3. Create Pending_Location
+                # -----------------------------
+                if matched_location:
+                    pending_location = Pending_Location.objects.create(
+                        loc_name=matched_location.loc_name,
+                        city_name=matched_location.city_name,
+                        address=matched_location.address,
+                        real_location=matched_location,
+                        processing_status="matched",
+                        source_upload_id=upload_id,
+                        org=upload_info.organization
+                    )
+                else:
+                    pending_location = Pending_Location.objects.create(
+                        loc_name=row.location_name,
+                        city_name=row.city,
+                        address=row.address,
+                        processing_status="new",
+                        source_upload_id=upload_id,
+                        org=upload_info.organization
+                    )
+
+   
+    #Wrap each row (or batch) in transaction.atomic() to avoid partial inserts.
+    return redirect("upload_approval", upload_id=upload_id)
+
+
+def upload_approval(request, upload_id):
+
+    # GET (this is the only query you need)
+    sessions = Pending_Session.objects.select_related(
+            "activity",
+            "location",
+            "location__real_location"
+        ).filter(activity__source_upload_id=upload_id)
+    return render(request, "orgs/upload_approval.html", {
+        "sessions": sessions
+    })
+
+def upload_publish(request, upload_id):
+    #urpose: Move approved rows from pending tables into production.
+    #Logic:
+    #Promote locations first (Location_Pending → Location)
+    #Promote sessions (Session_Pending → Session)
+    #Promote activities (Activity_Pending → Activity)
+    #Wrap the entire promotion in a transaction per row (or per batch).
+    #Mark pending rows as archived or approved for audit.
+    #URL example: /promote_pending_activity/
+    return render(request, "orgs/upload_success.html")
+
+def upload_reject(request, upload_id):
+    #Purpose: Mark rows as rejected and optionally log reasons.
+    #Logic:
+    #Update pending rows with status “rejected” and save any user comments.
+    #Optionally, move rejected rows to a separate table for audit.
+    #URL example: /reject_pending_activity/
+    return render(request, "orgs/upload_success.html")

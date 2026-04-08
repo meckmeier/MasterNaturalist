@@ -19,7 +19,7 @@
  <input type="hidden" name="next" value="{{ request.GET.next|default:request.get_full_path }}">
     
 {% if view_only %}
-         <a class="button-link" href="{% url 'activity_edit' activity.id %}">Edit</a>        
+         <a class="me-button-link" href="{% url 'activity_edit' activity.id %}">Edit</a>        
          {%endif%}
 {% if duplicate_warning %}
   <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
@@ -27,14 +27,14 @@
     Are you sure you want to add another?
   </div>
 
-  <button type="submit" name="confirm_duplicate" value="1">
+  <button class="me-btn" type="submit" name="confirm_duplicate" value="1">
     Yes, add anyway
   </button>
 
-  <a href="" class="btn">Cancel</a>
+  <a href="" class="me-button-link">Cancel</a>
 {% else %}
 
-       <button type ="submit" class="mybtn">
+       <button type ="submit" class="me-btn">
             Save
         </button>
 
@@ -162,7 +162,7 @@
     </div>
     {% if can_edit %}
     {% if not view_only %}
-        <button type="button" id="add-btn" class="mybtn">
+        <button type="button" id="add-btn" class="me-btn">
             Add Sessions
         </button>
     {% endif %}
