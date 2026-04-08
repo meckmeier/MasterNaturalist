@@ -955,7 +955,7 @@ def upload_review(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
     # Fetch all staged rows
-    staged_rows = StagingActivity.objects.filter(upload=upload)
+    staged_rows = RawLoadData.objects.filter(upload=upload)
     
     # Fetch any errors from the staging process (from session)
     errors = request.session.pop(f"errors_{upload_id}", [])
@@ -963,7 +963,7 @@ def upload_review(request, upload_id):
     if request.method == "POST":
         # Handle row skipping
         skip_ids = request.POST.getlist("skip_row")
-        StagingActivity.objects.filter(id__in=skip_ids).update(status="skipped")
+        RawLoadData.objects.filter(id__in=skip_ids).update(status="skipped")
         return redirect("upload_commit", upload_id=upload.id)
 
     return render(request, "orgs/upload_review.html", {
@@ -974,7 +974,7 @@ def upload_review(request, upload_id):
 # Step 4: Commit to final tables
 def upload_commit(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
-    staged_rows = StagingActivity.objects.filter(upload=upload, status="valid")
+    staged_rows = RawLoadData.objects.filter(upload=upload, status="valid")
     
     # Implement logic to insert into your final Activity/Location tables here
     # e.g., for row in staged_rows: Activity.objects.create(...)
