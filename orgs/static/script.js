@@ -39,6 +39,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     console.log("finished with hash code")
+    
+    const descriptionBlocks = document.querySelectorAll('.me-description-block');
+
+    descriptionBlocks.forEach(block => {
+    block.addEventListener('click', () => {
+        block.classList.toggle('expanded');
+    });
+    console.log()
 });
     document.addEventListener("click", function(e) {
     if (e.target && e.target.id === "add-btn") {
@@ -65,22 +73,4 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
     console.log("finished with add button")
-    document.addEventListener("click", function (e) {
-
-        const block = e.target.closest(".description-block");
-        if (!block) return;
-        console.log("have block")
-        const shortText = block.querySelector(".desc-short");
-        const fullText = block.querySelector(".desc-full");
-        const toggle = block.querySelector(".toggle-desc");
-
-        shortText.classList.toggle("d-none");
-        fullText.classList.toggle("d-none");
-
-        if (toggle) {
-            toggle.textContent =
-                shortText.classList.contains("d-none") ? "▲" : "▼";
-        }
-
-    });
-
+});

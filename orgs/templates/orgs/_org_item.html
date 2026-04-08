@@ -1,13 +1,16 @@
 {% load static %}
 {% load highlight %}
 
-<div class="card shadow-sm mb-3 border-0">
+<div class="me-card">
         <!-- Title row -->
-        <div class="d-flex justify-content-between align-items-start">
-          <h5 class="card-title mb-1">
+        <div class="me-card-header">
+          <div class="me-card-header-left">
+                <div class="me-card-title-row">
                   <a href="{% url 'org_view' o.id %}" class="text-decoration-none">
                           {% if q %}{{ o.org_name|highlight:q|safe }}{% else %}{{ o.org_name }} {% endif %} </a></h5>
-            
+                </div>
+          </div>
+          <div class="me-card-header-right">
                 <img src="{% static o.region_image %}"  style="height:50px; width:auto;">
                 
             
@@ -17,9 +20,8 @@
                           · {{ o.orgloc.loc_name }}
                       {% endif %}
         </div>
-        <div>
-                    {{o.about|truncatewords:500 }}
-        </div>
-           
-
-      </div>
+        <div class="me-description-block">
+                    <div class="me-desc-short">{{o.about|truncatewords:500 }}</div>
+                    <div class="me-desc-full">{{ o.about }}</div>
+                </div>
+</div>

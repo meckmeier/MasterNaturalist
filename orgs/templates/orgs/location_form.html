@@ -13,12 +13,10 @@
     {% csrf_token %}
    {{form.id}}
        <!-- submit button INSIDE the form -->
-    {% if can_edit and not view_only %}
-        <button type="submit" class="mybtn">
-            {% if loc %}Save{% else %}Add{% endif %}
+        <button type="submit" class="me-btn">
+            Save
         </button>
-        
-    {% endif %}
+
     <div class = "form-grid {% if view_only %}view-mode{% endif %}">
         <div class ="form-field title">
             {{ form.loc_name.label_tag }}
@@ -70,15 +68,12 @@
             {{ form.zip_code.errors }}
         </div>
 
-         <div class ="form-field">
-            {{ form.org.label_tag }}
-            {{ form.org}}
-            {{ form.org.errors }}
-        </div>
+
     </div>
 
 </form>
-  <p>Created :
+ <p>Org: {{ loc.org.org_name }}</p> 
+ <p>Created :
 {% if loc.created_by %}
   {{ loc.created_by }}
   /{{ loc.created_at }}

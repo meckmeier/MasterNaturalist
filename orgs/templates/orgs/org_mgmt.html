@@ -1,17 +1,34 @@
 {% extends "orgs/layout.html" %}
 {% load static %}
 {% block body %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
 
+<div class="me-page">
 <h1>My Organizations</h1>
  {% for org in organizations %}
-
-   <div class="card mb-4 p-3"  id="org-{{org.id}}">
+<!-- org header -->
+   <div class="me-card"  id="org-{{org.id}}">
     <!-- Organization Name -->
-    <h4 class="card-title">{{ org.org_name }}<a href="{% url 'org_edit' org.id %}" title="manage organization details"><i class="bi bi-pencil"></i></a>
-    </h4>
-    <a href="{% url 'upload_csv' org.id%}" class="mybtn">Upload Activities</a>
+     <div class="me-card-header">
+        <div class="me-card-header-left">
+        <h4 class="me-card-title">{{ org.org_name }}<a href="{% url 'org_edit' org.id %}" title="manage organization details"><i class="bi bi-pencil"></i></a>
+    </h4></div>
+    <div class="me-card-header-right">
+    <a href="{% url 'upload_csv' org.id%}" class="me-button-link btn">Upload Activities</a>
+    </div>
+    </div>
     <!-- Description -->
-    <p class="card-text mb-4">{{ org.about|truncatewords:30 }}</p>
+      
+    <div class="me-description-block">
+        <div class="me-desc-short"> {{ org.about|truncatewords:30 }} </div>
+        <div class="me-desc-full">{{ org.about }}</div>
+    </div>
 
     <!-- Locations & Activities side by side -->
     <div class="row">
@@ -26,7 +43,7 @@
                     {% for loc in org.pre_locs %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             {{ loc.loc_name }} | {{ loc.county_id.county_name }}
-                            <a href="{% url 'loc_edit' loc.id %}" title="edit location"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location"><i class="bi bi-pencil"></i></a>
                         </li>
                     {% empty %}
                         <li class="list-group-item">No locations yet</li>
@@ -91,4 +108,5 @@
 
 <!-- Add New Organization -->
 <a href="{% url 'org_create' %}" class="btn btn-primary">ADD Org</a>
+</div>
 {% endblock %}

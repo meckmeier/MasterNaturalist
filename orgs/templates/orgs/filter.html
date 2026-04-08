@@ -4,7 +4,7 @@
 {% load can_edit_filters %}
 
 {% block body%}
-<div class="container my-4">
+<div class="my-page">
 <form method="POST" action="{{ request.path }}">
      {% csrf_token %}
     <input type="hidden" name="page" value="{{ request.GET.page|default:'1' }}">
@@ -53,7 +53,7 @@
     
     <div class="d-flex gap-2">
         
-        <button type="submit"  class="mybtn">Go</a>
+        <button type="submit"  class="me-btn">Go</a>
     </div>
 </form>
 </div>

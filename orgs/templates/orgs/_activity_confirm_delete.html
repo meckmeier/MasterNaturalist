@@ -10,7 +10,7 @@
 
 <form method="post">
   {% csrf_token %}
-  <button type="submit">Yes, delete</button>
+  <button class="me-btn" type="submit">Yes, delete</button>
   <a href="{% url 'org_mgmt' %}#org-{{ activity.org.id }}">Cancel</a>
 </form>
 {% endblock %}

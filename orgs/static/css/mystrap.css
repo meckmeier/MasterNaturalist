@@ -1,0 +1,247 @@
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #222;
+}
+
+/* Layout */
+.me-page {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Tabs */
+.me-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 1rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.me-tab-button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.me-tab-button.active {
+  border-bottom: 2px solid black;
+  font-weight: 600;
+}
+
+/* Text */
+.me-muted {
+  color: #777;
+}
+
+.me-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* vertical spacing */
+}
+
+/* Date line */
+.me-card-date {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Header row: left + right */
+.me-card-header {
+  display: flex;
+  justify-content: space-between; /* left block vs right icons */
+  align-items: center;            /* vertical center right icons with left block */
+  gap: 1rem;
+}
+
+/* Left block stacked */
+.me-card-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Title row: inline icons + title + edit */
+.me-card-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Sponsored text under title row */
+.me-card-sponsor {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Right block: inline icons */
+.me-card-header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Description */
+.description-block {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+/* Badges */
+.me-badge {
+  display: inline-block;
+  background: #eee;
+  color: #333;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  margin-right: 0.25rem;
+}
+
+/* default state */
+.me-description-block .me-desc-short {
+  display: block;
+}
+.me-description-block .me-desc-full {
+  display: none;
+}
+
+/* expanded state */
+.me-description-block.expanded .me-desc-short {
+  display: none;
+}
+.me-description-block.expanded .me-desc-full {
+  display: block;
+}
+
+/* Hidden description for toggle */
+.me-hidden {
+  display: none;
+}
+
+/* Stack helper for badges */
+.me-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.me-btn {
+    background-color:  #128140d8;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+.me-btn:hover{
+    background-color: #0056b3;   /* Darker blue on hover */
+}
+a.me-button-link {
+    display: inline-block;       /* Makes it behave like a button */
+    padding: 5px 10px;          /* Space inside the button */
+    background-color: #128140d8;   /* Button background color */
+    color: white;                /* Text color */
+    text-align: center;          /* Center text */
+    text-decoration: none;       /* Remove underline */
+    border-radius: 4px;          /* Rounded corners */
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+a.me-button-link-2nd{
+    background-color: #1d9fc773;   /* Button background color */
+    display: inline-block;       /* Makes it behave like a button */
+    padding: 5px 10px;          /* Space inside the button */
+    color: white;                /* Text color */
+    text-align: center;          /* Center text */
+    text-decoration: none;       /* Remove underline */
+    border-radius: 5px;          /* Rounded corners */
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    transition: background-color 0.3s ease; /* Smooth hover effect */ 
+
+}
+/* Hover effect */
+a.me-button-link:hover {
+    background-color: #0056b3;   /* Darker blue on hover */
+}
+a.me-button-link-2nd:hover {
+    background-color: #0056b3;   /* Darker blue on hover */
+}
+.error-text{
+    color:red;
+    
+}
+.me-tabs {
+  display: inline-flex;
+  border-bottom: 1px solid #ddd;
+  padding-left: 0;   /* remove default ul padding */
+  margin: 0;         /* remove default margin */
+  list-style: none;  /* remove bullets */
+  width: fit-content;
+}
+
+.me-tab-button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #666;
+  border-bottom: 2px solid transparent;
+}
+
+/* remove ugly default outline */
+.me-tab-button:focus {
+  outline: none;
+}
+
+/* optional: nicer focus style */
+.me-tab-button:focus-visible {
+  outline: 2px solid #aaa;
+  outline-offset: 2px;
+
+}
+.me-tab-button.active {
+  color: #000;
+  border-bottom: 2px solid #0cec32;  /* your “dark bottom border” */
+  font-weight: 600;
+}
+.me-tab-button:hover {
+  color: #000;
+}
+.me-tab-content {
+  width: 100%;
+  max-width: 1000px;   /* adjust to your taste */
+  margin: 0 auto;     /* centers it */
+}
+
+.upload-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.upload-section {
+  margin-left: 20px;
+  margin-top: 5px;
+}
+
+.good { color: green; }
+.warn { color: orange; }

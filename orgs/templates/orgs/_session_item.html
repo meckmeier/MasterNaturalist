@@ -2,74 +2,71 @@
 {% load highlight %}
 {% load can_edit_filters %}
 
- <div class="card shadow-sm mb-3 border-1"  id="activity-{{ e.activity.id }}">
-      <!-- Date row -->
-       
-      <div class="mt-2 small text-muted">
-            <strong>Starts:</strong> {{ e.start }}
-            {% if e.end %}
-                | <strong>Ends:</strong> {{ e.end }}
-            {% endif %}
-            {% if e.date_description %}
-                | <em>{{ e.date_description }}</em>
-            {% endif %}
-      </div>
-      <!-- Title row -->
-      <div class="d-flex justify-content-between align-items-start">
-        <h5 class="card-title mb-1">
-          <span><strong>
-            {% if e.activity.is_newly_added %}<i class="bi bi-asterisk" data-bs-toggle="tooltip" title="Newly added activity"></i>{% endif %}
-            
-            {% if e.activity.activity_type == "t"%}<i class="bi bi-mortarboard" data-bs-toggle="tooltip" title="Training"></i>
-            {% else %} <i class="bi bi-tree" data-bs-toggle="tooltip" title="Volunteer Opportunity"></i>{% endif %}</strong></span>
-          
-          {% if q %}{{ e.activity.title|highlight:q|safe  }}{% else %}{{ e.activity.title }}{% endif %}
-          {% if e.activity|can_edit:request.user %}<a href="{% url 'activity_edit' e.activity_id%}"><i class="bi bi-pencil-fill"></i></a>{% endif %}
-          <div class="mt-2 small text-muted">Sponsored by: {{e.activity.org.org_name}}</div>
-         
-          
-        </h5>
-        <div class="d-flex align-items-baseline gap-2">
-              {% if e.session_format != "i" %}
-                <i class = "bi bi-globe fs-5 text-info" title="There are online sessions for this activity"></i>
-              {% endif %}
-              <img src="{% static e.region_image %}" alt="Region" style="height:30px; width:auto;">
-        </div>
-      </div>
-      <div class="text-muted small">
-                    {{ e.org.org_name }}
-                    {% if e.location %}
-                          · {{ e.location.loc_name }} | {{e.location.county_id.county_name}}
-                      {% endif %}
-                      {% if e.activity.contact_email %}
-                         | <a href="mailto:{{ activity.contact_email }}">{{activity.contact_email}}<i class="bi bi-envelope"></i></a>
-                      {% endif %}
-                      {% if e.activity.activity_url %}| 
-                         | <a href="{{ e.activity.activity_url}}"><i class="bi bi-globe"></i></a>
-                      {% endif %}
-      </div>
-      <div class="mt-2 small text-muted">
-        
-      </div>
-      <div class="description-block">
-        <div class = "desc-short">
-          {{ e.activity.description|truncatechars:200 }}
-        </div>
-        <div class="desc-full d-none">
-           {{ e.activity.description|highlight:q|safe }}
-        </div>
-        {% if not q %}
-          <div class="desc-toggle">
-            <span class="toggle-desc small text-muted ms-1">
-                          ▼</span>
-          </div>
+ <div class="me-card">
+
+  <!-- Date line -->
+  <div class="me-card-date">
+    <strong>Starts:</strong> {{ e.start }}
+    {% if e.end %}| <strong>Ends:</strong> {{ e.end }}{% endif %}
+    {% if e.date_description %}| <em>{{ e.date_description }}</em>{% endif %}
+  </div>
+
+  <!-- Header row -->
+  <div class="me-card-header">
+    
+    <!-- Left block -->
+    <div class="me-card-header-left">
+      <div class="me-card-title-row">
+        {% if e.activity.is_newly_added %}
+          <i class="bi bi-asterisk" title="Newly added activity"></i>
         {% endif %}
-        </div>
-        <div>
-      
-          <p>{% for cat in e.activity.categories.all %}
-                    <span class="badge bg-secondary me-1">{{cat.name}}</span>
-                {% endfor %}
-                </p>
-        </div>
-    </div> 
+        {% if e.activity.activity_type == "t" %}
+          <i class="bi bi-mortarboard" title="Training"></i>
+        {% else %}
+          <i class="bi bi-tree" title="Volunteer Opportunity"></i>
+        {% endif %}
+        {{ e.activity.title }}
+        {% if e.activity|can_edit:request.user %}
+          <a href="{% url 'activity_edit' e.activity_id %}">
+            <i class="bi bi-pencil-fill"></i>
+          </a>
+        {% endif %}
+      </div>
+      <div class="me-card-sponsor">
+        Sponsored by: {{ e.activity.org.org_name }}
+      </div>
+    </div>
+
+    <!-- Right block: simple inline icons -->
+    <div class="me-card-header-right">
+      {% if e.activity.activity_url %}
+        <a href="{{ e.activity.activity_url }}"><i class="bi bi-globe fs-5 text-info"></i></a>
+      {% endif %}
+      {% if e.location %}
+        <img src="{% static e.region_image %}" alt="Region" style="height:30px; width:auto;">
+      {% endif %}
+      {% if e.session_format != "i" %}
+        <i class="bi bi-globe fs-5 text-info" title="Online sessions"></i>
+      {% endif %}
+    </div>
+
+  </div> <!-- header -->
+
+  <!-- Description -->
+  <div class="me-description-block">
+    <div class="me-desc-short">{{ e.activity.description|truncatechars:200 }}</div>
+    {%if q %}
+    <div class="me-desc-full">{{ e.activity.description|highlight:q|safe }}</div>
+    {% else %}
+    <div class="me-desc-full">{{ e.activity.description }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Badges -->
+  <div class="me-stack">
+    {% for cat in e.activity.categories.all %}
+      <span class="me-badge">{{ cat.name }}</span>
+    {% endfor %}
+  </div>
+
+</div>
