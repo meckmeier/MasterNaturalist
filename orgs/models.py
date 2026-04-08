@@ -251,7 +251,12 @@ class Location(models.Model):
 
     class Meta:
         ordering = ['loc_name']  # sort by loc_name by default  
-
+        constraints = [
+            models.UniqueConstraint(
+                fields=["fingerprint"],
+                name="unique_location_fp"
+            )
+        ]
     def __str__(self):
         return f"{self.loc_name}"
     
