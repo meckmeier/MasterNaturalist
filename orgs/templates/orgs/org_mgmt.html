@@ -41,9 +41,24 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     {% for loc in org.pre_locs %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ loc.loc_name }} | {{ loc.county_id.county_name }}
-                            <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location"><i class="bi bi-pencil"></i></a>
+                         <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                {{ loc.loc_name }}{% if loc.county_id %} | {{ loc.county_id.county_name }}{% endif %}
+                                {% if org.default_location_id == loc.id %}
+                                    <span class="badge bg-success ms-2">Default</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                {% if org.default_location_id != loc.id %}
+                                    <a href="{% url 'org_set_default_location' org.id loc.id %}" title="make default location">
+                                        <i class="bi bi-star"></i>
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
                         </li>
                     {% empty %}
                         <li class="list-group-item">No locations yet</li>

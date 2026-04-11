@@ -561,6 +561,20 @@ def locations(request):
         }
     )
 
+@login_required
+def org_set_default_location(request, org_id, loc_id):
+    org = get_object_or_404(Organization, id=org_id)
+    loc = get_object_or_404(Location, id=loc_id, org=org)
+
+    if not org.can_edit(request.user):
+        return HttpResponseForbidden()
+
+    org.default_location = loc
+    org.save(update_fields=["default_location"])
+
+    messages.success(request, f"{loc.loc_name} is now the default location.")
+    return redirect("org_mgmt")
+
 def login_view(request):
     if request.method == "POST":
 
@@ -632,7 +646,7 @@ def activity_detail(request, activity_id=None):
     view_only = request.resolver_match.url_name == "activity_view"
     can_edit = False
     categories = EventCategory.objects.all().order_by("name")
-
+    default_location_id =""
     grouped_categories = defaultdict(list)
     grouped_ids ={}
 
@@ -673,7 +687,8 @@ def activity_detail(request, activity_id=None):
                         "session_formset": session_formset,
                         "can_edit": can_edit,
                         "view_only": view_only,
-                        "duplicate_warning": True
+                        "duplicate_warning": True,
+                        "default_location_id": default_location_id
                     })
             #if there is no owner
             if not activity.owner:
@@ -702,16 +717,30 @@ def activity_detail(request, activity_id=None):
             print("Management errors:", session_formset.management_form.errors)
             print("main form errors" , activity_form.errors)
          
-        #next_url = request.POST.get("next")
+            #next_url = request.POST.get("next")
+            return render(request, "orgs/activity_form.html", {
+                "activity": activity,
+                "activity_form": activity_form,
+                "session_formset": session_formset,
+                "can_edit": can_edit,
+                "view_only": view_only,
+                "duplicate_warning": False
+            })
         return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
-
 
     #this is the GET part of the code
     else:
         org_id = request.GET.get("org")
         location_id = request.GET.get("location")
+        
         if org_id:
                 activity.org_id = org_id
+                org = Organization.objects.filter(id=org_id).first()
+                if org and org.default_location_id:
+                    default_location_id = str(org.default_location_id)
+        elif activity.org_id and activity.org and activity.org.default_location_id:
+            default_location_id = str(activity.org.default_location_id)
+        
         initial = []
         if location_id:      
                 initial.append({
@@ -737,7 +766,8 @@ def activity_detail(request, activity_id=None):
         "session_formset": session_formset,
         "can_edit": can_edit,
         "view_only": view_only,
-         "duplicate_warning": False
+        "duplicate_warning": False,
+        "default_location_id": default_location_id,
         })
 
 def activity_delete(request,activity_id=None):

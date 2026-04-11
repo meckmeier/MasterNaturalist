@@ -4,6 +4,7 @@ console.log("FORMSET SCRIPT LOADED");
 // --- run after DOM is ready ---
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded and parsed");
+  
     const tabButtons = document.querySelectorAll('#eventTabs button[data-bs-toggle="tab"]');
 
     tabButtons.forEach(btn => {
@@ -48,6 +49,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     console.log()
 });
+        const activityForm = document.getElementById("activity-form");
+    const defaultLocationId = activityForm ? activityForm.dataset.defaultLocation : "";
+    
+    function wireSessionRow(row) {
+        const formatField = row.querySelector("select[name$='session_format']");
+        const locationField = row.querySelector("select[name$='location']");
+        
+        if (!formatField || !locationField) return;
+        formatField.addEventListener("change", function(){
+            const format = formatField.value;
+            const currentLocation = locationField.value;
+            if ((format === "i" || format ==="b") && !currentLocation && defaultLocationId) {
+                locationField.value = defaultLocationId;
+            }
+        });
+    }
+    document.querySelectorAll(".formset-row").forEach(row => {
+        if (!row.classList.contains("form-template")){
+            wireSessionRow(row);
+        }
+    });
     document.addEventListener("click", function(e) {
     if (e.target && e.target.id === "add-btn") {
         const container = document.querySelector(".formset");
@@ -69,6 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tbody.appendChild(newRow);
         totalForms.value = formIndex + 1;
+        wireSessionRow(newRow);
     }
 });
 

@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import timedelta
+from django.core.exceptions import ValidationError
 
 # fixed lists:
 #-------------------------------------------------------    
@@ -131,7 +132,7 @@ class Organization(models.Model):
     region_name = models.CharField(max_length =100, choices = region_list, default='', blank=True)
     training_url = models.URLField(max_length=200, default="", blank=True)
     volunteer_url = models.URLField(max_length=200, default="", blank=True)
-    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_orgs', null=True, blank=True)
+    default_location = models.ForeignKey("Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="default_for_org")
     deleted=models.BooleanField(default=False)
     deleted_at = models.DateTimeField( null=True, blank=True)
     created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, blank=True, null=True, related_name="created_orgs")
@@ -203,16 +204,13 @@ class Location(models.Model):
     physical_location = models.BooleanField(default=True)
     address = models.CharField(max_length=255, default ='', blank=True, null=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )
-    county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL, related_name="county")
+    county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL, related_name="locations")
     region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     org_loc_url = models.URLField(max_length=200, default="", blank=True)
     location_about = models.TextField(default="", blank=True )
     contact_email = models.EmailField(default="", blank=True)
-    latitude = models.FloatField(null=True, blank=True)
-    longitude = models.FloatField(null=True, blank=True)
-    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_locs',  null=True, blank=True)
     deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField( null=True, blank=True)
     created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="created_locations")
@@ -251,23 +249,22 @@ class Location(models.Model):
 
     class Meta:
         ordering = ['loc_name']  # sort by loc_name by default  
-        constraints = [
-            models.UniqueConstraint(
-                fields=["fingerprint"],
-                name="unique_location_fp"
-            )
-        ]
+        
+        
     def __str__(self):
         return f"{self.loc_name}"
     
     def can_edit(self, user):
         if not user.is_authenticated:
             return False
-        return (
-            user.profile.staff
-            or self.org.managed.filter(profile=user.profile,
-                                          role__in=["owner","admin","editor"]).exists()
-    )
+        if user.profile.staff:
+            return True
+        if self.org is None:
+            return False
+        return self.org.managed.filter(
+            profile=user.profile,
+            role__in=["owner", "admin", "editor"],
+        ).exists()
     
     @property
     def region_image(self):
@@ -376,6 +373,30 @@ class Session(models.Model):
 
     objects = SessionQuerySet.as_manager()
     all_objects = models.Manager()
+
+    def clean(self):
+        errors ={}
+        if self.session_format =="i":
+            if not self.location:
+                errors["location"]="In-person sessions require a location."
+        elif self.session_format =="o":
+            if not self.session_url:
+                errors["session_url"]="online sessions require a session URL."
+        elif self.session_format == "b":
+            if not self.location:
+                errors["location"]="Hybrid sessions require a location."
+            if not self.session_url:
+                errors["session_url"] = "Hybrid sessions require a session URL."
+        if errors:
+            raise ValidationError(errors)
+        
+    def save(self, *args, **kwargs):
+        if (self.session_format in ["i","b"] 
+            and not self.location and self.activity_id 
+            and self.activity.org and self.activity.org.default_location):
+            self.location = self.activity.org.default_location
+        super().save(*args, **kwargs)
+    
 
     def __str__(self):
         return f"{self.activity.title} – {self.start}"

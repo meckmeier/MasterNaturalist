@@ -12,7 +12,7 @@
     </ul>
 {% endif %}
 
-<form method="post">
+<form method="post" id="activity-form" data-default-location="{{ default_location_id }}">
  {% csrf_token %}
  <input type="hidden" name="org" value="{{ request.GET.org }}">
  <input type="hidden" name="location" value="{{ request.GET.location }}">
@@ -95,57 +95,71 @@
                         {% for hidden in form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
-
                         
+                                                
                         <td>
-                         <span class="field-value">
-                                {{ form.session_format|default:"—" }}  
-                         </span>
-                            {{ form.session_format.errors }}
+                        {% if view_only %}
+                            <span class="field-value">{{ form.session_format|default:"—" }}  </span>
+                        {% else %}
                             {{ form.session_format }}
+                            {{ form.session_format.errors }}
+                        {% endif %}
                         </td>
                         
                         <td>
-                         <span class="field-value">
-                                {{ form.session_url|default:"—" }}  
-                         </span>
-                            {{ form.session_url.errors }}
+                         {% if view_only %}
+                            <span class="field-value"> {{ form.session_url|default:"—" }}  </span>
+                        {% else %}
                             {{ form.session_url }}
+                            {{ form.session_url.errors }}
+                        {% endif %}
                         </td> 
                         <td>
-                         <span class="field-value">
-                                {{ form.location|default:"—" }}  
-                         </span>
-                            {{ form.location.errors }}
+                        {% if view_only %} 
+                            <span class="field-value">{{ form.location|default:"—" }} </span>
+                        {% else %}
+                            
                             {{ form.location }}
+                            {{ form.location.errors }}
+                        {% endif %}
                         </td>       
                         <td> 
-                            {{form.ongoing.errors}}
+                           
                             {{form.ongoing }}
-                            
+                             {{form.ongoing.errors}}
                         </td>
                         <td>
-                         <span class="field-value">
-                                {{ form.start|default:"—" }}  
-                         </span>
-                            {{ form.start.errors }}
+                         {% if view_only %}
+                            <span class="field-value">{{ form.start|default:"—" }}   </span>
+                          {% else %}  
                             {{ form.start }}
+                            {{ form.start.errors }}
+                        {% endif %}
                         </td>       
                         <td>
-                         <span class="field-value">
-                                {{ form.end|default:"—" }}  
-                         </span>
-                            {{ form.end.errors }}
+                         {% if view_only %}
+                            <span class="field-value"> {{ form.end|default:"—" }}  </span>
+                        {% else %}  
                             {{ form.end }}
+                            {{ form.end.errors }}
+                        {% endif %}
                         </td>    
                         <td>{{form.DELETE}}</td>
                     </tr>
+                    
             {% empty %}
                     <tr class="empty-hint">
                         <td colspan="4">No sessions added.</td>
                     </tr>
             {% endfor %}
-                    <tr class="formset-row form-template" style="display:none;">
+                     {% if form.non_field_errors %}
+                        <tr>
+                            <td colspan="7" class="error-text">
+                                {{ form.non_field_errors }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr class="formset-row form-template" style="display:none;">
                         {% for hidden in session_formset.empty_form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}

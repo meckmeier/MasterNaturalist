@@ -237,6 +237,16 @@ a.button-link-2nd:hover {
     color:red;
     
 }
+errorlist {
+    color: red;
+    list-style-type: none;   /* removes the bullet (*) */
+    padding-left: 0;
+    margin: 4px 0;
+}
+
+.errorlist li {
+    margin: 0;
+}
 /* Vertical version on desktop */
 @media (min-width: 768px) {
     .nav-tabs.flex-md-column .nav-link.active {

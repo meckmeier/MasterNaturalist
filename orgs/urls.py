@@ -29,7 +29,7 @@ urlpatterns = [
     path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),
     path("locations/", views.locations, name="locations"),
     path("follow_org/<int:org_id>", views.follow_org, name="follow_org"),
- 
+    path( "org/<int:org_id>/default-location/<int:loc_id>/",views.org_set_default_location,name="org_set_default_location"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
