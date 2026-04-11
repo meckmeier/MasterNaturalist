@@ -1,0 +1,57 @@
+{% extends "orgs/layout.html" %}
+
+{% block title %}Upload Approval{% endblock %}
+
+{% block body %}
+<form method="post">
+{% csrf_token %}
+
+<button type="submit" name="action" value="approve_all">Approve All</button>
+<button type="submit" name="action" value="unapprove_all">Unapprove All</button>
+
+<hr>
+
+{% for s in sessions %}
+  <div class="upload-card">
+
+    <!-- APPROVAL -->
+    <input type="checkbox" name="approve_ids" value="{{ s.id }}" {% if s.approved %}checked{% endif %}>
+
+    <!-- ACTIVITY -->
+    <div class="upload-section">
+      <strong>Activity</strong><br>
+      <input type="text" name="activity_title_{{ s.id }}" value="{{ s.activity.title }}">
+    </div>
+
+    <!-- SESSION -->
+    <div class="section">
+      <strong>Session</strong><br>
+      <label>Start date: </label><input type="text" name="start_{{ s.id }}" value="{{ s.start }}">
+      <label>End date: </label><input type="text" name="end_{{ s.id }}" value="{{ s.end_date }}">
+      <label>Date Description: </label><input type="text" name="end_{{ s.id }}" value="{{ s.date_description }}">
+      <label>Time Description: </label><input type="text" name="end_{{ s.id }}" value="{{ s.time_description }}">
+    </div>
+
+    <!-- LOCATION -->
+    <div class="section">
+      <strong>Location</strong><br>
+
+      <label>Location: </label><input type="text" name="loc_name_{{ s.id }}" value="{{ s.location.loc_name }}"> {{s.Location.org.org_name}}<br>
+      <label>Address: </label><input type="text" name="address_{{ s.id }}" value="{{ s.location.address}}"><br>
+      <label>City: </label><input type="text" name="city_{{ s.id }}" value="{{ s.location.city_name }}"> <input type="text" name="state_{{ s.id }}" value="{{ s.location.state_name }}"> <input type="text" name="zip_code_{{ s.id }}" value="{{ s.location.zip_code }}">
+
+      {% if s.location.real_location %}
+        <div class="good">✔ Matched: {{ s.location.real_location.loc_name }}</div>
+      {% else %}
+        <div class="warn">⚠ Needs review</div>
+      {% endif %}
+
+    </div>
+
+  </div>
+{% endfor %}
+
+<button type="submit">Save Changes</button>
+
+</form>
+{% endblock %}

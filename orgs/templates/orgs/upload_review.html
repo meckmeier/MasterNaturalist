@@ -1,61 +1,32 @@
 {% extends "orgs/layout.html" %}
 {% block body %}
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li class="{{ message.tags }}">{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-<h2>Review Staged Data</h2>
+<h2>Review data as loaded</h2>
+{% for item in result %}
+    <div>
+        <h3>Row {{ item.row }}</h3>
 
-{% if errors %}
-    <div style="color:red;">
-        <h3>Errors:</h3>
+        {% if item.is_valid %}
+            <p style="color:green;">Valid</p>
+        {% else %}
+            <p style="color:red;">Errors</p>
+        {% endif %}
+
         <ul>
-        {% for error in errors %}
-            <li>{{ error }}</li>
-        {% endfor %}
+            <li>Title: {{ item.data.title }}</li>
+            <li>City: {{ item.data.city }}</li>
+            <li>State: {{ item.data.state }}</li>
+            <li>ZIP: {{ item.data.zip }}</li>
+            <li>Session Type: {{ item.data.session_type }}</li>
         </ul>
+
+        {% if item.errors %}
+            <ul style="color:red;">
+                {% for err in item.errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </div>
-{% endif %}
-
-<form method="post">
-    {% csrf_token %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Skip?</th>
-                <th>#</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>City</th>
-                <th>Location</th>
-                <th>Address</th>
-                <th>Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for row in staged_rows %}
-            <tr {% if row.status == "skipped" %} style="background-color:#fdd;" {% endif %}>
-                <td>
-                    <input type="checkbox" name="skip_row" value="{{ row.id }}" {% if row.status == "skipped" %} checked {% endif %}>
-                </td>
-                <td>{{ row.row_number }}</td>
-                <td>{{ row.title }}</td>
-                <td>{{ row.description }}</td>
-                <td>{{ row.city }}</td>
-                <td>{{ row.location_name }}</td>
-                <td>{{ row.address }}</td>
-                <td>{{ row.date }}</td>
-                <td>{{ row.status }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <button type="submit" class="me-btn">Update Skipped Rows</button>
-</form>
-
-<a href="{% url 'upload_commit' upload.id %}">Commit Valid Rows to Final Tables</a>
+    <hr>
+{% endfor %}
 {% endblock %}

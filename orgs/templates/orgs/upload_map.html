@@ -5,27 +5,18 @@
 <form method="post">
     {% csrf_token %}
     <table>
-        {% for col in columns %}
-        <tr>
-            <td>{{ col }}</td>
+            {% for col, options in dropdown_options.items %}
+            <tr> <td>{{ col }}</td>
             <td>
                 <select name="mapping_{{ col }}">
-                    <option value="">Ignore</option>
-                    <option value="title">title</option>
-                    <option value="description">description</option>
-                    <option value="city">city</option>
-                    <option value="location_name">location Name</option>
-                    <option value="address">address</option>
-                    <option value="date">date</option>
-                    <option value="time_commitment">time commitment</option>
-                    <option value="date_description">date description</option>
-                    <option value="activity_url">activity url</option>  
-                    <option value="no_cost">no cost</option>
-                    <option value="contact_email">contact email</option>      
+                    {% for field in options.choices %}
+                        <option value="{{ field }}" {% if field == options.preselected %}selected{% endif %}>{{ field }}</option>
+                    {% endfor %}
                 </select>
             </td>
-        </tr>
-        {% endfor %}
+            </tr>
+{% endfor %}
+            
     </table>
     <button type="submit" class="me-btn">Save Mapping</button>
 </form>

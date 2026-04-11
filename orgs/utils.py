@@ -3,6 +3,7 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 from orgs.models import Location, Organization, Activity, Session, Profile
 from datetime import datetime
+import pandas as pd
 
 geolocator = Nominatim(user_agent="volunteer_map_app")
 geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
@@ -101,3 +102,26 @@ def resaveLocations():
     # >>> resaveLocations()
     for loc in Location.objects.all():
         loc.save()
+
+
+
+def CountyToZip():
+    # Load data
+    df = pd.read_csv("C:\Project\MasterNaturalist\hud_crosswalk_county.csv", dtype={"ZIP": str, "COUNTY2": str})
+
+    # Pick the column you want
+    RATIO_COL = "TOT_RATIO"   # or "RES_RATIO"
+
+    # Sort so highest ratio comes first per ZIP
+    df_sorted = df.sort_values(by=["ZIP", RATIO_COL], ascending=[True, False])
+
+    # Keep only the first row per ZIP (highest ratio)
+    df_deduped = df_sorted.drop_duplicates(subset=["ZIP"], keep="first")
+    
+    # Keep only what you need
+    result = df_deduped[["ZIP", "COUNTY2"]]
+
+    # Save it
+    result.to_csv("zip_to_county.csv", index=False)
+
+    print(result.head())

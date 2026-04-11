@@ -12,13 +12,15 @@ from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.utils import timezone
-from datetime import date, timedelta
+
+from datetime import date, timedelta, datetime
 from django.db.models import Q, Prefetch, F
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 import pandas as pd
 from .services.csv_importer import CSVImporter
+from .services.zip_to_county import get_county_id_from_zip, get_region_from_county_id
 from django.db import transaction
 
 from django.views.decorators.http import require_POST
@@ -883,6 +885,7 @@ def debug_sessions(request):
         "today": today
     })
 
+# step 1 - get csv file
 @login_required
 def upload_csv(request, org_id):
     org = get_object_or_404(Organization, id=org_id)
@@ -896,31 +899,34 @@ def upload_csv(request, org_id):
             upload = form.save(commit=False)
             upload.organization =org
             upload.uploaded_by = request.user
+            upload.status="started"
             upload.save()
             return redirect("upload_map", upload_id=upload.id)
     else:
         form = UploadFileForm()
     return render(request, "orgs/upload.html", {"form": form})
 
-# Step 1: Map columns
+from orgs.services.mapping import build_mapping, build_dropdown_options
+
+# Step 1: Map columns from csv to rawloaddata fields
 def upload_map(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
     # Read first row to show column headers
     df = pd.read_csv(upload.file) if upload.file.name.endswith(".csv") else pd.read_excel(upload.file, engine="openpyxl")
-    first_row = list(df.columns)
-
+    columns = list(df.columns)
+    EXCLUDE_FIELDS = ["id", "upload", "row_number", "organization"]
+    field_names = [(f.name) for f in RawLoadData._meta.get_fields() 
+               if not f.many_to_many and not f.one_to_many and f.name not in EXCLUDE_FIELDS] 
+    
     if request.method == "POST":
         # Example: user-submitted mapping comes as mapping_ColumnName fields
-        mapping = {}
-        for col in first_row:
-            field = request.POST.get(f"mapping_{col}")
-            if field:
-                mapping[field] = col
-
+        mapping = build_mapping(request.POST, columns)
+    
         # Save mapping in session (or a model if you prefer)
         request.session[f"mapping_{upload_id}"] = mapping
-        print("Received mapping:", mapping)  # Debug log
+        #print("Received mapping:", mapping)  # Debug log
+
         # Update upload status
         upload.status = "mapped"
         upload.save()
@@ -929,36 +935,39 @@ def upload_map(request, upload_id):
         return redirect("upload_stage", upload_id=upload.id)
 
     # GET request → show mapping form
-    return render(request, "orgs/upload_map.html", {"upload": upload, "columns": first_row})
+    dropdown_options = build_dropdown_options(columns, field_names)
+    
+    
+    return render(request, "orgs/upload_map.html", {
+        "upload": upload, 
+        "dropdown_options":dropdown_options})
 
-# Step 2: Stage data
+from orgs.services.upload_pipeline import run_upload_pipeline
+
+# Step 2: Load mapped fields into rawloaddata 
 def upload_stage(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
-    
     # Example: you would get mapping from previous step
     mapping = request.session.get(f"mapping_{upload_id}")
+    
     if not mapping:
         return redirect("upload_map", upload_id=upload.id)
-    print ("Using mapping for staging:", mapping)  # Debug log
-    importer = CSVImporter(upload, mapping=mapping)
-    importer.read()
-    importer.normalize()
-    importer.validate()
-
-    if importer.errors:
-        # You could show errors or redirect to review page
-        request.session[f"errors_{upload_id}"] = importer.errors
-        return redirect("upload_review", upload_id=upload.id)
-
-    importer.process()
-    upload.status = "staged"
+    
+    result = run_upload_pipeline(upload,mapping)
+    print("result", result)
+    
+    upload.status = "loaded"
     upload.save()
 
-    return redirect("upload_review", upload_id=upload.id)
+    return render(request, "orgs/upload_review.html", {
+        "upload": upload,
+        "result": result
+       
+    })
 
-# Step 3: Review / cleanup
-def upload_review(request, upload_id):
+# KILL Step 3: show rawloaddata rows - to confirm data went into staging correctly
+def xupload_review(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
     # Fetch all staged rows
@@ -966,30 +975,23 @@ def upload_review(request, upload_id):
     
     # Fetch any errors from the staging process (from session)
     errors = request.session.pop(f"errors_{upload_id}", [])
+    
 
     if request.method == "POST":
         # Handle row skipping
         skip_ids = request.POST.getlist("skip_row")
-        RawLoadData.objects.filter(id__in=skip_ids).update(status="skipped")
-        return redirect("upload_commit", upload_id=upload.id)
+        RawLoadData.objects.filter(id__in=skip_ids).update(status="skip")
+        upload.status = "reviewed"
+        upload.save()
+        return redirect("upload_review", upload_id=upload.id)
 
+    
     return render(request, "orgs/upload_review.html", {
         "upload": upload,
         "staged_rows": staged_rows,
         "errors": errors
     })
-# Step 4: Commit to final tables
-def upload_commit(request, upload_id):
-    upload = get_object_or_404(ActivityUpload, id=upload_id)
-    staged_rows = RawLoadData.objects.filter(upload=upload, status="valid")
-    
-    # Implement logic to insert into your final Activity/Location tables here
-    # e.g., for row in staged_rows: Activity.objects.create(...)
 
-    upload.processed = True
-    upload.status = "completed"
-    upload.save()
-    return redirect("upload_processing", upload_id=upload.id)
 
 # Success page
 def upload_success(request):
@@ -998,79 +1000,19 @@ def upload_success(request):
 def normalize(text):
     return text.strip().lower() if text else ""
 
-def upload_processing(request, upload_id):
+
+# KILL - done in the upload_pipeline. step 4 - process from rawloaddata into pending tables
+def xupload_process(request, upload_id):
     #Purpose: Take the raw rows and map them into your four pending tables:
-    #Location_Pending
-    #Session_Pending
-    #Activity_Pending
+
     print("Starting processing for upload:", upload_id)
     upload_info = get_object_or_404(ActivityUpload, id=upload_id)
-    rows = RawLoadData.objects.filter(upload_id=upload_id)
-
-    for row in rows:
-        with transaction.atomic():
-            print(f"Processing row {row.id}")
-
-            # -----------------------------
-            # Normalize
-            # -----------------------------
-            lkp_loc_name = normalize(row.location_name)
-            lkp_city = normalize(row.city)
-            lkp_address = normalize(row.address)
-            lkp_title = normalize(row.title)
-
-            # -----------------------------
-            # 1. Check Pending_Location FIRST
-            # -----------------------------
-            pending_location = Pending_Location.objects.filter(
-                loc_name__iexact=lkp_loc_name,
-                city_name__iexact=lkp_city,
-                address__iexact=lkp_address
-            ).first()
-
-            if pending_location:
-                # ✅ Already staged — reuse it
-                pass
-
-            else:
-                # -----------------------------
-                # 2. Check real Location
-                # -----------------------------
-                matched_location = Location.objects.filter(
-                    loc_name__iexact=lkp_loc_name,
-                    city_name__iexact=lkp_city
-                    
-                ).first()
-
-                # -----------------------------
-                # 3. Create Pending_Location
-                # -----------------------------
-                if matched_location:
-                    pending_location = Pending_Location.objects.create(
-                        loc_name=matched_location.loc_name,
-                        city_name=matched_location.city_name,
-                        address=matched_location.address,
-                        real_location=matched_location,
-                        processing_status="matched",
-                        source_upload_id=upload_id,
-                        org=upload_info.organization
-                    )
-                else:
-                    pending_location = Pending_Location.objects.create(
-                        loc_name=row.location_name,
-                        city_name=row.city,
-                        address=row.address,
-                        processing_status="new",
-                        source_upload_id=upload_id,
-                        org=upload_info.organization
-                    )
-
-   
+            
     #Wrap each row (or batch) in transaction.atomic() to avoid partial inserts.
-    return redirect("upload_approval", upload_id=upload_id)
+    return redirect("upload_approve", upload_id=upload_id)
 
-
-def upload_approval(request, upload_id):
+# NEXT step 5: review pending tables and approve/reject
+def upload_approve(request, upload_id):
 
     # GET (this is the only query you need)
     sessions = Pending_Session.objects.select_related(
@@ -1078,10 +1020,11 @@ def upload_approval(request, upload_id):
             "location",
             "location__real_location"
         ).filter(activity__source_upload_id=upload_id)
-    return render(request, "orgs/upload_approval.html", {
+    return render(request, "orgs/upload_approve.html", {
         "sessions": sessions
     })
 
+#step 6: promote approved rows to production.
 def upload_publish(request, upload_id):
     #urpose: Move approved rows from pending tables into production.
     #Logic:
@@ -1093,6 +1036,7 @@ def upload_publish(request, upload_id):
     #URL example: /promote_pending_activity/
     return render(request, "orgs/upload_success.html")
 
+#step 7: show any rejected data.
 def upload_reject(request, upload_id):
     #Purpose: Mark rows as rejected and optionally log reasons.
     #Logic:

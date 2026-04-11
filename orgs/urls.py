@@ -42,12 +42,12 @@ urlpatterns = [
     path("upload/<int:org_id>/", views.upload_csv, name="upload_csv"),
     path("upload/<int:upload_id>/map/", views.upload_map, name="upload_map"),
     path("upload/<int:upload_id>/stage/", views.upload_stage, name="upload_stage"),
-    path("upload/<int:upload_id>/review/", views.upload_review, name="upload_review"),
-    path("upload/<int:upload_id>/commit/", views.upload_commit, name="upload_commit"),
+    path("upload/<int:upload_id>/review/", views.xupload_review, name="upload_review"),
+
     path("upload/success/", views.upload_success, name="upload_success"),
-    path("upload/<int:upload_id>/processing/", views.upload_processing, name="upload_processing"),
-    path("upload/<int:upload_id>/approval", views.upload_approval, name="upload_approval"),
-    path("upload/<int:upload_id>/publish/", views.upload_publish, name="upload_publish"),
+    path("upload/<int:upload_id>/process/", views.xupload_process, name="upload_process"),
+    path("upload/<int:upload_id>/approve", views.upload_approve, name="upload_approve"),
+    path("upload/<int:upload_id>/finalize/", views.upload_publish, name="upload_finalize"),
     path("upload/<int:upload_id>/reject/", views.upload_reject, name="upload_reject"),
 
     path("test_email",views.test_email, name="test_email"),
