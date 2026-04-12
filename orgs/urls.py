@@ -49,7 +49,8 @@ urlpatterns = [
     path("upload/<int:upload_id>/approval", views.upload_approval, name="upload_approval"),
     path("upload/<int:upload_id>/publish/", views.upload_publish, name="upload_publish"),
     path("upload/<int:upload_id>/reject/", views.upload_reject, name="upload_reject"),
-
+    
+    path("lookup-zip/", views.lookup_zip, name="lookup_zip"),
     path("test_email",views.test_email, name="test_email"),
     path("admin/run-backfill/", views.run_backfill),
     path("debug/sessions/", views.debug_sessions, name="debug_sessions"),

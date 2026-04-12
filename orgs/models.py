@@ -71,7 +71,14 @@ def one_year_from_now():
 
 #actual classes for models
 #-------------------------------------------------------
+class ZipToCounty (models.Model):
+    zip=models.CharField(max_length=5, unique=True)
+    county=models.ForeignKey("County", on_delete=models.CASCADE, related_name="zips")
+    def __str__(self):
+        return self.zip
 
+
+        
 class Commitment(models.Model):
     time= models.CharField(max_length=50)
 

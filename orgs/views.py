@@ -7,7 +7,8 @@ from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.db import IntegrityError
-from django.http import  HttpResponseRedirect,  HttpResponse, HttpResponseForbidden
+from django.http import  HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
+
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
@@ -321,10 +322,18 @@ def org_mgmt(request):
             )
             )
         )
+    get_data = request.GET.copy()
+    filter_form=OrgFilterForm(get_data or None)
+    if filter_form.is_valid():
+    
+        data = filter_form.cleaned_data
+        if data.get("org"):
+            orgs=orgs.filter(id=data["org"].id)
 
     return render(request, "orgs/org_mgmt.html", {
-        "organizations": orgs
-    })
+        "organizations": orgs,
+        "filter_form": OrgFilterForm(request.GET or None),
+            })
 
 def org_detail(request, org_id=None, view_only=False):
     #edit a single organization - only the organization fields.
@@ -363,11 +372,13 @@ def org_detail(request, org_id=None, view_only=False):
                 )
             
             # once you have finished editing your organization record, you should go back to the org dashboard.
+            messages.success(request, "Organization added successfully.", extra_tags=f"orgmsg-{org.id}")
             return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
         else:
-            messages.error(request, "there are errors in the form.")
+            messages.success(request, "there are errors in the form.", extra_tags=f"org-msg org-{org.id}")
+
             print("org form errors",form.errors)
-            print("loc formset errors", loc_formset.errors)
+            
             #print("non field error", form.non_field_errors())
             #print("FORMSET is_valid:", loc_formset.is_valid())
             #print("FORMSET non_form_errors:", loc_formset.non_form_errors())
@@ -375,6 +386,7 @@ def org_detail(request, org_id=None, view_only=False):
             #print("TOTAL_FORMS:", request.POST.get("locations-TOTAL_FORMS"))
             #print("INITIAL_FORMS:", request.POST.get("locations-INITIAL_FORMS"))
             #if the forms are not valid - stay on the org_detail page.
+
             return render(request, "orgs/org_detail.html", {
                 "org": org,
                 "events": [],
@@ -406,8 +418,8 @@ def loc_detail(request, loc_id=None):
     org_on_url = request.GET.get("org")
     
     if not org_on_url and not loc:
-        messages.error(request, "Organization context is required to create a new location")
-        return redirect(reverse("org_mgmt"))
+        messages.success(request, "Org context is needed for to create a new location", extra_tags=f"main-msg")
+        return redirect(f"{reverse('org_mgmt')}")
     
     if request.method == "POST" and can_edit and not view_only:
         form= LocForm(request.POST, instance=loc) 
@@ -561,6 +573,24 @@ def locations(request):
         }
     )
 
+def lookup_zip(request):
+    zip_code = request.GET.get("zip_code", "").strip()
+    print("zip_code",zip_code)
+    if not zip_code:
+        return JsonResponse({"county_id": None, "region": None})
+
+    try:
+        zip_row = ZipToCounty.objects.select_related("county").get(zip=zip_code)
+    except ZipToCounty.DoesNotExist:
+        return JsonResponse({"county_id": None, "region": None})
+
+    county = zip_row.county
+    print("county", county)
+    return JsonResponse({
+        "county_id": county.id,
+        "region": county.region_name,  # adjust if needed
+    })
+
 @login_required
 def org_set_default_location(request, org_id, loc_id):
     org = get_object_or_404(Organization, id=org_id)
@@ -573,7 +603,9 @@ def org_set_default_location(request, org_id, loc_id):
     org.save(update_fields=["default_location"])
 
     messages.success(request, f"{loc.loc_name} is now the default location.")
-    return redirect("org_mgmt")
+    #return redirect("org_mgmt")
+    url = reverse("org_mgmt")
+    return redirect(f"{url}#org-{org.id}")
 
 def login_view(request):
     if request.method == "POST":

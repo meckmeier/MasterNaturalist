@@ -38,20 +38,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
             }
+            console.log("finished with hash code")
         }
-    console.log("finished with hash code")
+    
     
     const descriptionBlocks = document.querySelectorAll('.me-description-block');
 
     descriptionBlocks.forEach(block => {
     block.addEventListener('click', () => {
         block.classList.toggle('expanded');
+        });
     });
-    console.log()
-});
-        const activityForm = document.getElementById("activity-form");
+    const activityForm = document.getElementById("activity-form");
     const defaultLocationId = activityForm ? activityForm.dataset.defaultLocation : "";
-    
+        
     function wireSessionRow(row) {
         const formatField = row.querySelector("select[name$='session_format']");
         const locationField = row.querySelector("select[name$='location']");
@@ -93,7 +93,30 @@ document.addEventListener("DOMContentLoaded", function () {
         totalForms.value = formIndex + 1;
         wireSessionRow(newRow);
     }
-});
+    });
 
-    console.log("finished with add button")
+    console.log("finished with current code")
+
+    const zipField = document.getElementById("id_zip_code");
+    const countyField = document.getElementById("id_county_id");
+    const regionField = document.getElementById("id_region_name");
+
+    if (zipField && countyField && regionField) {
+
+        zipField.addEventListener("change", function () {
+            const zip = zipField.value.trim().substring(0, 5);          
+            
+            fetch(`/lookup-zip/?zip_code=${zip}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.county_id) {
+                        countyField.value = data.county_id;
+                    }
+                    if (data.region) {
+                        regionField.value = data.region;
+                    }
+                })
+                .catch(error => console.error("Zip lookup failed:", error));
+        });
+    }
 });
