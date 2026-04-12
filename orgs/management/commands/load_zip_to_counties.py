@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = "Load zip-to-county mappings from CSV"
 
     def handle(self, *args, **options):
-        path = "orgs/zip_to_county.csv"
+        path = "orgs/data/zip_to_county.csv"
 
         with open(path, newline="", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
