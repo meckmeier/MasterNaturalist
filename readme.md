@@ -23,5 +23,10 @@ python manage.py load_locations_from_csv "orgs/data/recreation_areas.csv" "Wisco
 
 python manage.py load_zip_to_counties
 
+
+Map - tasks
+1. configure current locations.html to show list OR map - make sure filter implementation lets you show filtered maps.
+2. load wisconsin sites - state parks, state forests, recreation areas. make sure you have the orgs for each.
+
 Next Feature:
 Configure an upload process that will take in a csv or excel file and load it into Pending Locations, Pending Activities and Pending Sessions for audit/approval and push into the production tables. So we can automate the loading of data. (this is one way to automate getting activities into the system... maybe even extend this into an API thing so we can pull the data directly from connected organizations ultimately)
