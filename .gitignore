@@ -43,3 +43,9 @@ Thumbs.db
 *.xlsx
 *.h5
 *.hdf5-e "venv/\nstaticfiles/\n__pycache__/\n*.py[cod]" 
+
+# allow specific CSVs
+!orgs/data/zip_to_county.csv
+!orgs/data/state_parks.csv
+!orgs/data/recreation_area.csv
+!orgs/data/state_forest.csv
