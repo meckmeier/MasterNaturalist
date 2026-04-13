@@ -1,4 +1,5 @@
 // --- global URL for AJAX ---
+// --this form contains page UI, activity form/formset and zip lookup for location.
 console.log("FORMSET SCRIPT LOADED");
 
 // --- run after DOM is ready ---

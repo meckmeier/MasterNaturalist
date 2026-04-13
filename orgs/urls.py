@@ -22,6 +22,7 @@ urlpatterns = [
         path("activity/<int:activity_id>/", views.activity_detail, name="activity_view"),
         path("activity/<int:activity_id>/edit", views.activity_detail, name="activity_edit"),
         path("activity/<int:activity_id>/delete/", views.activity_delete, name="activity_delete"),
+        path("locations/search/", views.location_search, name="location_search"),
         path("locs/new/", views.loc_detail, name="loc_create"),
         path("locs/<int:loc_id>/edit/", views.loc_detail, name="loc_edit"),
         path("locs/<int:loc_id>/", views.loc_detail, name="loc_view"),
@@ -52,6 +53,7 @@ urlpatterns = [
     
     path("lookup-zip/", views.lookup_zip, name="lookup_zip"),
     path("test_email",views.test_email, name="test_email"),
+    path("test_html", views.test_html, name="test_html"),
     path("admin/run-backfill/", views.run_backfill),
     path("debug/sessions/", views.debug_sessions, name="debug_sessions"),
 ]

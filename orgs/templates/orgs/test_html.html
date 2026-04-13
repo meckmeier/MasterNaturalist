@@ -1,0 +1,248 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+{% load static %}
+
+<form id="activity-form">
+  <div class="mb-3">
+    <label for="location-select" class="form-label">Location</label>
+    <select id="location-select" name="location" class="form-select">
+      <option value="">Select a location</option>
+      <option value="12" selected>Nature Center</option>
+      <option value="15">Main Office</option>
+      <option value="18">Trailhead A</option>
+    </select>
+    <div class="form-text">
+      Start with one of this organization’s locations.
+    </div>
+  </div>
+
+  <div class="mb-3 d-flex gap-2 flex-wrap">
+    <button
+      type="button"
+      id="open-location-search"
+      class="btn btn-outline-secondary btn-sm"
+      data-bs-toggle="modal"
+      data-bs-target="#locationSearchModal"
+    >
+      Search all locations
+    </button>
+
+    <button type="button" id="create-location-btn" class="btn btn-link btn-sm p-0">
+      Create new location
+    </button>
+  </div>
+
+  <div id="chosen-location-summary" class="alert alert-light border d-none">
+    <strong>Selected location:</strong>
+    <span id="chosen-location-text"></span>
+  </div>
+
+  <input type="hidden" id="selected-location-id" name="selected_location_id" value="12">
+</form>
+
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="locationSearchModal" tabindex="-1" aria-labelledby="locationSearchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="locationSearchModalLabel">Find a location</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="location-search-input" class="form-label">Search by name, city, address, or organization</label>
+          <input
+            type="text"
+            id="location-search-input"
+            class="form-control"
+            placeholder="Start typing..."
+          >
+          <div class="form-text">
+            Your organization’s locations appear first.
+          </div>
+        </div>
+
+        <div id="location-search-results">
+          <div class="mb-4">
+            <h6 class="border-bottom pb-2">Your organization</h6>
+            <div id="org-results" class="list-group"></div>
+          </div>
+
+          <div class="mb-3">
+            <h6 class="border-bottom pb-2">Other matching locations</h6>
+            <div id="other-results" class="list-group"></div>
+          </div>
+        </div>
+
+        <div id="no-results-message" class="alert alert-warning d-none">
+          No matching locations found.
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-primary btn-sm" id="create-from-search-btn">
+          Create new location
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script>
+  const mockLocations = [
+    { id: 12, name: "Nature Center", city: "Eau Claire", address: "101 Forest Ln", orgId: 1, orgName: "Wild Paths" },
+    { id: 15, name: "Main Office", city: "Eau Claire", address: "200 River St", orgId: 1, orgName: "Wild Paths" },
+    { id: 18, name: "Trailhead A", city: "Eau Claire", address: "North Trail Rd", orgId: 1, orgName: "Wild Paths" },
+
+    { id: 31, name: "Beaver Creek Reserve", city: "Fall Creek", address: "S1 County Rd K", orgId: 2, orgName: "Beaver Creek Reserve" },
+    { id: 44, name: "Lowes Creek Park", city: "Eau Claire", address: "Lowes Creek Rd", orgId: 3, orgName: "County Parks" },
+    { id: 52, name: "UW Arboretum", city: "Madison", address: "1207 Seminole Hwy", orgId: 4, orgName: "UW" },
+    { id: 60, name: "Warner Park", city: "Madison", address: "2930 N Sherman Ave", orgId: 5, orgName: "Madison Parks" }
+  ];
+
+  const currentOrgId = 1;
+
+  const locationSelect = document.getElementById("location-select");
+  const hiddenLocationId = document.getElementById("selected-location-id");
+  const chosenSummary = document.getElementById("chosen-location-summary");
+  const chosenText = document.getElementById("chosen-location-text");
+
+  const searchInput = document.getElementById("location-search-input");
+  const orgResults = document.getElementById("org-results");
+  const otherResults = document.getElementById("other-results");
+  const noResultsMessage = document.getElementById("no-results-message");
+
+  const modalElement = document.getElementById("locationSearchModal");
+  const createLocationBtn = document.getElementById("create-location-btn");
+  const createFromSearchBtn = document.getElementById("create-from-search-btn");
+
+  modalElement.addEventListener("shown.bs.modal", function () {
+    searchInput.value = "";
+    renderResults("");
+    searchInput.focus();
+  });
+
+  searchInput.addEventListener("input", function () {
+    renderResults(searchInput.value);
+  });
+
+  locationSelect.addEventListener("change", function () {
+    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+    const locationId = locationSelect.value;
+
+    hiddenLocationId.value = locationId;
+
+    if (locationId) {
+      chosenText.textContent = selectedOption.text;
+      chosenSummary.classList.remove("d-none");
+    } else {
+      chosenText.textContent = "";
+      chosenSummary.classList.add("d-none");
+    }
+  });
+
+  function renderResults(query) {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    let filtered = mockLocations.filter(loc => {
+      if (!normalizedQuery) {
+        return loc.orgId === currentOrgId;
+      }
+
+      return (
+        loc.name.toLowerCase().includes(normalizedQuery) ||
+        loc.city.toLowerCase().includes(normalizedQuery) ||
+        loc.address.toLowerCase().includes(normalizedQuery) ||
+        loc.orgName.toLowerCase().includes(normalizedQuery)
+      );
+    });
+
+    const orgMatches = filtered.filter(loc => loc.orgId === currentOrgId);
+    const otherMatches = filtered.filter(loc => loc.orgId !== currentOrgId);
+
+    renderGroup(orgResults, orgMatches);
+    renderGroup(otherResults, otherMatches);
+
+    const hasAny = orgMatches.length > 0 || otherMatches.length > 0;
+    noResultsMessage.classList.toggle("d-none", hasAny);
+  }
+
+  function renderGroup(container, locations) {
+    container.innerHTML = "";
+
+    if (locations.length === 0) {
+      container.innerHTML = `<div class="text-muted small px-2 py-1">No matches</div>`;
+      return;
+    }
+
+    locations.forEach(loc => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "list-group-item list-group-item-action text-start";
+
+      button.innerHTML = `
+        <div><strong>${loc.name}</strong></div>
+        <div class="small text-muted">
+          ${loc.city} • ${loc.address}
+        </div>
+        <div class="small text-muted">
+          ${loc.orgName}
+        </div>
+      `;
+
+      button.addEventListener("click", function () {
+        chooseLocation(loc);
+      });
+
+      container.appendChild(button);
+    });
+  }
+
+  function chooseLocation(loc) {
+    hiddenLocationId.value = String(loc.id);
+    chosenText.textContent = `${loc.name} — ${loc.city} — ${loc.orgName}`;
+    chosenSummary.classList.remove("d-none");
+
+    const existingOption = Array.from(locationSelect.options).find(
+      opt => opt.value === String(loc.id)
+    );
+
+    if (existingOption) {
+      locationSelect.value = String(loc.id);
+    } else {
+      locationSelect.value = "";
+    }
+
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    modal.hide();
+  }
+
+  function initializeSelectedLocation() {
+    if (!locationSelect.value) return;
+
+    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+    hiddenLocationId.value = locationSelect.value;
+    chosenText.textContent = selectedOption.text;
+    chosenSummary.classList.remove("d-none");
+  }
+
+  createLocationBtn.addEventListener("click", function () {
+    alert("Later this can open your create-location form.");
+  });
+
+  createFromSearchBtn.addEventListener("click", function () {
+    alert("Later this can open your create-location form from inside the modal.");
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    initializeSelectedLocation();
+  });
+</script>
+{% endblock %}

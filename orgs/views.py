@@ -671,136 +671,144 @@ def profile_view(request):
 
     return render(request, "orgs/profile.html", {"form": form})
     
-def activity_detail(request, activity_id=None): 
-    next_url = request.POST.get("next")
+from collections import defaultdict
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
+
+def activity_detail(request, activity_id=None):
     is_new = activity_id is None
     confirm = request.POST.get("confirm_duplicate")
-    view_only = request.resolver_match.url_name == "activity_view"
-    can_edit = False
+
     categories = EventCategory.objects.all().order_by("name")
-    default_location_id =""
     grouped_categories = defaultdict(list)
-    grouped_ids ={}
+    grouped_ids = {}
 
     for cat in categories:
         group = cat.category_class or "Other"
-        grouped_categories.setdefault(group, []).append(cat)
+        grouped_categories[group].append(cat)
+
     for group, cats in grouped_categories.items():
         grouped_ids[group] = [str(cat.id) for cat in cats]
 
-    # is this new or existing activity
-    if activity_id:
-        activity = get_object_or_404(Activity, id=activity_id)
-        if request.user.profile.staff or activity.org.owner == request.user.profile:
-            can_edit = True
+    # always in org context
+    if is_new:
+        org_id = request.GET.get("org") or request.POST.get("org")
+        org = get_object_or_404(Organization, id=org_id)
+        activity = Activity(org=org)
     else:
-        activity=Activity()
-        if request.user.is_authenticated or request.user.staff:
+        activity = get_object_or_404(Activity, id=activity_id)
+        org = activity.org
+
+    can_edit = False
+    if request.user.is_authenticated:
+        if request.user.profile.staff or org.owner == request.user.profile:
             can_edit = True
 
-    #figure out redirect
-    if request.method == "POST" and not view_only:
-        org_id= request.POST.get("org")
-        location_id=request.POST.get("locations")
+    if not can_edit:
+        return redirect("org_mgmt")
 
-        activity_form = ActivityForm(request.POST, instance=activity)
-        session_formset = SessionFormSet(request.POST, instance=activity, prefix="sessions")
+    default_location_id = ""
+    if org and org.default_location_id:
+        default_location_id = str(org.default_location_id)
 
+    location_id = request.GET.get("location")
+    initial = [{"location": location_id}] if request.method == "GET" and location_id else None
+
+    activity_form = ActivityForm(
+        request.POST or None,
+        instance=activity,
+    )
+
+    session_formset = SessionFormSet(
+        request.POST or None,
+        instance=activity,
+        initial=initial,
+        prefix="sessions",
+        form_kwargs={"org": org},
+    )
+
+    if request.method == "POST":
         if activity_form.is_valid() and session_formset.is_valid():
             activity = activity_form.save(commit=False)
 
-            #if activity is NEW
             if is_new:
                 activity.owner = request.user.profile
+
                 if activity_form.possible_duplicate() and not confirm:
                     return render(request, "orgs/activity_form.html", {
                         "activity": activity,
                         "activity_form": activity_form,
                         "session_formset": session_formset,
                         "can_edit": can_edit,
-                        "view_only": view_only,
                         "duplicate_warning": True,
-                        "default_location_id": default_location_id
+                        "default_location_id": default_location_id,
+                        "grouped_categories": grouped_categories,
+                        "grouped_ids": grouped_ids,
                     })
-            #if there is no owner
+
             if not activity.owner:
                 activity.owner = request.user.profile
             if not activity.created_by:
                 activity.created_by = request.user.profile
             activity.updated_by = request.user.profile
+            activity.org = org
+            activity.save()
 
-            activity = activity_form.save()
-            
-            # Save Sessions with metadata
             sessions = session_formset.save(commit=False)
             for s in sessions:
                 if not s.created_by:
                     s.created_by = request.user.profile
                 s.updated_by = request.user.profile
-                s.activity = activity  # ensure relation
+                s.activity = activity
                 s.save()
 
-            # Handle any deleted sessions
             for s in session_formset.deleted_objects:
                 s.delete()
-            
-        else:
-            print("Session formset errors:", session_formset.errors)
-            print("Management errors:", session_formset.management_form.errors)
-            print("main form errors" , activity_form.errors)
-         
-            #next_url = request.POST.get("next")
-            return render(request, "orgs/activity_form.html", {
-                "activity": activity,
-                "activity_form": activity_form,
-                "session_formset": session_formset,
-                "can_edit": can_edit,
-                "view_only": view_only,
-                "duplicate_warning": False
-            })
-        return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
 
-    #this is the GET part of the code
-    else:
-        org_id = request.GET.get("org")
-        location_id = request.GET.get("location")
-        
-        if org_id:
-                activity.org_id = org_id
-                org = Organization.objects.filter(id=org_id).first()
-                if org and org.default_location_id:
-                    default_location_id = str(org.default_location_id)
-        elif activity.org_id and activity.org and activity.org.default_location_id:
-            default_location_id = str(activity.org.default_location_id)
-        
-        initial = []
-        if location_id:      
-                initial.append({
-                     "location": location_id
-                     })
+            return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
 
-        activity_form = ActivityForm(instance=activity)
-        session_formset = SessionFormSet(
-                instance=activity,
-                initial=initial,
-                prefix="sessions"
-            )
-        
-    if view_only:
-        for field in activity_form.fields.values():
-            field.disabled = True
+        print("Session formset errors:", session_formset.errors)
+        print("Management errors:", session_formset.management_form.errors)
+        print("Main form errors:", activity_form.errors)
 
-    
-   
     return render(request, "orgs/activity_form.html", {
         "activity": activity,
         "activity_form": activity_form,
         "session_formset": session_formset,
         "can_edit": can_edit,
-        "view_only": view_only,
         "duplicate_warning": False,
         "default_location_id": default_location_id,
-        })
+        "grouped_categories": grouped_categories,
+        "grouped_ids": grouped_ids,
+    })
+
+def location_search(request):
+    q = request.GET.get("q", "").lower()
+    org_id = request.GET.get("org_id")
+    
+    locations = Location.objects.all()
+   
+    if q:
+        locations = locations.filter(
+        Q(loc_name__icontains=q) |
+        Q(city_name__icontains=q)
+    )
+
+    org_locations = locations.filter(org_id=org_id)
+    other_locations = locations.exclude(org_id=org_id)
+    print("org_locations", org_locations)
+    def serialize(loc):
+        return {
+            "id": loc.id,
+            "label": loc.loc_name,
+            "city": loc.city_name,
+            "org_name": loc.org.org_name if loc.org else "",
+        }
+
+    return JsonResponse({
+        "org_locations": [serialize(l) for l in org_locations],
+        "other_locations": [serialize(l) for l in other_locations],
+    })
 
 def activity_delete(request,activity_id=None):
     activity = get_object_or_404(Activity, id=activity_id)
@@ -1162,3 +1170,13 @@ def upload_reject(request, upload_id):
     #Optionally, move rejected rows to a separate table for audit.
     #URL example: /reject_pending_activity/
     return render(request, "orgs/upload_success.html")
+
+def test_html(request):
+    activity=Activity.objects.first()
+    activity_form = ActivityForm(instance=activity)
+    default_location_id =""
+    return render(request, "orgs/test_html.html", {
+        "activity": activity,
+        "activity_form": activity_form,
+        "default_location_id": default_location_id,
+        })

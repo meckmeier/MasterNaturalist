@@ -331,7 +331,7 @@ class Activity(models.Model):
     
     @property
     def is_newly_added(self):
-        return self.created_at >= timezone.now() - timedelta(days=30)
+        return self.created_at >= timezone.now() - timedelta(days=15)
 
 
 

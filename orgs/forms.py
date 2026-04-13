@@ -356,6 +356,32 @@ class SessionForm(forms.ModelForm):
             "end": forms.DateInput(attrs={"type": "date"}),
             "format": forms.Select(),
         }
+    def __init__(self, *args, org=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        qs = Location.objects.none()
+
+        if org:
+            qs = Location.objects.filter(org=org)
+
+        # if form is bound, include the posted location id too
+        bound_location_id = None
+        if self.is_bound:
+            field_name = self.add_prefix("location")
+            bound_location_id = self.data.get(field_name)
+
+        if bound_location_id:
+            qs = Location.objects.filter(
+                Q(org=org) | Q(pk=bound_location_id)
+            ).distinct()
+
+        # if editing an existing session, include its current location too
+        elif self.instance and self.instance.pk and self.instance.location_id:
+            qs = Location.objects.filter(
+                Q(org=org) | Q(pk=self.instance.location_id)
+            ).distinct()
+
+        self.fields["location"].queryset = qs
         
 SessionFormSet = inlineformset_factory(
     Activity,
@@ -364,7 +390,7 @@ SessionFormSet = inlineformset_factory(
     extra=0,       # number of blank forms shown initially
     min_num=1,
     validate_min=True,
-    can_delete=True
+    can_delete=True,
 )
 class GroupedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     def optgroups(self, name, value, attrs=None):
