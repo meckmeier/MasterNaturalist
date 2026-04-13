@@ -15,6 +15,11 @@ class OrgForm(forms.ModelForm):
             }),
         }
 
+class LocModal(forms.ModelForm):
+    class Meta:
+        model=Location
+        fields = ["loc_name"]
+        
 class LocForm(forms.ModelForm):
     class Meta:
         model = Location

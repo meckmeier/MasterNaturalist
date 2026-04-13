@@ -21,9 +21,10 @@ import json
 import pandas as pd
 from .services.csv_importer import CSVImporter
 from django.db import transaction
+from collections import defaultdict
 
 from django.views.decorators.http import require_POST
-from collections import defaultdict
+
 from orgs.models import *
 from .forms import *
 
@@ -671,9 +672,6 @@ def profile_view(request):
 
     return render(request, "orgs/profile.html", {"form": form})
     
-from collections import defaultdict
-from django.shortcuts import get_object_or_404, render, redirect
-from django.urls import reverse
 
 def activity_detail(request, activity_id=None):
     is_new = activity_id is None
@@ -808,6 +806,39 @@ def location_search(request):
     return JsonResponse({
         "org_locations": [serialize(l) for l in org_locations],
         "other_locations": [serialize(l) for l in other_locations],
+    })
+
+def quick_location_create(request):
+    org_id = request.GET.get("org_id") or request.POST.get("org_id")
+    org = get_object_or_404(Organization, id=org_id)
+
+    if request.method == "POST":
+        form = LocModal(request.POST)
+
+        if form.is_valid():
+            location = form.save(commit=False)
+            location.org = org
+            location.created_by = request.user.profile
+            location.updated_by = request.user.profile
+            location.save()
+
+            return JsonResponse({
+                "success": True,
+                "id": location.id,
+                "label": location.loc_name,
+                "city": location.city_name or "",
+                "org_name": location.org.org_name if location.org else "",
+            })
+
+        return JsonResponse({
+            "success": False,
+            "errors": form.errors,
+        }, status=400)
+
+    form = LocModal()
+    return render(request, "orgs/location_form_modal.html", {
+        "form": form,
+        "org": org,
     })
 
 def activity_delete(request,activity_id=None):

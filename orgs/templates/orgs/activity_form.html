@@ -275,15 +275,22 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-primary" data-bs-target="#quickAddLocationModal" data-bs-toggle="modal">
+        <button type="button"
+                class="btn btn-outline-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#quickAddLocationModal"
+                data-bs-dismiss="modal">
           Add new location
         </button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
       </div>
     </div>
   </div>
 </div>
-
+{% include "orgs/quick_location_modal.html"  with org=activity.org  %}
 <hr>
 <p>Created :
 {% if activity.created_by %}

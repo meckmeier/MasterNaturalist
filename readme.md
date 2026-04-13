@@ -18,6 +18,8 @@ python manage.py load_locations_from_csv "orgs/data/state_parks.csv" "Wisconsin 
 python manage.py load_locations_from_csv "orgs/data/state_forests.csv" "Wisconsin State Forests"
 python manage.py load_locations_from_csv "orgs/data/recreation_areas.csv" "Wisconsin Recreation Areas"
 
+- adding location selector.
+- need to create loation_form_modal for adding a location while in an activity form.
 
 feature-map
  - tasks

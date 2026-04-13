@@ -1,3 +1,7 @@
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     let activeRow = null;
 
@@ -105,4 +109,38 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.hide();
         }
     };
+    document.addEventListener("submit", function (e) {
+    if (e.target.id === "quick-location-form") {
+        console.log("quick submit fired")
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch("/locations/loc_modal/", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": getCSRFToken()
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                chooseLocation({
+                    id: data.id,
+                    label: data.label
+                });
+
+                // close modal
+                const modalEl = document.getElementById("quickAddLocationModal");
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            } else {
+                console.log("errors", data.errors);
+            }
+        })
+        .catch(err => console.error("Quick create failed:", err));
+    }
+});
 });

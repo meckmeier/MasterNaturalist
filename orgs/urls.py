@@ -26,6 +26,7 @@ urlpatterns = [
         path("locs/new/", views.loc_detail, name="loc_create"),
         path("locs/<int:loc_id>/edit/", views.loc_detail, name="loc_edit"),
         path("locs/<int:loc_id>/", views.loc_detail, name="loc_view"),
+        path("locations/loc_modal/", views.quick_location_create, name="quick_location_create"),
     path("map/", views.map_view, name="map"),
     path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),
     path("locations/", views.locations, name="locations"),
