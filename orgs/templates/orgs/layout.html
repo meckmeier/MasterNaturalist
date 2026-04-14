@@ -46,8 +46,9 @@
                     Find Activities</a></li>{% endif %}
                 {% if request.path != "/orgs/" %}<li class ="nav-item"><a class="nav-link" href="{% url 'orgs' %}">
                     Browse Orgs</a></li>{% endif %}
-                {% if request.path != "/map/" %}<li class="nav-item"><a class="nav-link" href="{% url 'map' %}">
-                    Map</a></li>{% endif %}
+                {% if request.path != "/locations/" %}<li class ="nav-item"><a class="nav-link" href="{% url 'locations' %}">
+                    Locations</a></li>{% endif %}
+
 
                 {% if request.path != "/org_mgmt/" %}<li class="nav-item"><a class="nav-link" href="{% url 'org_mgmt' %}">
                     Organization Management</a></li>{% endif %}

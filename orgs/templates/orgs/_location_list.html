@@ -1,0 +1,130 @@
+{% load highlight %}
+{% load static %}
+<div class="me-page">
+<h1>Locations</h1>
+{% for loc in locs %}
+<div class="me-card" id="loc-{{loc.id}}">
+  <div class="me-card-header">
+    <div class="me-card-header-left">
+      <div class="me-card-title-row">
+        
+        {% if user.is_authenticated %}
+        
+          {% if q %}{{ loc.loc_name|highlight:q|safe }}{% else %}{{ loc.loc_name }}{% endif %}
+         {% else %}
+          {{ loc.loc_name }}
+          {% endif %}
+          
+          </div>
+          
+          {% if loc.org %}
+            <div class="me-card-sponsor"">{{loc.org.org_name}}</div>{% endif %}
+      </div>
+      
+      <div class="me-card-header-right">
+          {% if user.is_authenticated and loc.org %}
+  
+            <a href="{% url 'follow_org' loc.org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-sm">
+              {% if loc.org.id in followed_orgs %}
+                <i class="bi bi-heart-fill text-danger"></i> 
+              {% else %}
+                <i class="bi bi-heart"></i> 
+              {% endif %}
+            </a>
+          {% endif %}
+          <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe"></i> </a></span>
+          <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:30px; width:auto;">
+      </div>
+    </div>
+  <div >
+      <!-- Tabs Column (vertical on md+, horizontal on mobile) -->
+      <div class="col-12 mb-3">
+        <div class="d-flex d-md-block justify-content-start justify-content-md-end">
+
+          <!-- Horizontal on mobile -->
+          <ul class="nav nav-tabs" id="locTabs{{ loc.id }}" role="tablist" aria-orientation="vertical">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active px-2 py-1" id="v-pills-info-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-info{{ loc.id }}" type="button" role="tab">Info</button>
+            </li>
+            {% if loc.volunteer %}
+              <li class="nav-item " role="presentation">
+                <button class="nav-link px-2 py-1" id="v-pills-volunteer-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-volunteer{{ loc.id }}" type="button" role="tab">Volunteer</button>
+              </li>
+            {% endif %}
+            {% if loc.training  %}
+            <li class="nav-item me-2 me-md-0" role="presentation">
+              <button class="nav-link px-2 py-1" id="v-pills-trainings-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-trainings{{ loc.id }}" type="button" role="tab">Trainings</button>
+            </li>
+              {% endif %}
+          </ul>
+        </div>
+      </div>
+      <!-- Tab Content -->
+      <div class="col-12 col-md-11 order-md-1 tab-content mx-auto" id="v-pills-tabContent{{ loc.id }}">
+        
+        <!-- Info Tab -->
+        <div class="tab-pane fade show active" id="v-pills-info{{ loc.id }}" role="tabpanel">
+            
+        {{loc.address}}, {{loc.city_name}} | {{loc.county_id.county_name}} 
+        
+          {% if loc.location_about %}
+          <div class="me-description-block"></p>
+            <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
+            <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>
+             
+            </div>
+            
+          {% endif %}
+
+        </div>
+
+        <!-- Events Tab -->
+        <div class="tab-pane fade" id="v-pills-volunteer{{ loc.id }}" role="tabpanel">
+       
+          {% for each in loc.volunteer %}
+            {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
+              
+          {% endfor %}
+        </div>
+
+        <!-- Trainings Tab -->
+        <div class="tab-pane fade" id="v-pills-trainings{{ loc.id }}" role="tabpanel">
+          
+          {% for a in loc.training %}
+            {% include "orgs/_session_item.html" with e=a q=q %}
+                  
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+{% endfor %}
+
+<!-- Pagination -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if locs.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ locs.previous_page_number }}&{{ query_params.urlencode }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      {% endif %}
+      {% for num in locs.paginator.page_range %}
+        <li class="page-item {% if locs.number == num %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}&{{ query_params.urlencode }}">{{ num }}</a>
+        </li>
+      {% endfor %}
+      {% if locs.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ locs.next_page_number }}&{{ query_params.urlencode }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+</div>

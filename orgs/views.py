@@ -559,6 +559,20 @@ def locations(request):
     all_locs =Location.objects.filter(deleted=False).order_by("loc_name")
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
+    import json
+    print("queryset is:", queryset)
+    print("type of queryset:", type(queryset))
+    json_locs = json.dumps([
+        {
+            "id": loc.id,
+            "name": loc.loc_name,
+            "latitude": loc.latitude,
+            "longitude": loc.longitude,
+            "county": loc.county_id.county_name if loc.county_id else ""
+        }
+        for loc in queryset
+        if loc.latitude and loc.longitude
+    ])
 
     return render(
         request,
@@ -571,6 +585,7 @@ def locations(request):
             "counties": counties,
             "query_params": clean_get,
             "orgs": all_locs,
+            "json_locs": json_locs,
         }
     )
 
