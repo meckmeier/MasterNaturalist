@@ -302,6 +302,7 @@ class Activity(models.Model):
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
     categories = models.ManyToManyField(EventCategory, blank=True, related_name="category_activities")
     date_description = models.CharField(max_length=100, default='', blank=True, null=True)
+    time_description = models.CharField(max_length=100, default='', blank=True, null=True)
     expire_date = models.DateField(default=one_year_from_now())
     activity_url = models.URLField(max_length=200, default="", blank=True)
     no_cost = models.BooleanField(default=False)

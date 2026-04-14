@@ -60,13 +60,13 @@
       <div class="view-toggle">
     <label>
         <input type="radio" name="view" value="list"
-               {% if request.GET.view != "map" %}checked{% endif %}>
+               {% if request.GET.view == "list" %}checked{% endif %}>
         List View
     </label>
 
     <label>
         <input type="radio" name="view" value="map"
-               {% if request.GET.view == "map" %}checked{% endif %}>
+               {% if request.GET.view != "list" %}checked{% endif %}>
         Map View
     </label>
 </div>

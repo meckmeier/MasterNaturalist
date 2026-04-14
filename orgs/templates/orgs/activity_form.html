@@ -66,7 +66,11 @@
             {{ activity_form.activity_url}}
             <span class="error-text">{{ activity_form.activity_url.errors}}</span>
         </div>
-        <div></div>
+        <div class="form-field">
+            Listing expires: <br>
+            {{ activity_form.expire_date }}
+            {{ activity_form.expire_date.errors }}
+        </div>
         <div class="form-field">
             Activity contact:<br>
             {{ activity_form.contact_email }}
@@ -200,18 +204,19 @@
             {{ activity_form.date_description }}
             {{ activity_form.date_description.errors }}
         </div>
-
         <div class="form-field">
-            Time<br>
+            Time: <br>
             {{ activity_form.time_commitment }}
             {{ activity_form.time_commitment.errors }}
+        </div> 
+        <div class="form-field">
+            {{ activity_form.time_description.label_tag }}<br>
+            {{ activity_form.time_description }}
+            {{ activity_form.time_description.errors }}
         </div>
 
-        <div class="form-field">
-            Expiration date for the activity listing: <br>
-            {{ activity_form.expire_date }}
-            {{ activity_form.expire_date.errors }}
-        </div>
+
+        
         
         <div class ="form-field-full">
             {{ activity_form.description.label_tag }}<br>

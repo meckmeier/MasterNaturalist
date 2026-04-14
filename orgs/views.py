@@ -1,5 +1,7 @@
 from urllib import request
-
+import markdown
+from django.conf import settings
+from pathlib import Path
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .utils import update_new_fields
 from django.core.mail import send_mail
@@ -7,7 +9,7 @@ from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.db import IntegrityError
-from django.http import  HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import  Http404, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
 
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -1226,3 +1228,21 @@ def test_html(request):
         "activity_form": activity_form,
         "default_location_id": default_location_id,
         })
+
+
+def render_markdown(request, filename):
+    
+    file_path = Path(settings.BASE_DIR) / f"{filename}.md"
+    
+    if not file_path.exists():
+        raise Http404(f"{filename}.md not found at {file_path}")
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        md_content = f.read()
+
+    html_content = markdown.markdown(md_content)
+   
+    return render(request, "orgs/legal_page.html", {
+        "content": html_content,
+        "title": filename.capitalize()
+    })
