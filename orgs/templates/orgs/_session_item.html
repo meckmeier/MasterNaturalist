@@ -74,5 +74,9 @@
       <span class="me-badge">{{ cat.name }}</span>
     {% endfor %}
   </div>
-
+  <div class="small text-muted py-3">
+    Last update: {% if e.updated_at > e.activity.updated_at %}{{ e.updated_at|date:"M j, Y" }}
+    {% else %}{{ e.activity.updated_at|date:"M j, Y" }}{% endif %}
+   
+  </div>
 </div>
