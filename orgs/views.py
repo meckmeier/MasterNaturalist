@@ -1,31 +1,31 @@
-from urllib import request
-import markdown
+
+
 from django.conf import settings
-from pathlib import Path
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .utils import update_new_fields
-from django.core.mail import send_mail
-
-from django.contrib.auth import authenticate, login, logout
-from django.utils.http import url_has_allowed_host_and_scheme
-from django.db import IntegrityError
-from django.http import  Http404, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
-
-from django.urls import reverse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.core.paginator import Paginator
-from django.utils import timezone
-from datetime import date, timedelta
-from django.db.models import Q, Prefetch, F
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import IntegrityError
+from django.db import transaction
+from django.db.models import Q, Prefetch, F
+from django.http import  Http404, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
+
+from datetime import date, timedelta
+from pathlib import Path
+from .utils import update_new_fields
+import markdown
 import json
 import pandas as pd
 from .services.csv_importer import CSVImporter
-from django.db import transaction
-from collections import defaultdict
 
-from django.views.decorators.http import require_POST
+from collections import defaultdict
 
 from orgs.models import *
 from .forms import *
@@ -292,7 +292,7 @@ def org_mgmt(request):
             ),
             Prefetch(
                 "activities",
-                queryset=Activity.objects.active(),
+                queryset=Activity.objects.with_active_flag(),
                 to_attr="pre_activities"  # optional: access as org.active_activities
             ),
             Prefetch(
@@ -315,7 +315,7 @@ def org_mgmt(request):
                 ),
             Prefetch(
                 "activities",
-                queryset=Activity.objects.active(),
+                queryset=Activity.objects.with_active_flag(),
                 to_attr="pre_activities"  # optional: access as org.active_activities
             ),
             Prefetch(
@@ -716,7 +716,7 @@ def activity_detail(request, activity_id=None):
 
     can_edit = False
     if request.user.is_authenticated:
-        if request.user.profile.staff or org.owner == request.user.profile:
+        if request.user.profile.staff or  org.can_edit(request.user):
             can_edit = True
 
     if not can_edit:

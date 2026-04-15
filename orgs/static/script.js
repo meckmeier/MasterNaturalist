@@ -101,15 +101,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const zipField = document.getElementById("id_zip_code");
     const countyField = document.getElementById("id_county_id");
     const regionField = document.getElementById("id_region_name");
-
+    console.log("starting zip code lookup wiring", { zipField, countyField, regionField });
     if (zipField && countyField && regionField) {
 
         zipField.addEventListener("change", function () {
+           
             const zip = zipField.value.trim().substring(0, 5);          
+            console.log("looking up zip code", zip);
             
             fetch(`/lookup-zip/?zip_code=${zip}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log("zip lookup response", data);
                     if (data.county_id) {
                         countyField.value = data.county_id;
                     }

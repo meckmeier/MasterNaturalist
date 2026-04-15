@@ -6,11 +6,13 @@
 
   <!-- Date line -->
   <div class="me-card-date">
+
     <strong>Starts:</strong> {{ e.start }}
     {% if e.end %}| <strong>Ends:</strong> {{ e.end }}{% endif %}
     {% if e.activity.date_description %}| <em>{{ e.activity.date_description }}</em>{% endif %}
     {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}
     {% if e.ongoing %}| <span class="badge bg-success">Ongoing</span>{% endif %}
+    {% if e.session_format != "i" %}| <span class="badge bg-success">Online</span>{% endif %}
   </div>
 
   <!-- Header row -->
@@ -27,7 +29,11 @@
         {% else %}
           <i class="bi bi-tree" title="Volunteer Opportunity"></i>
         {% endif %}
-        {{ e.activity.title }}
+        {% if q %}
+          {{ e.activity.title|highlight:q|safe }}
+        {% else %}
+          {{ e.activity.title }}
+        {% endif %}
         {% if e.activity|can_edit:request.user %}
           <a href="{% url 'activity_edit' e.activity_id %}">
             <i class="bi bi-pencil-fill"></i>
@@ -44,21 +50,16 @@
 
     <!-- Right block: simple inline icons -->
     <div class="me-card-header-right">
-      {% if e.session_url %}
-        <a href="{{ e.session_url }}"><i class="bi bi-globe fs-5 text-info"></i></a>
-      {% endif %}
+  
       {% if e.location %}
-        <img src="{% static e.region_image %}" alt="Region" style="height:30px; width:auto;">
-      {% endif %}
-      {% if e.session_format != "i" %}
-        <i class="bi bi-globe fs-5 text-info" title="Online sessions"></i>
+        <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" style="height:30px; width:auto;">
       {% endif %}
     </div>
 
   </div> <!-- header -->
 
   <!-- Description -->
-  <div class="me-description-block">
+  <div class="me-description-block {% if q %}expanded{% endif %}">
     <div class="me-desc-short">{{ e.activity.description|truncatechars:200 }}</div>
     {%if q %}
     <div class="me-desc-full">{{ e.activity.description|highlight:q|safe }}</div>

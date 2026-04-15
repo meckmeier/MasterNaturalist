@@ -121,10 +121,12 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     {% for act in org.pre_activities %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <li class="list-group-item d-flex justify-content-between align-items-center {% if not act.is_active %}inactive{% endif %}">
                             {{ act.title }} | {{ act.date_description }}
                             <a href="{% url 'activity_edit' act.id %}" title="edit activity"><i class="bi bi-pencil"></i></a>
                             <a href="{% url 'activity_delete' act.id %}" title="Delete"><i class="bi bi-trash"></i></a>
+
+                          
                         </li>
                     {% empty %}
                         <li class="list-group-item">No activities yet</li>

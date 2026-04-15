@@ -246,3 +246,6 @@ a.me-button-link-2nd:hover {
 .good { color: green; }
 .warn { color: orange; }
 
+li.inactive {
+    opacity: 0.6;
+}

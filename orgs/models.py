@@ -1,7 +1,7 @@
 import re
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import timedelta
@@ -281,9 +281,29 @@ class Location(models.Model):
         )
     
 class ActivityQuerySet(models.QuerySet):
+    def base(self):
+        return self.filter(
+            deleted=False,
+            org__deleted=False
+        )
+    def with_active_flag(self):
+        current_sessions = Session.objects.current().filter(
+            activity=OuterRef('pk')
+        )
+
+        return self.base().annotate(
+            is_active=Exists(current_sessions)
+        )
     def active(self):
-        return self.filter(deleted=False,
-                           org__deleted=False)
+        current_sessions = Session.objects.current().filter(
+            activity=OuterRef('pk')
+        )
+        return self.base(
+        ).annotate(
+            has_current_session=Exists(current_sessions)
+        ).filter(
+            has_current_session=True
+        )
     def volunteer(self):
         return self.active().filter(
             activity_type="v"
@@ -338,6 +358,7 @@ class Activity(models.Model):
 
 class SessionQuerySet(models.QuerySet):
     def active(self):
+        
         return self.filter(
             deleted=False,
             activity__deleted=False,
