@@ -445,3 +445,14 @@ class UploadFileForm(forms.ModelForm):
     class Meta:
         model = ActivityUpload
         fields = ["file"]
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ["name", "email", "note", "page_url"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "note": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "page_url": forms.HiddenInput(),
+        }

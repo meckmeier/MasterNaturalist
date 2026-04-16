@@ -42,16 +42,16 @@
             
 
             {% if user.is_authenticated %}
-                {% if request.path != "/filter/" %}<li class="nav-item"><a class="nav-link" href="{% url 'filter' %}">
-                    Find Activities</a></li>{% endif %}
-                {% if request.path != "/orgs/" %}<li class ="nav-item"><a class="nav-link" href="{% url 'orgs' %}">
-                    Browse Orgs</a></li>{% endif %}
-                {% if request.path != "/locations/" %}<li class ="nav-item"><a class="nav-link" href="{% url 'locations' %}">
-                    Locations</a></li>{% endif %}
-
-
-                {% if request.path != "/org_mgmt/" %}<li class="nav-item"><a class="nav-link" href="{% url 'org_mgmt' %}">
-                    Organization Management</a></li>{% endif %}
+               <li class="nav-item"><a class="nav-link" href="{% url 'filter' %}">
+                    Find Activities</a></li>
+                <li class ="nav-item"><a class="nav-link" href="{% url 'orgs' %}">
+                    Browse Orgs</a></li>
+                <li class ="nav-item"><a class="nav-link" href="{% url 'locations' %}">
+                    Locations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'org_mgmt' %}">
+                    Organization Management</a></li>
          
                 
                 

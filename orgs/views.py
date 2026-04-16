@@ -1246,3 +1246,18 @@ def render_markdown(request, filename):
         "content": html_content,
         "title": filename.capitalize()
     })
+
+
+
+def feedback_view(request):
+    if request.method == "POST":
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Thanks for the feedback.")
+            return redirect("feedback")
+    else:
+        initial_url = request.GET.get("page", "")
+        form = FeedbackForm(initial={"page_url": initial_url})
+
+    return render(request, "orgs/feedback.html", {"form": form})

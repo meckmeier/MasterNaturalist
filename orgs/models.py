@@ -585,3 +585,14 @@ class Pending_Session(models.Model):
     
     def __str__(self):
         return f"{self.activity.title} – {self.start}"  
+    
+class Feedback(models.Model):
+    name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(blank=True)
+    note = models.TextField()
+    page_url = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        who = self.name or self.email or "Anonymous"
+        return f"{who} - {self.created_at:%Y-%m-%d %H:%M}"

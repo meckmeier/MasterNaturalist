@@ -4,6 +4,7 @@
 
 {% block body %}
 {% load static %}
+<div class="me-page">
 <h2>Activity</h2>
 {%if messages %}
     <ul class="messages">
@@ -13,33 +14,13 @@
     </ul>
 {% endif %}
 
-<form method="post" id="activity-form" data-default-location="{{ default_location_id }}" data-org-id="{{ activity.org.id }}">
+<form class="me-form"method="post" id="activity-form" data-default-location="{{ default_location_id }}" data-org-id="{{ activity.org.id }}">
  {% csrf_token %}
  <input type="hidden" name="org" value="{{ request.GET.org }}">
  <input type="hidden" name="location" value="{{ request.GET.location }}">
  <input type="hidden" name="next" value="{{ request.GET.next|default:request.get_full_path }}">
     
-{% if view_only %}
-         <a class="me-button-link" href="{% url 'activity_edit' activity.id %}">Edit</a>        
-         {%endif%}
-{% if duplicate_warning %}
-  <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
-    ⚠️ An activity with this name already exists for this organization.
-    Are you sure you want to add another?
-  </div>
 
-  <button class="me-btn" type="submit" name="confirm_duplicate" value="1">
-    Yes, add anyway
-  </button>
-
-  <a href="" class="me-button-link">Cancel</a>
-{% else %}
-
-       <button type ="submit" class="me-btn">
-            Save
-        </button>
-
-{% endif %}
 <fieldset>
        <div class="error-text"> {{ activity_form.non_field_errors }}</div>
     <div class = "form-grid {% if view_only %}view-mode{% endif %}">
@@ -77,7 +58,7 @@
             <span class="error-text">{{ activity_form.contact_email.errors }}</span>
         </div>
         <div class="form-field-full">
-            <legend>WHERE - if an in-person event</legend>
+            <legend>Details</legend>
     
     <div class="formset" data-prefix="locations">
     
@@ -197,7 +178,8 @@
  {% endif %}    
     </div>
     <div class ="form-field-full">
-           <legend>WHEN - you can describe dates for display. </legend>
+           <legend>Display fields </legend>
+           <span class="me-muted">These fields are optional but you can use them to display additional information regarding dates and times.</span>
         </div>
         <div class="form-field">
             {{ activity_form.date_description.label_tag }}<br>
@@ -227,7 +209,7 @@
 
 {% for group, choices in activity_form.fields.categories.choices %}
 {% if group in "content" %}<div class="form-field-full">
-    {% else %}<div class="form-field">{% endif %}
+    {% else %}<div class="form-field-full">{% endif %}
    
 
     {% for value, label in choices %}
@@ -246,6 +228,27 @@
         
 
     </fieldset>
+    {% if view_only %}
+         <a class="me-button-link" href="{% url 'activity_edit' activity.id %}">Edit</a>        
+         {%endif%}
+{% if duplicate_warning %}
+  <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
+    ⚠️ An activity with this name already exists for this organization.
+    Are you sure you want to add another?
+  </div>
+
+  <button class="me-btn" type="submit" name="confirm_duplicate" value="1">
+    Yes, add anyway
+  </button>
+
+  <a href="" class="me-button-link">Cancel</a>
+{% else %}
+
+       <button type ="submit" class="me-btn">
+            Save
+        </button>
+
+{% endif %}
 
 </form>
 </form>
@@ -309,6 +312,7 @@
    {{ activity.updated_at }}
 {% endif %}
 </p>
+</div>
 {% endblock %}
 {% block extrajs%}
   <script src="{% static 'locationpicker.js' %}"></script>

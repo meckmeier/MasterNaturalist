@@ -59,6 +59,7 @@ urlpatterns = [
     path("debug/sessions/", views.debug_sessions, name="debug_sessions"),
     path("terms/", views.render_markdown, {"filename": "terms"}, name="terms"),
     path("privacy/", views.render_markdown, {"filename": "privacy"}, name="privacy"),
+    path("feedback/", views.feedback_view, name="feedback"),
 ]
 
 if settings.DEBUG:

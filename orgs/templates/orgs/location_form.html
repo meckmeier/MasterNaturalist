@@ -1,6 +1,7 @@
 {% extends "orgs/layout.html" %}
 
 {% block body %}
+<div class="me-page">
 {% if messages %}
     <ul class="messages">
         {% for message in messages %}
@@ -8,20 +9,39 @@
         {% endfor %}
     </ul>
 {% endif %}
-        
-<form method="post" class="loc-form">
+<h2>Locations</H2>
+ <p>Org: {{ loc.org.org_name }}</p> 
+
+    <form method="post" class="loc-form me-form" id="location-form">
     {% csrf_token %}
    {{form.id}}
-       <!-- submit button INSIDE the form -->
-        <button type="submit" class="me-btn">
-            Save
-        </button>
-
+      
+    
     <div class = "form-grid {% if view_only %}view-mode{% endif %}">
-        <div class ="form-field title">
-            {{ form.loc_name.label_tag }}
+        <div class ="form-field-full">
+            Location Name:
             {{ form.loc_name}}
             {{ form.loc_name.errors }}
+        </div>
+                <div class ="form-field-full">
+            {{ form.address.label_tag }}
+            {{ form.address}}
+            {{ form.address.errors }} 
+        </div>
+        <div class ="form-field">
+            {{ form.city_name.label_tag }}
+            {{ form.city_name}}
+            {{ form.city_name.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.state.label_tag }}
+            {{ form.state}}
+            {{ form.state.errors }}
+        </div>
+        <div class ="form-field">
+            {{ form.zip_code.label_tag }}
+            {{ form.zip_code}}
+            {{ form.zip_code.errors }}
         </div>
         <div class="form-field-full">
             {{ form.location_about.label_tag}}
@@ -47,35 +67,18 @@
             {{ form.county_id.errors }}
         </div>
    
-        <div class ="form-field-full">
-            {{ form.address.label_tag }}
-            {{ form.address}}
-            {{ form.address.errors }} 
-        </div>
-        <div class ="form-field">
-            {{ form.city_name.label_tag }}
-            {{ form.city_name}}
-            {{ form.city_name.errors }}
-        </div>
-        <div class ="form-field">
-            {{ form.state.label_tag }}
-            {{ form.state}}
-            {{ form.state.errors }}
-        </div>
-        <div class ="form-field">
-            {{ form.zip_code.label_tag }}
-            {{ form.zip_code}}
-            {{ form.zip_code.errors }}
-        </div>
+         <!-- submit button INSIDE the form -->
+        <button type="submit" class="me-btn">
+            Save
+        </button>
 
 
     </div>
 
 </form>
- <p>Org: {{ loc.org.org_name }}</p> 
- <p>Created :
+
 {% if loc.created_by %}
-  {{ loc.created_by }}
+  <p>Created : {{ loc.created_by }}
   /{{ loc.created_at }}
 {% endif %}</p>
 
@@ -84,4 +87,5 @@
   {{ loc.updated_by }} |
    {{ loc.updated_at }}
 {% endif %}
+</div>
 {% endblock %}
