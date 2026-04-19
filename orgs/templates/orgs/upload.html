@@ -1,5 +1,6 @@
 {% extends "orgs/layout.html" %}
 {% block body %}
+{% load static %}
 
 {% if messages %}
     <ul class="messages">
@@ -19,6 +20,12 @@
 
     <br>
 
-    <button type="submit">Upload</button>
+    <button type="submit" class="me-btn">Upload</button>
 </form>
+<hr>
+<a href="{% static 'upload_template.csv' %}"
+   class="btn me-btn"
+   download>
+   Download Template
+</a>
 {% endblock %}

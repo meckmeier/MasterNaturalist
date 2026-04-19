@@ -1,10 +1,39 @@
+:root {
+  --main-background: rgba(228, 228, 228, 0.1);   /* Dodger Blue */
+  --main-border: rgba(203, 213, 207, 0.5); /* Tomato */
+  --button: #220a8ad8;    /* Lime Green */
+  --color-dark: #222222;      /* Dark Gray */
+  --color-light: #f5f5f5;     /* Light Gray */
+  --color-warning: #ffcc00;   /* Yellow */
+}
+
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: #222;
 }
+.me-navbar {
+    background-color:var(--main-background);  /* soft natural green */
+    border-bottom: 1px solid var(--main-border);
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+.me-navbar .navbar-brand,
+.me-navbar .nav-link {
+    color: #2f4f3f;  /* deep green-gray */
+}
 
+.me-navbar .nav-link:hover {
+    color: #1e3529;
+}
+.me-navbar .navbar-toggler {
+    border-color: #2f4f3f;
+}
+
+.me-navbar .navbar-toggler-icon {
+    filter: invert(25%) sepia(20%) saturate(300%) hue-rotate(90deg);
+}
 /* Layout */
 .me-page {
   max-width: 1100px;
@@ -13,7 +42,7 @@ body {
 
 }
 .me-form {
-  background-color: #0cec3115;
+  background-color: var(--main-background);
   padding: 1rem;
   border:#666 solid 1px;
   border-radius: 8px;
@@ -146,7 +175,7 @@ body {
 }
 
 .me-btn {
-    background-color:  #128140d8;
+    background-color:  var(--button);
     color: white;
     border: none;
     padding: 5px 10px;
@@ -161,7 +190,7 @@ body {
 a.me-button-link {
     display: inline-block;       /* Makes it behave like a button */
     padding: 5px 10px;          /* Space inside the button */
-    background-color: #128140d8;   /* Button background color */
+    background-color: var(--button);   /* Button background color */
     color: white;                /* Text color */
     text-align: center;          /* Center text */
     text-decoration: none;       /* Remove underline */
@@ -171,7 +200,7 @@ a.me-button-link {
     transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 a.me-button-link-2nd{
-    background-color: #1d9fc773;   /* Button background color */
+    background-color: var(--button);   /* Button background color */
     display: inline-block;       /* Makes it behave like a button */
     padding: 5px 10px;          /* Space inside the button */
     color: white;                /* Text color */
@@ -254,4 +283,40 @@ a.me-button-link-2nd:hover {
 
 li.inactive {
     opacity: 0.6;
+}
+.me-tree-icon {
+    color: rgb(10, 14, 1);
+    font-size: 1rem;
+    background-color: rgba(4, 146, 27, 0.4);
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+.me-learn-icon {
+    color: rgb(34, 34, 34);
+    font-size: 1rem;
+    background-color: rgba(255, 215, 0, 0.4);
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+.me-new-icon {
+    color: red;
+    font-size: 1rem;
+    background-color: white;
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+.me-link-icon {
+    color: rgb(34, 34, 34);
+    font-size: 1rem;
+    background-color: white;
+    padding-left: .5rem;
+}
+.me-tree-tab {
+    background-color: rgba(4, 146, 27, 0.4);
+    color: rgb(34, 34, 34);
+    
+}
+.me-learn-tab {
+    background-color: rgba(255, 215, 0, 0.4);
+    color: rgb(34, 34, 34);
 }

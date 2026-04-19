@@ -86,7 +86,7 @@
               {% endif %}
             </a>
           {% endif %}
-          <a href="{{ org.org_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe"></i> </a>
+          <a href="{{ org.org_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe me-link-icon"></i> </a>
           <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="height:30px; width:auto;">
       </div>
     </div>
@@ -104,26 +104,26 @@
       </li>
       {% if org.pre_volunteer %}
         <li  role="presentation">
-          <button class="me-tab-button" 
+          <button class="me-tab-button me-tree-tab" 
             id="v-pills-events-tab{{ org.id }}" 
             data-bs-toggle="pill" 
             data-bs-target="#v-pills-events{{ org.id }}" 
             aria-controls="v-pills-events{{ org.id }}"
             aria-selected="true"
             type="button" 
-            role="tab">Volunteer</button>
+            role="tab">Volunteer<i class="bi bi-tree-fill"></i></button>
         </li>
       {% endif %}
       {% if org.pre_training  %}
       <li  role="presentation">
-        <button class="me-tab-button" 
+        <button class="me-tab-button me-learn-tab" 
         id="v-pills-trainings-tab{{ org.id }}" 
         data-bs-toggle="pill" 
         data-bs-target="#v-pills-trainings{{ org.id }}" 
         aria-controls="v-pills-trainings{{ org.id }}"
         aria-selected="true"
         type="button" 
-        role="tab">Trainings</button>
+        role="tab">Trainings<i class="bi bi-mortarboard-fill"></i></button>
       </li>
         {% endif %}
     </ul>

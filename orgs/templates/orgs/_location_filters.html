@@ -1,0 +1,62 @@
+<form method="get" action="{{ request.path }}">
+    
+    <div class="mb-3">
+        {{ filter_form.org.label_tag }}
+        {{ filter_form.org }}
+        {{ filter_form.org.errors }}
+    </div>
+    <div class="mb-3">
+       {{ filter_form.my_orgs }}
+       {{ filter_form.my_orgs.label_tag }}
+       {{ filter_form.my_orgs.errors }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.has_v }}
+        {{ filter_form.has_v.label_tag }}
+        {{ filter_form.has_v.errors }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.has_t }}
+        {{ filter_form.has_t.label_tag }}
+        {{ filter_form.has_t.errors }}
+    </div>
+    <div class="mb-3">
+      {{filter_form.loc.label_tag}}
+      {{filter_form.loc}}
+      {{filter_form.loc.errors}}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.county.label_tag}}
+        {{ filter_form.county }}
+        {{ filter_form.county.errors }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.region.label_tag}}
+        {{ filter_form.region }}
+        {{ filter_form.region.errors }}
+    </div>
+    <div class="mb-3"> 
+        {{ filter_form.q.label_tag }}
+        {{ filter_form.q }}
+        {{ filter_form.q.errors }}
+    </div>      
+    <div class="view-toggle">
+    
+    <label>
+        <input type="radio" name="view" value="list"
+               {% if request.GET.view == "list" %}checked{% endif %}>
+        List View
+    </label>
+
+    <label>
+        <input type="radio" name="view" value="map"
+               {% if request.GET.view == "map" or not request.GET.view %}checked{% endif %}>
+        Map View
+    </label>
+
+</div>
+    <div class="d-flex gap-2">
+        <button type = "submit" class="me-btn">Apply</button>
+        <a href="{% url 'locations'%}" class ="me-button-link">Clear</a>
+    </div>
+</form>

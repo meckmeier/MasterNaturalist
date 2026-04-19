@@ -22,6 +22,11 @@
             Location Name:
             {{ form.loc_name}}
             {{ form.loc_name.errors }}
+            {% if form.loc_name.help_text %}
+                <div class="form-text">
+                    {{ form.loc_name.help_text }}
+                </div>
+            {% endif %}
         </div>
                 <div class ="form-field-full">
             {{ form.address.label_tag }}

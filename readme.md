@@ -19,6 +19,8 @@ python manage.py load_locations_from_csv "orgs/data/state_forests.csv" "Wisconsi
 python manage.py load_locations_from_csv "orgs/data/recreation_areas.csv" "Wisconsin Recreation Areas"
 
 
+python manage.py update_latlng
+(this is not updating the latlng data on production)
 
 feature-map
  - tasks
@@ -32,3 +34,27 @@ Next UI steps:
 
 Future Feature:
 Configure an upload process that will take in a csv or excel file and load it into Pending Locations, Pending Activities and Pending Sessions for audit/approval and push into the production tables. So we can automate the loading of data. (this is one way to automate getting activities into the system... maybe even extend this into an API thing so we can pull the data directly from connected organizations ultimately)
+
+Notes from meeting with Tim:
+unhide password when typing.
+present the rules when typing a password.
+xfind a way to say what the icons mean right away (?) - on the main pages as a simple legend.
+xmd pages should not have numbers.use 2nd layer headers.
+xmake region icons bigger on the activity screen.
+implement the default search page?
+... keep me notified of all the bird stuff...
+--- what just's happening in the next 2 weeks.
+--- what's in an area. 
+
+x can i re-implement the filter page on the side bar./ maybe rebuild with activity name instead of results.
+
+(let the initial page show with filter visible.)
+xcolor the tabs - and color the markers.
+walk thru the story and make sure you have implemented the following tasks:
+xfilter fields based on session_format 
+xadd example data in the various form fields
+make sure the notices are always in red
+volunteer = lime green 
+training = blue
+consider making the end_date required if you have a start date... if you are doing ongoing then you don't have any dates...
+add a check to the delete manager where you cannot delete yourself.

@@ -26,14 +26,14 @@
   
             <a href="{% url 'follow_org' loc.org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-sm">
               {% if loc.org.id in followed_orgs %}
-                <i class="bi bi-heart-fill text-danger"></i> 
+                <i class="bi bi-heart-fill text-danger me-link-icon"></i> 
               {% else %}
-                <i class="bi bi-heart"></i> 
+                <i class="bi bi-heart me-link-icon"></i> 
               {% endif %}
             </a>
           {% endif %}
-          <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe"></i> </a></span>
-          <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:30px; width:auto;">
+          <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe me-link-icon" title="click to go the location's webpage"></i> </a></span>
+          <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:30px;width:auto;" title="{{loc.region_name}}">
       </div>
     </div>
   <div >
@@ -44,16 +44,18 @@
           <!-- Horizontal on mobile -->
           <ul class="nav nav-tabs" id="locTabs{{ loc.id }}" role="tablist" aria-orientation="vertical">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active px-2 py-1" id="v-pills-info-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-info{{ loc.id }}" type="button" role="tab">Info</button>
+              <button class="me-tab-button active" id="v-pills-info-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-info{{ loc.id }}" type="button" role="tab">Info</button>
             </li>
             {% if loc.volunteer %}
               <li class="nav-item " role="presentation">
-                <button class="nav-link px-2 py-1" id="v-pills-volunteer-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-volunteer{{ loc.id }}" type="button" role="tab">Volunteer</button>
+                <button class="me-tab-button me-tree-tab"  id="v-pills-volunteer-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-volunteer{{ loc.id }}" type="button" role="tab">
+                    Volunteer</button>
               </li>
             {% endif %}
             {% if loc.training  %}
             <li class="nav-item me-2 me-md-0" role="presentation">
-              <button class="nav-link px-2 py-1" id="v-pills-trainings-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-trainings{{ loc.id }}" type="button" role="tab">Trainings</button>
+              <button class="me-tab-button me-learn-tab" id="v-pills-trainings-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-trainings{{ loc.id }}" type="button" role="tab">
+                Trainings</button>
             </li>
               {% endif %}
           </ul>

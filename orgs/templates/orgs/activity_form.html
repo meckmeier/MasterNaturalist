@@ -47,11 +47,7 @@
             {{ activity_form.activity_url}}
             <span class="error-text">{{ activity_form.activity_url.errors}}</span>
         </div>
-        <div class="form-field">
-            Listing expires: <br>
-            {{ activity_form.expire_date }}
-            {{ activity_form.expire_date.errors }}
-        </div>
+        <div></div>
         <div class="form-field">
             Activity contact:<br>
             {{ activity_form.contact_email }}
@@ -85,35 +81,35 @@
                         
                                                 
                         <td>
-                        {% if view_only %}
-                            <span class="field-value">{{ form.session_format|default:"—" }}  </span>
-                        {% else %}
+
                             {{ form.session_format }}
                             {{ form.session_format.errors }}
-                        {% endif %}
+
                         </td>
                         
                         <td>
-                         {% if view_only %}
-                            <span class="field-value"> {{ form.session_url|default:"—" }}  </span>
-                        {% else %}
+                            <div class="url-group">
                             {{ form.session_url }}
                             {{ form.session_url.errors }}
-                        {% endif %}
+                            </div
                         </td> 
                         <td>
-                        {% if view_only %} 
-                            <span class="field-value">{{ form.location|default:"—" }} </span>
-                        {% else %}
-                           
+                           <div  class="loc-group">
                             {{ form.location }}
-                             <div class="selected-location-display small text-muted"></div>
+                             <div class="selected-location-display small border rounded p-2 mb-1">
+                                {% if form.instance.location %}
+                                    {{ form.instance.location.loc_name }}
+                                {% else %}
+                                    <span class="text-muted">No location selected</span>s
+                                {% endif %}
+                            </div>
+
                             {{ form.location.errors }}
                              <button type="button"  
                              class="btn btn-sm btn-outline-secondary open-location-search mt-1"
                              data-bs-toggle="modal" data-bs-target="#locationSearchModal">
                                 Find or Add Location</button>
-                        {% endif %}
+                            </div>
                         </td>       
                         <td> 
                            
@@ -121,20 +117,16 @@
                              {{form.ongoing.errors}}
                         </td>
                         <td>
-                         {% if view_only %}
-                            <span class="field-value">{{ form.start|default:"—" }}   </span>
-                          {% else %}  
+
                             {{ form.start }}
                             {{ form.start.errors }}
-                        {% endif %}
+
                         </td>       
                         <td>
-                         {% if view_only %}
-                            <span class="field-value"> {{ form.end|default:"—" }}  </span>
-                        {% else %}  
+
                             {{ form.end }}
                             {{ form.end.errors }}
-                        {% endif %}
+
                         </td>    
                         <td>{{form.DELETE}}</td>
                     </tr>

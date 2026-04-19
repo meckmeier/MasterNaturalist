@@ -7,8 +7,8 @@ img{
 .region_image{
   border-radius: 4px;
   padding: 5px;
-  width: 50px;
-
+  height:30px;
+  width: auto;
 }
 
 .mycontainer {

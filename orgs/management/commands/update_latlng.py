@@ -35,7 +35,7 @@ class Command(BaseCommand):
         dry_run = options["dry_run"]
 
         geolocator = Nominatim(user_agent="volunteer_map_app mary@eckmeier.com")
-        geocode = RateLimiter(geolocator.geocode, min_delay_seconds=15, swallow_exceptions=False)
+        geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1, swallow_exceptions=False)
 
         if update_all:
             qs = Location.objects.all()

@@ -9,9 +9,9 @@
         <div class="me-card-header-left">
           <div class="me-card-title-row">
             <span><strong>
-              {% if e.is_newly_added %}<i class="bi bi-asterisk" data-bs-toggle="tooltip" title="Newly added activity"></i>{% endif %}
-              {% if e.activity_type == "t"%}<i class="bi bi-mortarboard" data-bs-toggle="tooltip" title="Training"></i>
-              {%else%} <i class="bi bi-tree" data-bs-toggle="tooltip" title="Volunteer Opportunity"></i>{% endif %}
+              {% if e.is_newly_added %}<i class="bi bi-asterisk me-new-icon" data-bs-toggle="tooltip" title="Newly added activity"></i>{% endif %}
+              {% if e.activity_type == "t"%}<i class="bi bi-mortarboard-fill me-learn-icon" data-bs-toggle="tooltip" title="Training"></i>
+              {%else%} <i class="bi bi-tree-fill me-tree-icon" data-bs-toggle="tooltip" title="Volunteer Opportunity"></i>{% endif %}
             </strong></span>
           
             {% if q %}{{ e.title|highlight:q|safe  }}{% else %}{{ e.title }}{% endif %}
@@ -20,10 +20,10 @@
     </div>
     <div class="me-card-header-right">
       {% if e.contact_email %}
-           | <a href="mailto:{{ e.contact_email }}"><i class="bi bi-envelope"></i></a>
+           | <a href="mailto:{{ e.contact_email }}"><i class="bi bi-envelope" title="send email to contact person"></i></a>
       {% endif %}
       {% if e.activity_url %}| 
-          | <a href="{{ e.activity_url}}"><i class="bi bi-globe"></i></a>
+          | <a href="{{ e.activity_url}}"><i class="bi bi-globe me-link-icon"></i></a>
       {% endif %}
     </div>
     </div>

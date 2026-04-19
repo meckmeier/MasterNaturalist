@@ -50,21 +50,63 @@ document.addEventListener("DOMContentLoaded", function () {
         block.classList.toggle('expanded');
         });
     });
-    const activityForm = document.getElementById("activity-form");
+    function updateSessionRowVisibility(row) {
+        const formatField = row.querySelector("select[name$='session_format']");
+        const urlGroup = row.querySelector(".url-group");
+        const locationGroup = row.querySelector(".loc-group");
+
+        if (!formatField) return;
+
+        const format = formatField.value;
+        console.log("visibility", { format, urlGroup, locationGroup });
+
+        const showUrl = (format === "o" || format === "b");
+        const showLocation = (format === "i" || format === "b");
+
+        if (urlGroup) {
+            urlGroup.style.display = showUrl ? "block" : "none";
+        }
+
+        if (locationGroup) {
+            locationGroup.style.display = showLocation ? "block" : "none";
+        }
+    }
+   const activityForm = document.getElementById("activity-form");
     const defaultLocationId = activityForm ? activityForm.dataset.defaultLocation : "";
-        
+    const defaultLocationLabel = activityForm ? activityForm.dataset.defaultLocationLabel : "";
+
     function wireSessionRow(row) {
         const formatField = row.querySelector("select[name$='session_format']");
-        const locationField = row.querySelector("select[name$='location']");
-        
-        if (!formatField || !locationField) return;
-        formatField.addEventListener("change", function(){
+        const locationField = row.querySelector("input[name$='location']");
+        const startField = row.querySelector("input[name$='start']");
+        const endField = row.querySelector("input[name$='end']");
+
+        if (!formatField) return;
+
+        formatField.addEventListener("change", function () {
             const format = formatField.value;
-            const currentLocation = locationField.value;
-            if ((format === "i" || format ==="b") && !currentLocation && defaultLocationId) {
+            const currentLocation = locationField ? locationField.value : "";
+
+            updateSessionRowVisibility(row);
+
+            if ((format === "i" || format === "b") && !currentLocation && defaultLocationId && locationField) {
                 locationField.value = defaultLocationId;
+
+                const display = row.querySelector(".selected-location-display");
+                if (display) {
+                    display.textContent = defaultLocationLabel || "Default location selected";
+                }
             }
         });
+        // 👉 NEW: auto-fill end date
+        if (startField && endField) {
+            startField.addEventListener("change", function () {
+                if (!endField.value) {
+                    endField.value = startField.value;
+                }
+            });
+        }
+        updateSessionRowVisibility(row);
     }
     document.querySelectorAll(".formset-row").forEach(row => {
         if (!row.classList.contains("form-template")){

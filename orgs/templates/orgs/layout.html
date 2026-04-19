@@ -23,7 +23,7 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg me-navbar">
   <div class="container-fluid">
     <!-- Brand -->
     <a href="{% url "landing" %}">
@@ -42,11 +42,11 @@
             
 
             {% if user.is_authenticated %}
-               <li class="nav-item"><a class="nav-link" href="{% url 'filter' %}">
-                    Find Activities</a></li>
-                <li class ="nav-item"><a class="nav-link" href="{% url 'orgs' %}">
-                    Browse Orgs</a></li>
-                <li class ="nav-item"><a class="nav-link" href="{% url 'locations' %}">
+               <li class="nav-item"><a class="nav-link" href="{% url 'activities' %}" title="Click here to see training or volunteer opportunities">
+                    Activities</a></li>
+                <li class ="nav-item"><a class="nav-link" href="{% url 'orgs' %}" title="Click here to browse nature based organizations">
+                    Organizations</a></li>
+                <li class ="nav-item"><a class="nav-link" href="{% url 'locations' %}" title="Click here to see a map or list of locations with training or volunteer opportunities">
                     Locations</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
                 </li>

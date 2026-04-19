@@ -66,6 +66,13 @@ def normalize_address(addr):
     addr = re.sub(r"\s+", " ", addr)
     return addr.strip()
 
+def normalize_url(url):
+        if url:
+            url = url.strip()
+            if not url.startswith(("http://", "https://")):
+                return "https://" + url
+        return url
+
 def one_year_from_now():
     return now().date() + timedelta(days=365)
 
@@ -169,6 +176,14 @@ class Organization(models.Model):
                                           role__in=["owner","admin","editor"]).exists()
     )
 
+
+    def save(self, *args, **kwargs):
+        self.org_url = normalize_url(self.org_url)
+        self.volunteer_url = normalize_url(self.volunteer_url)
+        self.training_url = normalize_url(self.training_url)
+
+        super().save(*args, **kwargs)
+
     @property
     def region_image(self):
         return REGION_IMAGE_MAP.get(
@@ -207,7 +222,7 @@ class LocationQuerySet(models.QuerySet):
         
 class Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
-    loc_name= models.CharField(max_length=255)
+    loc_name= models.CharField(max_length=255,help_text="Your location can be used system-wide. You may want to include your organization name to help make it unique e.g., 'MyOrg Main Location'.")
     physical_location = models.BooleanField(default=True)
     address = models.CharField(max_length=255, default ='', blank=True, null=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )
@@ -240,7 +255,16 @@ class Location(models.Model):
 
     def build_fingerprint(self):
         return f"{self.norm_loc_name}|{self.norm_address}|{self.norm_city}|{self.norm_state}"
-    
+        
+
+    def save(self, *args, **kwargs):
+        self.org_url = self._normalize_url(self.org_url)
+        self.volunteer_url = self._normalize_url(self.volunteer_url)
+        self.training_url = self._normalize_url(self.training_url)
+        self.org_loc_url = self._normalize_url(self.org_loc_url)
+
+        super().save(*args, **kwargs)
+        
     def save(self, *args, **kwargs):
         # 👇 ALWAYS populate normalized fields
         self.norm_loc_name = normalize_text(self.loc_name)
@@ -349,7 +373,10 @@ class Activity(models.Model):
             or self.org.managed.filter(profile=user.profile,
                                           role__in=["owner","admin","editor"]).exists()
     )
-    
+    def save(self, *args, **kwargs):
+        self.activity_url = normalize_url(self.activity_url)
+       
+        super().save(*args, **kwargs)
     @property
     def is_newly_added(self):
         return self.created_at >= timezone.now() - timedelta(days=15)
@@ -424,6 +451,7 @@ class Session(models.Model):
             and not self.location and self.activity_id 
             and self.activity.org and self.activity.org.default_location):
             self.location = self.activity.org.default_location
+        self.session_url = normalize_url(self.session_url)    
         super().save(*args, **kwargs)
     
 
@@ -461,22 +489,49 @@ class ActivityUpload(models.Model):
 class RawLoadData(models.Model):
     upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
     row_number = models.IntegerField()
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)
+
+    # 🔹 RAW INPUT (exactly what came from CSV)
+    raw_data = models.JSONField(null=True, blank=True)
+
+    # 🔹 CLEANED / PARSED FIELDS (typed, nullable)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    city = models.CharField(max_length=255, null=True, blank=True)
+    activity_type = models.CharField(max_length=50, null=True, blank=True)
+
     location_name = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
+    state = models.CharField(max_length=2, default="WI", null=True, blank=True)
+    zip = models.CharField(max_length=20, null=True, blank=True)
+
+    ongoing = models.BooleanField(null=True)   # ✅ changed
+
     date = models.DateField(null=True, blank=True)
-    activity_type = models.CharField(max_length=1,
-                                  choices=[("v","Volunteer Opportunity"),("t","Training" )])
-    time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
-    date_description = models.CharField(max_length=100, default='', blank=True, null=True)
-    expire_date = models.DateField(default=one_year_from_now())
-    activity_url = models.URLField(max_length=200, default="", blank=True)
-    no_cost = models.BooleanField(default=False)
-    contact_email = models.EmailField(default="", blank=True)
-    status = models.CharField(max_length=50, default="pending")  # pending, valid, warning, error
+    end_date = models.DateField(null=True, blank=True)  # ✅ FIXED (was CharField)
+
+    time_commitment = models.CharField(max_length=50, null=True, blank=True)
+    time_description = models.CharField(max_length=50, null=True, blank=True)
+    date_description = models.CharField(max_length=100, null=True, blank=True)
+
+    expire_date = models.DateField(null=True, blank=True)
+    activity_url = models.CharField(max_length=200, null=True, blank=True)
+
+    no_cost = models.BooleanField(null=True)   # ✅ changed
+    session_format = models.CharField(max_length=1, null=True, blank=True)    # ✅ changed
+
+    contact_email = models.CharField(max_length=200, null=True, blank=True)
+
+    # 🔹 VALIDATION OUTPUT
+    validation_errors = models.JSONField(default=dict)
+    validation_warnings = models.JSONField(default=dict)
+
+    # 🔹 PROCESSING STATUS
+    status = models.CharField(
+        max_length=50,
+        default="pending"
+        # pending, error, warning, valid, skipped, approved
+    )
 
     def __str__(self):
         return f"Row {self.row_number} - {self.title or 'No Title'}"

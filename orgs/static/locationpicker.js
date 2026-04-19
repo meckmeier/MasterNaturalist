@@ -80,35 +80,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    window.chooseLocation = function (loc) {
-        if (!activeRow) return;
+   window.chooseLocation = function (loc) {
+    if (!activeRow) return;
 
-        const locationField = activeRow.querySelector("select[name$='location']");
-        if (!locationField) return;
+    const locationField = activeRow.querySelector("input[name$='location']");
+    if (!locationField) return;
 
-        let existingOption = Array.from(locationField.options).find(
-            option => option.value === String(loc.id)
-        );
+    locationField.value = String(loc.id);
 
-        if (!existingOption) {
-            existingOption = document.createElement("option");
-            existingOption.value = loc.id;
-            existingOption.text = loc.label;
-            locationField.appendChild(existingOption);
-        }
+    const display = activeRow.querySelector(".selected-location-display");
+    if (display) {
+        display.textContent = loc.label;
+    }
 
-        locationField.value = String(loc.id);
-
-        const display = activeRow.querySelector(".selected-location-display");
-        if (display) {
-            display.textContent = `Selected: ${loc.label}`;
-        }
-
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        if (modal) {
-            modal.hide();
-        }
-    };
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) {
+        modal.hide();
+    }
+};
     document.addEventListener("submit", function (e) {
     if (e.target.id === "quick-location-form") {
         console.log("quick submit fired")

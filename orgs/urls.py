@@ -10,11 +10,12 @@ urlpatterns = [
 
     path("filter/", views.filter, name="filter"),
         path("results/", views.results, name="results"),
-    
+    path("activities/", views.activities, name="activities"),
     path("orgs/", views.orgs, name="orgs"),
     path("org_mgmt/", views.org_mgmt, name="org_mgmt"),
         path("manager/add/", views.add_manager, name="add_manager"),
         path("manager/add/page/", views.manager_add_page, name="manager_add_page"),
+        path("org-managers/<int:pk>/delete/", views.org_manager_delete, name="org_manager_delete"),
         path("org_detail/<int:org_id>/", views.org_detail, name="org_view"),
         path("org_detail/<int:org_id>/edit/", views.org_detail, name="org_edit"),
         path("org_detail/new/", views.org_detail, name="org_create"),

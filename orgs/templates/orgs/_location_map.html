@@ -26,7 +26,7 @@ const markers = [];
 locations.forEach(loc => {
     const marker = L.marker([loc.latitude, loc.longitude])
         .bindPopup(`<b>${loc.name}</b><br>${loc.county}
-        <a href="/locations/?loc=${loc.id}">View Details</a>`);
+        <a href="/locations/?loc=${loc.id}&view=list">View Details</a>`);
     marker.addTo(map);
     markers.push({ marker: marker, county: loc.county });
 });

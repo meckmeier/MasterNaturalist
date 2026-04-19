@@ -20,14 +20,14 @@
     
     <!-- Left block -->
     <div class="me-card-header-left">
-      <div class="me-card-title-row">
+      <div class="me-card-title-row {% if e.activity.activity_type == "t" %}me-learn-tab{% else %}me-tree-tab{% endif %}">
         {% if e.activity.is_newly_added %}
-          <i class="bi bi-asterisk" title="Newly added activity"></i>
+          <i class="bi bi-asterisk me-new-icon" title="Newly added activity"></i>
         {% endif %}
         {% if e.activity.activity_type == "t" %}
-          <i class="bi bi-mortarboard" title="Training"></i>
+          <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
         {% else %}
-          <i class="bi bi-tree" title="Volunteer Opportunity"></i>
+          <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
         {% endif %}
         {% if q %}
           {{ e.activity.title|highlight:q|safe }}
@@ -36,7 +36,7 @@
         {% endif %}
         {% if e.activity|can_edit:request.user %}
           <a href="{% url 'activity_edit' e.activity_id %}">
-            <i class="bi bi-pencil-fill"></i>
+            <i class="bi bi-pencil"></i>
           </a>
         {% endif %}
       </div>

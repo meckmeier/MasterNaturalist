@@ -21,13 +21,18 @@
         </button>
     {% endif %}
     <div class = "form-grid {% if view_only %}view-mode{% endif %}">
-        <div class ="form-field title">
-            {{ form.org_name.label_tag }}
+        <div class ="form-field-full">
+            Organization Name:
             {{ form.org_name}}
             {{ form.org_name.errors }}
         </div>
+        <div class ="form-field-full">
+            {{ form.about.label_tag }}
+            {{ form.about}}
+            {{ form.about.errors }} 
+        </div>
         <div class ="form-field">
-            {{ form.org_url.label_tag }}
+            Main URL:
             {{ form.org_url}}
             {{ form.org_url.errors }}
         </div>
@@ -42,13 +47,9 @@
             {{ form.region_name}}
             {{ form.region_name.errors }}
         </div>
-        <div class ="form-field-full">
-            {{ form.about.label_tag }}
-            {{ form.about}}
-            {{ form.about.errors }} 
-        </div>
+        
         <div class="form-field">
-            {{ form.volunteer_url.label_tag }}
+            URL for Volunteering Opportunities:
             {{ form.volunteer_url }}
             {{ form.volunteer_url.errors }}
         </div>
@@ -58,7 +59,7 @@
             {{ form.host.errors }}
         </div>
         <div class="form-field">
-            {{ form.training_url.label_tag }}
+            URL for Trainings:
             {{ form.training_url }}
             {{ form.training_url.errors }}
         </div>

@@ -1,5 +1,7 @@
 
 
+from warnings import filters
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -562,8 +564,8 @@ def locations(request):
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
     import json
-    print("queryset is:", queryset)
-    print("type of queryset:", type(queryset))
+    #print("queryset is:", queryset)
+    #print("type of queryset:", type(queryset))
     json_locs = json.dumps([
         {
             "id": loc.id,
@@ -689,7 +691,89 @@ def profile_view(request):
 
     return render(request, "orgs/profile.html", {"form": form})
     
+def activities(request):
+    q = request.GET.get("q", "")
+    today = timezone.now().date()
+    # activities results... should i change this so we know what it is?
+   
+    queryset = Session.objects.current().select_related(
+            "activity",        # follow FK from Session -> Activity
+            "activity__org",   # Activity -> Organization
+            "location"         # Session -> Location
+        ).prefetch_related(
+            "activity__categories"  # m2m from Activity -> categories
+        )
+    get_data = request.GET.copy()
 
+    if "org_id" in get_data and "org" not in get_data:
+        get_data["org"]=get_data["org_id"]
+
+    filter_form=EventFilterForm(get_data or None)
+    if filter_form.is_valid():
+    
+        data = filter_form.cleaned_data
+        
+        if data.get("org"):
+            queryset=queryset.filter(activity__org__id=data["org"].id)
+
+        if data.get("my_orgs"):
+            followed_orgs = request.user.profile.following_orgs.filter(deleted=False)
+            queryset = queryset.filter(activity__org__id__in=followed_orgs)
+
+        if data.get("county") :
+            queryset=queryset.filter(location__county_id=data["county"]).distinct()
+
+        if data.get("region"):
+            queryset=queryset.filter(location__region_name=data["region"]).distinct()
+
+        if data.get("q"):
+            queryset =queryset.filter(Q(activity__org__org_name__icontains=q) 
+                                      | Q(activity__description__icontains=q)
+                                      | Q(location__loc_name__icontains=q)
+                                        | Q(activity__title__icontains=q)
+                                      ).distinct()
+        if data.get("activity_type"):
+            queryset=queryset.filter(activity__activity_type=data["activity_type"]).distinct()
+
+        if data.get("categories"):
+            queryset = queryset.filter(activity__categories__id__in=data["categories"]).distinct()
+        if data.get("start_date"):
+            queryset = queryset.filter(start__gte=data["start_date"])
+
+        if data.get("end_date"):
+            queryset = queryset.filter(start__lte=data["end_date"])
+        if data.get("session_mode") == "in_person":
+            queryset = queryset.filter(session_format__in=["i", "b"])
+        elif data.get("session_mode") == "online":
+            queryset = queryset.filter(session_format__in=["o", "b"])
+                
+
+
+    clean_get = request.GET.copy()
+    for p in ["page", "curr_page", "onl_page","ong_page"]:
+        clean_get.pop(p, None)
+    
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+
+    # Current: future start dates, sorted by start ascending
+    upcoming_sessions = queryset.upcoming().order_by('start')
+        
+    # Ongoing: start <= now <= end, sorted by start ascending
+    ongoing_sessions = queryset.ongoing().order_by('activity__title')
+    #print("ongoing sessions", ongoing_sessions)
+
+    # For client-side tab segmentation, pass the whole filtered queryset
+    return render(request, "orgs/activities.html",{
+                    "filter_form":filter_form,
+                    "upcoming" : upcoming_sessions,
+                    "ongoing": ongoing_sessions,
+                    "query_params": clean_get,
+                    "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
+                    "cats": EventCategory.objects.all(),
+                    "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
+
+                  } )
+    
 def activity_detail(request, activity_id=None):
     is_new = activity_id is None
     confirm = request.POST.get("confirm_duplicate")
@@ -872,6 +956,24 @@ def activity_delete(request,activity_id=None):
         "activity": activity
     })
 
+def org_manager_delete(request, pk):
+    if request.method != "POST":
+        return HttpResponseForbidden("Invalid request")
+
+    org_manager = OrgManager.objects.filter(pk=pk).select_related("org").first()
+    if not org_manager:
+        return redirect("org_mgmt")
+
+    if not (
+        request.user.profile.staff
+        or org_manager.org.managed.filter(id=request.user.profile.id).exists()
+    ):
+        return HttpResponseForbidden("You do not have permission to delete this manager.")
+
+    org_id = org_manager.org.id
+    org_manager.delete()
+    return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
+
 def map_view(request):
 
     locations_qs = Location.objects.filter(
@@ -1020,25 +1122,27 @@ def upload_csv(request, org_id):
         form = UploadFileForm()
     return render(request, "orgs/upload.html", {"form": form})
 
-# Step 1: Map columns
+#from orgs.services.mapping.py import build_mapping, build_dropdown_options
+
+# Step 1: Map columns from csv to rawloaddata fields
 def upload_map(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
     # Read first row to show column headers
     df = pd.read_csv(upload.file) if upload.file.name.endswith(".csv") else pd.read_excel(upload.file, engine="openpyxl")
-    first_row = list(df.columns)
-
+    columns = list(df.columns)
+    EXCLUDE_FIELDS = ["id", "upload", "row_number", "organization"]
+    field_names = [(f.name) for f in RawLoadData._meta.get_fields() 
+               if not f.many_to_many and not f.one_to_many and f.name not in EXCLUDE_FIELDS] 
+    
     if request.method == "POST":
         # Example: user-submitted mapping comes as mapping_ColumnName fields
-        mapping = {}
-        for col in first_row:
-            field = request.POST.get(f"mapping_{col}")
-            if field:
-                mapping[field] = col
-
+        mapping = build_mapping(request.POST, columns)
+    
         # Save mapping in session (or a model if you prefer)
         request.session[f"mapping_{upload_id}"] = mapping
-        print("Received mapping:", mapping)  # Debug log
+        #print("Received mapping:", mapping)  # Debug log
+
         # Update upload status
         upload.status = "mapped"
         upload.save()
@@ -1047,7 +1151,13 @@ def upload_map(request, upload_id):
         return redirect("upload_stage", upload_id=upload.id)
 
     # GET request → show mapping form
-    return render(request, "orgs/upload_map.html", {"upload": upload, "columns": first_row})
+    dropdown_options = build_dropdown_options(columns, field_names)
+    
+    
+    return render(request, "orgs/upload_map.html", {
+        "upload": upload, 
+        "dropdown_options":dropdown_options})
+   
 
 # Step 2: Stage data
 def upload_stage(request, upload_id):

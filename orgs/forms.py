@@ -5,15 +5,47 @@ from collections import defaultdict
 from .models import *
 
 class OrgForm(forms.ModelForm):
-    in_wisconsin = forms.CharField(label='WI', widget=forms.CheckboxInput(), required=False)
+    in_wisconsin = forms.BooleanField(
+        label="WI",
+        required=False,
+        widget=forms.CheckboxInput()
+    )
+
+    org_url = forms.CharField(required=False)
+    volunteer_url = forms.CharField(required=False)
+    training_url = forms.CharField(required=False)
+
     class Meta:
         model = Organization
-        fields = ['id', 'org_name', 'org_url', 'volunteer_url','training_url' ,'in_wisconsin', 'about', 'region_name', 'host', 'deleted']
+        fields = [
+            'id', 'org_name', 'org_url', 'volunteer_url', 'training_url',
+            'in_wisconsin', 'about', 'region_name', 'host', 'deleted'
+        ]
         widgets = {
-            "about": forms.Textarea(attrs={
-                "rows": 5,
+            "about": forms.Textarea(attrs={"rows": 5}),
+            "org_url": forms.TextInput(attrs={
+                "placeholder": "https://www.yourorg.org"
+            }),
+            "volunteer_url": forms.TextInput(attrs={
+                "placeholder": "https://www.yourorg.org/volunteer"
+            }),
+            "training_url": forms.TextInput(attrs={
+                "placeholder": "https://www.yourorg.org/training"
             }),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        for field in ["org_url", "volunteer_url", "training_url"]:
+            url = cleaned_data.get(field)
+            if url:
+                url = url.strip()
+                if not url.startswith(("http://", "https://")):
+                    url = "https://" + url
+                cleaned_data[field] = url
+
+        return cleaned_data
 
 class LocModal(forms.ModelForm):
     class Meta:
@@ -21,14 +53,31 @@ class LocModal(forms.ModelForm):
         fields = ["loc_name"]
         
 class LocForm(forms.ModelForm):
+    org_loc_url = forms.CharField(required=False)
     class Meta:
         model = Location
         fields = [ "loc_name", "physical_location", "address", "city_name", "county_id", "region_name", "state", "zip_code", "org_loc_url", "location_about", "contact_email"]
         widgets = {
             "location_about": forms.Textarea(attrs={
                 "rows": 3,
+                "placeholder": "e.g. Great Lakes Visitor Center, Eagle River Trail, UW sMadison Education Building"
+            }),
+            "org_loc_url": forms.TextInput(attrs={
+                "placeholder": "https://www.yourorg.org/location"
             }),
         }
+    def clean(self):
+        cleaned_data = super().clean()
+
+        for field in ["org_loc_url"]:
+            url = cleaned_data.get(field)
+            if url:
+                url = url.strip()
+                if not url.startswith(("http://", "https://")):
+                    url = "https://" + url
+                cleaned_data[field] = url
+
+        return cleaned_data
     
 class BaseLocationFormSet(BaseInlineFormSet):
     def clean(self):
@@ -131,13 +180,38 @@ class FilterForm(forms.Form):
     )
 
 class EventFilterForm(forms.Form):
-    type = forms.ChoiceField(
-        choices=[("", "Any"), ("v", "Volunteer Opportunity"), ("t", "Training")],
+    session_mode = forms.ChoiceField(
+    required=False,
+    choices=[
+        ("", "All formats"),
+        ("i", "In person"),
+        ("o", "Online"),
+    ],
+    widget=forms.RadioSelect
+)
+
+    start_date = forms.DateField(
+        required=False,
+        input_formats=["%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y"],
+        widget=forms.DateInput(attrs={
+            "class": "form-control",
+            "placeholder": "YYYY-MM-DD"
+        })
+    )
+    end_date = forms.DateField(
+        required=False,
+        input_formats=["%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y"],
+        widget=forms.DateInput(attrs={
+            "class": "form-control",
+            "placeholder": "YYYY-MM-DD"
+        })
+    )
+    activity_type = forms.ChoiceField(
+        choices=[("", "Any"), ("v", "Volunteer"), ("t", "Training")],
         required=False, 
         label="Type",
-        widget=forms.Select(attrs={"class":"form-select"})
+        widget=forms.RadioSelect
     )
-
     org= forms.ModelChoiceField(
         queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
         required=False,
@@ -302,6 +376,7 @@ class ProfileForm(forms.ModelForm):
             "preferred_region": forms.Select(attrs={"class": "form-select"}),
             "include_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
 class ActivityForm(forms.ModelForm):
     categories = forms.ModelMultipleChoiceField(
         queryset=EventCategory.objects.all(),
@@ -310,18 +385,34 @@ class ActivityForm(forms.ModelForm):
     )
 
     class Meta:
+        
         model = Activity
         fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "expire_date", "activity_url", "no_cost", "contact_email", "time_description"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "expire_date": forms.DateInput(attrs={"type": "date"}),
-            "date_description": forms.TextInput(attrs={"placeholder": "e.g., 'Ongoing weekly'"}),
-             "deleted": forms.CheckboxInput(attrs={"style": "display:none;"})
+            "date_description": forms.TextInput(attrs={"placeholder": "e.g., Ongoing or Wednesdays in June"}),
+            "time_description": forms.TextInput(attrs={"placeholder": "e.g., 2 hours per week, or 9-11:30am"}),
+            "deleted": forms.CheckboxInput(attrs={"style": "display:none;"}),
+            "activity_url": forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/eventpage"}),
+            "contact_email": forms.EmailInput(attrs={"placeholder": "contact@yourorg.org"})
+         
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.fields["activity_type"].required = True
 
+        # ChoiceField (CharField w/ choices)
+        self.fields["activity_type"].choices = [
+            ("", "Select Type"),
+        ] + [
+            c for c in self.fields["activity_type"].choices if c[0] != ""
+        ]
+        
+        
+        
         grouped = defaultdict(list)
 
         # ✅ use the existing queryset (important habit)
@@ -353,16 +444,33 @@ class ActivityForm(forms.ModelForm):
         ).exists()
     
 class SessionForm(forms.ModelForm):
+    start = forms.DateField(
+        required=False,
+        input_formats=["%m-%d-%Y"],
+        widget=forms.DateInput(attrs={"placeholder": "MM-DD-YYYY"})
+    )
+
+    end = forms.DateField(
+        required=False,
+        input_formats=["%m-%d-%Y"],
+        widget=forms.DateInput(attrs={"placeholder": "MM-DD-YYYY"})
+    )
     class Meta:
         model = Session
         fields = "__all__"
         widgets = {
-            "start": forms.DateInput(attrs={"type": "date"}),
-            "end": forms.DateInput(attrs={"type": "date"}),
+            
             "format": forms.Select(),
+            "location": forms.HiddenInput(),
         }
     def __init__(self, *args, org=None, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields["session_format"].choices = [
+            ("", "Select format"),
+        ] + [
+            c for c in self.fields["session_format"].choices if c[0] != ""
+        ]
 
         qs = Location.objects.none()
 
