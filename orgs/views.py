@@ -968,7 +968,7 @@ def org_manager_delete(request, pk):
         request.user.profile.staff
         or org_manager.org.managed.filter(id=request.user.profile.id).exists()
     ):
-        return HttpResponseForbidden("You do not have permission to delete this manager.")
+        return HttpResponseForbidden("You do not have permission to delete this manager.") 
 
     org_id = org_manager.org.id
     org_manager.delete()
@@ -1034,21 +1034,59 @@ def run_backfill(request):
     return HttpResponse("Backfill complete")
 
 
+@login_required
+def org_manager_add(request, org_id):
+    org = get_object_or_404(Organization, pk=org_id)
+
+    if not (
+        request.user.profile.staff
+        or org.managed.filter(id=request.user.profile.id).exists()
+    ):
+        return HttpResponseForbidden("You do not have permission to add managers.")
+
+    if request.method == "POST":
+        form = AddOrgManagerForm(request.POST, org=org)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Manager added.")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+
+    return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
+
+def manager_search(request):
+    q = request.GET.get("q", "").strip()
+    results = []
+
+    if q:
+        profiles = (
+            Profile.objects
+            .select_related("user")
+            .filter(
+                user__email__iexact=q,
+                
+            ).exclude(user__is_staff=True)
+           
+        )
+
+        for profile in profiles:
+            user = profile.user
+            display_name = f"{user.first_name} {user.last_name}".strip()
+
+            results.append({
+                "profile_id": profile.id,
+                "email": user.email,
+                "username": user.username,
+                "display_name": display_name,
+            })
+
+    return JsonResponse({"results": results})
 
 
-def manager_add_page(request):
-    org_id = request.GET.get("org")
-    org = get_object_or_404(Organization, id=org_id)
-
-    profiles = Profile.objects.select_related("user").all()
-    #print("profiles", profiles)
-    return render(request, "orgs/add_mgr.html", {
-        "org": org,
-        "profiles": profiles
-    })
-
-@require_POST
 def add_manager(request):
+    
     org_id = request.POST.get("org_id")
     profile_id = request.POST.get("profile_id")
 

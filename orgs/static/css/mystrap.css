@@ -41,6 +41,10 @@ body {
   padding: 0 1rem;
 
 }
+.me-landing-content {
+  text-align: center;
+  margin-top: 2rem;
+}
 .me-form {
   background-color: var(--main-background);
   padding: 1rem;

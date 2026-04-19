@@ -42,7 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("finished with hash code")
         }
     
-    
+    // description block expand/collapse
+
     const descriptionBlocks = document.querySelectorAll('.me-description-block');
 
     descriptionBlocks.forEach(block => {
@@ -71,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
             locationGroup.style.display = showLocation ? "block" : "none";
         }
     }
-   const activityForm = document.getElementById("activity-form");
+    const activityForm = document.getElementById("activity-form");
     const defaultLocationId = activityForm ? activityForm.dataset.defaultLocation : "";
     const defaultLocationLabel = activityForm ? activityForm.dataset.defaultLocationLabel : "";
 
@@ -165,4 +166,5 @@ document.addEventListener("DOMContentLoaded", function () {
                 .catch(error => console.error("Zip lookup failed:", error));
         });
     }
+    
 });

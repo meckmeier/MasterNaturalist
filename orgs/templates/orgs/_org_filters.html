@@ -1,3 +1,4 @@
+
 <form method="get" action="{{ request.path }}" class="me-form">
     
     <div class="mb-3">
@@ -21,16 +22,6 @@
         {{ filter_form.has_t.errors }}
     </div>
     <div class="mb-3">
-      {{filter_form.loc.label_tag}}
-      {{filter_form.loc}}
-      {{filter_form.loc.errors}}
-    </div>
-    <div class="mb-3">
-        {{ filter_form.county.label_tag}}
-        {{ filter_form.county }}
-        {{ filter_form.county.errors }}
-    </div>
-    <div class="mb-3">
         {{ filter_form.region.label_tag}}
         {{ filter_form.region }}
         {{ filter_form.region.errors }}
@@ -40,23 +31,9 @@
         {{ filter_form.q }}
         {{ filter_form.q.errors }}
     </div>      
-    <div class="view-toggle">
     
-    <label>
-        <input type="radio" name="view" value="list"
-               {% if request.GET.view == "list" %}checked{% endif %}>
-        List View
-    </label>
-
-    <label>
-        <input type="radio" name="view" value="map"
-               {% if request.GET.view == "map" or not request.GET.view %}checked{% endif %}>
-        Map View
-    </label>
-
-</div>
     <div class="d-flex gap-2">
-        <button type = "submit" class="me-btn">Apply</button>
-        <a href="{% url 'locations'%}" class ="me-button-link">Clear</a>
+        <button type = "submit" class="btn btn-primary">Apply</button>
+        <a href="{% url 'orgs'%}" class ="btn btn-outline-secondary">Clear</a>
     </div>
 </form>

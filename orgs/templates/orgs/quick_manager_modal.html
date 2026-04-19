@@ -1,0 +1,47 @@
+<div class="modal fade" id="addManagerModal-{{ org.id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'org_manager_add' org.id %}" class="manager-picker-form">
+        {% csrf_token %}
+
+        <div class="modal-header">
+          <h5 class="modal-title">Add manager</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Search by email</label>
+            <input
+              type="text"
+              class="form-control manager-search-input"
+              placeholder="Type an email address"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="manager-results list-group mb-3"></div>
+
+          <div class="manager-selected alert alert-light d-none">
+            Selected: <span class="manager-selected-label"></span>
+          </div>
+
+          <input type="hidden" name="profile_id" class="manager-profile-id">
+
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-select">
+              <option value="owner">Owner</option>
+              <option value="admin">Admin</option>
+              <option value="editor" selected>Editor</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Add manager</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

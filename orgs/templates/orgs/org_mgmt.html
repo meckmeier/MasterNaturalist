@@ -144,8 +144,13 @@
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Managers</span>
-                    <a href="{% url 'manager_add_page' %}?org={{ org.id }}" title="add manager">
-                    <i class="bi bi-plus-circle"></i></a>
+                    <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addManagerModal-{{ org.id }}">
+                <i class="bi bi-plus-circle"></i>
+            </button>
+                   
                 </div>
                 <ul class="list-group list-group-flush">
                     {% for mgr in org.pre_mgrs %}
@@ -180,4 +185,10 @@
 <!-- Add New Organization -->
 <a href="{% url 'org_create' %}" class="btn btn-primary">ADD Org</a>
 </div>
+{% for org in organizations %}
+    {% include "orgs/quick_manager_modal.html" with org=org %}
+{% endfor %}
+{% endblock %}
+{% block extrajs %}
+<script src="{% static 'managerpicker.js' %}"></script>
 {% endblock %}

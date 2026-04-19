@@ -1,31 +1,27 @@
 {% extends "orgs/layout.html" %}
 {% block body %}
+{% load static %}
 <div class="me-page">
-
-<h1>Wild Paths - Wisconsin</h1>
-
+<div class="me-landing-content">
 {% if user.is_authenticated%}
-<p>Organized into a directory of nature based organizations - or a search feature to find volunteer or training opportunities today.
-    </p>
 
 <a class="me-button-link" href="{% url 'activities' %}?activity_type=v">
     Volunteer</a>
 <a class="me-button-link" href="{% url 'activities' %}?activity_type=t">
-    Find Training</a>
-    <br><br>
+    Training</a>
 <a class="me-button-link" href="{% url 'locations' %}">
     See Locations</a>
 <a class="me-button-link" href="{% url 'orgs' %}">
     Browse Organizations</a>
+ <img src="{% static 'orgs/images/wild_paths_wisconsin_logo.jpg' %}" alt="Wild Paths - Wisconsin" width="300" class="img-fluid">
 
-<h3>Legend</h3>
 <p>You might see the following icons when you start browsing in the app - here is what they mean:</p>
-    <ul>
-        <li><i class="bi bi-globe me-link-icon"></i>: Click here to go to an external website - you will leave us, but go to a new tab.</li>
-        <li><i class="bi bi-tree-fill me-tree-icon"></i>: this is a volunteer opportunity</li>
-        <li><i class="bi bi-mortarboard-fill me-learn-icon"></i>: this is a training opportunity</li>
-        <li><i class="bi bi-asterisk me-new-icon"></i>: this means the activity was added recently.</li>
-    </ul></p>
+   
+       <i class="bi bi-globe me-link-icon"></i>: Link to external site.
+         | <i class="bi bi-tree-fill me-tree-icon"></i>: Volunteer opportunity
+         | <i class="bi bi-mortarboard-fill me-learn-icon"></i>: Training opportunity
+         | <i class="bi bi-asterisk me-new-icon"></i>: added recently.
+    
 
     <p>If you are an organization and need to manage your org, locations or add new activities:</p>
     <a class="me-button-link-2nd" href="{% url 'org_mgmt' %}">
@@ -41,5 +37,6 @@
      to gain full advantage of this system to connect you to your natural world.
 
 {%endif%}
+</div>
 </div>
 {% endblock %}

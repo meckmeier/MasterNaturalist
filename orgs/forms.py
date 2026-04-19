@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 from collections import defaultdict
 from .models import *
 
@@ -538,16 +539,7 @@ class GroupedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
             optgroups.append((group_name.title(), subgroup, index))
 
         return optgroups
-class OrgManagerForm(forms.ModelForm):
-    class Meta:
-        model = OrgManager
-        fields = ["profile", "role"]  # org is set in view
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # optional: nicer labels
-        self.fields["profile"].label = "User"
 
 class UploadFileForm(forms.ModelForm):
     class Meta:
@@ -564,3 +556,38 @@ class FeedbackForm(forms.ModelForm):
             "note": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
             "page_url": forms.HiddenInput(),
         }
+
+
+
+class AddOrgManagerForm(forms.Form):
+    profile_id = forms.IntegerField(widget=forms.HiddenInput())
+    role = forms.ChoiceField(choices=OrgManager.ROLE_CHOICES)
+
+    def __init__(self, *args, org=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.org = org
+        self.profile_obj = None
+
+    def clean_profile_id(self):
+        profile_id = self.cleaned_data["profile_id"]
+        try:
+            self.profile_obj = Profile.objects.select_related("user").get(pk=profile_id)
+        except Profile.DoesNotExist:
+            raise forms.ValidationError("Please select a valid user.")
+        return profile_id
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.org and self.profile_obj:
+            if OrgManager.objects.filter(org=self.org, profile=self.profile_obj).exists():
+                self.add_error("profile_id", "That user is already a manager for this organization.")
+
+        return cleaned_data
+
+    def save(self):
+        return OrgManager.objects.create(
+            org=self.org,
+            profile=self.profile_obj,
+            role=self.cleaned_data["role"]
+        )
