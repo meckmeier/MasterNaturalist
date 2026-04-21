@@ -227,6 +227,21 @@ a.me-button-link-2nd:hover {
     color:red;
     
 }
+.error-text{
+    color:red;
+    
+}
+errorlist {
+    color: red;
+    list-style-type: none;   /* removes the bullet (*) */
+    padding-left: 0;
+    margin: 4px 0;
+}
+
+.errorlist li {
+    color: red;
+    margin: 0;
+}
 .me-tabs {
   display: inline-flex;
   border-bottom: 1px solid #ddd;
@@ -316,11 +331,11 @@ li.inactive {
     padding-left: .5rem;
 }
 .me-tree-tab {
-    background-color: rgba(4, 146, 27, 0.4);
+    background-color: rgba(4, 146, 27, 0.1);
     color: rgb(34, 34, 34);
     
 }
 .me-learn-tab {
-    background-color: rgba(255, 215, 0, 0.4);
+    background-color: rgba(255, 215, 0, 0.2);
     color: rgb(34, 34, 34);
 }

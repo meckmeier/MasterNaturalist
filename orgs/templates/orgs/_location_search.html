@@ -1,0 +1,46 @@
+<div class="modal fade" id="locationSearchModal" tabindex="-1" aria-labelledby="locationSearchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="locationSearchModalLabel">Find a location</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="location-search-input" class="form-label">Search locations</label>
+          <input
+            type="text"
+            class="form-control"
+            id="location-search-input"
+            placeholder="Type a location name or city"
+          >
+        </div>
+
+        <div class="mb-3">
+          <h6>Your organization</h6>
+          <div id="org-location-results" class="list-group"></div>
+        </div>
+
+        <div class="mb-3">
+          <h6>Other locations</h6>
+          <div id="other-location-results" class="list-group"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-outline-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#quickAddLocationModal"
+                data-bs-dismiss="modal">
+          Add new location
+        </button>
+
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

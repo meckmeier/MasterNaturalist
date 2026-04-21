@@ -73,41 +73,59 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
     const activityForm = document.getElementById("activity-form");
-    const defaultLocationId = activityForm ? activityForm.dataset.defaultLocation : "";
-    const defaultLocationLabel = activityForm ? activityForm.dataset.defaultLocationLabel : "";
+    
+    
+    function syncLocationDisplay(row) {
+    if (!row) return;
 
-    function wireSessionRow(row) {
-        const formatField = row.querySelector("select[name$='session_format']");
-        const locationField = row.querySelector("input[name$='location']");
-        const startField = row.querySelector("input[name$='start']");
-        const endField = row.querySelector("input[name$='end']");
+    const locationField = row.querySelector("select[name$='-location']");
+    const display = row.querySelector(".selected-location-display");
 
-        if (!formatField) return;
+    if (!locationField || !display) return;
 
-        formatField.addEventListener("change", function () {
-            const format = formatField.value;
-            const currentLocation = locationField ? locationField.value : "";
+    const selectedOption = locationField.options[locationField.selectedIndex];
 
-            updateSessionRowVisibility(row);
+    if (locationField.value && selectedOption) {
+        display.textContent = selectedOption.textContent;
+    } else {
+        display.innerHTML = '<span class="text-muted">No location selected</span>';
+    }
+}
 
-            if ((format === "i" || format === "b") && !currentLocation && defaultLocationId && locationField) {
-                locationField.value = defaultLocationId;
+function wireSessionRow(row) {
+    const formatField = row.querySelector("select[name$='session_format']");
+    const locationField = row.querySelector("select[name$='-location']");
+    const startField = row.querySelector("input[name$='start']");
+    const endField = row.querySelector("input[name$='end']");
 
-                const display = row.querySelector(".selected-location-display");
-                if (display) {
-                    display.textContent = defaultLocationLabel || "Default location selected";
-                }
+    if (!formatField) return;
+
+    const format = formatField.value;
+
+    
+
+    syncLocationDisplay(row);
+
+    formatField.addEventListener("change", function () {
+        const format = formatField.value;
+        const currentLocation = locationField ? locationField.value : "";
+
+        updateSessionRowVisibility(row);
+
+       
+
+        syncLocationDisplay(row);
+    });
+
+    if (startField && endField) {
+        startField.addEventListener("change", function () {
+            if (!endField.value) {
+                endField.value = startField.value;
             }
         });
-        // 👉 NEW: auto-fill end date
-        if (startField && endField) {
-            startField.addEventListener("change", function () {
-                if (!endField.value) {
-                    endField.value = startField.value;
-                }
-            });
-        }
-        updateSessionRowVisibility(row);
+    }
+
+    updateSessionRowVisibility(row);
     }
     document.querySelectorAll(".formset-row").forEach(row => {
         if (!row.classList.contains("form-template")){
@@ -135,7 +153,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tbody.appendChild(newRow);
         totalForms.value = formIndex + 1;
+        const newFormatField = newRow.querySelector("select[name$='session_format']");
+        if (newFormatField && !newFormatField.value) {
+            newFormatField.value = "i";
+        }
+
         wireSessionRow(newRow);
+
     }
     });
 

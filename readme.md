@@ -58,3 +58,7 @@ volunteer = lime green
 training = blue
 consider making the end_date required if you have a start date... if you are doing ongoing then you don't have any dates...
 add a check to the delete manager where you cannot delete yourself.
+
+ok - you have good work done on the forms but you still have a couple things to fix:
+1. get the location picker to actually work on the org form.
+2. make sure that your errors all actually show on the forms (both activities and org and location) because you are getting required errors but they are not showing on the form.

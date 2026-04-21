@@ -63,7 +63,7 @@
             {{ org.org_name }}  <a href="{% url 'org_edit' org.id %}" title="manage organization details"><i class="bi bi-pencil"></i></a>
             </h4>
             <a href="{{org.org_url}}" target="_blank" rel="noopener noreferrer">{{org.org_url}}</a>
-
+            Default Location: {{ org.default_location.loc_name }}
         </div>
     <div class="me-card-header-right">
     <a href="{% url 'upload_csv' org.id%}" class="me-button-link btn">Upload Activities</a>
@@ -84,7 +84,7 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Locations</span>
+                    <span>Managed Locations</span>
                     <a href="{% url 'loc_create' %}?org={{ org.id }}" title="Add location"><i class="bi bi-plus-circle"></i></a>
                 </div>
                 <ul class="list-group list-group-flush">
@@ -96,13 +96,8 @@
                                     <span class="badge bg-success ms-2">Default</span>
                                 {% endif %}
                             </div>
-
                             <div class="d-flex align-items-center gap-2">
-                                {% if org.default_location_id != loc.id %}
-                                    <a href="{% url 'org_set_default_location' org.id loc.id %}" title="make default location">
-                                        <i class="bi bi-star"></i>
-                                    </a>
-                                {% endif %}
+                                
                                 <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location">
                                     <i class="bi bi-pencil"></i>
                                 </a>
@@ -159,7 +154,7 @@
                           {% if mgr.id %}
                             <form method="post" action="{% url 'org_manager_delete' mgr.id %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                <button type="submit" class="btn btn-sm"
                                         onclick="return confirm('Remove this manager?');">
                                     <i class="bi bi-trash"></i>
                                 </button>

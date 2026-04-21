@@ -14,12 +14,30 @@
     </ul>
 {% endif %}
 
-<form class="me-form"method="post" id="activity-form" data-default-location="{{ default_location_id }}" data-org-id="{{ activity.org.id }}">
+<form class="me-form"method="post" id="activity-form" data-default-location="{{ default_location_id }}" data-org-id="{{ activity.org.id }}" novalidate>
  {% csrf_token %}
  <input type="hidden" name="org" value="{{ request.GET.org }}">
  <input type="hidden" name="location" value="{{ request.GET.location }}">
  <input type="hidden" name="next" value="{{ request.GET.next|default:request.get_full_path }}">
-    
+ {% if duplicate_warning %}
+  <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
+    ⚠️ An activity with this name already exists for this organization.
+    Are you sure you want to add another? 
+    (if you cancel you will lose your edits - if you want it but with a different name, just change the title and click Add Anyway)
+  </div>
+
+  <button class="me-btn" type="submit" name="confirm_duplicate" value="1">
+    Yes, add anyway
+  </button>
+
+  <a href="" class="me-button-link">Cancel</a>
+{% else %}
+
+       <button type ="submit" class="me-btn">
+            Save
+        </button>
+
+{% endif %}   
 
 <fieldset>
        <div class="error-text"> {{ activity_form.non_field_errors }}</div>
@@ -30,8 +48,6 @@
             <span class="error-text">{{ activity_form.title.errors }}</span>
         </div>
 
-         
-      
          <div class="form-field">
             Type:<br>
             {{ activity_form.activity_type }}
@@ -63,7 +79,7 @@
         <table class="formset-table {% if view_only %}view-mode{% endif %}">
             <thead>
                 <tr> 
-                    <th>Format</th>
+                    <th>In Person/Online</th>
                     <th>URL (if online option)</th>
                     <th>Location (if inperson)</th>
                     <th>Ongoing</th>
@@ -95,21 +111,27 @@
                         </td> 
                         <td>
                            <div  class="loc-group">
-                            {{ form.location }}
-                             <div class="selected-location-display small border rounded p-2 mb-1">
+                            <div class="real-location-field d-none">
+                                {{ form.location }}
+                            </div>
+
+                            <div class="selected-location-display small border rounded p-2 mb-1">
                                 {% if form.instance.location %}
                                     {{ form.instance.location.loc_name }}
                                 {% else %}
-                                    <span class="text-muted">No location selected</span>s
+                                    <span class="text-muted">No location selected</span>
                                 {% endif %}
                             </div>
 
                             {{ form.location.errors }}
-                             <button type="button"  
-                             class="btn btn-sm btn-outline-secondary open-location-search mt-1"
-                             data-bs-toggle="modal" data-bs-target="#locationSearchModal">
-                                Find or Add Location</button>
-                            </div>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary open-location-search mt-1"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#locationSearchModal">
+                                Find or Add Location
+                            </button>
+                        </div>
                         </td>       
                         <td> 
                            
@@ -150,8 +172,12 @@
                      <td>{{ session_formset.empty_form.session_format }}</td>
                      <td>{{ session_formset.empty_form.session_url }}</td>
                      <td>{{ session_formset.empty_form.location }}
-                            <button type="button"  class="btn btn-sm btn-outline-secondary open-location-search mt-1">
-                                Find or Add Location</button>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary open-location-search mt-1"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#locationSearchModal">
+                                Find or Add Location
+                            </button>
                      </td>
                      <td>{{ session_formset.empty_form.ongoing }}</td>
                      <td>{{ session_formset.empty_form.start }}</td>
@@ -189,9 +215,6 @@
             {{ activity_form.time_description.errors }}
         </div>
 
-
-        
-        
         <div class ="form-field-full">
             {{ activity_form.description.label_tag }}<br>
             {{ activity_form.description }}
@@ -220,9 +243,8 @@
         
 
     </fieldset>
-    {% if view_only %}
-         <a class="me-button-link" href="{% url 'activity_edit' activity.id %}">Edit</a>        
-         {%endif%}
+    
+        
 {% if duplicate_warning %}
   <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
     ⚠️ An activity with this name already exists for this organization.

@@ -20,7 +20,7 @@ class OrgForm(forms.ModelForm):
         model = Organization
         fields = [
             'id', 'org_name', 'org_url', 'volunteer_url', 'training_url',
-            'in_wisconsin', 'about', 'region_name', 'host', 'deleted'
+            'in_wisconsin', 'about', 'region_name', 'host', 'deleted', 'default_location'
         ]
         widgets = {
             "about": forms.Textarea(attrs={"rows": 5}),
@@ -47,6 +47,19 @@ class OrgForm(forms.ModelForm):
                 cleaned_data[field] = url
 
         return cleaned_data
+    def clean_org_name(self):
+        name = self.cleaned_data.get("org_name", "").strip()
+
+        qs = Organization.objects.filter(org_name__iexact=name)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise forms.ValidationError(
+                "That organization already exists. Please search for it instead of creating a new one."
+            )
+
+        return name
 
 class LocModal(forms.ModelForm):
     class Meta:
@@ -388,7 +401,7 @@ class ActivityForm(forms.ModelForm):
     class Meta:
         
         model = Activity
-        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "expire_date", "activity_url", "no_cost", "contact_email", "time_description"] 
+        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "no_cost", "contact_email", "time_description"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "expire_date": forms.DateInput(attrs={"type": "date"}),
@@ -433,7 +446,7 @@ class ActivityForm(forms.ModelForm):
             message = "Provide either a URL or a contact email."
             self.add_error('activity_url', message)
             self.add_error('contact_email', message)
-
+        
         return cleaned_data
     def possible_duplicate(self):
         title = self.cleaned_data.get("title")
@@ -456,51 +469,66 @@ class SessionForm(forms.ModelForm):
         input_formats=["%m-%d-%Y"],
         widget=forms.DateInput(attrs={"placeholder": "MM-DD-YYYY"})
     )
+    
     class Meta:
         model = Session
         fields = "__all__"
         widgets = {
             
             "format": forms.Select(),
-            "location": forms.HiddenInput(),
+            "location": forms.Select(attrs={"class": "form-select form-select-sm real-location-field"}),
         }
     def __init__(self, *args, org=None, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.org=org
         self.fields["session_format"].choices = [
             ("", "Select format"),
         ] + [
             c for c in self.fields["session_format"].choices if c[0] != ""
         ]
 
-        qs = Location.objects.none()
+        include_ids = set()
 
-        if org:
-            qs = Location.objects.filter(org=org)
+        if org and org.default_location_id:
+            include_ids.add(org.default_location_id)
 
-        # if form is bound, include the posted location id too
-        bound_location_id = None
         if self.is_bound:
             field_name = self.add_prefix("location")
             bound_location_id = self.data.get(field_name)
+            if bound_location_id:
+                include_ids.add(bound_location_id)
 
-        if bound_location_id:
-            qs = Location.objects.filter(
-                Q(org=org) | Q(pk=bound_location_id)
-            ).distinct()
-
-        # if editing an existing session, include its current location too
         elif self.instance and self.instance.pk and self.instance.location_id:
-            qs = Location.objects.filter(
-                Q(org=org) | Q(pk=self.instance.location_id)
-            ).distinct()
+            include_ids.add(self.instance.location_id)
 
-        self.fields["location"].queryset = qs
-        
+        if include_ids:
+            self.fields["location"].queryset = Location.objects.filter(pk__in=include_ids)
+        else:
+            self.fields["location"].queryset = Location.objects.none()
+
+        if (
+            org
+            and org.default_location_id
+            and not self.is_bound
+            and not (self.instance and self.instance.pk and self.instance.location_id)
+        ):
+            self.fields["location"].initial = org.default_location_id
+
+class BaseSessionFormSet(BaseInlineFormSet):
+    def __init__(self, *args, org=None, **kwargs):
+        self.org = org
+        super().__init__(*args, **kwargs)
+
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        kwargs["org"] = self.org
+        return kwargs
+    
 SessionFormSet = inlineformset_factory(
     Activity,
     Session,
     form=SessionForm,
+    formset=BaseSessionFormSet,
     extra=0,       # number of blank forms shown initially
     min_num=1,
     validate_min=True,

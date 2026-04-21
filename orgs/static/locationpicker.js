@@ -1,12 +1,56 @@
 function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const tokenField = document.querySelector("[name=csrfmiddlewaretoken]");
+    return tokenField ? tokenField.value : "";
+}
+function getCSRFTokenFromForm(form) {
+    const tokenField = form.querySelector("[name=csrfmiddlewaretoken]");
+    return tokenField ? tokenField.value : "";
+}
+
+function syncLocationDisplay(row) {
+
+    let locationField = null;
+    let display = null;
+
+    if (row) {
+        // formset row
+        locationField = row.querySelector("select[name$='-location']");
+        display = row.querySelector(".selected-location-display");
+    } else {
+        // org form
+        locationField = document.querySelector("select[name='default_location']");
+        display = document.querySelector(".selected-location-display");
+    }
+
+    if (!locationField || !display) return;
+
+    const selectedOption = locationField.options[locationField.selectedIndex];
+
+    if (locationField.value && selectedOption) {
+        display.textContent = selectedOption.textContent;
+    } else {
+        display.innerHTML = '<span class="text-muted">No location selected</span>';
+    }
+}
+function syncAllLocationDisplays() {
+    document.querySelectorAll(".formset-row").forEach(function (row) {
+        if (!row.classList.contains("form-template")) {
+            syncLocationDisplay(row);
+        }
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    let activeRow = null;
+    console.log("location picker loaded");
 
-    const formEl = document.getElementById("activity-form");
-    const currentOrgId = formEl ? formEl.dataset.orgId : null;
+    let activeRow = null;
+    const formEl =
+    document.getElementById("activity-form") ||
+    document.getElementById("org-form");
+
+    const currentOrgId = formEl ? formEl.dataset.orgId : "";
+    console.log ("currentOrgId", currentOrgId);
+
     const searchInput = document.getElementById("location-search-input");
     const orgResults = document.getElementById("org-location-results");
     const otherResults = document.getElementById("other-location-results");
@@ -14,14 +58,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!modalEl) return;
 
-    document.addEventListener("click", function (e) {
-        const openBtn = e.target.closest(".open-location-search");
-        if (openBtn) {
-            activeRow = openBtn.closest(".formset-row");
-            renderLocationResults("");
-            return;
-        }
+    syncAllLocationDisplays();
 
+    document.addEventListener("click", handleDocumentClick);
+    document.addEventListener("submit", handleDocumentSubmit);
+
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            renderLocationResults(searchInput.value.trim());
+        });
+    }
+
+    modalEl.addEventListener("shown.bs.modal", function () {
+        if (!searchInput) return;
+
+        searchInput.value = "";
+        renderLocationResults("");
+        searchInput.focus();
+    });
+
+    modalEl.addEventListener("show.bs.modal", function (e) {
+        const openBtn = e.relatedTarget;
+
+        if (openBtn && openBtn.classList.contains("open-location-search")) {
+            activeRow = openBtn.closest("tr");
+            console.log("location picker activeRow", activeRow);
+            syncLocationDisplay(activeRow);
+        }
+    });
+
+    function handleDocumentClick(e) {
         const resultBtn = e.target.closest(".location-result");
         if (resultBtn) {
             chooseLocation({
@@ -29,28 +95,53 @@ document.addEventListener("DOMContentLoaded", function () {
                 label: resultBtn.dataset.label
             });
         }
-    });
-
-    if (searchInput) {
-        searchInput.addEventListener("input", function () {
-            renderLocationResults(searchInput.value);
-        });
     }
 
-    modalEl.addEventListener("shown.bs.modal", function () {
-        if (searchInput) {
-            searchInput.value = "";
-            renderLocationResults("");
-            searchInput.focus();
-        }
-    });
+    function handleDocumentSubmit(e) {
+        if (e.target.id !== "quick-location-form") return;
+
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const quickLocationForm = document.getElementById("quick-location-form");
+        const csrfToken = getCSRFTokenFromForm(quickLocationForm);
+
+        fetch("/locations/loc_modal/", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": csrfToken
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    chooseLocation({
+                        id: data.id,
+                        label: data.label
+                    });
+
+                    const quickAddModalEl = document.getElementById("quickAddLocationModal");
+                    const quickAddModal = bootstrap.Modal.getInstance(quickAddModalEl);
+                    if (quickAddModal) {
+                        quickAddModal.hide();
+                    }
+                } else {
+                    console.log("quick location errors", data.errors);
+                }
+            })
+            .catch(err => {
+                console.error("Quick create failed:", err);
+            });
+    }
 
     function renderLocationResults(query) {
         fetch(`/locations/search/?q=${encodeURIComponent(query)}&org_id=${currentOrgId}`)
             .then(res => res.json())
             .then(data => {
-                renderGroup(orgResults, data.org_locations);
-                renderGroup(otherResults, data.other_locations);
+                renderGroup(orgResults, data.org_locations || []);
+                renderGroup(otherResults, data.other_locations || []);
             })
             .catch(err => {
                 console.error("Search failed:", err);
@@ -59,14 +150,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function renderGroup(container, locations) {
         if (!container) return;
+
         container.innerHTML = "";
 
         if (!locations.length) {
-            container.innerHTML = `<div class="text-muted small">No matches</div>`;
+            container.innerHTML = '<div class="text-muted small">No matches</div>';
             return;
         }
 
-        locations.forEach(loc => {
+        locations.forEach(function (loc) {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "list-group-item list-group-item-action location-result";
@@ -80,56 +172,44 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-   window.chooseLocation = function (loc) {
-    if (!activeRow) return;
+    function chooseLocation(loc) {
+        console.log("chosen location", loc);
+        console.log("activeRow", activeRow);
+        let locationField =null;
 
-    const locationField = activeRow.querySelector("input[name$='location']");
-    if (!locationField) return;
+        if (activeRow) {
+            locationField = activeRow.querySelector("select[name$='-location']");
+        } else {
+            locationField = document.querySelector("select[name='default_location']");
+        }
+        if (!locationField) {
+            console.error("No location field found in active row");
+            return;
+        }
 
-    locationField.value = String(loc.id);
+        let option = locationField.querySelector(`option[value="${loc.id}"]`);
 
-    const display = activeRow.querySelector(".selected-location-display");
-    if (display) {
-        display.textContent = loc.label;
+        if (!option) {
+            option = document.createElement("option");
+            option.value = String(loc.id);
+            option.textContent = loc.label;
+            locationField.appendChild(option);
+        }
+
+        locationField.value = String(loc.id);
+        locationField.dispatchEvent(new Event("change", { bubbles: true }));
+
+        syncLocationDisplay(activeRow);
+        
+        const orgDisplay = document.getElementById("selected-default-location");
+        if (!activeRow && orgDisplay) {
+            orgDisplay.textContent = loc.label;
+        }
+
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+            modal.hide();
+        }
     }
-
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) {
-        modal.hide();
-    }
-};
-    document.addEventListener("submit", function (e) {
-    if (e.target.id === "quick-location-form") {
-        console.log("quick submit fired")
-        e.preventDefault();
-
-        const form = e.target;
-        const formData = new FormData(form);
-
-        fetch("/locations/loc_modal/", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-CSRFToken": getCSRFToken()
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                chooseLocation({
-                    id: data.id,
-                    label: data.label
-                });
-
-                // close modal
-                const modalEl = document.getElementById("quickAddLocationModal");
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) modal.hide();
-            } else {
-                console.log("errors", data.errors);
-            }
-        })
-        .catch(err => console.error("Quick create failed:", err));
-    }
-});
+    window.chooseLocation = chooseLocation;
 });

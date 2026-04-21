@@ -11,7 +11,7 @@ from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError
 from django.db import transaction
-from django.db.models import Q, Prefetch, F
+from django.db.models import Q, Min, Prefetch, F
 from django.http import  Http404, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -279,22 +279,37 @@ def follow_org(request, org_id):
 
 def org_mgmt(request):
     # managing YOUR organizations - this is where you can edit them, add activities, etc.
-    managers_qs=OrgManager.objects.all().select_related("profile__user")    
-    
+    today = timezone.localdate()
     if not request.user.is_authenticated:
         return redirect("login")
     
+    managers_qs=OrgManager.objects.all().select_related("profile__user")
+    activities_qs = (
+        Activity.objects
+        .with_active_flag()   # ✅ your custom logic
+        .annotate(
+            next_session_start=Min(
+                "sessions__start",
+            )
+        )
+        .order_by(
+            "-is_active",
+            F("next_session_start").asc(nulls_last=True),
+        )
+    )
+    locations_qs = Location.objects.active()
+
     # staff gets to see all the organizations
     if request.user.profile.staff:
         orgs = Organization.objects.active().prefetch_related(
             Prefetch(
                 "locations", 
-                queryset=Location.objects.active(),
+                queryset=locations_qs,
                 to_attr="pre_locs"  # optional: lets you access org.active_locs
             ),
             Prefetch(
                 "activities",
-                queryset=Activity.objects.with_active_flag(),
+                queryset=activities_qs,
                 to_attr="pre_activities"  # optional: access as org.active_activities
             ),
             Prefetch(
@@ -312,12 +327,12 @@ def org_mgmt(request):
             .prefetch_related(
                 Prefetch(
                     "locations",
-                    queryset=Location.objects.active(),
+                    queryset=locations_qs,
                     to_attr="pre_locs"  # optional: access as org.active_locs in template
                 ),
             Prefetch(
                 "activities",
-                queryset=Activity.objects.with_active_flag(),
+                queryset=activities_qs,
                 to_attr="pre_activities"  # optional: access as org.active_activities
             ),
             Prefetch(
@@ -340,34 +355,14 @@ def org_mgmt(request):
         "filter_form": OrgFilterForm(request.GET or None),
             })
 
-def org_detail(request, org_id=None, view_only=False):
-    #edit a single organization - only the organization fields.
-    # in theory you should be in a can_edit state if you are on this page, but this just double checks it.
-
-    can_edit=False
-
-    # if there is an org_id then you are editing an existing org.
-    if org_id:
-        org = get_object_or_404(Organization, id=org_id)
-        if org.can_edit(request.user):
-            can_edit = True
-    #if no org_id then you are creating a new one.
-    else:
-        org = None
-        if request.user.is_authenticated:
-            can_edit=True
-                                    
-    if request.method == "POST" and not view_only:
-        form= OrgForm(request.POST, instance=org)
-        
-
-        if form.is_valid() :
+def org_create(request):
+    if request.method == "POST":
+        form = OrgForm(request.POST)
+        if form.is_valid():
             org = form.save(commit=False)
-            if not org_id:
-                org.owner = request.user.profile
-            if not org.created_by:
-                org.created_by = request.user.profile
+            org.created_by = request.user.profile
             org.updated_by = request.user.profile
+            org.owner = request.user.profile
             org.save()
             if not OrgManager.objects.filter(org=org, profile=request.user.profile).exists():
                 OrgManager.objects.create(
@@ -375,44 +370,54 @@ def org_detail(request, org_id=None, view_only=False):
                     profile=request.user.profile,
                     role='owner'  # if you added the role field
                 )
-            
-            # once you have finished editing your organization record, you should go back to the org dashboard.
+            return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
+    else:
+        form = OrgForm()
+    return render(request, "orgs/org_detail.html", {
+        "form": form,
+        "staff": request.user.profile.staff if request.user.is_authenticated else False
+        })
+
+def org_edit(request, org_id):
+
+    org = get_object_or_404(Organization, id=org_id)
+    if not (
+        request.user.profile.staff or
+        org.managed.filter(pk=request.user.profile.org.id).exists()
+    ):
+        return HttpResponseForbidden("You do not have permission to edit this organization.")
+       
+                                    
+    if request.method == "POST" :
+        form= OrgForm(request.POST, instance=org)
+        
+        if form.is_valid() :
+            org = form.save(commit=False)
+            if not org.created_by:
+                org.created_by = request.user.profile
+            org.updated_by = request.user.profile
+            org.save()
             messages.success(request, "Organization added successfully.", extra_tags=f"orgmsg-{org.id}")
-            return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
+            return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
         else:
-            messages.success(request, "there are errors in the form.", extra_tags=f"org-msg org-{org.id}")
+            messages.error(request, "There are errors in the form.")
 
             print("org form errors",form.errors)
             
-            #print("non field error", form.non_field_errors())
-            #print("FORMSET is_valid:", loc_formset.is_valid())
-            #print("FORMSET non_form_errors:", loc_formset.non_form_errors())
-            #print("MANAGEMENT errors:", loc_formset.management_form.errors)
-            #print("TOTAL_FORMS:", request.POST.get("locations-TOTAL_FORMS"))
-            #print("INITIAL_FORMS:", request.POST.get("locations-INITIAL_FORMS"))
+            print("non field error", form.non_field_errors())
             #if the forms are not valid - stay on the org_detail page.
 
-            return render(request, "orgs/org_detail.html", {
-                "org": org,
-                "events": [],
-                "form": form,
-                "view_only": view_only,
-                "can_edit": can_edit,
-            })
-        
     else:
-        form = OrgForm(instance=org)
-        
-    if view_only:
-        for field in form.fields.values():
-            field.disabled = True
+        form=OrgForm(instance=org)
+      
     # if it's just a get then display the org_detail form.    
     return render(request, "orgs/org_detail.html", {
                 "org": org,
                 "events": [],
                 "form": form,
-                "view_only": view_only,
-                "can_edit": can_edit})
+                "staff": request.user.profile.staff if request.user.is_authenticated else False
+
+                })
 
 def loc_detail(request, loc_id=None):
     loc=get_object_or_404(Location, id=loc_id) if loc_id else None
@@ -773,7 +778,120 @@ def activities(request):
                     "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
 
                   } )
+
+def get_grouped_categories():
+    categories = EventCategory.objects.all().order_by("name")
+    grouped_categories = defaultdict(list)
+    grouped_ids = {}
+
+    for cat in categories:
+        group = cat.category_class or "Other"
+        grouped_categories[group].append(cat)
+
+    for group, cats in grouped_categories.items():
+        grouped_ids[group] = [str(cat.id) for cat in cats]
+
+    return grouped_categories, grouped_ids
+
+def user_can_edit_org(request, org):
+    if not request.user.is_authenticated:
+        return False
+    return request.user.profile.staff or org.can_edit(request.user)
+
+def _activity_form_workflow(request, org, activity, is_new=False):
+    confirm = request.POST.get("confirm_duplicate")
+    grouped_categories, grouped_ids = get_grouped_categories()
+
+    if not user_can_edit_org(request, org):
+        return redirect("org_mgmt")
+
     
+    activity_form = ActivityForm(request.POST or None,instance=activity,)
+
+    session_formset = SessionFormSet(
+        request.POST or None,
+        instance=activity,
+        org=org,
+        prefix="sessions",
+        form_kwargs={"org": org},
+    )
+
+    if request.method == "POST":
+        if activity_form.is_valid() and session_formset.is_valid():
+            activity = activity_form.save(commit=False)
+
+            if is_new:
+                activity.owner = request.user.profile
+
+                if activity_form.possible_duplicate() and not confirm:
+                    return render(request, "orgs/activity_form.html", {
+                        "activity": activity,
+                        "activity_form": activity_form,
+                        "session_formset": session_formset,
+                        "can_edit": True,
+                        "duplicate_warning": True,
+                        "grouped_categories": grouped_categories,
+                        "grouped_ids": grouped_ids,
+                    })
+
+            if not activity.owner:
+                activity.owner = request.user.profile
+            if not activity.created_by:
+                activity.created_by = request.user.profile
+
+            activity.updated_by = request.user.profile
+            activity.org = org
+            activity.save()
+            activity_form.save_m2m()
+
+            sessions = session_formset.save(commit=False)
+            for s in sessions:
+                if not s.created_by:
+                    s.created_by = request.user.profile
+                s.updated_by = request.user.profile
+                s.activity = activity
+                s.save()
+
+            for s in session_formset.deleted_objects:
+                s.delete()
+
+            return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
+
+    print("Session formset errors:", session_formset.errors)
+    print("Management errors:", session_formset.management_form.errors)
+    print("Main form errors:", activity_form.errors)
+
+    return render(request, "orgs/activity_form.html", {
+        "activity": activity,
+        "activity_form": activity_form,
+        "session_formset": session_formset,
+        "can_edit": True,
+        "duplicate_warning": False,
+        "grouped_categories": grouped_categories,
+        "grouped_ids": grouped_ids,
+    })
+
+def activity_create(request):
+    org_id = request.GET.get("org") or request.POST.get("org")
+    org = get_object_or_404(Organization, id=org_id)
+    activity = Activity(org=org)
+    print("launching activity create for new org", org.org_name)
+    return _activity_form_workflow(
+        request=request,
+        org=org,
+        activity=activity,
+        is_new=True,
+    )
+def activity_edit(request, activity_id):
+    activity = get_object_or_404(Activity, id=activity_id)
+    org = activity.org
+
+    return _activity_form_workflow(
+        request=request,
+        org=org,
+        activity=activity,
+        is_new=False,
+    )   
 def activity_detail(request, activity_id=None):
     is_new = activity_id is None
     confirm = request.POST.get("confirm_duplicate")
@@ -821,6 +939,7 @@ def activity_detail(request, activity_id=None):
     session_formset = SessionFormSet(
         request.POST or None,
         instance=activity,
+        org=activity.org,
         initial=initial,
         prefix="sessions",
         form_kwargs={"org": org},
@@ -892,10 +1011,13 @@ def location_search(request):
         Q(loc_name__icontains=q) |
         Q(city_name__icontains=q)
     )
-
-    org_locations = locations.filter(org_id=org_id)
-    other_locations = locations.exclude(org_id=org_id)
-    print("org_locations", org_locations)
+    if org_id:
+        org_locations = locations.filter(org_id=org_id)
+        other_locations = locations.exclude(org_id=org_id)
+    else:
+        org_locations = Location.objects.none()
+        other_locations = locations
+    
     def serialize(loc):
         return {
             "id": loc.id,
@@ -903,7 +1025,7 @@ def location_search(request):
             "city": loc.city_name,
             "org_name": loc.org.org_name if loc.org else "",
         }
-
+    
     return JsonResponse({
         "org_locations": [serialize(l) for l in org_locations],
         "other_locations": [serialize(l) for l in other_locations],
@@ -956,23 +1078,6 @@ def activity_delete(request,activity_id=None):
         "activity": activity
     })
 
-def org_manager_delete(request, pk):
-    if request.method != "POST":
-        return HttpResponseForbidden("Invalid request")
-
-    org_manager = OrgManager.objects.filter(pk=pk).select_related("org").first()
-    if not org_manager:
-        return redirect("org_mgmt")
-
-    if not (
-        request.user.profile.staff
-        or org_manager.org.managed.filter(id=request.user.profile.id).exists()
-    ):
-        return HttpResponseForbidden("You do not have permission to delete this manager.") 
-
-    org_id = org_manager.org.id
-    org_manager.delete()
-    return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
 
 def map_view(request):
 
@@ -1056,7 +1161,7 @@ def org_manager_add(request, org_id):
 
     return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
 
-def manager_search(request):
+def org_manager_search(request):
     q = request.GET.get("q", "").strip()
     results = []
 
@@ -1067,7 +1172,7 @@ def manager_search(request):
             .filter(
                 user__email__iexact=q,
                 
-            ).exclude(user__is_staff=True)
+            )
            
         )
 
@@ -1084,19 +1189,27 @@ def manager_search(request):
 
     return JsonResponse({"results": results})
 
+def org_manager_delete(request, pk):
+    if request.method != "POST":
+        return HttpResponseForbidden("Invalid request")
 
-def add_manager(request):
+    org_manager = OrgManager.objects.filter(pk=pk).select_related("org").first()
+    if not org_manager:
+        return redirect("org_mgmt")
+
+    if not (
+        request.user.profile.staff
+        or org_manager.org.managed.filter(id=request.user.profile.id).exists()
+    ):
+        return HttpResponseForbidden("You do not have permission to delete this manager.") 
+
+    if org_manager.profile_id == request.user.profile.id:
+        return HttpResponseForbidden("You cannot remove yourself as a manager.")
     
-    org_id = request.POST.get("org_id")
-    profile_id = request.POST.get("profile_id")
+    org_id = org_manager.org.id
+    org_manager.delete()
+    return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
 
-    org = get_object_or_404(Organization, id=org_id)
-    profile = get_object_or_404(Profile, id=profile_id)
-
-    # prevent duplicates
-    OrgManager.objects.get_or_create(org=org, profile=profile)
-
-    return redirect("org_mgmt")
 
 def debug_sessions(request):
     today = timezone.now().date()

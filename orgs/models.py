@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.timezone import now
 from datetime import timedelta
 from django.core.exceptions import ValidationError
+from datetime import date, timedelta
 
 # fixed lists:
 #-------------------------------------------------------    
@@ -42,6 +43,8 @@ ADDRESS_MAP = {
 }
 # functions to help with matching and loading locations
 #-------------------------------------------------------
+def default_expire_date():
+    return date.today() + timedelta(days=365)
 
 def normalize_text(val):
     if not val:
@@ -347,7 +350,7 @@ class Activity(models.Model):
     categories = models.ManyToManyField(EventCategory, blank=True, related_name="category_activities")
     date_description = models.CharField(max_length=100, default='', blank=True, null=True)
     time_description = models.CharField(max_length=100, default='', blank=True, null=True)
-    expire_date = models.DateField(default=one_year_from_now())
+    expire_date = models.DateField(default=default_expire_date)
     activity_url = models.URLField(max_length=200, default="", blank=True)
     no_cost = models.BooleanField(default=False)
     contact_email = models.EmailField(default="", blank=True)
