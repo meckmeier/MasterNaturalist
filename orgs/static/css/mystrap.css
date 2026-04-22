@@ -326,26 +326,28 @@ li.inactive {
     color: rgb(10, 14, 1);
     font-size: 1.25rem;
     background-color: rgba(4, 146, 27, 0.4);
-    padding: .25rem;
+    padding: .4rem .5rem;
+    
+
     
 }
 .me-learn-icon {
     color: rgb(34, 34, 34);
     font-size: 1.25rem;
     background-color: rgba(255, 215, 0, 1);
-    padding: .25rem;
+    padding: .4rem .5rem;
 }
 .me-new-icon {
     color: black;
     font-size: 1.25rem;
     background-color: pink;
-    padding: .25rem;
+    padding: .4rem .5rem;
 }
 .me-link-icon {
     color: rgb(34, 34, 34);
     font-size: 1rem;
     background-color: white;
-    padding: .25rem;
+    padding: .4rem .5rem;
 }
 .me-tree-tab {
     
@@ -355,4 +357,25 @@ li.inactive {
 .me-learn-tab {
     
     color: rgb(34, 34, 34);
+}
+.me-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;   /* ← controls spacing between items */
+  flex-wrap: wrap; /* optional: wraps on small screens */
+  text-align:center;
+}
+
+.me-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem; /* space between icon + text */
+}
+
+/* optional: add divider automatically */
+.me-legend span:not(:last-child)::after {
+  content: "|";
+  margin-left: 1rem;
+  color: #999;
 }

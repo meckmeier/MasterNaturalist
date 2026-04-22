@@ -23,16 +23,7 @@
      
 
 </div>
-  <!-- Date line -->
-  <div class="me-card-date">
-
-    <strong>Starts:</strong> {{ e.start }}
-    {% if e.end %}| <strong>Ends:</strong> {{ e.end }}{% endif %}
-    {% if e.activity.date_description %}| <em>{{ e.activity.date_description }}</em>{% endif %}
-    {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}
-    {% if e.ongoing %}| <span class="badge bg-success">Ongoing</span>{% endif %}
-    {% if e.session_format != "i" %}| <span class="badge bg-success">Online</span>{% endif %}
-  </div>
+  
 
   <!-- Header row -->
   <div class="me-card-header">
@@ -63,7 +54,16 @@
 
    
   </div> <!-- header -->
+  <!-- Date line -->
+  <div class="me-card-date">
 
+    <strong>Starts:</strong> {{ e.start }}
+    {% if e.end %}| <strong>Ends:</strong> {{ e.end }}{% endif %}
+    {% if e.activity.date_description %}| <em>{{ e.activity.date_description }}</em>{% endif %}
+    {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}
+    {% if e.ongoing %}| <span class="badge bg-success">Ongoing</span>{% endif %}
+    {% if e.session_format != "i" %}| <span class="badge bg-success">Online</span>{% endif %}
+  </div>
   <!-- Description -->
   <div class="me-description-block {% if q %}expanded{% endif %}">
     <div class="me-desc-short">{{ e.activity.description|truncatechars:200 }}</div>
