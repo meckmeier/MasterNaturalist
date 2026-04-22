@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Wild Paths Wisconsin logo</title>
+  <desc id="desc">Vintage-inspired circular woodland logo with a winding path, sparse tree trunks, and WPA-style text.</desc>
+
+  <defs>
+    <style>
+      .green { fill: #1f4b2a; stroke: #1f4b2a; }
+      .cream { fill: #efe5cf; stroke: #efe5cf; }
+      .outline { fill: none; stroke: #1f4b2a; stroke-width: 18; }
+      .label-main {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 132px;
+        font-weight: 700;
+        letter-spacing: 6px;
+        fill: #1f4b2a;
+      }
+      .label-sub {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 54px;
+        font-weight: 700;
+        letter-spacing: 18px;
+        fill: #1f4b2a;
+      }
+      .smallcaps {
+        font-variant: small-caps;
+      }
+    </style>
+
+    <!-- Slightly rough poster-like edge, kept subtle so the mark still scales down well -->
+    <filter id="roughen" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="5" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.8" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+
+    <!-- Clip the art to the circle -->
+    <clipPath id="badgeClip">
+      <circle cx="600" cy="500" r="410"/>
+    </clipPath>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#f8f4ea"/>
+
+  <!-- Badge -->
+  <circle cx="600" cy="500" r="410" class="outline"/>
+
+  <g clip-path="url(#badgeClip)">
+    <rect x="150" y="70" width="900" height="860" class="cream"/>
+
+    <!-- Sparse forest floor masses -->
+    <path class="green" filter="url(#roughen)"
+      d="M300 725
+         C340 660, 410 640, 470 655
+         C520 668, 530 695, 560 712
+         C525 770, 455 790, 370 788
+         C330 787, 295 780, 260 764
+         C270 748, 285 735, 300 725 Z"/>
+    <path class="green" filter="url(#roughen)"
+      d="M655 706
+         C720 650, 825 644, 900 680
+         C940 700, 970 733, 981 770
+         C920 791, 860 797, 790 792
+         C720 787, 672 768, 630 740
+         C635 728, 645 716, 655 706 Z"/>
+
+    <!-- Path in negative space -->
+    <path class="cream" filter="url(#roughen)"
+      d="M520 905
+         C470 872, 446 833, 468 793
+         C495 744, 592 721, 628 676
+         C659 638, 634 598, 594 570
+         C556 543, 541 512, 560 481
+         C581 447, 643 432, 669 397
+         C694 364, 680 327, 645 299
+         C610 271, 600 248, 614 221
+         L700 221
+         C686 251, 693 280, 723 307
+         C763 343, 786 391, 760 437
+         C730 490, 651 505, 632 538
+         C615 566, 638 593, 671 617
+         C716 650, 746 701, 716 752
+         C681 813, 595 826, 578 869
+         C573 881, 572 894, 575 905
+         Z"/>
+
+    <!-- Foreground path opening -->
+    <path class="cream" filter="url(#roughen)"
+      d="M560 918
+         C500 894, 432 889, 372 902
+         C430 926, 492 940, 560 952
+         C637 966, 710 964, 792 958
+         C842 954, 891 946, 934 932
+         C847 914, 771 906, 696 903
+         C649 901, 603 904, 560 918 Z"/>
+
+    <!-- Tree trunks: sparser, full along path -->
+    <g class="green" filter="url(#roughen)">
+      <rect x="220" y="120" width="23" height="720" rx="5"/>
+      <rect x="286" y="150" width="48" height="650" rx="5"/>
+      <rect x="392" y="112" width="28" height="665" rx="5"/>
+      <rect x="495" y="168" width="16" height="552" rx="4"/>
+      <rect x="697" y="180" width="16" height="515" rx="4"/>
+      <rect x="804" y="118" width="34" height="630" rx="5"/>
+      <rect x="895" y="142" width="26" height="645" rx="5"/>
+      <rect x="980" y="110" width="18" height="720" rx="4"/>
+    </g>
+
+    <!-- Branch stubs -->
+    <g class="green" stroke-linecap="round" stroke-width="10" fill="none" filter="url(#roughen)">
+      <path d="M241 210 l-22 -18"/>
+      <path d="M241 330 l19 -26"/>
+      <path d="M241 520 l-18 -28"/>
+      <path d="M310 250 l28 -18"/>
+      <path d="M310 420 l20 -34"/>
+      <path d="M406 250 l24 -15"/>
+      <path d="M406 410 l20 -26"/>
+      <path d="M503 290 l18 -19"/>
+      <path d="M503 455 l20 -27"/>
+      <path d="M705 310 l-18 -20"/>
+      <path d="M705 470 l-20 -24"/>
+      <path d="M821 230 l25 -14"/>
+      <path d="M821 420 l19 -28"/>
+      <path d="M910 300 l26 -18"/>
+      <path d="M910 520 l18 -28"/>
+      <path d="M989 225 l22 -14"/>
+      <path d="M989 410 l19 -20"/>
+    </g>
+
+    <!-- Grass cuts for a poster/woodcut feel -->
+    <g class="cream" filter="url(#roughen)">
+      <path d="M328 792 l9 -56 l18 47 l11 -34 l8 42 z"/>
+      <path d="M458 744 l10 -46 l20 38 l9 -27 l7 29 z"/>
+      <path d="M758 745 l10 -46 l20 38 l10 -27 l8 29 z"/>
+      <path d="M885 792 l11 -57 l18 46 l10 -31 l7 41 z"/>
+    </g>
+  </g>
+
+  <!-- Text -->
+  <g transform="translate(600,1085)">
+    <text class="label-main" text-anchor="middle" filter="url(#roughen)">WILD PATHS</text>
+    <line x1="-330" y1="44" x2="-140" y2="44" stroke="#1f4b2a" stroke-width="8" stroke-linecap="round"/>
+    <line x1="140" y1="44" x2="330" y2="44" stroke="#1f4b2a" stroke-width="8" stroke-linecap="round"/>
+    <text class="label-sub" text-anchor="middle" y="100" filter="url(#roughen)">WISCONSIN</text>
+  </g>
+</svg>

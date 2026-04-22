@@ -3,7 +3,26 @@
 {% load can_edit_filters %}
 
  <div class="me-card">
+ <!-- Right block: simple inline icons -->
+  <div class="me-card-icons">
+  
+  {% if e.activity.is_newly_added %}
+          <i class="bi bi-asterisk me-new-icon" title="Newly added activity"></i>
+        {% endif %}
+        {% if e.activity.activity_type == "t" %}
+          <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
+        {% else %}
+          <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
+        {% endif %}
+       
+        {% if e.location %}
+          <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
+          style="height:40px; width:auto;">
+        {% endif %}
+       
+     
 
+</div>
   <!-- Date line -->
   <div class="me-card-date">
 
@@ -20,23 +39,17 @@
     
     <!-- Left block -->
     <div class="me-card-header-left">
-      <div class="me-card-title-row {% if e.activity.activity_type == "t" %}me-learn-tab{% else %}me-tree-tab{% endif %}">
-        {% if e.activity.is_newly_added %}
-          <i class="bi bi-asterisk me-new-icon" title="Newly added activity"></i>
-        {% endif %}
-        {% if e.activity.activity_type == "t" %}
-          <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
-        {% else %}
-          <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
-        {% endif %}
+   
+        
+      <div class="me-card-title-row">
         {% if q %}
           {{ e.activity.title|highlight:q|safe }}
         {% else %}
           {{ e.activity.title }}
         {% endif %}
-        {% if e.activity|can_edit:request.user %}
+       {% if e.activity|can_edit:request.user %}
           <a href="{% url 'activity_edit' e.activity_id %}">
-            <i class="bi bi-pencil"></i>
+            <i class="bi bi-pencil" style="font-size: .75rem;"></i>
           </a>
         {% endif %}
       </div>
@@ -48,14 +61,7 @@
       </div>
     </div>
 
-    <!-- Right block: simple inline icons -->
-    <div class="me-card-header-right">
-  
-      {% if e.location %}
-        <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" style="height:30px; width:auto;">
-      {% endif %}
-    </div>
-
+   
   </div> <!-- header -->
 
   <!-- Description -->
