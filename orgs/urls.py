@@ -61,6 +61,7 @@ urlpatterns = [
     path("terms/", views.render_markdown, {"filename": "terms"}, name="terms"),
     path("privacy/", views.render_markdown, {"filename": "privacy"}, name="privacy"),
     path("feedback/", views.feedback_view, name="feedback"),
+    path("logos/", TemplateView.as_view(template_name="orgs/logos.html"), name="logos"),
 ]
 
 if settings.DEBUG:

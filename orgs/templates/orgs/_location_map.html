@@ -44,22 +44,31 @@ fetch("{% static 'orgs/geo/gz_2010_us_050_00_500k.json' %}")
 
     // Add GeoJSON layer
     const geojsonLayer = L.geoJSON(wiCounties, {
-        style: { color: '#3388ff', weight: 2, fillOpacity: 0.05 },
-        onEachFeature: function(feature, layer) {
-            layer.bindPopup(feature.properties.NAME);
+    style: { color: '#3388ff', weight: 2, fillOpacity: 0.05 },
 
-            layer.on('click', function() {
-                const countyName = feature.properties.NAME;
-                markers.forEach(m => {
-                    if (m.county === countyName) {
-                        m.marker.addTo(map);
-                    } else {
-                        map.removeLayer(m.marker);
-                    }
-                });
-            });
-        }
-    }).addTo(map);
+    onEachFeature: function(feature, layer) {
+        layer.bindTooltip(feature.properties.NAME, {
+            sticky: true   // follows the mouse
+        });
+    }
+}).addTo(map);
+    //old code that actually used a click on the county. const geojsonLayer = L.geoJSON(wiCounties, {
+    //    style: { color: '#3388ff', weight: 2, fillOpacity: 0.05 },
+    //    onEachFeature: function(feature, layer) {
+    //        layer.bindPopup(feature.properties.NAME);
+
+     //       layer.on('click', function() {
+     //           const countyName = feature.properties.NAME;
+     //           markers.forEach(m => {
+     //               if (m.county === countyName) {
+     //                   m.marker.addTo(map);
+     //               } else {
+     //                   map.removeLayer(m.marker);
+     //               }
+     //           });
+      //      });
+    //    }
+    //}).addTo(map);
 
     // Fit map to Wisconsin counties bounds
     map.fitBounds(geojsonLayer.getBounds());

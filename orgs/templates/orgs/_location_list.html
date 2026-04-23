@@ -1,9 +1,8 @@
 {% load highlight %}
 {% load static %}
-<div class="me-page">
-<h1>Locations</h1>
+
 {% for loc in locs %}
-<div class="me-card" id="loc-{{loc.id}}">
+<div class="me-card" id="loc-{{loc.id}}" >
   <div class="me-card-header">
     <div class="me-card-header-left">
       <div class="me-card-title-row">
@@ -100,10 +99,11 @@
 
       </div>
     </div>
-  </div>
+ 
 <p class="small text-muted">
     Last updated: {{ loc.updated_at|date:"M j, Y" }}
   </p>
+   </div>
 {% endfor %}
 
 <!-- Pagination -->
@@ -131,4 +131,3 @@
     </ul>
   </nav>
 
-</div>

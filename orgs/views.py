@@ -747,9 +747,9 @@ def activities(request):
 
         if data.get("end_date"):
             queryset = queryset.filter(start__lte=data["end_date"])
-        if data.get("session_mode") == "in_person":
+        if data.get("session_mode") == "i":
             queryset = queryset.filter(session_format__in=["i", "b"])
-        elif data.get("session_mode") == "online":
+        elif data.get("session_mode") == "o":
             queryset = queryset.filter(session_format__in=["o", "b"])
                 
 

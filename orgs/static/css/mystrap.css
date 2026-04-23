@@ -1,11 +1,12 @@
 :root {
-  --main-background: linen;   /* Dodger Blue */
+  --main-background: ivory;   /* Dodger Blue */
   --main-border: rgba(203, 213, 207, 0.5); /* Tomato */
-  --button: #220a8ad8;    /* Lime Green */
+  --button: #220a8ad8;    
   --color-dark: #222222;      /* Dark Gray */
   --color-light: #f5f5f5;     /* Light Gray */
   --color-warning: #ffcc00;   /* Yellow */
-  --nav-text: white;        /* Deep Green-Gray */
+  --nav-text: rgb(8, 8, 8);        /* Deep Green-Gray */
+  --nav-bar-background: linen;
 }
 
 body {
@@ -13,21 +14,21 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: #222;
+  background-color: var(--main-background);
 }
 .me-navbar {
-    background-color:var(--main-background);  /* soft natural green */
-    
+    background-color:var(--nav-bar-background);  
     border-bottom: 1px solid var(--main-border);
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
 }
 .me-navbar .navbar-brand,
 .me-navbar .nav-link {
-    color:var(--nav-text);  /* deep green-gray */
+    color:var(--nav-text); 
 }
 
 .me-navbar .nav-link:hover {
-    color: #1e3529;
+    color: dodgerblue;
 }
 .me-navbar .navbar-toggler {
     border-color: #2f4f3f;
@@ -89,6 +90,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem; /* vertical spacing */
+  margin:.75rem;
 }
 .me-card-icons {
   display: flex;

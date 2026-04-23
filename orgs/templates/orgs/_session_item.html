@@ -6,32 +6,24 @@
  <!-- Right block: simple inline icons -->
   <div class="me-card-icons">
   
-  {% if e.activity.is_newly_added %}
-          <i class="bi bi-asterisk me-new-icon" title="Newly added activity"></i>
-        {% endif %}
-        {% if e.activity.activity_type == "t" %}
-          <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
-        {% else %}
-          <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
-        {% endif %}
-       
-        {% if e.location %}
-          <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
-          style="height:40px; width:auto;">
-        {% endif %}
-       
-     
+    {% if e.activity.is_newly_added %}
+      <i class="bi bi-asterisk me-new-icon" title="Newly added activity"></i>
+    {% endif %}
+    {% if e.activity.activity_type == "t" %}
+      <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
+    {% else %}
+      <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
+    {% endif %}  
+    {% if e.location %}
+      <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
+      style="height:40px; width:auto;">
+    {% endif %}
 
 </div>
-  
-
   <!-- Header row -->
   <div class="me-card-header">
-    
     <!-- Left block -->
-    <div class="me-card-header-left">
-   
-        
+    <div class="me-card-header-left">        
       <div class="me-card-title-row">
         {% if q %}
           {{ e.activity.title|highlight:q|safe }}
@@ -45,19 +37,30 @@
         {% endif %}
       </div>
       <div class="me-card-sponsor">
-        Sponsored by: {{ e.activity.org.org_name }}
-        <br>For more info: {{e.activity.contact_email }} 
-        {% if e.activity.activity_url %}| <a href="{{ e.activity.activity_url }}" target="_blank">Activity Details</a>{% endif %}
-        {% if e.session_url %} | <a href="{{ e.session_url }}" target="_blank">Session Details</a>{% endif %}
+        Sponsored by: {{ e.activity.org.org_name }} 
+        {% if e.location %} | Location: {{ e.location.loc_name }}{% endif %}
+        <br>For more info: 
+        {% if e.activity.contact_email%}
+          {{ e.activity.contact_email }}<a href="mailto:{{ e.activity.contact_email }}">
+          <i class="bi bi-envelope" title="send email to contact person"></i></a>
+          
+        {% endif %}
+  
+        {% if e.session_url %}
+           | <a href="{{ e.session_url }}" target="_blank">Session Details</a>
+        {% else %}
+          {% if e.activity.activity_url %}
+           | <a href="{{ e.activity.activity_url }}" target="_blank">Activity Details</a>
+          {% endif %}
+        {% endif %}
       </div>
     </div>
-
    
   </div> <!-- header -->
   <!-- Date line -->
   <div class="me-card-date">
 
-    <strong>Starts:</strong> {{ e.start }}
+    {% if e.start %}<strong>Starts:</strong> {{ e.start }}{% endif %}
     {% if e.end %}| <strong>Ends:</strong> {{ e.end }}{% endif %}
     {% if e.activity.date_description %}| <em>{{ e.activity.date_description }}</em>{% endif %}
     {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}

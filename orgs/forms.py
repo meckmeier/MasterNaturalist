@@ -460,14 +460,14 @@ class ActivityForm(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     start = forms.DateField(
         required=False,
-        input_formats=["%m-%d-%Y"],
-        widget=forms.DateInput(attrs={"placeholder": "MM-DD-YYYY"})
+        input_formats=["%Y-%m-%d"],
+        widget=forms.DateInput(attrs={"placeholder": "YYYY-MM-DD"})
     )
 
     end = forms.DateField(
         required=False,
-        input_formats=["%m-%d-%Y"],
-        widget=forms.DateInput(attrs={"placeholder": "MM-DD-YYYY"})
+        input_formats=["%Y-%m-%d"],
+        widget=forms.DateInput(attrs={"placeholder": "YYYY-MM-DD"})
     )
     
     class Meta:

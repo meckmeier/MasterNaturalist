@@ -417,7 +417,7 @@ class SessionQuerySet(models.QuerySet):
 class Session(models.Model):
     activity=models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="sessions")
     session_format = models.CharField(max_length=1 ,
-                              choices=[("o","Online"),("i","InPerson" ),("b","Hybrid")])
+                              choices=[("o","Online"),("i","InPerson" ),("b","Hybrid"), ("s","Self Selected Locations")])
     location = models.ForeignKey( Location, null=True, blank=True, on_delete=models.SET_NULL, related_name="sessions")
     session_url = models.URLField(max_length=200, default="", blank=True)
     ongoing = models.BooleanField(default=False)

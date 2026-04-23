@@ -29,14 +29,18 @@
 <div class="me-card orgcard" id="org-{{org.id}}">
   <div class="me-card-header">
     <div class="me-card-header-left">
-      <h4 class="me-card-title">
-        {% if user.is_authenticated %}
-        {% if q %}{{ org.org_name|highlight:q|safe }}{% else %}{{ org.org_name }}{% endif %}
+      <div class="me-card-title">
+        <h4>
+        {% if q %}
+          {{ org.org_name|highlight:q|safe }}
         {% else %}
           {{ org.org_name }}
         {% endif %}
-
-      </hr4>
+        
+      </h4>
+      
+      <a href="{{ org.org_url }}" target="_blank" class="text-decoration-none">{{ org.org_url }}</a>
+      </div>
       </div>
       <div class="me-card-header-right">
           {% if user.is_authenticated %}
@@ -48,7 +52,7 @@
               {% endif %}
             </a>
           {% endif %}
-          <a href="{{ org.org_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe me-link-icon"></i> </a>
+          
           <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="height:30px; width:auto;">
       </div>
     </div>

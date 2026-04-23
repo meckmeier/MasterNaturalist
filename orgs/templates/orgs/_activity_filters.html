@@ -3,7 +3,7 @@
      {% csrf_token %}
     <input type="hidden" name="page" value="{{ request.GET.page|default:'1' }}">
     <div class="mb-3">
-        {{ filter_form.org.label_tag }}
+        Sponsor: 
         {{ filter_form.org }}
         {{ filter_form.org.errors }}
     </div>

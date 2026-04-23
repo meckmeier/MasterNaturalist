@@ -52,29 +52,36 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     function updateSessionRowVisibility(row) {
-        const formatField = row.querySelector("select[name$='session_format']");
-        const urlGroup = row.querySelector(".url-group");
-        const locationGroup = row.querySelector(".loc-group");
+    const formatField = row.querySelector("select[name$='-session_format']");
+    const locationField = row.querySelector("select[name$='-location']");
+    const urlGroup = row.querySelector(".url-group");
+    const locationGroup = row.querySelector(".loc-group");
 
-        if (!formatField) return;
+    if (!formatField) return;
 
-        const format = formatField.value;
-        console.log("visibility", { format, urlGroup, locationGroup });
+    const format = formatField.value;
+    console.log("visibility", { format, urlGroup, locationGroup, locationField });
 
-        const showUrl = (format === "o" || format === "b");
-        const showLocation = (format === "i" || format === "b");
+    const showUrl = (format === "o" || format === "b");
+    const showLocation = (format === "i" || format === "b");
 
-        if (urlGroup) {
-            urlGroup.style.display = showUrl ? "block" : "none";
-        }
+    if (urlGroup) {
+        urlGroup.style.display = showUrl ? "block" : "none";
+    }
 
-        if (locationGroup) {
-            locationGroup.style.display = showLocation ? "block" : "none";
-        }
+    if (locationGroup) {
+        locationGroup.style.display = showLocation ? "block" : "none";
+    }
+
+    // Clear location whenever this format should not keep a location
+    if (locationField && (format === "o" || format === "s")) {
+        locationField.value = "";
+    }
+
+    syncLocationDisplay(row);
     }
     const activityForm = document.getElementById("activity-form");
-    
-    
+ 
     function syncLocationDisplay(row) {
     if (!row) return;
 
