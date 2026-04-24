@@ -398,8 +398,7 @@ class ActivityForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple
     )
 
-    class Meta:
-        
+    class Meta:        
         model = Activity
         fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "no_cost", "contact_email", "time_description"] 
         widgets = {
@@ -415,28 +414,34 @@ class ActivityForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         self.fields["activity_type"].required = True
 
-        # ChoiceField (CharField w/ choices)
         self.fields["activity_type"].choices = [
             ("", "Select Type"),
         ] + [
             c for c in self.fields["activity_type"].choices if c[0] != ""
         ]
-        
-        
-        
+
+        category_qs = EventCategory.objects.all().order_by("category_class", "name")
+        self.fields["categories"].queryset = category_qs
+
         grouped = defaultdict(list)
 
-        # ✅ use the existing queryset (important habit)
-        for cat in self.fields['categories'].queryset:
-            grouped[cat.category_class].append((cat.id, cat.name))
+        for cat in category_qs:
+            group_name = cat.category_class
+            grouped[group_name].append((cat.pk, cat.name))
 
-        # ✅ Django-native grouped choices
-        self.fields['categories'].choices = [
-            (group, choices) for group, choices in grouped.items()
-        ]
+        self.category_groups = list(grouped.items())
+
+        if self.is_bound:
+            selected = self.data.getlist(self.add_prefix("categories"))
+        elif self.instance and self.instance.pk:
+            selected = self.instance.categories.values_list("pk", flat=True)
+        else:
+            selected = self.initial.get("categories", [])
+
+        self.selected_category_ids = [str(x) for x in selected]
     def clean(self):   
         cleaned_data = super().clean()
         url = cleaned_data.get("activity_url")

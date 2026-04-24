@@ -228,23 +228,27 @@
         </div>
        
 
-{% for group, choices in activity_form.fields.categories.choices %}
-{% if group in "content" %}<div class="form-field-full">
-    {% else %}<div class="form-field-full">{% endif %}
-   
+<div class="form-field-full">
+    {% for group, choices in activity_form.category_groups %}
+    <div class="category-group">
+        <div class="category-group-title"><strong>{{ group|title }}</strong></div>
 
-    {% for value, label in choices %}
-        <div style="display:inline-block; margin-right:12px;">
-            <input type="checkbox"
-                   name="{{ activity_form.categories.html_name }}"  {# correct name #}
-                   value="{{ value }}"
-                   id="cat_{{ value }}"
-                   {% if value|stringformat:"s" in activity_form.initial.categories %}checked{% endif %}>
-            <label for="cat_{{ value }}">{{ label }}</label>
+        <div class="category-options">
+            {% for value, label in choices %}
+                <label class="category-checkbox">
+                    <input type="checkbox"
+                           name="{{ activity_form.categories.html_name }}"
+                           value="{{ value }}"
+                           id="cat_{{ value }}"
+                           {% if value|stringformat:"s" in activity_form.selected_category_ids %}checked{% endif %}>
+                    {{ label }}
+                </label>
+            {% endfor %}
         </div>
-    {% endfor %}
-</div>
+    </div>
 {% endfor %}
+   
+</div>
 
         
 
