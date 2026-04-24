@@ -402,9 +402,9 @@ def org_edit(request, org_id):
         else:
             messages.error(request, "There are errors in the form.")
 
-            print("org form errors",form.errors)
+            #print("org form errors",form.errors)
             
-            print("non field error", form.non_field_errors())
+            #print("non field error", form.non_field_errors())
             #if the forms are not valid - stay on the org_detail page.
 
     else:
@@ -452,7 +452,7 @@ def loc_detail(request, loc_id=None):
                 return redirect(f"{reverse('org_mgmt')}#org-{loc.org.id}")
             
         else:
-            print("loc form errors",form.errors)
+            #print("loc form errors",form.errors)
             messages.error(request, "there are errors in the form.")
             return render(request, "orgs/location_form.html", {
                 "loc": loc,
@@ -600,7 +600,7 @@ def locations(request):
 
 def lookup_zip(request):
     zip_code = request.GET.get("zip_code", "").strip()
-    print("zip_code",zip_code)
+    #print("zip_code",zip_code)
     if not zip_code:
         return JsonResponse({"county_id": None, "region": None})
 
@@ -610,7 +610,7 @@ def lookup_zip(request):
         return JsonResponse({"county_id": None, "region": None})
 
     county = zip_row.county
-    print("county", county)
+    #print("county", county)
     return JsonResponse({
         "county_id": county.id,
         "region": county.region_name,  # adjust if needed
@@ -857,9 +857,9 @@ def _activity_form_workflow(request, org, activity, is_new=False):
 
             return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
 
-    print("Session formset errors:", session_formset.errors)
-    print("Management errors:", session_formset.management_form.errors)
-    print("Main form errors:", activity_form.errors)
+    #print("Session formset errors:", session_formset.errors)
+    #print("Management errors:", session_formset.management_form.errors)
+    #print("Main form errors:", activity_form.errors)
 
     return render(request, "orgs/activity_form.html", {
         "activity": activity,
@@ -875,7 +875,7 @@ def activity_create(request):
     org_id = request.GET.get("org") or request.POST.get("org")
     org = get_object_or_404(Organization, id=org_id)
     activity = Activity(org=org)
-    print("launching activity create for new org", org.org_name)
+    #print("launching activity create for new org", org.org_name)
     return _activity_form_workflow(
         request=request,
         org=org,
@@ -985,9 +985,9 @@ def activity_detail(request, activity_id=None):
 
             return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
 
-        print("Session formset errors:", session_formset.errors)
-        print("Management errors:", session_formset.management_form.errors)
-        print("Main form errors:", activity_form.errors)
+        #print("Session formset errors:", session_formset.errors)
+        #print("Management errors:", session_formset.management_form.errors)
+        #print("Main form errors:", activity_form.errors)
 
     return render(request, "orgs/activity_form.html", {
         "activity": activity,
@@ -1319,7 +1319,7 @@ def upload_stage(request, upload_id):
     mapping = request.session.get(f"mapping_{upload_id}")
     if not mapping:
         return redirect("upload_map", upload_id=upload.id)
-    print ("Using mapping for staging:", mapping)  # Debug log
+    #print ("Using mapping for staging:", mapping)  # Debug log
     importer = CSVImporter(upload, mapping=mapping)
     importer.read()
     importer.normalize()
@@ -1382,13 +1382,13 @@ def upload_processing(request, upload_id):
     #Location_Pending
     #Session_Pending
     #Activity_Pending
-    print("Starting processing for upload:", upload_id)
+    #print("Starting processing for upload:", upload_id)
     upload_info = get_object_or_404(ActivityUpload, id=upload_id)
     rows = RawLoadData.objects.filter(upload_id=upload_id)
 
     for row in rows:
         with transaction.atomic():
-            print(f"Processing row {row.id}")
+           # print(f"Processing row {row.id}")
 
             # -----------------------------
             # Normalize

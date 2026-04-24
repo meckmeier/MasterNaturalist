@@ -1,31 +1,11 @@
 {% extends "orgs/layout.html" %}
 {% load static %}
 {% block filter_button %}
-    <button class="btn btn-outline-secondary ms-2"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#filterPanel"
-            aria-controls="filterPanel">
-        <i class="bi bi-funnel"></i>
-        Filter
-    </button>
+
 {% endblock %}
 
 {% block filters %}
-<form method="get" action="{{ request.path }}">
-    
-    <div class="mb-3">
-        {{ filter_form.org.label_tag }}
-        {{ filter_form.org }}
-        {{ filter_form.org.errors }}
-    </div>
-   
-    
-    <div class="d-flex gap-2">
-        <button type = "submit" class="btn btn-primary">Apply</button>
-        <a href="{% url 'orgs'%}" class ="btn btn-outline-secondary">Clear</a>
-    </div>
-</form>
+
 {% endblock %}
 
 {% block body %}
@@ -43,6 +23,17 @@
 
 <div class="me-page">
 <h1>My Organizations</h1>
+{% if user.profile.staff %}<form method="get" action="{{ request.path }}" class="mb-3" id="org-quick-filter-form">
+
+    {{ filter_form.org }}
+
+    {% if filter_form.org.errors %}
+        <div class="error-text">{{ filter_form.org.errors }}</div>
+    {% endif %}
+
+
+</form>
+{% endif %}
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}
@@ -186,4 +177,18 @@
 {% endblock %}
 {% block extrajs %}
 <script src="{% static 'managerpicker.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("org-quick-filter-form");
+    if (!form) return;
+
+    const orgField = form.querySelector("[name='org']");
+    if (!orgField) return;
+
+    orgField.addEventListener("change", function () {
+        form.submit();
+    });
+});
+</script>
 {% endblock %}

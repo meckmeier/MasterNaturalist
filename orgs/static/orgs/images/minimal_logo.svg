@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="400" height="500" preserveAspectRatio="xMinYMin meet" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="400" height="500"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-500)" style="clip-path: url(#clip)">
+		<g transform="">
+			<circle cx="200" cy="300" r="150" style="stroke: rgb(0%,39%,0%); stroke-linecap: butt; stroke-width: 3; fill: none; fill-rule: evenodd;"/>
+			<path d="M 200 180 C 180 220 220 260 200 300 C 180 340 220 380 200 420 L 210 420 C 230 380 190 340 210 300 C 230 260 190 220 210 180 Z " style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(0%,39%,0%); fill-rule: evenodd;"/>
+			<path d="M 120 200 L 120 420 " style="stroke: rgb(0%,39%,0%); stroke-linecap: butt; stroke-width: 6; fill: none; fill-rule: evenodd;"/>
+			<path d="M 150 200 L 150 420 " style="stroke: rgb(0%,39%,0%); stroke-linecap: butt; stroke-width: 6; fill: none; fill-rule: evenodd;"/>
+			<path d="M 250 200 L 250 420 " style="stroke: rgb(0%,39%,0%); stroke-linecap: butt; stroke-width: 6; fill: none; fill-rule: evenodd;"/>
+			<path d="M 280 200 L 280 420 " style="stroke: rgb(0%,39%,0%); stroke-linecap: butt; stroke-width: 6; fill: none; fill-rule: evenodd;"/>
+			<text x="115.622" y="120" style="font-family: Times-Roman; font-size: 28px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,240) scale(1,-1)">WILD PATHS</text>
+			<text x="161.115" y="90" style="font-family: Times-Roman; font-size: 14px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,180) scale(1,-1)">WISCONSIN</text>
+		</g>
+	</g>
+</svg>

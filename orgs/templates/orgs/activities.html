@@ -1,14 +1,7 @@
 {% extends "orgs/layout.html" %}
 
 {% block filter_button %}
-    <button class="btn btn-outline-secondary ms-2"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#filterPanel"
-            aria-controls="filterPanel">
-        <i class="bi bi-funnel"></i>
-        Filter
-    </button>
+   
 {% endblock %}
 
 {% block filters %}
@@ -23,46 +16,72 @@
 {% load highlight %}
 
 <div class="me-page">
-  <h1>Upcoming Training & Volunteer Roles</h1>
+  <h1>Activities</h1>
 
-  <!-- Tabs nav -->
-  <ul class="me-tabs" id="activityTabs" role="tablist">
+  <form method="get" class="quick-filters d-flex justify-content-left gap-3 mb-3">
+ 
+  <!-- Session Format -->
+  <div class="btn-group" role="group">
+    <input type="radio" class="btn-check" name="session_mode" id="format-all" value="" 
+           {% if not request.GET.session_mode %}checked{% endif %}>
+    <label class="btn btn-outline-secondary" for="format-all">All</label>
 
-  
-  <li class="nav-item">
-    <button class="me-tab-button active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">Upcoming</button>
-  </li>
-  <li class="nav-item">
-    <button class="me-tab-button" id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing"  type="button" role="tab">Ongoing</button>
-  </li>
+    <input type="radio" class="btn-check" name="session_mode" id="format-inperson" value="i"
+           {% if request.GET.session_mode == "i" %}checked{% endif %}>
+    <label class="btn btn-outline-secondary" for="format-inperson">In Person</label>
 
-</ul>
+    <input type="radio" class="btn-check" name="session_mode" id="format-online" value="o"
+           {% if request.GET.session_mode == "o" %}checked{% endif %}>
+    <label class="btn btn-outline-secondary" for="format-online">Online</label>
+  </div>
 
-<!-- Tabs content -->
-<div class="me-tab-content tab-content" id="activityTabsContent">
+  <!-- Activity Type -->
+  <div class="btn-group" role="group">
+    <input type="radio" class="btn-check" name="activity_type" id="type-all" value=""
+           {% if not request.GET.activity_type %}checked{% endif %}>
+    <label class="btn btn-outline-secondary" for="type-all">All</label>
 
-   
-  <!-- Upcoming -->
-   <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+    <input type="radio" class="btn-check" name="activity_type" id="type-volunteer" value="v"
+           {% if request.GET.activity_type == "v" %}checked{% endif %}>
+    <label class="btn btn-outline-secondary" for="type-volunteer">Volunteer</label>
+
+    <input type="radio" class="btn-check" name="activity_type" id="type-training" value="t"
+           {% if request.GET.activity_type == "t" %}checked{% endif %}>
+    <label class="btn btn-outline-secondary" for="type-training">Training</label>
+  </div>
+<button class="btn btn-outline-secondary ms-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#filterPanel"
+            aria-controls="filterPanel">
+        <i class="bi bi-funnel"></i>
+        More Filters
+    </button>
+</form>
+
     {% for a in upcoming %}
+    
       {% include "orgs/_session_item.html" with e=a q=q %} 
-    {% empty %}
-      <p class="text-muted">No current activities</p>
-    {% endfor %}
-    </div>
 
-    <!-- Online -->
-  <div class="tab-pane fade" id="ongoing" role="tabpanel">
-    {% for a in ongoing %}
+    {% endfor %}
+
+<hr>
+
+      {% for a in ongoing %}
       {% include "orgs/_session_item.html" with e=a q=q %}
-    {% empty %}
-      <p class="text-muted">No ongoing events</p>
+
     {% endfor %}
     
-  </div>
+
 
 
 {% endblock %}
 {% block extrajs %}
-
+<script>
+document.querySelectorAll(".quick-filters input").forEach(el => {
+  el.addEventListener("change", () => {
+    el.closest("form").submit();
+  });
+});
+</script>
 {% endblock %}

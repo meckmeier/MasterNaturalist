@@ -63,7 +63,13 @@
             {{ activity_form.activity_url}}
             <span class="error-text">{{ activity_form.activity_url.errors}}</span>
         </div>
-        <div></div>
+        <div class="form-field">
+            No cost<i class="bi bi-info-circle" title="Check this box if your training session has no cost to participants."></i>
+            {{ activity_form.no_cost }}
+            
+             <span class="error-text
+            <span class="error-text">{{ activity_form.no_cost.errors }}</span>
+        </div>
         <div class="form-field">
             Activity contact:<br>
             {{ activity_form.contact_email }}

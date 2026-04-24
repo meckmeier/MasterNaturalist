@@ -2,14 +2,7 @@
 
 
 {% block filter_button %}
-    <button class="btn btn-outline-secondary ms-2"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#filterPanel"
-            aria-controls="filterPanel">
-        <i class="bi bi-funnel"></i>
-        Filter
-    </button>
+   
 {% endblock %}
 
 {% block filters %}
@@ -31,18 +24,26 @@
     <input type="hidden" name="q" value="{{ request.GET.q }}">
     <input type="hidden" name="org" value="{{ request.GET.org }}">
     <input type="hidden" name="page" value="1">
+    
+     <div class="btn-group" role="group">
 
-    <label>
-        <input type="radio" name="view" value="list"
+        <input type="radio" class="btn-check" name="view" id="view-list" value="list"
                {% if request.GET.view == "list" %}checked{% endif %}>
-        List View
-    </label>
+        <label class="btn btn-outline-secondary" for="view-list">List</label>
 
-    <label>
-        <input type="radio" name="view" value="map"
+        <input type="radio" class="btn-check" name="view" id="view-map" value="map"
                {% if request.GET.view == "map" or not request.GET.view %}checked{% endif %}>
-        Map View
-    </label>
+        <label class="btn btn-outline-secondary" for="view-map">Map</label>
+
+    </div>
+ <button class="btn btn-outline-secondary ms-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#filterPanel"
+            aria-controls="filterPanel">
+        <i class="bi bi-funnel"></i>
+        More Filters
+    </button>
 </form>
 
 
