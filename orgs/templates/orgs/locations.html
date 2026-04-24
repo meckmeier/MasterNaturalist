@@ -29,14 +29,14 @@
 
         <input type="radio" class="btn-check" name="view" id="view-list" value="list"
                {% if request.GET.view == "list" %}checked{% endif %}>
-        <label class="btn btn-outline-secondary" for="view-list">List</label>
+        <label class="btn btn-outline-secondary btn-sm" for="view-list">List</label>
 
         <input type="radio" class="btn-check" name="view" id="view-map" value="map"
                {% if request.GET.view == "map" or not request.GET.view %}checked{% endif %}>
-        <label class="btn btn-outline-secondary" for="view-map">Map</label>
+        <label class="btn btn-outline-secondary btn-sm" for="view-map">Map</label>
 
     </div>
- <button class="btn btn-outline-secondary ms-2"
+ <button class="btn btn-outline-secondary btn-sm"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#filterPanel"
