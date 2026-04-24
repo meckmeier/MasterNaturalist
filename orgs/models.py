@@ -352,7 +352,7 @@ class Activity(models.Model):
     time_description = models.CharField(max_length=100, default='', blank=True, null=True)
     expire_date = models.DateField(default=default_expire_date)
     activity_url = models.URLField(max_length=200, default="", blank=True)
-    no_cost = models.BooleanField(default=False)
+    no_cost = models.BooleanField(default=True)
     contact_email = models.EmailField(default="", blank=True)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_acts', default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)

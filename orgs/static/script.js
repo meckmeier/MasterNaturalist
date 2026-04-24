@@ -6,6 +6,16 @@ console.log("FORMSET SCRIPT LOADED");
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded and parsed");
   
+    const button = document.getElementById("back-to-top");
+
+    if (!button) return;
+
+    button.addEventListener("click", function () {
+        window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+        });
+    });
     const tabButtons = document.querySelectorAll('#eventTabs button[data-bs-toggle="tab"]');
 
     tabButtons.forEach(btn => {

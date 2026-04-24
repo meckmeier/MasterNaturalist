@@ -46,9 +46,9 @@
           {% if user.is_authenticated %}
             <a href="{% url 'follow_org' org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-sm">
               {% if org.id in followed_orgs %}
-                <i class="bi bi-heart-fill text-danger"></i> 
+                <i class="bi bi-heart-fill text-danger" title="Click to UN-follow"></i> 
               {% else %}
-                <i class="bi bi-heart"></i> 
+                <i class="bi bi-heart" title="Click to this to follow this organization"></i> 
               {% endif %}
             </a>
           {% endif %}

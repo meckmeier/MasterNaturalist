@@ -235,7 +235,7 @@ class EventFilterForm(forms.Form):
     )  
     my_orgs = forms.BooleanField(
         required=False,
-        label="Show events for My Favorite Orgs"
+        label="Show events for Organizations I follow"
     )
     county = forms.ModelChoiceField(
         queryset = County.objects.all().order_by("county_name"),
@@ -285,7 +285,7 @@ class OrgFilterForm(forms.Form):
     )  
     my_orgs = forms.BooleanField(
         required=False,
-        label="Show My Favorite Orgs"
+        label="Show Followed Organizations"
     )
     has_v = forms.BooleanField(
         required=False,
@@ -331,7 +331,7 @@ class LocFilterForm(forms.Form):
     )  
     my_orgs = forms.BooleanField(
         required=False,
-        label="Show My Favorite Orgs"
+        label="Show Followed Organizations"
     )
     loc = forms.ModelChoiceField(
         queryset=Location.objects.filter(deleted=False).order_by ("loc_name"),
