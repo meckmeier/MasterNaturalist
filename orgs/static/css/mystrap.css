@@ -345,6 +345,12 @@ li.inactive {
     background-color: pink;
     padding: .4rem .5rem;
 }
+.me-cost-icon{
+  color:black;
+  font-size: 1.25rem;
+  background-color: rgb(150, 245, 7);
+  padding: .4rem .5rem;
+}
 .me-link-icon {
     color: rgb(34, 34, 34);
     font-size: 1rem;
