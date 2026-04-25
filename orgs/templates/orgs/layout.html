@@ -27,7 +27,7 @@
   <div class="container-fluid">
     <!-- Brand -->
     <a href="{% url "landing" %}">
-        <img src="{% static 'orgs/images/wild_paths_logo_cropped4.jpg' %}" alt="wild paths Logo" width="50" class="img-fluid">
+        <img src="{% static 'orgs/images/wild_paths_logo_cropped4.jpg' %}" alt="Home" width="120" class="img-fluid" style="margin-right:1rem;">
     </a>
     <!--Toggler -->
     <button class ="navbar-toggler" type="button" 
@@ -86,7 +86,6 @@
 </nav>
 {% if not user.is_authenticated %}<em>To access all features including activities and search - please login. </em>{% endif %}
 
-<hr>
   <!-- OFFCANVAS PANEL (global UI) -->
   <!-- Filter side panel -->
 <div class="offcanvas offcanvas-start"

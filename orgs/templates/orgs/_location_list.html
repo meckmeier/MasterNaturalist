@@ -18,21 +18,15 @@
           
           {% if loc.org %}
             <div class="me-card-sponsor"">{{loc.org.org_name}}</div>{% endif %}
+          {% if loc.location_url%}
+          <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">{{ loc.location_url }}</a></span>
+          {% endif %}
       </div>
       
       <div class="me-card-header-right">
-          {% if user.is_authenticated and loc.org %}
-  
-            <a href="{% url 'follow_org' loc.org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-sm">
-              {% if loc.org.id in followed_orgs %}
-                <i class="bi bi-heart-fill text-danger me-link-icon"></i> 
-              {% else %}
-                <i class="bi bi-heart me-link-icon"></i> 
-              {% endif %}
-            </a>
-          {% endif %}
-          <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none"><i class="bi bi-globe me-link-icon" title="click to go the location's webpage"></i> </a></span>
-          <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:30px;width:auto;" title="{{loc.region_name}}">
+
+          
+          <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:50px;width:auto;" title="{{loc.region_name}}">
       </div>
     </div>
   <div >

@@ -4,30 +4,18 @@
 
  <div class="me-card">
  <!-- Right block: simple inline icons -->
-  <div class="me-card-icons">
-  
-    {% if e.activity.is_newly_added %}
-      <i class="bi bi-asterisk me-new-icon" title="Newly added activity"></i>
-    {% endif %}
-    {% if e.activity.activity_type == "t" %}
-      <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
-    {% else %}
-      <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
-    {% endif %}  
-    {% if e.location %}
-      <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
-      style="height:40px; width:auto;">
-    {% endif %}
-     {%if not e.activity.no_cost %}   
-      <i class="bi bi-currency-dollar me-cost-icon" data-bs-toggle=""tooltip" title="Training has a cost for participants"></i>
-    {% endif %}
 
-</div>
   <!-- Header row -->
   <div class="me-card-header">
     <!-- Left block -->
     <div class="me-card-header-left">        
       <div class="me-card-title-row">
+        {% if e.activity.activity_type == "t" %}
+      <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
+    {% else %}
+      <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
+    {% endif %}  
+    
         {% if q %}
           {{ e.activity.title|highlight:q|safe }}
         {% else %}
@@ -58,7 +46,12 @@
         {% endif %}
       </div>
     </div>
-   
+   <div class="me-card-header-left"> 
+{% if e.location %}
+      <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
+      style="height:50px; width:auto;">
+    {% endif %}
+    </div>
   </div> <!-- header -->
   <!-- Date line -->
   <div class="me-card-date">
@@ -69,6 +62,10 @@
     {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}
     {% if e.ongoing %}| <span class="badge bg-success">Ongoing</span>{% endif %}
     {% if e.session_format != "i" %}| <span class="badge bg-success">Online</span>{% endif %}
+    {%if not e.activity.no_cost %}   
+      | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+    {% endif %}
+
   </div>
   <!-- Description -->
   <div class="me-description-block {% if q %}expanded{% endif %}">
@@ -87,8 +84,15 @@
     {% endfor %}
   </div>
   <div class="small text-muted py-3">
-    Last update: {% if e.updated_at > e.activity.updated_at %}{{ e.updated_at|date:"M j, Y" }}
+    
+    Activity added: {{ e.created_at|date:"M j, Y" }}
+    {% if e.activity.is_newly_added %}
+       <span class="badge bg-success">* New *</span>
+    {% endif %}
+    {% if e.updated_at > e.created_at or e.activity.updated_at > e.created_at %} | Last update: 
+    {% if e.updated_at > e.activity.updated_at %} {{ e.updated_at|date:"M j, Y" }}
     {% else %}{{ e.activity.updated_at|date:"M j, Y" }}{% endif %}
-   
+    {% endif %}
+
   </div>
 </div>
