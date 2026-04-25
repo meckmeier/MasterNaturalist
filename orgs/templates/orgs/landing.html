@@ -8,21 +8,21 @@
 <p>Welcome! We are here to connect <a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a> with volunteer and training opportunities throughout the state.</p>
 {% if user.is_authenticated%}
 
-<a class="me-landing-btn" href="{% url 'activities' %}?activity_type=v">
+<a class="me-landing-btn" href="{% url 'activities' %}?activity_type=v" style="background-color:rgba(4, 146, 27, 0.4);">
     <i class="bi bi-tree-fill me-tree-icon"></i> Volunteer opportunity</a>
-<a class="me-landing-btn" href="{% url 'activities' %}?activity_type=t">
+<a class="me-landing-btn" href="{% url 'activities' %}?activity_type=t" style="background-color: rgba(255, 215, 0, 1);">
     <span><i class="bi bi-mortarboard-fill me-learn-icon"></i> Training opportunity</span></a>
     <br><br>
-<a class="me-landing-btn" href="{% url 'locations' %}">
+<a class="me-button-link" href="{% url 'locations' %}">
     See Locations</a>
-<a class="me-landing-btn" href="{% url 'orgs' %}">
+<a class="me-button-link" href="{% url 'orgs' %}">
     Browse Organizations</a>
 </div>
 
 <hr>
 <br>
     <div class="me-muted">If you are an organization and need to manage locations or activities:</div><br>
-    <a class="me-landing-btn" href="{% url 'org_mgmt' %}">
+    <a class="me-button-link" href="{% url 'org_mgmt' %}">
     Manage Organizations</a>
 
 {%else%}

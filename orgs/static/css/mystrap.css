@@ -1,7 +1,7 @@
 :root {
   --main-background: ivory;   /* Dodger Blue */
   --main-border: rgba(203, 213, 207, 0.5); /* Tomato */
-  --button: #220a8ad8;    
+  --button: #2F5D50;    
   --color-dark: #222222;      /* Dark Gray */
   --color-light: #f5f5f5;     /* Light Gray */
   --color-warning: #ffcc00;   /* Yellow */
@@ -37,11 +37,23 @@ body {
     background-color: var(--nav-hover);
 }
 .me-navbar .navbar-toggler {
-    border-color: #2f4f3f;
+    border-color: white;
 }
 
 .me-navbar .navbar-toggler-icon {
     filter: invert(25%) sepia(20%) saturate(300%) hue-rotate(90deg);
+}
+.me-navbar .navbar-collapse {
+  background-color: #2F5D50;  /* same as your navbar */
+}
+
+.me-navbar .navbar-collapse .nav-link {
+  color: #ffffff;
+}
+
+.me-navbar .navbar-collapse .nav-link:hover,
+.me-navbar .navbar-collapse .nav-link:focus {
+  color: #dfeee8;
 }
 /* Layout */
 .me-page {
