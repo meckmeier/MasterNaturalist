@@ -13,7 +13,9 @@
          {% else %}
           {{ loc.loc_name }}
           {% endif %}
-          
+          {%if request.user.profile.staff%}
+          <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location">
+                                    <i class="bi bi-pencil"></i>{% endif %}
           </div>
           
           {% if loc.org %}

@@ -1,6 +1,7 @@
 
 <form method="get" action="{{ request.path }}" class="me-form">
-    
+   
+
     <div class="mb-3">
         {{ filter_form.org.label_tag }}
         {{ filter_form.org }}
@@ -8,19 +9,35 @@
     </div>
     <div class="mb-3">
        {{ filter_form.my_orgs }}
-       {{ filter_form.my_orgs.label_tag }}
+       Show my Favorite Organizations
        {{ filter_form.my_orgs.errors }}
     </div>
-    <div class="mb-3">
-        {{ filter_form.has_v }}
-        {{ filter_form.has_v.label_tag }}
-        {{ filter_form.has_v.errors }}
-    </div>
-    <div class="mb-3">
-        {{ filter_form.has_t }}
-        {{ filter_form.has_t.label_tag }}
-        {{ filter_form.has_t.errors }}
-    </div>
+     <div class="mb-3">
+        Has: 
+        <div class="btn-group" role="group">
+  
+  <input type="radio" class="btn-check" name="activity_status" id="status-all" value=""
+         {% if not request.GET.activity_status %}checked{% endif %}>
+  <label class="btn btn-outline-secondary btn-sm" for="status-all">All</label>
+
+  <input type="radio" class="btn-check" name="activity_status" id="status-volunteer" value="volunteer"
+         {% if request.GET.activity_status == "volunteer" %}checked{% endif %}>
+  <label class="btn btn-outline-secondary btn-sm" for="status-volunteer">Volunteer</label>
+
+  <input type="radio" class="btn-check" name="activity_status" id="status-training" value="training"
+         {% if request.GET.activity_status == "training" %}checked{% endif %}>
+  <label class="btn btn-outline-secondary btn-sm" for="status-training">Training</label>
+
+  <input type="radio" class="btn-check" name="activity_status" id="status-both" value="both"
+         {% if request.GET.activity_status == "both" %}checked{% endif %}>
+  <label class="btn btn-outline-secondary btn-sm" for="status-both">Both</label>
+
+  <input type="radio" class="btn-check" name="activity_status" id="status-none" value="none"
+         {% if request.GET.activity_status == "none" %}checked{% endif %}>
+  <label class="btn btn-outline-secondary btn-sm" for="status-none">None</label>
+
+</div></div>
+    
     <div class="mb-3">
         {{ filter_form.region.label_tag}}
         {{ filter_form.region }}

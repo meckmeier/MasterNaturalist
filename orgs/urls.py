@@ -8,8 +8,7 @@ from . import views
 urlpatterns = [
     path("",  views.landing, name="landing"),
 
-    path("filter/", views.filter, name="filter"),
-        path("results/", views.results, name="results"),
+    
     path("activities/", views.activities, name="activities"),
     path("orgs/", views.orgs, name="orgs"),
     path("org_mgmt/", views.org_mgmt, name="org_mgmt"),

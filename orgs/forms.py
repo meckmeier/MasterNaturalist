@@ -137,62 +137,6 @@ LocationFormSet = inlineformset_factory(
     formset=BaseLocationFormSet,
 )
 
-class FilterForm(forms.Form):
-    type = forms.ChoiceField(
-        choices=[("", "Any"), ("v", "Volunteer Opportunity"), ("t", "Training")],
-        required=False, 
-        label="Type",
-        widget=forms.Select(attrs={"class":"form-select"})
-    )
-    org= forms.ModelChoiceField(
-        queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
-        required=False,
-        empty_label="Any",
-        label="Org Name",
-        widget=forms.Select(attrs={"class":"form-select"})
-    )  
-    my_orgs = forms.BooleanField(
-        required=False,
-        label="Show events for My Favorite Orgs"
-    )
-    county = forms.ModelChoiceField(
-        queryset = County.objects.all().order_by("county_name"),
-        required=False,
-        empty_label="Any",
-        label="County" ,
-        widget=forms.Select(attrs={"class":"form-select"})       
-    )
-    REGION_CHOICES = [
-        ("", "Any"),
-        ("C", "Central"),
-        ("EC", "East Central"),
-        ("NE", "Northeast"),
-        ("NW", "Northwest"),
-        ("SC", "South Central"),
-        ("SE", "Southeast"),
-        ("SW", "Southwest"),
-        ("St", "Statewide"),
-    ]
-    region = forms.ChoiceField(
-        choices=REGION_CHOICES,
-        required=False,
-        label="Region",
-        widget=forms.Select(attrs={"class":"form-select"})
-    )
-    q = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={
-            "class":"form-control mr-2",
-            "placeholder":"Search in org, location, event or description"
-        })
-    )
-    categories = forms.ModelMultipleChoiceField(
-        queryset=EventCategory.objects.all().order_by("name"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
-        label="Event Categories"
-    )
-
 class EventFilterForm(forms.Form):
     session_mode = forms.ChoiceField(
     required=False,
@@ -235,7 +179,7 @@ class EventFilterForm(forms.Form):
     )  
     my_orgs = forms.BooleanField(
         required=False,
-        label="Show events for Organizations I follow"
+        label="Show events my Favorite Organizations"
     )
     county = forms.ModelChoiceField(
         queryset = County.objects.all().order_by("county_name"),
@@ -275,6 +219,26 @@ class EventFilterForm(forms.Form):
         label="Event Categories"
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        category_qs = EventCategory.objects.all().order_by("category_class", "name")
+        self.fields["categories"].queryset = category_qs
+
+        grouped = defaultdict(list)
+
+        for cat in category_qs:
+            group_name = cat.category_class
+            grouped[group_name].append((cat.pk, cat.name))
+
+        self.category_groups = list(grouped.items())
+
+        if self.is_bound:
+            selected = self.data.getlist(self.add_prefix("categories"))
+        else:
+            selected = self.initial.get("categories", [])
+
+        self.selected_category_ids = [str(x) for x in selected]
+
 class OrgFilterForm(forms.Form):
     org= forms.ModelChoiceField(
         queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
@@ -287,15 +251,17 @@ class OrgFilterForm(forms.Form):
         required=False,
         label="Show Followed Organizations"
     )
-    has_v = forms.BooleanField(
-        required=False,
-        label="Has Volunteer Opportunities"
+    activity_status = forms.ChoiceField(
+    required=False,
+    choices=[
+        ("", "All"),
+        ("training", "Training"),
+        ("volunteer", "Volunteer"),
+        ("none", "None"),
+        ("both", "Both"),
+    ],
+    widget=forms.RadioSelect,
     )
-    has_t = forms.BooleanField(
-        required=False,
-        label="Has Trainings"
-    )
-   
     REGION_CHOICES = [
         ("", "Any"),
         ("C", "Central"),
@@ -340,13 +306,16 @@ class LocFilterForm(forms.Form):
         label="Location Name",
         widget=forms.Select(attrs={"class":"form-select"})
     )
-    has_v = forms.BooleanField(
-        required=False,
-        label="Has Volunteer Opportunities"
-    )
-    has_t = forms.BooleanField(
-        required=False,
-        label="Has Trainings"
+    activity_status = forms.ChoiceField(
+    required=False,
+    choices=[
+        ("", "All"),
+        ("training", "Training"),
+        ("volunteer", "Volunteer"),
+        ("none", "None"),
+        ("both", "Both"),
+    ],
+    widget=forms.RadioSelect,
     )
     county = forms.ModelChoiceField(
         queryset = County.objects.all().order_by("county_name"),

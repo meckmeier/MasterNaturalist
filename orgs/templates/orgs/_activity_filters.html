@@ -2,78 +2,102 @@
     <div class="my-page">
      {% csrf_token %}
     <input type="hidden" name="page" value="{{ request.GET.page|default:'1' }}">
+    <div class="filter-row d-flex gap-3 flex-wrap">
+    <div class="btn-group" role="group">
+    <input type="radio" class="btn-check" name="session_mode" id="format-all" value="" 
+           {% if not request.GET.session_mode %}checked{% endif %}>
+    <label class="btn btn-outline-secondary btn-sm" for="format-all">All</label>
+
+    <input type="radio" class="btn-check" name="session_mode" id="format-inperson" value="i"
+           {% if request.GET.session_mode == "i" %}checked{% endif %}>
+    <label class="btn btn-outline-secondary btn-sm" for="format-inperson">In Person</label>
+
+    <input type="radio" class="btn-check" name="session_mode" id="format-online" value="o"
+           {% if request.GET.session_mode == "o" %}checked{% endif %}>
+    <label class="btn btn-outline-secondary btn-sm" for="format-online">Online</label>
+  </div>
+
+  <!-- Activity Type -->
+  <div class="btn-group" role="group">
+    <input type="radio" class="btn-check" name="activity_type" id="type-all" value=""
+           {% if not request.GET.activity_type %}checked{% endif %}>
+    <label class="btn btn-outline-secondary btn-sm" for="type-all">All</label>
+
+    <input type="radio" class="btn-check" name="activity_type" id="type-volunteer" value="v"
+           {% if request.GET.activity_type == "v" %}checked{% endif %}>
+    <label class="btn btn-outline-secondary btn-sm" for="type-volunteer">Volunteer</label>
+
+    <input type="radio" class="btn-check" name="activity_type" id="type-training" value="t"
+           {% if request.GET.activity_type == "t" %}checked{% endif %}>
+    <label class="btn btn-outline-secondary btn-sm" for="type-training">Training</label>
+  </div>
+  </div>
     <div class="mb-3">
         Sponsor: 
         {{ filter_form.org }}
         {{ filter_form.org.errors }}
+    </div>
+     <input type="hidden" name="tab" id="tabInput" value="{{ request.GET.tab|default:'upcoming' }}">
+    <div class="mb-3">
+        {{ filter_form.my_orgs }}
+        {{ filter_form.my_orgs.label_tag }}
+        {{ filter_form.my_orgs.errors }}
     </div>
     <div class="mb-3"> 
         Word Search: 
         {{ filter_form.q }}
         {{ filter_form.q.errors}}
     </div>  
-
-    <div class="mb-3">
-        <div class="d-flex gap-3">
-            {% for radio in filter_form.activity_type %}
-                <div class="form-check form-check-inline">
-                    {{ radio.tag }}
-                    <label class="form-check-label" for="{{ radio.id_for_label }}">
-                        {{ radio.choice_label }}
-                    </label>
-                </div>
-            {% endfor %}
-        </div>  
-    </div>
-    <div class="mb-3">
-
-  <div class="d-flex gap-3">
-    {% for radio in filter_form.session_mode %}
-      <div class="form-check">
-        {{ radio.tag }}
-        <label class="form-check-label">
-          {{ radio.choice_label }}
-        </label>
-      </div>
-    {% endfor %}
-  </div>
-    </div>
-    <div class="mb-3" id="start_date">
-        {{ filter_form.start_date.label_tag}}
+   <div class="me-filter-2colrow">
+    <div class="me-filter-col">
+        {{ filter_form.start_date.label_tag }}
         {{ filter_form.start_date }}
         {{ filter_form.start_date.errors }}
     </div>
-    <div class="mb-3" id="start_date">
-        {{ filter_form.end_date.label_tag}}
+
+    <div class="me-filter-col">
+        {{ filter_form.end_date.label_tag }}
         {{ filter_form.end_date }}
         {{ filter_form.end_date.errors }}
     </div>
-    <input type="hidden" name="tab" id="tabInput" value="{{ request.GET.tab|default:'upcoming' }}">
-    <div class="mb-3">
-        {{ filter_form.my_orgs }}
-        {{ filter_form.my_orgs.label_tag }}
-        {{ filter_form.my_orgs.errors }}
-    </div>
+</div>
+   
     <hr>
-    <div class="mb-3">
+    <div class="me-filter-2colrow">
+    <div class="me-filter-col">
         {{ filter_form.county.label_tag}}
         {{ filter_form.county }}
     </div>
-    <div class="mb-3">
+    <div class="me-filter-col">
         {{ filter_form.region.label_tag}}
         {{ filter_form.region }}
+    </div>
     </div>
     <div class="mb-3">
         <label class="form-label">Categories</label>
         <div class="d-flex flex-wrap gap-2">
-            {% for cat in filter_form.categories %}
-                <div class="form-check form-check-inline">
-                    {{cat.tag}}
-                    <label class="form-check-label" for="{{cat.id_for_label }}">
-                        {{cat.choice_label}}
+             {% for group, choices in filter_form.category_groups %}
+        <div class="category-group">
+            <div class="category-group-title">
+                <strong>{{ group|title }}</strong>
+            </div>
+
+            <div class="category-options">
+                {% for value, label in choices %}
+                    <label class="category-checkbox">
+                        <input type="checkbox"
+                               name="{{ filter_form.categories.html_name }}"
+                               value="{{ value }}"
+                               id="filter_cat_{{ value }}"
+                               {% if value|stringformat:"s" in filter_form.selected_category_ids %}checked{% endif %}>
+                        {{ label }}
                     </label>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    {{ filter_form.categories.errors }}
         </div>
     </div>
   

@@ -46,115 +46,6 @@ def landing(request):
         request,
         "orgs/landing.html")
 
-def filter(request):
-    # main activity filter page - 
-    if request.method == "POST":
-        filter_form = FilterForm(request.POST)
-
-        if filter_form.is_valid():
-            county=filter_form.cleaned_data.get("county")
-            filters = {
-                "region": filter_form.cleaned_data.get("region"),
-                "county": county.id if county else None,
-                "city": filter_form.cleaned_data.get("city"),
-                "categories": [c.id for c in filter_form.cleaned_data.get("categories")],
-                "type": filter_form.cleaned_data.get("type"),
-                "org": filter_form.cleaned_data.get("org"),
-                "my_orgs": filter_form.cleaned_data.get("my_orgs"),
-                "q": filter_form.cleaned_data.get("q"),
-            }
-
-            request.session["filters"] = filters
-            #print("from filter page", filters)
-
-            return redirect("results")
-
-    else:
-        filter_form = FilterForm()
-
-    categories = EventCategory.objects.all().order_by("name")
-
-    grouped_categories = {}
-
-    for cat in categories:
-        group = cat.category_class or "Other"
-        grouped_categories.setdefault(group, []).append(cat)
-
-    return render(request, "orgs/filter.html", {
-        "filter_form": filter_form,
-        "grouped_categories": grouped_categories
-    })
-
-def results(request):
-    # activities results... should i change this so we know what it is?
-   
-    sessions = Session.objects.current().select_related(
-            "activity",        # follow FK from Session -> Activity
-            "activity__org",   # Activity -> Organization
-            "location"         # Session -> Location
-        ).prefetch_related(
-            "activity__categories"  # m2m from Activity -> categories
-        )
-    #print(request.session.get("filters"))
-    filters = request.session.get("filters", {})
-    
-    if filters.get("categories"):
-        sessions = sessions.filter(activity__categories__id__in=filters["categories"]).distinct()
-           
-    if filters.get("type"):
-        sessions = sessions.filter(activity__activity_type=filters["type"])
-            
-    if filters.get("county") :
-        sessions = sessions.filter(location__county_id__id=filters["county"])
-            
-    if filters.get("org"):
-        sessions = sessions.filter(activity__org__id=filters["org"])
-
-    if filters.get("my_orgs"):
-        followed_orgs = request.user.profile.following_orgs.all()
-            
-        sessions = sessions.filter(activity__org__in=followed_orgs)
-           
-    if filters.get("region"):
-        sessions = sessions.filter(
-            Q(activity__org__region_name=filters["region"]) 
-            | Q(location__region_name=filters["region"])
-        )
-                  
-    if filters.get("q"):  
-        
-        sessions= sessions.filter(
-            Q(activity__title=filters["q"]) 
-                | Q(activity__description__icontains=filters["q"])
-                )      
-    q=filters.get("q")
-    clean_get = request.GET.copy()
-    for p in ["page", "curr_page", "onl_page","ong_page"]:
-        clean_get.pop(p, None)
-    
-    thirty_days_ago = timezone.now() - timedelta(days=30)
-
-    # Current: future start dates, sorted by start ascending
-    upcoming_sessions = sessions.upcoming().order_by('start')
-    
-    # New: recently created, sorted by created_on descending
-    new_sessions = sessions.filter(activity__created_at__gte=thirty_days_ago).order_by('-activity__created_at', F('start').asc(nulls_first=True))
-    
-    # Ongoing: start <= now <= end, sorted by start ascending
-    ongoing_sessions = sessions.ongoing().order_by('activity__title')
-    #print("ongoing sessions", ongoing_sessions)
-
-    # For client-side tab segmentation, pass the whole filtered queryset
-    return render(request, "orgs/results.html",{
-                    "upcoming" : upcoming_sessions,
-                    "new": new_sessions,
-                    "ongoing": ongoing_sessions,
-                    "query_params": clean_get,
-                    "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
-                    "cats": EventCategory.objects.all(),
-                    "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
-
-                  } )
 
 def orgs(request):
     # view that runs the org list - this page has it's own filter page.
@@ -223,15 +114,32 @@ def orgs(request):
                                       | Q(about__icontains=q)
                                       | Q(locations__loc_name__icontains=q)
                                       ).distinct()
-        if data.get("has_v"):
+        
+        activity_status = data.get("activity_status")
+            
+        if activity_status == "training":
+            org_queryset = org_queryset.filter(
+                activities__in=training_qs
+            ).distinct()
+
+        elif activity_status == "volunteer":
             org_queryset = org_queryset.filter(
                 activities__in=volunteer_qs
             ).distinct()
 
-        if data.get("has_t"):
+        elif activity_status == "both":
             org_queryset = org_queryset.filter(
                 activities__in=training_qs
-                ).distinct()
+            ).filter(
+                activities__in=volunteer_qs
+            ).distinct()
+
+        elif activity_status == "none":
+            org_queryset = org_queryset.filter(
+                activities__isnull=True
+            )
+
+        
     
     orgs=Paginator(org_queryset, 5)
     page_number = request.GET.get('page')
@@ -485,14 +393,18 @@ def locations(request):
     q = request.GET.get("q", "")
     today = timezone.now().date()
 
-    volunteer = (Session.objects
-        .filter(    Q(activity__expire_date__isnull=True) | Q(activity__expire_date__gte=today),
-                activity__activity_type="v")
-        )
-    training = (Session.objects
-                .filter ( Q(activity__expire_date__isnull=True) | Q(activity__expire_date__gte=today),
-                         activity__activity_type="t")
-        )
+    volunteer = Session.objects.current().filter(
+        activity__deleted=False,
+        activity__org__deleted=False,
+        activity__activity_type="v",
+    )
+
+    training = Session.objects.current().filter(
+        activity__deleted=False,
+        activity__org__deleted=False,
+        activity__activity_type="t",
+    )
+
     queryset = (
         Location.objects
         .filter(deleted=False)
@@ -548,15 +460,31 @@ def locations(request):
                                       | Q(loc_name__icontains=q)
                                       | Q(about__icontains=q)
                                       ).distinct()
-        if data.get("has_v"):
+        activity_status = data.get("activity_status")
+            
+        if activity_status == "training":
+            queryset = queryset.filter(
+                sessions__in=training
+            ).distinct()
+
+        elif activity_status == "volunteer":
             queryset = queryset.filter(
                 sessions__in=volunteer
             ).distinct()
 
-        if data.get("has_t"):
+        elif activity_status == "both":
             queryset = queryset.filter(
                 sessions__in=training
-                ).distinct()
+            ).filter(
+                sessions__in=volunteer
+            ).distinct()
+
+        elif activity_status == "none":
+            queryset = queryset.filter(
+                sessions__isnull=True
+            )
+        
+        
     
    
     locs=Paginator(queryset, 5)
@@ -577,7 +505,9 @@ def locations(request):
             "name": loc.loc_name,
             "latitude": loc.latitude,
             "longitude": loc.longitude,
-            "county": loc.county_id.county_name if loc.county_id else ""
+            "county": loc.county_id.county_name if loc.county_id else "",
+            "has_training": bool(loc.training),
+            "has_volunteer": bool(loc.volunteer),
         }
         for loc in queryset
         if loc.latitude and loc.longitude
@@ -1080,24 +1010,35 @@ def activity_delete(request,activity_id=None):
 
 
 def map_view(request):
+    training_qs = Activity.objects.training().filter(
+        sessions__location=OuterRef("pk")
+    )
+
+    volunteer_qs = Activity.objects.volunteer().filter(
+        sessions__location=OuterRef("pk")
+    )
 
     locations_qs = Location.objects.filter(
         state="WI",
         latitude__isnull=False,
         longitude__isnull=False
-    ).select_related('county_id')
-
+    ).select_related("county_id").annotate(
+        has_training=Exists(training_qs),
+        has_volunteer=Exists(volunteer_qs),
+    )
     locations_json = [
-        {
-            "id": loc.id,
-            "name": loc.loc_name,
-            "latitude": loc.latitude,
-            "longitude": loc.longitude,
-            "county": loc.county_id.county_name if loc.county_id else None,
-        }
-        for loc in locations_qs
+    {
+        "id": loc.id,
+        "name": loc.loc_name,
+        "latitude": loc.latitude,
+        "longitude": loc.longitude,
+        "county": loc.county_id.county_name if loc.county_id else None,
+        "has_training": loc.has_training,
+        "has_volunteer": loc.has_volunteer,
+    }
+    for loc in locations_qs
     ]
-
+    print ("location json", locations_json)
     context = {"locations": json.dumps(locations_json, cls=DjangoJSONEncoder)}
     # Render template
     return render(request, "orgs/map.html", context)

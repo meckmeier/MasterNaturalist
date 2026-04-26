@@ -298,6 +298,18 @@ errorlist {
     color: red;
     margin: 0;
 }
+.me-filter-panel {
+  --bs-offcanvas-width: 500px;
+}
+.me-filter-2colrow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.me-filter-col input {
+  width: 100%;
+}
 .me-tabs {
   display: inline-flex;
   border-bottom: 1px solid #ddd;
