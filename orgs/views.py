@@ -1442,10 +1442,16 @@ def render_markdown(request, filename):
     with open(file_path, "r", encoding="utf-8") as f:
         md_content = f.read()
 
-    html_content = markdown.markdown(md_content)
+
+    html = markdown.markdown(
+        md_content,
+        extensions=[
+            "extra",      # includes tables, fenced code, etc.
+        ]
+    )
    
-    return render(request, "orgs/legal_page.html", {
-        "content": html_content,
+    return render(request, "orgs/static_page.html", {
+        "content": html,
         "title": filename.capitalize()
     })
 

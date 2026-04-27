@@ -33,7 +33,7 @@ body {
 }
 
 .me-navbar .nav-link:hover {
-    color: var(--nav-background);
+    color: var(--nav-bar-background);
     background-color: var(--nav-hover);
 }
 .me-navbar .navbar-toggler {
@@ -53,7 +53,8 @@ body {
 
 .me-navbar .navbar-collapse .nav-link:hover,
 .me-navbar .navbar-collapse .nav-link:focus {
-  color: #dfeee8;
+    color: var(--nav-bar-background);
+    background-color: var(--nav-hover);
 }
 /* Layout */
 .me-page {
@@ -275,6 +276,7 @@ a.me-button-link-2nd{
 /* Hover effect */
 a.me-button-link:hover {
     background-color: #0056b3;   /* Darker blue on hover */
+    color:var(--nav-text);
 }
 a.me-button-link-2nd:hover {
     background-color: #0056b3;   /* Darker blue on hover */

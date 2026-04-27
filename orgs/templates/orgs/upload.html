@@ -19,13 +19,15 @@
     </div>
 
     <br>
-
+    
     <button type="submit" class="me-btn">Upload</button>
 </form>
 <hr>
-<a href="{% static 'upload_template.csv' %}"
-   class="btn me-btn"
-   download>
+<a href="{% static 'load_template.csv' %}"
+   class="btn me-btn">
    Download Template
 </a>
+<a href="{% url 'upload_faq' %}"
+        class="btn me-btn">
+        FAQ -About using the upload process</a>
 {% endblock %}
