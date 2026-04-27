@@ -28,7 +28,7 @@ urlpatterns = [
         path("locs/<int:loc_id>/", views.loc_detail, name="loc_view"),
         path("locations/loc_modal/", views.quick_location_create, name="quick_location_create"),
     path("map/", views.map_view, name="map"),
-    path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),
+    #path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),
     path("locations/", views.locations, name="locations"),
     path("follow_org/<int:org_id>", views.follow_org, name="follow_org"),
     path( "org/<int:org_id>/default-location/<int:loc_id>/",views.org_set_default_location,name="org_set_default_location"),
@@ -59,6 +59,7 @@ urlpatterns = [
     path("debug/sessions/", views.debug_sessions, name="debug_sessions"),
     path("terms/", views.render_markdown, {"filename": "terms"}, name="terms"),
     path("privacy/", views.render_markdown, {"filename": "privacy"}, name="privacy"),
+    path("about/",views.render_markdown, {"filename": "about"}, name="about"),
     path("feedback/", views.feedback_view, name="feedback"),
     path("logos/", TemplateView.as_view(template_name="orgs/logos.html"), name="logos"),
 ]
