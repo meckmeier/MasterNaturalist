@@ -27,34 +27,7 @@
           </a>
         {% endif %}
       </div>
-      <div class="me-card-sponsor">
-        Sponsored by: {{ e.activity.org.org_name }} 
-        {% if e.location %} | Location: {{ e.location.loc_name }}{% endif %}
-        <br>For more info: 
-        {% if e.activity.contact_email%}
-          {{ e.activity.contact_email }}<a href="mailto:{{ e.activity.contact_email }}">
-          <i class="bi bi-envelope" title="send email to contact person"></i></a>
-          
-        {% endif %}
-  
-        {% if e.session_url %}
-           | <a href="{{ e.session_url }}" target="_blank">Session Details</a>
-        {% else %}
-          {% if e.activity.activity_url %}
-           | <a href="{{ e.activity.activity_url }}" target="_blank">Activity Details</a>
-          {% endif %}
-        {% endif %}
-      </div>
-    </div>
-   <div class="me-card-header-left"> 
-{% if e.location %}
-      <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
-      style="height:50px; width:auto;">
-    {% endif %}
-    </div>
-  </div> <!-- header -->
-  <!-- Date line -->
-  <div class="me-card-date">
+        <div class="me-card-date">
 
     {% if e.start %}<strong>Starts:</strong> {{ e.start }}{% endif %}
     {% if e.end %}| <strong>Ends:</strong> {{ e.end }}{% endif %}
@@ -67,6 +40,17 @@
     {% endif %}
 
   </div>
+
+    </div>
+   <div class="me-card-header-left"> 
+{% if e.location %}
+      <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
+      style="height:75px; width:auto;">
+    {% endif %}
+    </div>
+  </div> <!-- header -->
+  <!-- Date line -->
+
   <!-- Description -->
   <div class="me-description-block {% if q %}expanded{% endif %}">
     <div class="me-desc-short">{{ e.activity.description|truncatechars:200 }}</div>
@@ -83,11 +67,27 @@
       <span class="me-badge">{{ cat.name }}</span>
     {% endfor %}
   </div>
-  <div class="small text-muted py-3">
-    
-    Activity added: {{ e.created_at|date:"M j, Y" }}
+  <div class="me-card-sponsor">
+            Sponsored by: <a href="{% url 'orgs'%}?org={{e.activity.org.id}}">{{ e.activity.org.org_name }}</a>
+
+           {% if e.location %} | Location: <a href="{% url 'locations'%}?&loc={{e.location.id}}&view=list">{{ e.location.loc_name }}</a>{% endif %}
+        <br>For more info: 
+        {% if e.activity.contact_email%}
+          {{ e.activity.contact_email }}<a href="mailto:{{ e.activity.contact_email }}">
+          <i class="bi bi-envelope" title="send email to contact person"></i></a>
+          
+        {% endif %}
+  
+        {% if e.session_url %}
+           | <a href="{{ e.session_url }}" target="_blank">Session Details</a>
+        {% else %}
+          {% if e.activity.activity_url %}
+           | <a href="{{ e.activity.activity_url }}" target="_blank">Activity Details</a>
+          {% endif %}
+        {% endif %}
+    <br>Activity added: {{ e.created_at|date:"M j, Y" }}
     {% if e.activity.is_newly_added %}
-       <span class="badge bg-success">* New *</span>
+       <span class="me-badge">* New *</span>
     {% endif %}
     {% if e.updated_at > e.created_at or e.activity.updated_at > e.created_at %} | Last update: 
     {% if e.updated_at > e.activity.updated_at %} {{ e.updated_at|date:"M j, Y" }}

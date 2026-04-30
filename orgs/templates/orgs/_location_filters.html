@@ -1,5 +1,5 @@
 <form method="get" action="{{ request.path }}" class="me-form">
-    
+    <input type="hidden" name="view" value="{{ request.GET.view }}">
     <div class="mb-3">
         {{ filter_form.org.label_tag }}
         {{ filter_form.org }}

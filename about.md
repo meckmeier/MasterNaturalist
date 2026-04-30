@@ -1,15 +1,18 @@
 # Wild Path - Wisconsin
 
-The Mission: to make it easier for <a href="https://wimasternaturalist.org/" target="_blank">Wisconsin Master Naturalists</a> to find  nature-based organizations. Having a place where you could browse volunteer opportunities and training sessions seemed like a good idea. So I wrote this site. My name is Mary Eckmeier - I'm a retired data professional in western Wisconsin. I hope you find this site useful.
+The Mission: to make it easier for <a href="https://wimasternaturalist.org/" target="_blank">Wisconsin Master Naturalists</a> to find  nature-based organizations. The program asks us to complete advanced training and provide volunteer hours annually to renew our designation. So this site was built to help you find these opportunities.
 
-To use the site you need to **REGISTER** and login. Once you are in - you can find volunteer or training opportunties under *Activities* (or use a button from the home page). Icons are used to help you quickly spot important things - like training vs. volunteer. If a training session as a cost there's a little $. And small map icons indicate the general area where activities are. There are things you can do online too... those are indicated with an online badge. 
+To use the site you need to **REGISTER** and login. 
 
-In addition you can **Browse Organizations** - see what they offer. Or look at **Locations** on a map - or a list. 
-Keep your eye out for the **FILTER** button - that will let you target your view. Sometimes the lists can get long.
+**Activities** = volunteer or training opportunities. Icons are used to help you quickly spot important things. If a training session has a cost there's a little $. Map pictures indicate the general area where activities are. Online activities have a badge. 
+
+**Organizations**  and **Locations** to browse or search for either sponsors or places where activities are happening.
+
+Keep your eye out for the **FILTER** button - that will let you target your view. 
 
 <hr>
 ### If you are a provider  
-Use the **Manage Organizations** button (or menu choice at the top) to see the organizations you manage. You get to manage an organization if YOU add it... but you can also be added in to manage existing organizations too. There you will see Locations that are managed by this organization (you may use locations from any organization for your activities, but if the location you want is not there - just add it). If you want your location on the map you have to give it an address. Code will run periodically to turn your address into a map point. Just so you know it's not an immediate thing. 
+**Manage** to see the organizations you manage. You get to manage an organization if YOU add it... but you can also be added in to manage existing organizations. There you will see Locations that are managed by this organization (you may use locations from any organization for your activities, but if the location you want is not there - just add it). If you want your location on the map you have to give it an address. Code will run periodically to turn your address into a map point. Just so you know it's not an immediate thing. 
 
 *Add activities* here - and *add managers* too.
 

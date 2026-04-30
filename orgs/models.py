@@ -510,7 +510,7 @@ class RawLoadData(models.Model):
 
     ongoing = models.BooleanField(null=True)   # ✅ changed
 
-    date = models.DateField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)  # ✅ FIXED (was CharField)
 
     time_commitment = models.CharField(max_length=50, null=True, blank=True)
@@ -520,7 +520,7 @@ class RawLoadData(models.Model):
     expire_date = models.DateField(null=True, blank=True)
     activity_url = models.CharField(max_length=200, null=True, blank=True)
 
-    no_cost = models.BooleanField(null=True)   # ✅ changed
+    has_cost = models.BooleanField(null=True)   # ✅ changed
     session_format = models.CharField(max_length=1, null=True, blank=True)    # ✅ changed
 
     contact_email = models.CharField(max_length=200, null=True, blank=True)

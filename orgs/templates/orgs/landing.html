@@ -3,21 +3,26 @@
 {% load static %}
 <div class="me-page">
 <div class="me-landing-content">
-     <img src="{% static 'orgs/images/wild_paths_logo.jpg' %}" alt="Wild Paths - Wisconsin" width="250" class="img-fluid">
+     <img src="{% static 'orgs/images/wild_paths_logo.jpg' %}" alt="Wild Paths - Wisconsin" width="100" class="img-fluid">
 <div>
-<p>Welcome! We are here to connect <a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a> with volunteer and training opportunities throughout the state.</p>
+<h1>Welcome!</h1> 
+<h4>Connect to nature-based organizations for training and volunteer opportunities.</h4>
+<br>
 {% if user.is_authenticated%}
 
-<a class="me-landing-btn" href="{% url 'activities' %}?activity_type=v" style="background-color:rgba(4, 146, 27, 0.4);">
-    <i class="bi bi-tree-fill me-tree-icon"></i> Volunteer opportunity</a>
-<a class="me-landing-btn" href="{% url 'activities' %}?activity_type=t" style="background-color: rgba(255, 215, 0, 1);">
-    <span><i class="bi bi-mortarboard-fill me-learn-icon"></i> Training opportunity</span></a>
+<a class="me-landing-btn" href="{% url 'activities' %}?activity_type=v" style="background-color:rgb(33, 212, 63); font-weight: bold;color:black;">
+    <i class="bi bi-tree-fill me-tree-icon"></i> Volunteer</a>
+<a class="me-landing-btn" href="{% url 'activities' %}?activity_type=t" style="background-color: rgba(255, 215, 0, 1);font-weight: bold;color:black;">
+    <span><i class="bi bi-mortarboard-fill me-learn-icon"></i> Training</span></a>
     <br><br>
-<a class="me-button-link" href="{% url 'locations' %}">
-    See Locations</a>
-<a class="me-button-link" href="{% url 'orgs' %}">
-    Browse Organizations</a>
+<a class="me-button-link" href="{% url 'locations' %}" title="See a map of locations">
+    Locations</a>
+<a class="me-button-link" href="{% url 'orgs' %}" title="See a list of organizations">
+    Organizations</a>
 </div>
+<br><br>
+This site was built to help <a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a>
+to find ways to maintain their designation with volunteer and training opportunities throughout the state.</p>
 
 <hr>
 <br>

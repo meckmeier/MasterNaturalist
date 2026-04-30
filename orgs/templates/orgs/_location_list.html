@@ -5,32 +5,42 @@
 <div class="me-card" id="loc-{{loc.id}}" >
   <div class="me-card-header">
     <div class="me-card-header-left">
-      <div class="me-card-title-row">
-        
-        {% if user.is_authenticated %}
-        
-          {% if q %}{{ loc.loc_name|highlight:q|safe }}{% else %}{{ loc.loc_name }}{% endif %}
-         {% else %}
-          {{ loc.loc_name }}
+      <div class="me-card-title-row">       
+          {% if q %}
+            {{ loc.loc_name|highlight:q|safe }}
+          {% else %}
+            {{ loc.loc_name }}
           {% endif %}
+
           {%if request.user.profile.staff%}
           <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location">
-                                    <i class="bi bi-pencil"></i>{% endif %}
-          </div>
-          
-          {% if loc.org %}
-            <div class="me-card-sponsor"">{{loc.org.org_name}}</div>{% endif %}
-          {% if loc.location_url%}
-          <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">{{ loc.location_url }}</a></span>
+                <i class="bi bi-pencil"></i></a>
           {% endif %}
+        </div>
+          <div class="me-card-sponsor">
+           {{loc.org.org_name}}
+          {% if loc.location_url%}
+            <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">{{ loc.location_url }}</a></span>
+          {% endif %}
+          <br>  {{loc.address}}, {{loc.city_name}} | {{loc.county_id.county_name}} 
+      
+      </div>
       </div>
       
-      <div class="me-card-header-right">
-
-          
-          <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:50px;width:auto;" title="{{loc.region_name}}">
+      
+      <div class="me-card-header-right">          
+          <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:75px;width:auto;" title="{{loc.region_name}}">
       </div>
     </div>
+ {% if loc.location_about %}
+          <div class="me-description-block"></p>
+            <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
+            <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>
+             
+            </div>
+            
+          {% endif %}
+     
   <div >
       <!-- Tabs Column (vertical on md+, horizontal on mobile) -->
       <div class="col-12 mb-3">
@@ -38,12 +48,10 @@
 
           <!-- Horizontal on mobile -->
           <ul class="nav nav-tabs" id="locTabs{{ loc.id }}" role="tablist" aria-orientation="vertical">
-            <li class="nav-item" role="presentation">
-              <button class="me-tab-button active" id="v-pills-info-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-info{{ loc.id }}" type="button" role="tab">Info</button>
-            </li>
+
             {% if loc.volunteer %}
               <li class="nav-item " role="presentation">
-                <button class="me-tab-button me-tree-tab"  id="v-pills-volunteer-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-volunteer{{ loc.id }}" type="button" role="tab">
+                <button class="me-tab-button active me-tree-tab"  id="v-pills-volunteer-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-volunteer{{ loc.id }}" type="button" role="tab">
                     Volunteer</button>
               </li>
             {% endif %}
@@ -58,25 +66,9 @@
       </div>
       <!-- Tab Content -->
       <div class="col-12 col-md-11 order-md-1 tab-content mx-auto" id="v-pills-tabContent{{ loc.id }}">
-        
-        <!-- Info Tab -->
-        <div class="tab-pane fade show active" id="v-pills-info{{ loc.id }}" role="tabpanel">
-            
-        {{loc.address}}, {{loc.city_name}} | {{loc.county_id.county_name}} 
-        
-          {% if loc.location_about %}
-          <div class="me-description-block"></p>
-            <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
-            <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>
-             
-            </div>
-            
-          {% endif %}
-
-        </div>
 
         <!-- Events Tab -->
-        <div class="tab-pane fade" id="v-pills-volunteer{{ loc.id }}" role="tabpanel">
+        <div class="tab-pane  active fade" id="v-pills-volunteer{{ loc.id }}" role="tabpanel">
        
           {% for each in loc.volunteer %}
             {% include "orgs/_session_item.html" with e=each q=q source='loc'%}

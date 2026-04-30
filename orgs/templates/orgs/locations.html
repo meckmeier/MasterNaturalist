@@ -1,13 +1,8 @@
 {% extends "orgs/layout.html" %}
 
 
-{% block filter_button %}
-   
-{% endblock %}
-
 {% block filters %}
-{% include "orgs/_location_filters.html" %}
-
+    {% include "orgs/_location_filters.html" %}
 {% endblock %}
 
 
@@ -16,6 +11,7 @@
 {% load highlight %}
 {% load can_edit_filters %}
 {% with query_params.urlencode as query_string %}
+
 <div class="me-page">
 <h1>Locations</h1>
 <form method="get" id="view-toggle-form" class="view-toggle mb-3">

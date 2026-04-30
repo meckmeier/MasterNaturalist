@@ -1197,7 +1197,10 @@ def debug_sessions(request):
 
 @login_required
 def upload_csv(request, org_id):
+    #this code will get the csv file and log it into the upload table.
+    
     org = get_object_or_404(Organization, id=org_id)
+    print("Starting upload csv-step1",org)
 
     if not (OrgManager.objects.filter(org=org, profile=request.user.profile).exists()  or request.user.profile.staff):
         return HttpResponseForbidden()
@@ -1214,10 +1217,13 @@ def upload_csv(request, org_id):
         form = UploadFileForm()
     return render(request, "orgs/upload.html", {"form": form})
 
-#from orgs.services.mapping.py import build_mapping, build_dropdown_options
+from orgs.services.mapping import build_mapping, build_dropdown_options
 
 # Step 1: Map columns from csv to rawloaddata fields
 def upload_map(request, upload_id):
+    #this code will map the fields from the upload file to the fields in the RawDataLoad table... 
+    # status is considered :Staged in upload table.
+    print("Starting upload_map for upload:", upload_id)
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
     # Read first row to show column headers
@@ -1253,25 +1259,29 @@ def upload_map(request, upload_id):
 
 # Step 2: Stage data
 def upload_stage(request, upload_id):
+    print("Starting upload_stage for upload:", upload_id)
     upload = get_object_or_404(ActivityUpload, id=upload_id)
-    
-    
-    # Example: you would get mapping from previous step
+
     mapping = request.session.get(f"mapping_{upload_id}")
     if not mapping:
         return redirect("upload_map", upload_id=upload.id)
-    #print ("Using mapping for staging:", mapping)  # Debug log
+
     importer = CSVImporter(upload, mapping=mapping)
     importer.read()
     importer.normalize()
     importer.validate()
 
     if importer.errors:
-        # You could show errors or redirect to review page
         request.session[f"errors_{upload_id}"] = importer.errors
+        upload.status = "error"
+        upload.save()
         return redirect("upload_review", upload_id=upload.id)
 
     importer.process()
+
+    if importer.warnings:
+        request.session[f"warnings_{upload_id}"] = importer.warnings
+
     upload.status = "staged"
     upload.save()
 
@@ -1279,6 +1289,7 @@ def upload_stage(request, upload_id):
 
 # Step 3: Review / cleanup
 def upload_review(request, upload_id):
+    print("Starting upload_review for upload:", upload_id)
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
     # Fetch all staged rows
@@ -1286,6 +1297,7 @@ def upload_review(request, upload_id):
     
     # Fetch any errors from the staging process (from session)
     errors = request.session.pop(f"errors_{upload_id}", [])
+    warnings = request.session.pop(f"warnings_{upload_id}",[])
 
     if request.method == "POST":
         # Handle row skipping
@@ -1296,10 +1308,12 @@ def upload_review(request, upload_id):
     return render(request, "orgs/upload_review.html", {
         "upload": upload,
         "staged_rows": staged_rows,
-        "errors": errors
+        "errors": errors,
+        "warnings":warnings
     })
 # Step 4: Commit to final tables
 def upload_commit(request, upload_id):
+    print("Starting upload_commit for upload:", upload_id)
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     staged_rows = RawLoadData.objects.filter(upload=upload, status="valid")
     
@@ -1313,6 +1327,7 @@ def upload_commit(request, upload_id):
 
 # Success page
 def upload_success(request):
+    print("Starting upload_success for upload:", upload_id)
     return render(request, "orgs/upload_success.html")
 
 def normalize(text):
@@ -1323,7 +1338,7 @@ def upload_processing(request, upload_id):
     #Location_Pending
     #Session_Pending
     #Activity_Pending
-    #print("Starting processing for upload:", upload_id)
+    print("Starting upload_processing for upload:", upload_id)
     upload_info = get_object_or_404(ActivityUpload, id=upload_id)
     rows = RawLoadData.objects.filter(upload_id=upload_id)
 
@@ -1391,7 +1406,7 @@ def upload_processing(request, upload_id):
 
 
 def upload_approval(request, upload_id):
-
+    print("Starting upload_approval for upload:", upload_id)
     # GET (this is the only query you need)
     sessions = Pending_Session.objects.select_related(
             "activity",
@@ -1403,6 +1418,7 @@ def upload_approval(request, upload_id):
     })
 
 def upload_publish(request, upload_id):
+    print("Starting upload_publish for upload:", upload_id)
     #urpose: Move approved rows from pending tables into production.
     #Logic:
     #Promote locations first (Location_Pending → Location)
@@ -1414,6 +1430,7 @@ def upload_publish(request, upload_id):
     return render(request, "orgs/upload_success.html")
 
 def upload_reject(request, upload_id):
+    print("Starting upload_reject for upload:", upload_id)
     #Purpose: Mark rows as rejected and optionally log reasons.
     #Logic:
     #Update pending rows with status “rejected” and save any user comments.

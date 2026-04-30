@@ -12,7 +12,7 @@
 
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1.5;
   color: #222;
   background-color: var(--main-background);
@@ -110,6 +110,8 @@ body {
   flex-direction: column;
   gap: 0.75rem; /* vertical spacing */
   margin:.75rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s ease;
 }
 .me-card-icons {
   display: flex;
@@ -242,7 +244,8 @@ a.me-landing-btn{
     border-radius: 4px;          /* Rounded corners */
     font-family: Arial, sans-serif;
     font-size: 1rem;
-    transition: background-color 0.3s ease; /* Smooth hover effect */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: box-shadow 0.2s ease, transform 0.1s ease, background-color 0.3s ease;
 }
 a.me-landing-btn:hover {
     background-color: var(--nav-bar-background);
@@ -376,7 +379,7 @@ li.inactive {
 .me-tree-icon {
     color: rgb(10, 14, 1);
     font-size: 1.25rem;
-    background-color: rgba(4, 146, 27, 0.4);
+    background-color: rgb(33, 212, 63);
     padding: .4rem .5rem;
     
 

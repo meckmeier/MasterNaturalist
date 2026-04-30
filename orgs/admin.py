@@ -15,7 +15,7 @@ admin.site.register(Activity)
 admin.site.register(Session)
 admin.site.register(OrgManager)
 admin.site.register(ActivityUpload)
-
+admin.site.register(RawLoadData)
 admin.site.register(Pending_Activity)
 admin.site.register(Pending_Session)
 admin.site.register(Pending_Location)

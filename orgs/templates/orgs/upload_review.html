@@ -19,7 +19,16 @@
         </ul>
     </div>
 {% endif %}
-
+{% if warnings %}
+  <div class="alert alert-warning">
+    <strong>Rows loaded with warnings:</strong>
+    <ul>
+      {% for w in warnings %}
+        <li>{{ w }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
 <form method="post">
     {% csrf_token %}
     <table border="1">
@@ -29,11 +38,20 @@
                 <th>#</th>
                 <th>Title</th>
                 <th>Description</th>
-                <th>City</th>
+                <th>Type</th>
                 <th>Location</th>
                 <th>Address</th>
-                <th>Date</th>
-                <th>Status</th>
+                <th>City</th>
+                <th>Zip</th>
+                <th>Ongoing</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Time</th>
+                <th>Time Description</th>
+                <th>Date Description</th>
+                <th>URL</th>
+                <th>Charges</th>
+                <th>Format</th>
             </tr>
         </thead>
         <tbody>
@@ -45,12 +63,58 @@
                 <td>{{ row.row_number }}</td>
                 <td>{{ row.title }}</td>
                 <td>{{ row.description }}</td>
-                <td>{{ row.city }}</td>
+                <td>{{activity_type}}</td>
+                
                 <td>{{ row.location_name }}</td>
                 <td>{{ row.address }}</td>
+                <td>{{ row.city }}</td>
+                <td>{{ row.zip }}</td>
+                <td>{{ row.ongoing }}</td>
+                <td>{{ row.start_date }}</td>
+                <td>{{ row.end_date }}</td>
+                <td>{{ row.time_commitment }}</td>
+                <td>{{ row.time_description }}</td>
+                <td>{{ row.date_description }}</td>
+                <td>{{ row.activity_url }}</td>
+                <td>{{ row.has_cost }}</td>
+                <td>{{ row.session_format }}</td>
                 <td>{{ row.date }}</td>
-                <td>{{ row.status }}</td>
+                <td>
+                    {% if row.status == "warning" %}
+                        <span class="text-warning">⚠ Warning</span>
+                    {% elif row.status == "valid" %}
+                        <span class="text-success">✔ OK</span>
+                    {% else %}
+                        <span class="text-danger">✖ Error</span>
+                    {% endif %}
+                    </td>
             </tr>
+        {% if row.validation_warnings.messages %}
+            <tr class="table-warning" style="background-color: orange;">
+            <td colspan="18">
+                <strong>Warnings:</strong>
+                <ul class="mb-0">
+                {% for warning in row.validation_warnings.messages %}
+                    <li>{{ warning }}</li>
+                {% endfor %}
+                </ul>
+            </td>
+            </tr>
+        {% endif %}
+
+        {% if row.validation_errors.messages %}
+            <tr class="table-danger" style="color:red;">
+            <td colspan="18">
+                <strong>Errors:</strong>
+                <ul class="mb-0">
+                {% for error in row.validation_errors.messages %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            </td>
+            </tr>
+        {% endif %}
+
         {% endfor %}
         </tbody>
     </table>
