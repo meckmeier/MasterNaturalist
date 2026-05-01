@@ -105,7 +105,7 @@
               {% if org.locations.exists %}
               <div class="me-card-sponsor">
                 {% for loc in org.pre_locs %}
-                  <a href="{% url 'locations'%}?loc={{loc.id}}">{{ loc.loc_name }}</a>{% if loc.county_id %} ({{ loc.county_id.county_name }}){% endif %}{% if not forloop.last %}, {% endif %}
+                  <a href="{% url 'locations'%}?loc={{loc.id}}&view=list">{{ loc.loc_name }}</a>{% if loc.county_id %} ({{ loc.county_id.county_name }}){% endif %}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
               </div>
               {% endif %}

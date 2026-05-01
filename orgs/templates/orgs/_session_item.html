@@ -79,10 +79,10 @@
         {% endif %}
   
         {% if e.session_url %}
-           | <a href="{{ e.session_url }}" target="_blank">Session Details</a>
+           | <a href="{{ e.session_url }}" target="_blank">Link to Details</a>
         {% else %}
           {% if e.activity.activity_url %}
-           | <a href="{{ e.activity.activity_url }}" target="_blank">Activity Details</a>
+           | <a href="{{ e.activity.activity_url }}" target="_blank">Link to Details</a>
           {% endif %}
         {% endif %}
     <br>Activity added: {{ e.created_at|date:"M j, Y" }}

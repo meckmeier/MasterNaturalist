@@ -19,8 +19,8 @@
         </div>
           <div class="me-card-sponsor">
            {{loc.org.org_name}}
-          {% if loc.location_url%}
-            <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">{{ loc.location_url }}</a></span>
+          {% if loc.org_loc_url%}
+            | <a href="{{ loc.org_loc_url }}" target="_blank" class="text-decoration-none">{{ loc.org_loc_url }}</a></span>
           {% endif %}
           <br>  {{loc.address}}, {{loc.city_name}} | {{loc.county_id.county_name}} 
       
@@ -63,7 +63,7 @@
       <!-- Tab Content -->
     {% if loc.volunteer %}
     <div id="volunteer-{{ loc.id }}" class="location-section d-none">
-        {{% for each in loc.volunteer %}
+        {% for each in loc.volunteer %}
             {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
               
           {% endfor %}

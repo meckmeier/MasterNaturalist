@@ -21,30 +21,41 @@
           {% if e|can_edit:request.user %} <a href="{% url 'activity_edit' e.id%}"><i class="bi bi-pencil-fill" data-bs-toggle="tooltip" title="Edit activity" style="font-size: .75rem;"></i></a>{% endif %} 
       </div>
      <div class="me-card-sponsor">
-        For more info: 
-          {% if e.contact_email%}
-            {{e.contact_email}} <a href="mailto:{{ e.contact_email }}"><i class="bi bi-envelope" title="send email to contact person"></i></a>
-          {% endif %}
-            {% if e.activity_url %}
-            | <a href="{{ e.activity.activity_url }}" target="_blank">Activity Details</a>
+      {% for session in e.sessions.all %}
+          <div>
+            {% if session.ongoing %} <span class="badge bg-success">Ongoing</span> 
+            {% elif session.start %}  {{ session.start|date:"m/d" }} 
             {% endif %}
-        {%if not e.no_cost %}   
-        <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
-          {% endif %}
+            {% if session.end and session.start != session.end %}  to {{ session.end|date:"m/d" }}
+            {% endif %}
+            {% if session.date_description %}  | <em>{{ a.session.date_description }}</em> 
+            {% endif %}
+            {% if session.session_format == "s" %} | <em>Self selected locations </em> 
+            {% endif %}
+            {% if session.session_format == "i" or session.session_format == "b" and session.location %} 
+              | <a href="{% url 'locations'%}?loc={{session.location.id}}&view=list">{{ session.location}} </a>
+            {% endif %}
+            {% if session.session_format == "o" or session.session_format == "b" and session.session_url %} | 
+               <span class="badge bg-success">Online</span> <a href="{{session.session_url}}">
+               <i class=" bi bi-arrow-right-square-fill" title="Link to actual session url"></i></a>
+            {% endif %}
+          </div>
+        {% endfor %}
+        
     </div>
     </div>
     <div class="me-card-header-right">
       <div class="me-card-sponsor">
-        {% for session in e.sessions.all %}
-          <div>
-            {% if session.start %}  {{ session.start|date:"m/d/y" }} {% endif %}
-            {% if session.end %}  to {{ session.end|date:"m/d/y" }}{% endif %}
-            {% if session.date_description %}  | <em>{{ a.session.date_description }}</em> {% endif %}
-            {% if session.session_format == "i" or session.session_format == "b" and session.location %} @ <a href="{% url 'locations'%}?loc={{session.location.id}}">{{ session.location|truncatechars:15 }} </a>{% endif %}
-            {% if session.session_url %} {% if session.session_format == "o" or session.session_format == "b"  %}| <span class="badge bg-success">Online</span>{% endif %} <a href="{{session.session_url}}">
-              <i class=" bi bi-arrow-right-square-fill" title="Link to actual session url"></i></a>{% endif %}
-          </div>
-        {% endfor %}
+        For more info: 
+          {% if e.contact_email%}
+           Email <a href="mailto:{{ e.contact_email }}"><i class="bi bi-envelope" title="send email to contact person"></i></a>
+          {% endif %}
+            {% if e.activity_url %}
+            | <a href="{{ e.activity_url }}" target="_blank">Activity Details</a>
+            {% endif %}
+        {%if not e.no_cost %}   
+        <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+          {% endif %}
     </div>  
   </div>
   </div>
@@ -60,7 +71,7 @@
  
   <!-- Date row -->
    <div>
-  {% if e.ongoing %}| <span class="badge bg-success">Ongoing</span>{% endif %}
+ 
       <div class="me-stacked">{% for cat in e.categories.all %}
               <span class="me-badge">{{cat.name}}</span>
           {% endfor %}
