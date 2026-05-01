@@ -42,50 +42,45 @@
           {% endif %}
      
   <div >
-      <!-- Tabs Column (vertical on md+, horizontal on mobile) -->
-      <div class="col-12 mb-3">
-        <div class="d-flex d-md-block justify-content-start justify-content-md-end">
+  <div class="location-toggles mb-2">
 
-          <!-- Horizontal on mobile -->
-          <ul class="nav nav-tabs" id="locTabs{{ loc.id }}" role="tablist" aria-orientation="vertical">
+    {% if loc.volunteer %}
+        <button type="button"
+                class="location-toggle me-btn"
+                data-target="volunteer-{{ loc.id }}">
+            Volunteer
+        </button>
+    {% endif %}
 
-            {% if loc.volunteer %}
-              <li class="nav-item " role="presentation">
-                <button class="me-tab-button active me-tree-tab"  id="v-pills-volunteer-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-volunteer{{ loc.id }}" type="button" role="tab">
-                    Volunteer</button>
-              </li>
-            {% endif %}
-            {% if loc.training  %}
-            <li class="nav-item me-2 me-md-0" role="presentation">
-              <button class="me-tab-button me-learn-tab" id="v-pills-trainings-tab{{ loc.id }}" data-bs-toggle="pill" data-bs-target="#v-pills-trainings{{ loc.id }}" type="button" role="tab">
-                Trainings</button>
-            </li>
-              {% endif %}
-          </ul>
-        </div>
-      </div>
+    {% if loc.training %}
+        <button type="button"
+                class="location-toggle me-btn"
+                data-target="training-{{ loc.id }}">
+            Training
+        </button>
+    {% endif %}
+  </div>
       <!-- Tab Content -->
-      <div class="col-12 col-md-11 order-md-1 tab-content mx-auto" id="v-pills-tabContent{{ loc.id }}">
-
-        <!-- Events Tab -->
-        <div class="tab-pane  active fade" id="v-pills-volunteer{{ loc.id }}" role="tabpanel">
-       
-          {% for each in loc.volunteer %}
+    {% if loc.volunteer %}
+    <div id="volunteer-{{ loc.id }}" class="location-section d-none">
+        {{% for each in loc.volunteer %}
             {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
               
           {% endfor %}
-        </div>
-
-        <!-- Trainings Tab -->
-        <div class="tab-pane fade" id="v-pills-trainings{{ loc.id }}" role="tabpanel">
+    </div>
+    {% endif %}
+          
+    {% if loc.training %}
+      <div id="training-{{ loc.id }}" class="location-section d-none">
           
           {% for a in loc.training %}
             {% include "orgs/_session_item.html" with e=a q=q %}
                   
           {% endfor %}
-        </div>
-
       </div>
+    {% endif %}
+
+  </div>
     </div>
  
 <p class="small text-muted">

@@ -43,17 +43,9 @@
       </div>
       </div>
       <div class="me-card-header-right">
-          {% if user.is_authenticated %}
-            <a href="{% url 'follow_org' org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-sm">
-              {% if org.id in followed_orgs %}
-                <i class="bi bi-heart-fill text-danger" title="Click to UN-follow"></i> 
-              {% else %}
-                <i class="bi bi-heart" title="Click to this to follow this organization"></i> 
-              {% endif %}
-            </a>
-          {% endif %}
           
-          <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="height:30px; width:auto;">
+          
+          <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="height:75px; width:auto;">
       </div>
     </div>
     <!-- tab buttons -->
@@ -109,7 +101,7 @@
                <div class="me-desc-full"> {{ org.about }} </div> 
               </div>
           {% endif %}
-                          
+             
               {% if org.locations.exists %}
               <div class="me-card-sponsor">
                 {% for loc in org.pre_locs %}
@@ -118,6 +110,16 @@
               </div>
               {% endif %}
            </div>
+           <div>
+            {% if user.is_authenticated %}
+             <a href="{% url 'follow_org' org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-sm">
+              {% if org.id in followed_orgs %}
+                <i class="bi bi-heart-fill text-danger" title="Click to UN-follow">To remove from favorites</i> 
+              {% else %}
+                <i class="bi bi-heart" title="Click to this to follow this organization">To add to favorites</i> 
+              {% endif %}
+            </a>
+          {% endif %}    </div>        
         </div>
 
         <!-- Events Tab -->

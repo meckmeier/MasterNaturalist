@@ -20,6 +20,7 @@
     <input type="hidden" name="q" value="{{ request.GET.q }}">
     <input type="hidden" name="org" value="{{ request.GET.org }}">
     <input type="hidden" name="page" value="1">
+    <input type="hidden" name="loc" value="{{ request.GET.loc}}">
     
      <div class="btn-group" role="group">
 
@@ -70,6 +71,21 @@ document.addEventListener("DOMContentLoaded", function () {
             form.submit();
         });
     });
+  document.querySelectorAll(".location-toggle").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const section = document.getElementById(button.dataset.target);
+      if (!section) return;
+
+      section.classList.toggle("d-none");
+      button.classList.toggle("active");
+
+      if (button.classList.contains("active")) {
+        button.textContent = button.textContent.replace("Show", "Hide");
+      } else {
+        button.textContent = button.textContent.replace("Hide", "Show");
+      }
+    });
+  });
 });
 </script>
 {% endblock %}

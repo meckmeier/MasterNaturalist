@@ -228,10 +228,10 @@
         </div>
        
 
-<div class="mb-3">
-    <label class="form-label">Categories</label>
+<div class="form-field-full">
+     <legend>Categories</legend>
 
-    {% for group, choices in filter_form.category_groups %}
+    {% for group, choices in activity_form.category_groups %}
         <div class="category-group">
             <div class="category-group-title">
                 <strong>{{ group|title }}</strong>
@@ -241,10 +241,10 @@
                 {% for value, label in choices %}
                     <label class="category-checkbox">
                         <input type="checkbox"
-                               name="{{ filter_form.categories.html_name }}"
+                               name="{{ activity_form.categories.html_name }}"
                                value="{{ value }}"
                                id="filter_cat_{{ value }}"
-                               {% if value|stringformat:"s" in filter_form.selected_category_ids %}checked{% endif %}>
+                               {% if value|stringformat:"s" in activity_form.selected_category_ids %}checked{% endif %}>
                         {{ label }}
                     </label>
                 {% endfor %}
@@ -252,7 +252,7 @@
         </div>
     {% endfor %}
 
-    {{ filter_form.categories.errors }}
+    {{ activity_form.categories.errors }}
 </div>
    
 </div>
