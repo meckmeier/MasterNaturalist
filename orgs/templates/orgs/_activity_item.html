@@ -23,7 +23,7 @@
      <div class="me-card-sponsor">
       {% for session in e.sessions.all %}
           <div>
-            {% if session.ongoing %} <span class="badge bg-success">Ongoing</span> 
+            {% if session.ongoing %} <span class="me-badge">Ongoing</span> 
             {% elif session.start %}  {{ session.start|date:"m/d" }} 
             {% endif %}
             {% if session.end and session.start != session.end %}  to {{ session.end|date:"m/d" }}
@@ -32,30 +32,32 @@
             {% endif %}
             {% if session.session_format == "s" %} | <em>Self selected locations </em> 
             {% endif %}
-            {% if session.session_format == "i" or session.session_format == "b" and session.location %} 
+            {% if session.session_format == "i" or session.session_format == "b" %} 
+              {% if session.location != e.org.default_location %} 
               | <a href="{% url 'locations'%}?loc={{session.location.id}}&view=list">{{ session.location}} </a>
+              {% endif %}
             {% endif %}
             {% if session.session_format == "o" or session.session_format == "b" and session.session_url %} | 
-               <span class="badge bg-success">Online</span> <a href="{{session.session_url}}">
-               <i class=" bi bi-arrow-right-square-fill" title="Link to actual session url"></i></a>
+               <span class="me-badge">Online</span> <a href="{{session.session_url}}">
+               <i class=" bi bi-arrow-up-right-square" title="Link to actual session url"></i></a>
             {% endif %}
+              
           </div>
         {% endfor %}
-        
+         {% if not e.no_cost %}   
+        <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+          {% endif %}
     </div>
     </div>
     <div class="me-card-header-right">
-      <div class="me-card-sponsor">
-        For more info: 
+      <div class="me-icons">
           {% if e.contact_email%}
-           Email <a href="mailto:{{ e.contact_email }}"><i class="bi bi-envelope" title="send email to contact person"></i></a>
-          {% endif %}
-            {% if e.activity_url %}
-            | <a href="{{ e.activity_url }}" target="_blank">Activity Details</a>
+           <a class="me-button-link" href="mailto:{{ e.contact_email }}"><i class="bi bi-envelope" title="send email to contact person"></i></a>
+            {% elif e.activity_url %}
+           <a class="me-button-link" href="{{ e.activity_url }}" target="_blank">
+            <i class="bi bi-arrow-up-right-square" title="link to website"></i></a>
             {% endif %}
-        {%if not e.no_cost %}   
-        <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
-          {% endif %}
+     
     </div>  
   </div>
   </div>

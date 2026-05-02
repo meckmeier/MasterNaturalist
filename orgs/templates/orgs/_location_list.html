@@ -17,36 +17,32 @@
                 <i class="bi bi-pencil"></i></a>
           {% endif %}
         </div>
-          <div class="me-card-sponsor">
+        <div class="me-card-sponsor">
            {{loc.org.org_name}}
-          {% if loc.org_loc_url%}
-            | <a href="{{ loc.org_loc_url }}" target="_blank" class="text-decoration-none">{{ loc.org_loc_url }}</a></span>
+          {% if loc.location_url%}
+            <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">{{ loc.location_url }}</a></span>
           {% endif %}
           <br>  {{loc.address}}, {{loc.city_name}} | {{loc.county_id.county_name}} 
       
-      </div>
+        </div>
       </div>
       
       
       <div class="me-card-header-right">          
           <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:75px;width:auto;" title="{{loc.region_name}}">
       </div>
-    </div>
- {% if loc.location_about %}
-          <div class="me-description-block"></p>
-            <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
-            <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>
-             
-            </div>
-            
-          {% endif %}
-     
-  <div >
-  <div class="location-toggles mb-2">
+  </div>
+  {% if loc.location_about %}
+  <div class="me-description-block"></p>
+    <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
+    <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>  
+  </div>
+  {% endif %}
 
+  <div class="location-toggles mb-2">
     {% if loc.volunteer %}
         <button type="button"
-                class="location-toggle me-btn"
+                class="location-toggle "
                 data-target="volunteer-{{ loc.id }}">
             Volunteer
         </button>
@@ -54,41 +50,35 @@
 
     {% if loc.training %}
         <button type="button"
-                class="location-toggle me-btn"
+                class="location-toggle"
                 data-target="training-{{ loc.id }}">
-            Training
+           Training
         </button>
     {% endif %}
-  </div>
-      <!-- Tab Content -->
-    {% if loc.volunteer %}
+ </div>
+  <!-- Tab Content -->
+  {% if loc.volunteer %}
     <div id="volunteer-{{ loc.id }}" class="location-section d-none">
-        {% for each in loc.volunteer %}
-            {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
-              
-          {% endfor %}
+    {% for each in loc.volunteer %}
+        {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
+      {% endfor %}
     </div>
-    {% endif %}
-          
-    {% if loc.training %}
-      <div id="training-{{ loc.id }}" class="location-section d-none">
-          
-          {% for a in loc.training %}
-            {% include "orgs/_session_item.html" with e=a q=q %}
-                  
-          {% endfor %}
-      </div>
+  {% endif %}
+  {% if loc.training %}
+    <div id="training-{{ loc.id }}" class="location-section d-none">   
+      {% for a in loc.training %}
+        {% include "orgs/_session_item.html" with e=a q=q %}          
+      {% endfor %}
+    </div>
     {% endif %}
 
-  </div>
-    </div>
- 
 <p class="small text-muted">
     Last updated: {{ loc.updated_at|date:"M j, Y" }}
   </p>
-   </div>
-{% endfor %}
 
+  </div>
+{% endfor %}
+  </div>
 <!-- Pagination -->
   <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">

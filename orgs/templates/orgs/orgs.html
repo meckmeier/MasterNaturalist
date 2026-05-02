@@ -43,11 +43,26 @@
       </div>
       </div>
       <div class="me-card-header-right">
+        <div class="me-icons">
+          {% if user.is_authenticated %}
+             <a href="{% url 'follow_org' org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-lg">
+              {% if org.id in followed_orgs %}
+                <i class="bi bi-heart-fill text-danger" title="Click to UN-follow"></i> 
+              {% else %}
+                <i class="bi bi-heart" title="Click to this to follow this organization"></i> 
+              {% endif %}
+            </a>
+          {% endif %} 
+    
           
-          
-          <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="height:75px; width:auto;">
-      </div>
+      </div></div>
     </div>
+    {% if org.about %}
+            <div class="me-description-block">
+              <div class = "me-desc-short"> {{ org.about|truncatechars:250 }} </div>
+               <div class="me-desc-full"> {{ org.about }} </div> 
+              </div>
+          {% endif %}
     <!-- tab buttons -->
     <ul class="me-tabs" id="orgTabs{{ org.id }}" role="tablist" aria-orientation="vertical">
       <li role="presentation">
@@ -92,34 +107,43 @@
         <!-- Info Tab -->
         <div class="tab-pane fade show active" id="v-pills-info{{ org.id }}" aria-labelledby="v-pills-info-tab{{ org.id }}" role="tabpanel">
           <div class="me-card">
-          {% for each in org.pre_volunteer %}
-              {{org.pre_volunteer.title}}
-            {% endfor %}
-          {% if org.about %}
-            <div class="me-description-block">
-              <div class = "me-desc-short"> {{ org.about|truncatechars:250 }} </div>
-               <div class="me-desc-full"> {{ org.about }} </div> 
+            <div class="me-card-header">
+              
+              <div class="me-card-header-left">
+                
+                {% if org.default_location %}
+                Main Location:
+                <strong>{{org.default_location.loc_name}}</strong><br>
+                          {{org.default_location.address}}, {{org.default_location.city_name}} {{org.default_location.county_id.county_name}}
+                {% endif %}
+                {% if org.volunteer_url%}<a href="{{org.volunteer_url}}">Volunteer site.</a>{% endif %}
+                {% if org.training_url%}<a href="{{org.training_url}}">Training site.</a>{% endif %}
               </div>
-          {% endif %}
-             
+              <div class="me-card-header-right">
+                {% if org|can_edit:request.user %}
+                  <a class="me-button-link" href="{% url 'org_mgmt' %}?org={{org.id}}">Manage</a>
+                  {% endif %}
+                <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="width:75px;">
+            
+            </div>
+          </div>
+            
               {% if org.locations.exists %}
               <div class="me-card-sponsor">
+                Additional locations: 
                 {% for loc in org.pre_locs %}
-                  <a href="{% url 'locations'%}?loc={{loc.id}}&view=list">{{ loc.loc_name }}</a>{% if loc.county_id %} ({{ loc.county_id.county_name }}){% endif %}{% if not forloop.last %}, {% endif %}
+                  <a href="{% url 'locations'%}?loc={{loc.id}}&view=list">{{ loc.loc_name }}</a>
+                  {% if loc.county_id %} ({{ loc.county_id.county_name }}){% endif %}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
               </div>
-              {% endif %}
-           </div>
-           <div>
-            {% if user.is_authenticated %}
-             <a href="{% url 'follow_org' org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-sm">
-              {% if org.id in followed_orgs %}
-                <i class="bi bi-heart-fill text-danger" title="Click to UN-follow">To remove from favorites</i> 
               {% else %}
-                <i class="bi bi-heart" title="Click to this to follow this organization">To add to favorites</i> 
+                This organization does not maintain locations.
               {% endif %}
-            </a>
-          {% endif %}    </div>        
+              
+            </div>
+            
+           <div>
+               </div>        
         </div>
 
         <!-- Events Tab -->

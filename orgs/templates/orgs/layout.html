@@ -22,66 +22,104 @@
 
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-dark me-navbar">
+<nav class="navbar navbar-light sticky-top me-navbar">
   <div class="container-fluid">
+
     <!-- Brand -->
-    <a href="{% url "landing" %}">
-        <img src="{% static 'orgs/images/wild_paths_logo_cropped4.jpg' %}" alt="Home" width="120" class="img-fluid" style="margin-right:1rem;">
+    <a class="navbar-brand" href="{% url 'landing' %}">
+      <img src="{% static 'orgs/images/softpath.jpg' %}"
+           alt="Home"
+           width="50"
+           class="img-fluid">
     </a>
-    <!--Toggler -->
-    <button class ="navbar-toggler" type="button" 
-                data-bs-toggle="collapse" data-bs-target="#navbarMain">
-                <span class="navbar-toggler-icon"></span>
+
+    <!-- Hamburger -->
+    <button class="navbar-toggler"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#navbarMain"
+            aria-controls="navbarMain"
+            aria-label="Open menu">
+      <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- menu items-->
-    <div class="collapse navbar-collapse" id="navbarMain">
-        <!-- left side -->
-        <ul class = "navbar-nav me-auto mb-2 mb-lg-0">
-            
+    <!-- Left slide-out menu -->
+    <div class="offcanvas offcanvas-end"
+         tabindex="-1"
+         id="navbarMain"
+         aria-labelledby="navbarMainLabel">
 
-            {% if user.is_authenticated %}
-                <li class="nav-item">
-                    {% block filter_button %}{% endblock %}    
-                </li>   
-               <li class="nav-item"><a class="nav-link" href="{% url 'activities' %}" title="Click here to see training or volunteer opportunities">
-                    Activities</a></li>
-                <li class ="nav-item"><a class="nav-link" href="{% url 'orgs' %}" title="Click here to browse nature based organizations">
-                    Organizations</a></li>
-                <li class ="nav-item"><a class="nav-link" href="{% url 'locations' %}" title="Click here to see a map or list of locations with training or volunteer opportunities">
-                    Locations</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
-                </li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'org_mgmt' %}">
-                    Manage</a></li>
-                
-                {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="/admin/">
-                    Admin</a></li>
-                {% endif %}  
-                 
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="navbarMainLabel">Menu</h5>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+      </div>
 
-            {% endif %} 
-            <li class = "nav-item">
-                <a class="nav-link" href="{% url 'about' %}">
-                 About</a>
+      <div class="offcanvas-body">
+        <ul class="navbar-nav">
+
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              {% block filter_button %}{% endblock %}
             </li>
-        </ul>
-        <!-- RIGHT SIDE -->
-        <ul class="navbar-nav ms-auto">
-            {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">
-                    Logout</a></li>
-                <li class="nav-item"><span class="nav-link disabled">
-                    Signed in as {{ user.username }}</span></li>
-            {% else %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">
-                    Log In</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">
-                    Register</a></li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'activities' %}">Activities</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'orgs' %}">Organizations</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'locations' %}">Locations</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'org_mgmt' %}">Manage</a>
+            </li>
+
+            {% if user.is_staff %}
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/">Admin</a>
+              </li>
             {% endif %}
+          {% endif %}
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'about' %}">About</a>
+          </li>
+
+          <hr>
+
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+
+            <li class="nav-item">
+              <span class="nav-link disabled">Signed in as {{ user.username }}</span>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Log In</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'register' %}">Register</a>
+            </li>
+          {% endif %}
+
         </ul>
+      </div>
     </div>
+
   </div>
 </nav>
 {% if not user.is_authenticated %}<em>To access all features including activities and search - please login. </em>{% endif %}

@@ -1,13 +1,18 @@
 :root {
   --main-background: ivory;   /* Dodger Blue */
-  --main-border: rgba(203, 213, 207, 0.5); /* Tomato */
-  --button: #2F5D50;    
+  --main-border: rgba(203, 213, 207, 0.5); 
+  --button: #6c757d;    
+  --button-text: IVORY;
+  --light-green: #d6e076;
   --color-dark: #222222;      /* Dark Gray */
   --color-light: #f5f5f5;     /* Light Gray */
   --color-warning: #ffcc00;   /* Yellow */
-  --nav-text: rgb(250, 248, 248);        /* Deep Green-Gray */
-  --nav-bar-background: #2F5D50;
-  --nav-hover: #dfeee8;
+  --nav-text: black;        /* Deep Green-Gray */
+  --nav-bar-background: ivory;
+  --hover: #6B6F34;
+  --hover-text: #FFEF91;
+  --contrast: #9AD872;
+  --accent: #FFEF91;
 }
 html{
   font-size: 20px;
@@ -20,9 +25,9 @@ body {
 }
 .me-navbar {
     background-color:var(--nav-bar-background);  
-    border-bottom: 1px solid var(--main-border);
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+    border-bottom: .5px solid var(--main-border);
+    
+    
 }
 .me-navbar .navbar-brand,
 .me-navbar .nav-link {
@@ -34,15 +39,15 @@ body {
 }
 
 .me-navbar .nav-link:hover {
-    color: var(--nav-bar-background);
-    background-color: var(--nav-hover);
+    color: var(--hover-text);
+    background-color: var(--hover);
 }
 .me-navbar .navbar-toggler {
-    border-color: white;
+    border-color: black;
 }
 
 .me-navbar .navbar-toggler-icon {
-    filter: invert(25%) sepia(20%) saturate(300%) hue-rotate(90deg);
+    filter: black;
 }
 .me-navbar .navbar-collapse {
   background-color: #2F5D50;  /* same as your navbar */
@@ -55,12 +60,12 @@ body {
 .me-navbar .navbar-collapse .nav-link:hover,
 .me-navbar .navbar-collapse .nav-link:focus {
     color: var(--nav-bar-background);
-    background-color: var(--nav-hover);
+    background-color: var(--hover);
 }
 /* Layout */
 .me-page {
   max-width: 1300px;
-  margin: 2rem auto;
+  margin: auto;
   padding: 0 1rem;
 
 }
@@ -142,14 +147,16 @@ body {
 .me-card-header {
   display: flex;
   justify-content: space-between; /* left block vs right icons */
-  align-items: center;            /* vertical center right icons with left block */
-  gap: 1rem;
+  align-items: flex-start;            /* vertical center right icons with left block */
+  gap: .75rem;
 }
 
 /* Left block stacked */
 .me-card-header-left {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-width:0;
   gap: 0.25rem;
 }
 
@@ -171,9 +178,7 @@ body {
 
 /* Right block: inline icons */
 .me-card-header-right {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex: 0 0 auto;
 }
 
 /* Description */
@@ -223,45 +228,50 @@ body {
 
 .me-btn {
     background-color:  var(--button);
-    color: white;
+    color: var(--button-text);
     border: none;
     padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 1rem;
+    margin: 10px;
+    box-shadow:  0 3px 8px var(--hover);
     transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 .me-btn:hover{
-    background-color: #0056b3;   /* Darker blue on hover */
+    background-color: var(--hover);   /* Darker blue on hover */
 }
 a.me-landing-btn{
     display: inline-block;       /* Makes it behave like a button */
-    padding: 5px 10px;          /* Space inside the button */
+    padding: 3px 10px 3px 1px;          /* Space inside the button */
     background-color: white;   /* Button background color */
-    color: var(--nav-bar-background);                /* Text color */
+    color: black;                /* Text color */
     border: solid thin black;
     text-align: center;          /* Center text */
     text-decoration: none;       /* Remove underline */
     border-radius: 4px;          /* Rounded corners */
     font-family: Arial, sans-serif;
     font-size: 1rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 8px var(--hover);
+    margin: 20px;
     transition: box-shadow 0.2s ease, transform 0.1s ease, background-color 0.3s ease;
 }
 a.me-landing-btn:hover {
     background-color: var(--nav-bar-background);
-    color: var(--nav-hover)
+    color: var(--hover)
 }
 a.me-button-link {
     display: inline-block;       /* Makes it behave like a button */
     padding: 5px 10px;          /* Space inside the button */
     background-color: var(--button);   /* Button background color */
-    color: white;                /* Text color */
+    color: var(--button-text);                /* Text color */
     text-align: center;          /* Center text */
     text-decoration: none;       /* Remove underline */
     border-radius: 4px;          /* Rounded corners */
     font-family: Arial, sans-serif;
     font-size: 1rem;
+    margin: 10px;
+    box-shadow: 0 2px 6px var(--hover);
     transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 a.me-button-link-2nd{
@@ -279,11 +289,11 @@ a.me-button-link-2nd{
 }
 /* Hover effect */
 a.me-button-link:hover {
-    background-color: #0056b3;   /* Darker blue on hover */
+    background-color: var(--hover);   /* Darker blue on hover */
     color:var(--nav-text);
 }
 a.me-button-link-2nd:hover {
-    background-color: #0056b3;   /* Darker blue on hover */
+    background-color: var(--hover);   /* Darker blue on hover */
 }
 .error-text{
     color:red;
@@ -352,7 +362,7 @@ errorlist {
   font-weight: 600;
 }
 .me-tab-button:hover {
-  color: #000;
+  color: var(--hover);
 }
 .me-tab-content {
   width: 100%;
@@ -380,17 +390,18 @@ li.inactive {
 .me-tree-icon {
     color: rgb(10, 14, 1);
     font-size: 1.25rem;
-    background-color: rgb(33, 212, 63);
+    background-color: var(--contrast);
     padding: .4rem .5rem;
-    
+     border-radius: 4px;
 
     
 }
 .me-learn-icon {
     color: rgb(34, 34, 34);
     font-size: 1.25rem;
-    background-color: rgba(255, 215, 0, 1);
+    background-color: var(--accent);
     padding: .4rem .5rem;
+     border-radius: 4px;
 }
 .me-new-icon {
     color: black;
@@ -439,4 +450,33 @@ li.inactive {
   content: "|";
   margin-left: 1rem;
   color: #999;
+}
+.me-activity-header {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* arrow indicator */
+.me-activity-header::after {
+  content: "▸";
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.me-activity-header.open::after {
+  transform: rotate(90deg);
+}
+
+.me-activity-body {
+  padding-left: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.me-activity-item {
+  font-size: 0.9rem;
+  padding: 0.2rem 0;
 }
