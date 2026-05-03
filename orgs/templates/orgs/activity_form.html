@@ -27,14 +27,20 @@
   </div>
 
   <button class="me-btn" type="submit" name="confirm_duplicate" value="1">
-    Yes, add anyway
+    <span><i class="bi bi-check-square me-btn-icon"></i></span>
+    <span class="me-btn-label">Yes, add anyway</span>
+
   </button>
 
-  <a href="" class="me-button-link">Cancel</a>
+  <a href="" class="me-btn">
+    <span><i class="bi bi-x-square me-btn-icon"></i></span>
+    <span class="me-btn-label">Cancel</span>
+    </a>
 {% else %}
 
        <button type ="submit" class="me-btn">
-            Save
+        <span><i class="bi bi-floppy me-btn-icon"></i></span>
+         <span class="me-btn-label">Save</span>
         </button>
 
 {% endif %}   
@@ -132,10 +138,11 @@
                             {{ form.location.errors }}
 
                             <button type="button"
-                                    class="btn btn-sm btn-outline-secondary open-location-search mt-1"
+                                    class="me-btn  open-location-search"
                                     data-bs-toggle="modal"
                                     data-bs-target="#locationSearchModal">
-                                Find or Add Location
+                                 <span><i class="bi bi-search me-btn-icon"></i></span> 
+                               <span class="me-btn-label">Find Location</span>
                             </button>
                         </div>
                         </td>       
@@ -179,10 +186,11 @@
                      <td>{{ session_formset.empty_form.session_url }}</td>
                      <td>{{ session_formset.empty_form.location }}
                             <button type="button"
-                                    class="btn btn-sm btn-outline-secondary open-location-search mt-1"
+                                    class="me-btn"
                                     data-bs-toggle="modal"
                                     data-bs-target="#locationSearchModal">
-                                Find or Add Location
+                               <span><i class="bi bi-plus-fill me-btn-icon"></i></span> 
+                               <span class="me-btn-label">Find or Add Location</span>
                             </button>
                      </td>
                      <td>{{ session_formset.empty_form.ongoing }}</td>
@@ -196,7 +204,8 @@
     {% if can_edit %}
     {% if not view_only %}
         <button type="button" id="add-btn" class="me-btn">
-            Add Sessions
+           <span><i class="bi bi-plus-circle me-btn-icon"></i></span> 
+           <span class="me-btn-label">Add Sessions</span>
         </button>
     {% endif %}
  {% endif %}    
@@ -269,14 +278,18 @@
   </div>
 
   <button class="me-btn" type="submit" name="confirm_duplicate" value="1">
-    Yes, add anyway
+    <span><i class="bi bi-check-square me-btn-icon"></i></span>
+    <span class="me-btn-label">Yes, add anyway</span>
   </button>
 
-  <a href="" class="me-button-link">Cancel</a>
+  <a href="" class="me-btn">
+    <span><i class="bi bi-x-square me-btn-icon"></i></span>
+    <span class="me-btn-label">Cancel<span></span></a>
 {% else %}
 
        <button type ="submit" class="me-btn">
-            Save
+        <span><i class="bi bi-floppy me-btn-icon"></i></span>
+         <span class="me-btn-label">Save</span>
         </button>
 
 {% endif %}

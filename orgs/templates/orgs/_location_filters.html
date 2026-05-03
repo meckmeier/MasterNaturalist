@@ -8,27 +8,25 @@
 
     <div class="mb-3">
         Has: 
-        <div class="btn-group" role="group">
+        <div class="me-toggle" role="group">
   
-  <input type="radio" class="btn-check" name="activity_status" id="status-all" value=""
+  <input type="radio" name="activity_status" id="status-all" value=""
          {% if not request.GET.activity_status %}checked{% endif %}>
-  <label class="btn btn-outline-secondary btn-sm" for="status-all">All</label>
+  <label for="status-all">All</label>
 
-  <input type="radio" class="btn-check" name="activity_status" id="status-volunteer" value="volunteer"
+  <input type="radio" name="activity_status" id="status-volunteer" value="volunteer"
          {% if request.GET.activity_status == "volunteer" %}checked{% endif %}>
-  <label class="btn btn-outline-secondary btn-sm" for="status-volunteer">Volunteer</label>
+  <label for="status-volunteer">Volunteer</label>
 
-  <input type="radio" class="btn-check" name="activity_status" id="status-training" value="training"
+  <input type="radio" name="activity_status" id="status-training" value="training"
          {% if request.GET.activity_status == "training" %}checked{% endif %}>
-  <label class="btn btn-outline-secondary btn-sm" for="status-training">Training</label>
+  <label for="status-training">Training</label>
 
-  <input type="radio" class="btn-check" name="activity_status" id="status-both" value="both"
+  <input type="radio" name="activity_status" id="status-both" value="both"
          {% if request.GET.activity_status == "both" %}checked{% endif %}>
-  <label class="btn btn-outline-secondary btn-sm" for="status-both">Both</label>
+  <label for="status-both">Both</label>
 
-  <input type="radio" class="btn-check" name="activity_status" id="status-none" value="none"
-         {% if request.GET.activity_status == "none" %}checked{% endif %}>
-  <label class="btn btn-outline-secondary btn-sm" for="status-none">None</label>
+
 
 </div></div>
     <div class="mb-3">
@@ -53,7 +51,13 @@
     </div>      
     
     <div class="d-flex gap-2">
-        <button type = "submit" class="me-btn">Apply</button>
-        <a href="{% url 'locations'%}" class ="me-button-link">Clear</a>
+         <button type="submit"  class="me-btn">
+            <span><i class="bi bi-search me-btn-icon"></i></span>
+            <span class="me-btn-label">Apply</span>
+        </button>
+        <a href="{% url 'locations'%}" class ="me-btn">
+            <span><i class="bi bi-x-circle-fill me-btn-icon"></i></span>
+            <span class="me-btn-label">Clear</span></a> 
+       
     </div>
 </form>

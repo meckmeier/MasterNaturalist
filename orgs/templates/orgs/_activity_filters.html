@@ -3,33 +3,33 @@
      {% csrf_token %}
     <input type="hidden" name="page" value="{{ request.GET.page|default:'1' }}">
     <div class="filter-row d-flex gap-3 flex-wrap">
-    <div class="btn-group" role="group">
-    <input type="radio" class="btn-check" name="session_mode" id="format-all" value="" 
+    <div class="me-toggle" role="group">
+    <input type="radio" name="session_mode" id="format-all" value="" 
            {% if not request.GET.session_mode %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="format-all">All</label>
+    <label for="format-all">All</label>
 
-    <input type="radio" class="btn-check" name="session_mode" id="format-inperson" value="i"
+    <input type="radio" name="session_mode" id="format-inperson" value="i"
            {% if request.GET.session_mode == "i" %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="format-inperson">In Person</label>
+    <label for="format-inperson">In Person</label>
 
-    <input type="radio" class="btn-check" name="session_mode" id="format-online" value="o"
+    <input type="radio" name="session_mode" id="format-online" value="o"
            {% if request.GET.session_mode == "o" %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="format-online">Online</label>
+    <label  for="format-online">Online</label>
   </div>
 
   <!-- Activity Type -->
-  <div class="btn-group" role="group">
-    <input type="radio" class="btn-check" name="activity_type" id="type-all" value=""
+  <div class="me-toggle" role="group">
+    <input type="radio" name="activity_type" id="type-all" value=""
            {% if not request.GET.activity_type %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="type-all">All</label>
+    <label for="type-all">All</label>
 
     <input type="radio" class="btn-check" name="activity_type" id="type-volunteer" value="v"
            {% if request.GET.activity_type == "v" %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="type-volunteer">Volunteer</label>
+    <label for="type-volunteer">Volunteer</label>
 
     <input type="radio" class="btn-check" name="activity_type" id="type-training" value="t"
            {% if request.GET.activity_type == "t" %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="type-training">Training</label>
+    <label for="type-training">Training</label>
   </div>
   </div>
     <div class="mb-3">
@@ -104,8 +104,13 @@
     
     <div class="d-flex gap-2">
         
-        <button type="submit"  class="me-btn">Apply</button>
-        <a href="{% url 'activities'%}" class ="me-button-link">Clear</a>    
+        <button type="submit"  class="me-btn">
+            <span><i class="bi bi-search me-btn-icon"></i></span>
+            <span class="me-btn-label">Apply</span>
+        </button>
+        <a href="{% url 'activities'%}" class ="me-btn">
+            <span><i class="bi bi-x-circle-fill me-btn-icon"></i></span>
+            <span class="me-btn-label">Clear</span></a>    
     </div>
 </form>
 </div>

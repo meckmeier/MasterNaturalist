@@ -4,27 +4,55 @@
   --button: #6c757d;    
   --button-text: IVORY;
   --light-green: #d6e076;
-  --color-dark: #222222;      /* Dark Gray */
-  --color-light: #f5f5f5;     /* Light Gray */
-  --color-warning: #ffcc00;   /* Yellow */
-  --nav-text: black;        /* Deep Green-Gray */
+  --dark-green: rgb(12,67,11);      
+  --med-green:  rgb(63,103,14);     /* Light Gray */
+  --green: #2e7d32;
+  --blue: #2C6FA3;
+  --mustard: #FF7F11;   /* Yellow */
+  --nav-text: #2e7d32;        /* Deep Green-Gray */
   --nav-bar-background: ivory;
   --hover: #6B6F34;
   --hover-text: #FFEF91;
   --contrast: #9AD872;
   --accent: #FFEF91;
+
 }
 html{
   font-size: 20px;
+  
 }
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  color: #222;
+  color: var(--dark-green);
+  font-weight:450;
   background-color: var(--main-background);
 }
+h1{
+  color: var(--dark-green);
+  font-weight:700;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+}
+a {
+  color: rgb(12,67,11);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  color: #2e7d32;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: rgb(12,67,11);
+}
+
+a:active {
+  color: #FF7F11;
+}
 .me-navbar {
-    background-color:var(--nav-bar-background);  
+    background-color:var(--green);  
     border-bottom: .5px solid var(--main-border);
     
     
@@ -43,11 +71,11 @@ body {
     background-color: var(--hover);
 }
 .me-navbar .navbar-toggler {
-    border-color: black;
+    border-color: ivory;
 }
 
 .me-navbar .navbar-toggler-icon {
-    filter: black;
+    filter: ivory;
 }
 .me-navbar .navbar-collapse {
   background-color: #2F5D50;  /* same as your navbar */
@@ -134,7 +162,7 @@ body {
 /* Date line */
 .me-card-date {
   font-size: 1rem;
-  color: #666;
+  color: var(--green);
 }
 .me-nav-img {
     height: 40px;
@@ -173,7 +201,7 @@ body {
 /* Sponsored text under title row */
 .me-card-sponsor {
   font-size: .9rem;
-  color: #666;
+  color: var(--green);
 }
 
 /* Right block: inline icons */
@@ -184,16 +212,16 @@ body {
 /* Description */
 .description-block {
   font-size: 0.95rem;
-  color: #444;
+  color: var(--dark-green);
 }
 
 /* Badges */
 .me-badge {
   display: inline-block;
-  background: #eee;
+  background: var(--light-green);
   color: #333;
   padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 12px;
   font-size: 0.75rem;
   margin-right: 0.25rem;
 }
@@ -227,19 +255,78 @@ body {
 }
 
 .me-btn {
-    background-color:  var(--button);
-    color: var(--button-text);
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    margin: 10px;
-    box-shadow:  0 3px 8px var(--hover);
-    transition: background-color 0.3s ease; /* Smooth hover effect */
+  display: inline-flex;
+  align-items: stretch;
+  height: 50px;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  line-height: 1;
+  background-color: white;
+  box-shadow: 5px 4px 4px rgba(0,0,0,0.35);
+  text-decoration: none;
+  color: inherit;
+  margin: 10px;
 }
-.me-btn:hover{
-    background-color: var(--hover);   /* Darker blue on hover */
+.me-btn,
+.me-btn a,
+.me-btn button {
+  font-family: inherit;
+  font-weight: 450;
+  line-height: 1;
+}
+.me-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2e7d32;
+  color: white;
+  font-size: 1.25rem;
+  width: 44px;        /* cleaner than padding for fixed icon block */
+  height: 100%;
+  padding: 0;
+  border-radius: 0;  /* important */
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.me-btn-icon i {
+  display: block;
+  line-height: 1;
+}
+
+.me-btn-label {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 0.7rem;
+  color: black;
+  font-size: 0.9rem;
+}
+
+.me-btn-learn-icon {
+  background-color: var(--mustard);
+}
+
+.me-btn-vol-icon {
+  background-color: var(--blue);
+}
+
+.me-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
+.me-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.me-btn:link,
+.me-btn:visited {
+  text-decoration: none;
+  color: inherit;
 }
 a.me-landing-btn{
     display: inline-block;       /* Makes it behave like a button */
@@ -388,26 +475,25 @@ li.inactive {
     opacity: 0.6;
 }
 .me-tree-icon {
-    color: rgb(10, 14, 1);
+    color: ivory;
     font-size: 1.25rem;
-    background-color: var(--contrast);
+    background-color: var(--blue);
     padding: .4rem .5rem;
-     border-radius: 4px;
-
-    
+    border-radius: 8px;
 }
 .me-learn-icon {
+    color: ivory;
+    font-size: 1.25rem;
+    background-color: var(--mustard);
+    padding: .4rem .5rem;
+     border-radius: 8px;
+}
+.me-icon {
     color: rgb(34, 34, 34);
     font-size: 1.25rem;
-    background-color: var(--accent);
+    background-color: var(--med-green);
     padding: .4rem .5rem;
-     border-radius: 4px;
-}
-.me-new-icon {
-    color: black;
-    font-size: 1.25rem;
-    background-color: pink;
-    padding: .4rem .5rem;
+    border-radius: 8px;
 }
 .me-cost-icon{
   color:black;
@@ -479,4 +565,64 @@ li.inactive {
 .me-activity-item {
   font-size: 0.9rem;
   padding: 0.2rem 0;
+}
+/* whole segmented control */
+.me-toggle {
+  display: inline-flex;
+  height: 50px;                 /* same as your .me-btn */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  margin: 10px;
+}
+
+/* hide actual radio buttons completely */
+.me-toggle input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+/* visible option buttons */
+.me-toggle label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 1rem;
+  margin: 0;
+  background: white;
+  color: var(--dark-green);
+  border-right: 1px solid #ccc;
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* no divider after last label */
+.me-toggle label:last-child {
+  border-right: none;
+}
+
+/* selected option */
+.me-toggle input[type="radio"]:checked + label {
+  background: #2e7d32;
+  color: white;
+}
+
+/* optional hover */
+.me-toggle label:hover {
+  background: #f3f3f3;
+}
+
+/* keep selected green even on hover */
+.me-toggle input[type="radio"]:checked + label:hover {
+  background: #2e7d32;
+  color: white;
 }

@@ -23,7 +23,7 @@
      <div class="me-card-sponsor">
       {% for session in e.sessions.all %}
           <div>
-            {% if session.ongoing %} <span class="me-badge">Ongoing</span> 
+            {% if session.ongoing %} <strong>Ongoing</strong> 
             {% elif session.start %}  {{ session.start|date:"m/d" }} 
             {% endif %}
             {% if session.end and session.start != session.end %}  to {{ session.end|date:"m/d" }}
@@ -38,7 +38,7 @@
               {% endif %}
             {% endif %}
             {% if session.session_format == "o" or session.session_format == "b" and session.session_url %} | 
-               <span class="me-badge">Online</span> <a href="{{session.session_url}}">
+               <strong>Online</strong> <a href="{{session.session_url}}">
                <i class=" bi bi-arrow-up-right-square" title="Link to actual session url"></i></a>
             {% endif %}
               

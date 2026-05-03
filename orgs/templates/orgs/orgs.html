@@ -16,13 +16,13 @@
 
 <div class="me-page">
 <h1>Nature Based Organizations</h1>
-<button class="btn btn-outline-secondary btn-sm"
+<button class="me-btn"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#filterPanel"
             aria-controls="filterPanel">
-        <i class="bi bi-funnel"></i>
-        Filter
+       <span> <i class="bi bi-funnel me-btn-icon"></i></span>
+       <span class="me-btn-label">Filter</span>
     </button>
 {% for org in organizations %}
 
@@ -121,7 +121,7 @@
               </div>
               <div class="me-card-header-right">
                 {% if org|can_edit:request.user %}
-                  <a class="me-button-link" href="{% url 'org_mgmt' %}?org={{org.id}}">Manage</a>
+                  <a class="me-button-link" href="{% url 'org_mgmt' %}?org={{org.id}}"><i class="bi bi-gear-fill"></i></a>
                   {% endif %}
                 <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="width:75px;">
             

@@ -28,14 +28,14 @@
         {% endif %}
       </div>
         <div class="me-card-date">
-    {% if e.ongoing %}| <span class="me-badge ">Ongoing</span>
+    {% if e.ongoing %}<strong>Ongoing</strong>
     {% elif e.start %}{{ e.start }}{% endif %}
 
     {% if e.end and e.start != e.end %} - {{ e.end }}{% endif %}
     {% if e.activity.date_description %}<br><em>{{ e.activity.date_description }}</em>{% endif %}
     {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}
 
-    {% if e.session_format != "i" %}| <span class="me-badge ">Online</span>{% endif %}
+    {% if e.session_format == "o" or e.session_format == "b" %}| <strong>Online</strong>{% endif %}
     {%if not e.activity.no_cost %}   
       | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
     {% endif %}
@@ -45,19 +45,12 @@
     </div>
    <div class="me-card-header-right"> 
     <div class="me-icons">
-     {% if e.session_url %}
-            <a class="me-button-link" href="{{ e.session_url }}" target="_blank">Connect</a>
-      {% elif e.activity.activity_url %}
-            <a class="me-button-link" href="{{ e.activity.activity_url }}" target="_blank"><i class="bi bi-arrow-up-right-square" title="link to website"></i></a>
-      {% elif e.activity.contact_email%}
-           <a class="me-button-link" href="mailto:{{ e.activity.contact_email }}">
-          <i class="bi bi-envelope" title="send email to contact person"></i></a>
-          
-        {% endif %}
-{% if e.location %}
+      {% if e.location %}
       <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
       style="height:75px; width:auto;">
     {% endif %}
+   
+
     </div></div>
   </div> <!-- header -->
   <!-- Date line -->
@@ -78,15 +71,16 @@
       <span class="me-badge">{{ cat.name }}</span>
     {% endfor %}
   </div>
-  <div class="me-card-sponsor">
+  
+   <div class="me-card-header">
+        <div class="me-card-header-left">   
+   
+      <div class="me-card-sponsor">
             Sponsored by: <a href="{% url 'orgs'%}?org={{e.activity.org.id}}">{{ e.activity.org.org_name }}</a>
 
            {% if e.location %} | Location: <a href="{% url 'locations'%}?&loc={{e.location.id}}&view=list">{{ e.location.loc_name }}</a>{% endif %}
-        <br>
-        
-  
-       
-    <br>Activity added: {{ e.created_at|date:"M j, Y" }}
+     
+  <br>Activity added: {{ e.created_at|date:"M j, Y" }}
     {% if e.activity.is_newly_added %}
        <span class="me-badge">* New *</span>
     {% endif %}
@@ -94,6 +88,28 @@
     {% if e.updated_at > e.activity.updated_at %} {{ e.updated_at|date:"M j, Y" }}
     {% else %}{{ e.activity.updated_at|date:"M j, Y" }}{% endif %}
     {% endif %}
+    </div>  </div>
+     <div class="me-card-header-right"> 
+    <div class="me-icons">
+    
 
+     {% if e.session_url %}
+            <a class="me-btn" href="{{ e.session_url }}" target="_blank">
+             <span><i class="bi bi-arrow-up-right-square me-btn-icon" title="link to session site"></i></span>
+              <span class="me-btn-label">Connect</span></a>
+      {% elif e.activity.activity_url %}
+            <a class="me-btn" href="{{ e.activity.activity_url }}" target="_blank">
+              <span><i class="bi bi-arrow-up-right-square me-btn-icon" title="link to activity site"></i></span>
+            <span class="me-btn-label">Contact</span></a>
+      {% elif e.activity.contact_email%}
+           <a class="me-btn" href="mailto:{{ e.activity.contact_email }}">
+            <span>
+          <i class="bi bi-envelope me-btn-icon" title="send email to contact person"></i></span>
+         <span class="me-btn-label">Contact</span></a>
+          
+        {% endif %}
+
+    </div></div>   
+    
   </div>
 </div>

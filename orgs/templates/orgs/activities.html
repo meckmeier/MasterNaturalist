@@ -22,41 +22,44 @@
   <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3">
  
   <!-- Session Format -->
-  <div class="btn-group" role="group">
-    <input type="radio" class="btn-check" name="session_mode" id="main-format-all" value="" 
-           {% if not request.GET.session_mode %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="main-format-all">All</label>
+  <div class="me-toggle" role="group" aria-label="Session Format">
 
-    <input type="radio" class="btn-check" name="session_mode" id="main-format-inperson" value="i"
-           {% if request.GET.session_mode == "i" %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="main-format-inperson">In Person</label>
+  <input type="radio" name="session_mode" id="main-format-all" value=""
+         {% if not request.GET.session_mode %}checked{% endif %}>
+  <label for="main-format-all">All</label>
 
-    <input type="radio" class="btn-check" name="session_mode" id="main-format-online" value="o"
-           {% if request.GET.session_mode == "o" %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="main-format-online">Online</label>
-  </div>
+  <input type="radio" name="session_mode" id="main-format-inperson" value="i"
+         {% if request.GET.session_mode == "i" %}checked{% endif %}>
+  <label for="main-format-inperson">In Person</label>
+
+  <input type="radio" name="session_mode" id="main-format-online" value="o"
+         {% if request.GET.session_mode == "o" %}checked{% endif %}>
+  <label for="main-format-online">Online</label>
+
+</div>
 
   <!-- Activity Type -->
-  <div class="btn-group" role="group">
-    <input type="radio" class="btn-check" name="activity_type" id="main-type-all" value=""
+  <div class="me-toggle" role="group" aria-label="Activity Type">
+    <input type="radio" name="activity_type" id="main-type-all" value=""
            {% if not request.GET.activity_type %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="main-type-all">All</label>
+    <label for="main-type-all">All</label>
 
-    <input type="radio" class="btn-check" name="activity_type" id="main-type-volunteer" value="v"
+    <input type="radio" name="activity_type" id="main-type-volunteer" value="v"
            {% if request.GET.activity_type == "v" %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="main-type-volunteer">Volunteer</label>
+    <label for="main-type-volunteer">Volunteer</label>
 
-    <input type="radio" class="btn-check" name="activity_type" id="main-type-training" value="t"
+    <input type="radio" name="activity_type" id="main-type-training" value="t"
            {% if request.GET.activity_type == "t" %}checked{% endif %}>
-    <label class="btn btn-outline-secondary btn-sm" for="main-type-training">Training</label>
+    <label for="main-type-training">Training</label>
   </div>
-<button class="btn btn-outline-secondary btn-sm"
+<button class="me-btn"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#filterPanel"
             aria-controls="filterPanel">
-        <i class="bi bi-funnel"></i>
-        More Filters
+        <span><i class="bi bi-funnel me-btn-icon"></i></span>
+        <span class="me-btn-label">
+        More Filters</span>
     </button>
 </form>
 

@@ -79,17 +79,19 @@
                 {% endif %}
             </div>                
             <button type="button"
-                class="btn btn-sm btn-outline-secondary open-default-location-search"
+                class="me-btn  open-location-search"
                 data-bs-toggle="modal"
                 data-bs-target="#locationSearchModal">
-            Find Default Location
+            <span><i class="bi bi-search me-btn-icon"></i></span>
+            <span class="me-btn-label">Find Default Location</span>
         </button>                     
     </div>
     </div>
     <!-- submit button INSIDE the form -->
     
         <button type="submit" class="me-btn">
-            {% if org %}Save{% else %}Add{% endif %}
+          <span><i class="bi bi-floppy me-btn-icon"></i></span>
+            <span class="me-btn-label">Save</span>
         </button>
    
 </form>

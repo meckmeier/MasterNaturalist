@@ -21,10 +21,14 @@
     
    
 
-<div class="me-page">
+<div >
 <h1>My Organizations</h1>
 {% if user.profile.staff %}<form method="get" action="{{ request.path }}" class="mb-3" id="org-quick-filter-form">
-
+<!-- Add New Organization -->
+<a href="{% url 'org_create' %}" class="me-btn">
+    <span><i class="bi bi-plus-square me-btn-icon"></i></span>
+    <span class="me-btn-label">Add New Organization</span></a>
+</div>
     {{ filter_form.org }}
 
     {% if filter_form.org.errors %}
@@ -57,7 +61,9 @@
             Default Location: {{ org.default_location.loc_name }}
         </div>
     <div class="me-card-header-right">
-    <a href="{% url 'upload_csv' org.id%}" class="me-button-link btn">Upload Activities</a>
+    <a href="{% url 'upload_csv' org.id%}" class="me-btn">
+        <span><i class="bi bi-arrow-up-square-fill me-btn-icon"></i></i></span>
+        <span class="me-btn-label">Upload Activities</span></a>
     </div>
     </div>
 
@@ -168,9 +174,7 @@
 <p>You are not managing any organizations yet.</p>
 {% endfor %}
 
-<!-- Add New Organization -->
-<a href="{% url 'org_create' %}" class="btn btn-primary">ADD Org</a>
-</div>
+
 {% for org in organizations %}
     {% include "orgs/quick_manager_modal.html" with org=org %}
 {% endfor %}
