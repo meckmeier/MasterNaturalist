@@ -14,7 +14,7 @@
 
 <div class="me-page">
 <h1>Locations</h1>
- <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3">
+ <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3" id="view-toggle-form">
     <input type="hidden" name="county" value="{{ request.GET.county }}">
     <input type="hidden" name="region" value="{{ request.GET.region }}">
     <input type="hidden" name="q" value="{{ request.GET.q }}">
@@ -22,7 +22,7 @@
     <input type="hidden" name="page" value="1">
     <input type="hidden" name="loc" value="{{ request.GET.loc}}">
     
-     <div class="me-toggle" role="group">
+     <div class="me-toggle" role="group"  style="margin: 15px;">
 
         <input type="radio" name="view" id="view-list" value="list"
                {% if request.GET.view == "list" %}checked{% endif %}>
