@@ -329,29 +329,54 @@ a:active {
   text-decoration: none;
   color: inherit;
 }
-a.me-landing-btn{
-    display: inline-block;       /* Makes it behave like a button */
-    padding: 3px 10px 3px 1px;          /* Space inside the button */
-    background-color: white;   /* Button background color */
-    color: black;                /* Text color */
-    border: solid thin black;
-    text-align: center;          /* Center text */
-    text-decoration: none;       /* Remove underline */
-    border-radius: 4px;          /* Rounded corners */
-    font-family: Arial, sans-serif;
-    font-size: 1rem;
-    box-shadow: 0 3px 8px var(--hover);
-    margin: 20px;
-    transition: box-shadow 0.2s ease, transform 0.1s ease, background-color 0.3s ease;
+.me-btn-simple {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;   /* matches Bootstrap */
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.15s ease-in-out;
+
+  /* 🔑 YOUR COLORS */
+  background-color: #2e7d32;   /* base */
+  color: #fff;
+  border-color: #2e7d32;
 }
-a.me-landing-btn:hover {
-    background-color: var(--nav-bar-background);
-    color: var(--hover)
+
+/* hover */
+.me-btn-simple:hover {
+  background-color: var(--light-green);   /* darker */
+  border-color: var(--dark-green);
+  color: #fff;
+}
+
+/* active (click) */
+.me-btn-simple:active {
+  background-color: #1e5120;
+  border-color: #1e5120;
+}
+
+/* focus (keyboard accessibility) */
+.me-btn-simple:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.4);
+}
+
+/* disabled */
+.me-btn-simple:disabled,
+.me-btn-simple.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 a.me-button-link {
     display: inline-block;       /* Makes it behave like a button */
     padding: 5px 10px;          /* Space inside the button */
-    background-color: var(--button);   /* Button background color */
+    background-color: var(--green);   /* Button background color */
     color: var(--button-text);                /* Text color */
     text-align: center;          /* Center text */
     text-decoration: none;       /* Remove underline */
@@ -362,27 +387,14 @@ a.me-button-link {
     box-shadow: 0 2px 6px var(--hover);
     transition: background-color 0.3s ease; /* Smooth hover effect */
 }
-a.me-button-link-2nd{
-    background-color: var(--button);   /* Button background color */
-    display: inline-block;       /* Makes it behave like a button */
-    padding: 5px 10px;          /* Space inside the button */
-    color: white;                /* Text color */
-    text-align: center;          /* Center text */
-    text-decoration: none;       /* Remove underline */
-    border-radius: 5px;          /* Rounded corners */
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    transition: background-color 0.3s ease; /* Smooth hover effect */ 
 
-}
 /* Hover effect */
 a.me-button-link:hover {
-    background-color: var(--hover);   /* Darker blue on hover */
-    color:var(--nav-text);
+    background-color: var(--light-green);   
+    color:var(--nav-dark-green);
 }
-a.me-button-link-2nd:hover {
-    background-color: var(--hover);   /* Darker blue on hover */
-}
+
+
 .error-text{
     color:red;
     

@@ -13,21 +13,26 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    <div>
+    <div >
+        
         <label for="file">Choose CSV or Excel file:</label><br>
         {{ form.file }}
     </div>
 
     <br>
     
-    <button type="submit" class="me-btn">Upload</button>
+    <button type="submit" class="me-btn">
+        <span><i class="bi bi-upload me-btn-icon"></i></span>
+        <span class="me-btn-label">Upload</span></button>
 </form>
 <hr>
 <a href="{% static 'load_template.csv' %}"
    class="btn me-btn">
-   Download Template
+   <span><i class="bi bi-download me-btn-icon"></i></span>
+   <span class="me-btn-label">Template</span>
 </a>
 <a href="{% url 'upload_faq' %}"
         class="btn me-btn">
-        FAQ -About using the upload process</a>
+        <span><i class="bi bi-info me-btn-icon"></i></span>
+        <span class="me-btn-label">FAQ -About using the upload process</span></a>
 {% endblock %}

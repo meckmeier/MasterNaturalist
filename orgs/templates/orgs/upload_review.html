@@ -118,8 +118,12 @@
         {% endfor %}
         </tbody>
     </table>
-    <button type="submit" class="me-btn">Update Skipped Rows</button>
+    <button type="submit" class="me-btn">
+        <span><i class="bi bi-save me-btn-icon"></i></span>
+        <span class="me-btn-label">Update Skipped Rows</span></button>
 </form>
 
-<a href="{% url 'upload_commit' upload.id %}">Commit Valid Rows to Final Tables</a>
+<a href="{% url 'upload_commit' upload.id %}" class="me-btn">
+    <span><i class="bi bi-gear me-btn-icon"></i></span>
+    <span class="me-btn-label">Continue</span></a>
 {% endblock %}
