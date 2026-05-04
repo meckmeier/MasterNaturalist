@@ -351,13 +351,13 @@ def loc_detail(request, loc_id=None):
                 loc.updated_by = request.user.profile
                 loc.save()
                 messages.success(request, f"Location '{loc.loc_name}' saved successfully!")
-                return redirect(f"{reverse('org_mgmt')}#org-{loc.org.id}")
+                return redirect(f"{reverse('locations')}?view=list&loc={loc.id}")
             else:
                 loc = form.save(commit=False)
                 loc.updated_by = request.user.profile
                 loc.save()
                 messages.success(request, f"Location '{loc.loc_name}' updated successfully!")
-                return redirect(f"{reverse('org_mgmt')}#org-{loc.org.id}")
+                return redirect(f"{reverse('locations')}?view=list&loc={loc.id}")
             
         else:
             #print("loc form errors",form.errors)
@@ -628,6 +628,9 @@ def profile_view(request):
     
 def activities(request):
     q = request.GET.get("q", "")
+    
+
+
     today = timezone.now().date()
     # activities results... should i change this so we know what it is?
    
@@ -681,8 +684,11 @@ def activities(request):
             queryset = queryset.filter(session_format__in=["i", "b"])
         elif data.get("session_mode") == "o":
             queryset = queryset.filter(session_format__in=["o", "b"])
-                
+        
+    activity_id = request.GET.get("activity_id")
 
+    if activity_id:
+        queryset = queryset.filter(activity_id=activity_id)
 
     clean_get = request.GET.copy()
     for p in ["page", "curr_page", "onl_page","ong_page"]:
@@ -785,7 +791,7 @@ def _activity_form_workflow(request, org, activity, is_new=False):
             for s in session_formset.deleted_objects:
                 s.delete()
 
-            return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
+            return redirect(f"{reverse('activities')}?activity_id={activity.id}")
 
     #print("Session formset errors:", session_formset.errors)
     #print("Management errors:", session_formset.management_form.errors)

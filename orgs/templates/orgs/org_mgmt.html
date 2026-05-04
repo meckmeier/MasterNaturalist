@@ -23,18 +23,17 @@
 
 <div >
 <h1>My Organizations</h1>
-{% if user.profile.staff %}<form method="get" action="{{ request.path }}" class="mb-3" id="org-quick-filter-form">
 <!-- Add New Organization -->
-<a href="{% url 'org_create' %}" class="me-btn">
+ <a href="{% url 'org_create' %}" class="me-btn">
     <span><i class="bi bi-plus-square me-btn-icon"></i></span>
     <span class="me-btn-label">Add New Organization</span></a>
 </div>
+{% if user.profile.staff %}
+<form method="get" action="{{ request.path }}" class="mb-3" style="margin:10px;" id="org-quick-filter-form">
     {{ filter_form.org }}
-
     {% if filter_form.org.errors %}
         <div class="error-text">{{ filter_form.org.errors }}</div>
     {% endif %}
-
 
 </form>
 {% endif %}
