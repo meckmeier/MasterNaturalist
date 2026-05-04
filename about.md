@@ -1,6 +1,6 @@
 # Wild Path - Wisconsin
 
-The Mission: to make it easier for <a href="https://wimasternaturalist.org/" target="_blank">Wisconsin Master Naturalists</a> to find  nature-based organizations. The program asks us to complete advanced training and provide volunteer hours annually to renew our designation. So this site was built to help you find these opportunities.
+The Mission: to make it easy for <a href="https://wimasternaturalist.org/" target="_blank">Wisconsin Master Naturalists</a> to find  nature-based organizations. The program asks us to complete advanced training and do volunteer hours annually to renew our designation. So this site was built to help you find these opportunities.
 
 To use the site you need to **REGISTER** and login. 
 
@@ -12,9 +12,7 @@ Keep your eye out for the **FILTER** button - that will let you target your view
 
 <hr>
 ### If you are a provider  
-**Manage** to see the organizations you manage. You get to manage an organization if YOU add it... but you can also be added in to manage existing organizations. There you will see Locations that are managed by this organization (you may use locations from any organization for your activities, but if the location you want is not there - just add it). If you want your location on the map you have to give it an address. Code will run periodically to turn your address into a map point. Just so you know it's not an immediate thing. 
-
-*Add activities* here - and *add managers* too.
+**Manage** to see the organizations you manage. You can add or manage locations. If you want your location on the map you have to give it an address. Code will run periodically to turn your address into a map point. Just so you know it's not an immediate thing. You can *add activities* - and add or remove *managers*.
 
 If you need to do something different (delete a location for example) just fill out a **Feedback** form - be sure to include your email so I can get back to you.
 

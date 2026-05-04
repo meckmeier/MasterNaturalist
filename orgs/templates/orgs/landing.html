@@ -6,7 +6,7 @@
      <img src="{% static 'orgs/images/white_only_transparent.png'%}" width ="150" class="img-fluid" style="background-color:#2e7d32;">
 <div>
 <h1>Welcome!</h1> 
-<h4>Find your way to nature organizations in Wisconsin.</h4>
+<h4>Find your way to support nature in Wisconsin.</h4>
 
 {% if user.is_authenticated%}
 
@@ -42,12 +42,12 @@
 </a>
 </div>
 
-This site was built to help <a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a>
-to find ways to maintain their designation with volunteer and training opportunities throughout the state.</p>
+<a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a>
+can use this site to find ways to volunteer and access advanced training opportunities throughout the state.</p>
 
 <hr>
 
-    <div class="me-muted">If you are an organization and need to manage locations or activities:</div><br>
+    <div class="me-muted">If you are an organization and want to manage locations or activities:</div><br>
     <a class="me-btn" href="{% url 'org_mgmt' %}" title="Manage YOUR organizations">
         <span>
             <i class="bi bi-gear-fill me-btn-icon"></i>
