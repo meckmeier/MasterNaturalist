@@ -6,20 +6,26 @@ function getCSRFTokenFromForm(form) {
     const tokenField = form.querySelector("[name=csrfmiddlewaretoken]");
     return tokenField ? tokenField.value : "";
 }
-
 function syncLocationDisplay(row) {
-
     let locationField = null;
     let display = null;
 
     if (row) {
-        // formset row
-        locationField = row.querySelector("select[name$='-location']");
+        locationField =
+            row.querySelector("select[name$='-location']") ||
+            row.querySelector("select[name='default_location']");
+
         display = row.querySelector(".selected-location-display");
     } else {
-        // org form
         locationField = document.querySelector("select[name='default_location']");
-        display = document.querySelector(".selected-location-display");
+
+        const wrapper = locationField
+            ? locationField.closest(".form-field")
+            : null;
+
+        display = wrapper
+            ? wrapper.querySelector(".selected-location-display")
+            : document.querySelector(".selected-location-display");
     }
 
     if (!locationField || !display) return;
@@ -81,21 +87,47 @@ document.addEventListener("DOMContentLoaded", function () {
         const openBtn = e.relatedTarget;
 
         if (openBtn && openBtn.classList.contains("open-location-search")) {
-            activeRow = openBtn.closest("tr");
+            activeRow = openBtn.closest("tr")||
+            openBtn.closest(".location-picker-row") ||
+            openBtn.closest("form");
+
             console.log("location picker activeRow", activeRow);
             syncLocationDisplay(activeRow);
         }
     });
+    const quickAddBtn = document.getElementById("open-quick-add-location");
 
-    function handleDocumentClick(e) {
-        const resultBtn = e.target.closest(".location-result");
-        if (resultBtn) {
-            chooseLocation({
-                id: resultBtn.dataset.id,
-                label: resultBtn.dataset.label
-            });
-        }
+    if (quickAddBtn) {
+        quickAddBtn.addEventListener("click", function () {
+            const searchValue = searchInput ? searchInput.value.trim() : "";
+            const quickNameInput = document.querySelector("#quick-location-form input[name='loc_name']");
+
+            console.log("copying search to add form", searchValue, quickNameInput);
+
+            if (quickNameInput) {
+                quickNameInput.value = searchValue;
+            }
+        });
     }
+
+ function handleDocumentClick(e) {
+    console.log("document click target:", e.target);
+
+    const resultBtn = e.target.closest(".location-result");
+    console.log("resultBtn:", resultBtn);
+
+    if (!resultBtn) return;
+
+    console.log("location result clicked", {
+        id: resultBtn.dataset.id,
+        label: resultBtn.dataset.label
+    });
+
+    chooseLocation({
+        id: resultBtn.dataset.id,
+        label: resultBtn.dataset.label
+    });
+}
 
     function handleDocumentSubmit(e) {
         if (e.target.id !== "quick-location-form") return;
@@ -173,18 +205,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function chooseLocation(loc) {
-        console.log("chosen location", loc);
-        console.log("activeRow", activeRow);
-        let locationField =null;
 
+        let locationField =null;
+        console.log("selects inside activeRow:", activeRow ? activeRow.querySelectorAll("select") : "no activeRow");
         if (activeRow) {
-            locationField = activeRow.querySelector("select[name$='-location']");
+            locationField =
+                activeRow.querySelector("select[name$='-location']") ||
+                activeRow.querySelector("select[name='default_location']");
         } else {
             locationField = document.querySelector("select[name='default_location']");
-        }
-        if (!locationField) {
-            console.error("No location field found in active row");
-            return;
         }
 
         let option = locationField.querySelector(`option[value="${loc.id}"]`);

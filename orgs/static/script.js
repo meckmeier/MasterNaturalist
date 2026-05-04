@@ -5,7 +5,8 @@ console.log("FORMSET SCRIPT LOADED");
 // --- run after DOM is ready ---
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded and parsed");
-  
+    //--- back to top buttons
+    console.log("adding back to top button")
     const button = document.getElementById("back-to-top");
 
     if (!button) return;
@@ -15,9 +16,12 @@ document.addEventListener("DOMContentLoaded", function () {
         top: 0,
         behavior: "smooth"
         });
+    console.log("finished back to top button")
     });
-    const tabButtons = document.querySelectorAll('#eventTabs button[data-bs-toggle="tab"]');
 
+    //--- toggle tab buttons
+    const tabButtons = document.querySelectorAll('#eventTabs button[data-bs-toggle="tab"]');
+    console.log("adding toggle tab buttons")
     tabButtons.forEach(btn => {
         btn.addEventListener('shown.bs.tab', function (event) {
         // event.target = newly activated tab button
@@ -25,9 +29,9 @@ document.addEventListener("DOMContentLoaded", function () {
         history.replaceState(null, '', targetId); // updates URL hash without reloading
         });
     });
-
-
+    console.log("finished toggle tab buttons")
     // Check if the URL has a hash like #activity-123
+    console.log("adding hash locator")
     const hash = window.location.hash;
 
     if (hash) {
@@ -53,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     
     // description block expand/collapse
-
+    console.log("description block resizing code")
     const descriptionBlocks = document.querySelectorAll('.me-description-block');
 
     descriptionBlocks.forEach(block => {
@@ -61,75 +65,77 @@ document.addEventListener("DOMContentLoaded", function () {
         block.classList.toggle('expanded');
         });
     });
+
+    //function for session visibility -- hiding and showing appropriate session columns
+    console.log("session visibility code")
     function updateSessionRowVisibility(row) {
-    const formatField = row.querySelector("select[name$='-session_format']");
-    const locationField = row.querySelector("select[name$='-location']");
-    const urlGroup = row.querySelector(".url-group");
-    const locationGroup = row.querySelector(".loc-group");
+        const formatField = row.querySelector("select[name$='-session_format']");
+        const locationField = row.querySelector("select[name$='-location']");
+        const urlGroup = row.querySelector(".url-group");
+        const locationGroup = row.querySelector(".loc-group");
 
-    if (!formatField) return;
+        if (!formatField) return;
 
-    const format = formatField.value;
-    console.log("visibility", { format, urlGroup, locationGroup, locationField });
-
-    const showUrl = (format === "o" || format === "b");
-    const showLocation = (format === "i" || format === "b");
-
-    if (urlGroup) {
-        urlGroup.style.display = showUrl ? "block" : "none";
-    }
-
-    if (locationGroup) {
-        locationGroup.style.display = showLocation ? "block" : "none";
-    }
-
-    // Clear location whenever this format should not keep a location
-    if (locationField && (format === "o" || format === "s")) {
-        locationField.value = "";
-    }
-
-    syncLocationDisplay(row);
-    }
-    const activityForm = document.getElementById("activity-form");
- 
-    function syncLocationDisplay(row) {
-    if (!row) return;
-
-    const locationField = row.querySelector("select[name$='-location']");
-    const display = row.querySelector(".selected-location-display");
-
-    if (!locationField || !display) return;
-
-    const selectedOption = locationField.options[locationField.selectedIndex];
-
-    if (locationField.value && selectedOption) {
-        display.textContent = selectedOption.textContent;
-    } else {
-        display.innerHTML = '<span class="text-muted">No location selected</span>';
-    }
-}
-
-function wireSessionRow(row) {
-    const formatField = row.querySelector("select[name$='session_format']");
-    const locationField = row.querySelector("select[name$='-location']");
-    const startField = row.querySelector("input[name$='start']");
-    const endField = row.querySelector("input[name$='end']");
-
-    if (!formatField) return;
-
-    const format = formatField.value;
-
-    
-
-    syncLocationDisplay(row);
-
-    formatField.addEventListener("change", function () {
         const format = formatField.value;
-        const currentLocation = locationField ? locationField.value : "";
+        console.log("visibility", { format, urlGroup, locationGroup, locationField });
+
+        const showUrl = (format === "o" || format === "b");
+        const showLocation = (format === "i" || format === "b");
+
+        if (urlGroup) {
+            urlGroup.style.display = showUrl ? "block" : "none";
+        }
+
+        if (locationGroup) {
+            locationGroup.style.display = showLocation ? "block" : "none";
+        }
+
+        // Clear location whenever this format should not keep a location
+        if (locationField && (format === "o" || format === "s")) {
+            locationField.value = "";
+        }
+
+        syncLocationDisplay(row);
+    }
+
+    //-- function for sync'ing location display
+    const activityForm = document.getElementById("activity-form");
+    
+    function syncLocationDisplay(row) {
+        if (!row) return;
+        console.log("running syncLocationcode")
+        const locationField = row.querySelector("select[name$='-location']");
+        const display = row.querySelector(".selected-location-display");
+
+        if (!locationField || !display) return;
+
+        const selectedOption = locationField.options[locationField.selectedIndex];
+
+        if (locationField.value && selectedOption) {
+            display.textContent = selectedOption.textContent;
+        } else {
+            display.innerHTML = '<span class="text-muted">No location selected</span>';
+        }
+    }
+
+    //-- wire up the session row
+    function wireSessionRow(row) {
+        const formatField = row.querySelector("select[name$='session_format']");
+        const locationField = row.querySelector("select[name$='-location']");
+        const startField = row.querySelector("input[name$='start']");
+        const endField = row.querySelector("input[name$='end']");
+        console.log("running wiresessioncode")
+        if (!formatField) return;
+
+        const format = formatField.value;
+
+        syncLocationDisplay(row);
+
+        formatField.addEventListener("change", function () {
+            const format = formatField.value;
+            const currentLocation = locationField ? locationField.value : "";
 
         updateSessionRowVisibility(row);
-
-       
 
         syncLocationDisplay(row);
     });
@@ -149,12 +155,18 @@ function wireSessionRow(row) {
             wireSessionRow(row);
         }
     });
+
+    //--add session row button
+    console.log("adding session add button")
     document.addEventListener("click", function(e) {
-    if (e.target && e.target.id === "add-btn") {
+        const addBtn = e.target.closest("#add-btn");
+        if (!addBtn) return;
+
         const container = document.querySelector(".formset");
         const totalForms = document.querySelector("[id$='-TOTAL_FORMS']");
         const template = document.querySelector(".form-template");
         const tbody = document.querySelector(".formset-table tbody");
+
         console.log("Add button clicked", { container, totalForms, template, tbody });
 
         if (!container || !totalForms || !template || !tbody) return;
@@ -164,20 +176,20 @@ function wireSessionRow(row) {
 
         const formIndex = parseInt(totalForms.value);
         const newRow = template.cloneNode(true);
+
         newRow.style.display = "table-row";
         newRow.classList.remove("form-template");
         newRow.innerHTML = newRow.innerHTML.replace(/__prefix__/g, formIndex);
 
         tbody.appendChild(newRow);
         totalForms.value = formIndex + 1;
+
         const newFormatField = newRow.querySelector("select[name$='session_format']");
         if (newFormatField && !newFormatField.value) {
             newFormatField.value = "i";
         }
 
         wireSessionRow(newRow);
-
-    }
     });
 
     console.log("finished with current code")
