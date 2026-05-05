@@ -65,7 +65,7 @@
             {{ activity_form.org.errors }}
         </div>
         <div class="form-field">
-            URL for Activity Details
+            URL for Activity
             {{ activity_form.activity_url}}
             <span class="error-text">{{ activity_form.activity_url.errors}}</span>
         </div>
@@ -81,8 +81,13 @@
             {{ activity_form.contact_email }}
             <span class="error-text">{{ activity_form.contact_email.errors }}</span>
         </div>
+                <div class ="form-field-full">
+            {{ activity_form.description.label_tag }}<br>
+            {{ activity_form.description }}
+            {{ activity_form.description.errors }}
+        </div>
         <div class="form-field-full">
-            <legend>Details</legend>
+          
     
     <div class="formset" data-prefix="locations">
     
@@ -211,7 +216,7 @@
  {% endif %}    
     </div>
     <div class ="form-field-full">
-           <legend>Display fields </legend>
+             <legend>Details</legend>
            <span class="me-muted">These fields are optional but you can use them to display additional information regarding dates and times.</span>
         </div>
         <div class="form-field">
@@ -230,15 +235,11 @@
             {{ activity_form.time_description.errors }}
         </div>
 
-        <div class ="form-field-full">
-            {{ activity_form.description.label_tag }}<br>
-            {{ activity_form.description }}
-            {{ activity_form.description.errors }}
-        </div>
+
        
 
 <div class="form-field-full">
-     <legend>Categories</legend>
+     <legend>Keywords (to help with volunteer searches)</legend>
 
     {% for group, choices in activity_form.category_groups %}
         <div class="category-group">

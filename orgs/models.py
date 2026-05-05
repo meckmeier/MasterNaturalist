@@ -404,16 +404,12 @@ class SessionQuerySet(models.QuerySet):
         )
     def upcoming(self):
         today = timezone.now().date()
-        return self.active().filter(start__gte=today )
+        return self.active().filter(ongoing=False )
 
     def ongoing(self):
         today = timezone.now().date()
-        return self.active().filter(
-            Q(start__lt=today)|Q(start__isnull=True)
-        ).filter(
-            Q(end__isnull=True) | Q(end__gte=today)
-        )
-    
+        return self.active().filter(ongoing=True)
+   
 class Session(models.Model):
     activity=models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="sessions")
     session_format = models.CharField(max_length=1 ,
