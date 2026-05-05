@@ -639,3 +639,9 @@ li.inactive {
   background: #2e7d32;
   color: white;
 }
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+}

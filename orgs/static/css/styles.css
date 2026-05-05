@@ -226,6 +226,24 @@ a.button-link-2nd:hover {
     background-color: #0056b3;   /* Darker blue on hover */
 }
 
+.back-to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1000;
+
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+}
 /* Vertical version on desktop */
 @media (min-width: 768px) {
     .nav-tabs.flex-md-column .nav-link.active {
@@ -246,16 +264,5 @@ a.button-link-2nd:hover {
         right: 0;
         z-index: 1000;
         }
-}
-.back-to-top {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 1000;
+ }
 
-  padding: 0.5rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid #ccc;
-  background: white;
-  cursor: pointer;
-}
