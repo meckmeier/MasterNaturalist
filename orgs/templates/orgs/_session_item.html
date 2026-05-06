@@ -79,7 +79,9 @@
             Sponsored by: <a href="{% url 'orgs'%}?org={{e.activity.org.id}}">{{ e.activity.org.org_name }}</a>
 
            {% if e.location %} | Location: <a href="{% url 'locations'%}?&loc={{e.location.id}}&view=list">{{ e.location.loc_name }}</a>{% endif %}
-          {% if e.session_format == "o" or e.session_format == "b" %}| <strong>Online</strong>{% endif %}
+            {% if e.session_format == "o"  %}| Location: <strong>Online</strong>{% endif %}
+            {% if e.session_format == "s" %}| Location: <strong>Self selected locations </strong>{% endif %}
+            {% if e.session_format == "b" %} and <strong>Online</strong> {% endif %}
   <br>Activity added: {{ e.created_at|date:"M j, Y" }}
     {% if e.activity.is_newly_added %}
        <span class="me-badge">* New *</span>
