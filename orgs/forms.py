@@ -318,6 +318,7 @@ class LocFilterForm(forms.Form):
         ("volunteer", "Volunteer"),
         ("none", "None"),
         ("both", "Both"),
+        ("has","Has Activities"),
     ],
     widget=forms.RadioSelect,
     )

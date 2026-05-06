@@ -483,6 +483,10 @@ def locations(request):
             queryset = queryset.filter(
                 sessions__isnull=True
             )
+        elif activity_status == "has":
+            queryset = queryset.filter(
+                sessions__isnull=False
+            )
         
         
     

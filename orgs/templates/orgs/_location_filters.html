@@ -13,7 +13,10 @@
   <input type="radio" name="activity_status" id="status-all" value=""
          {% if not request.GET.activity_status %}checked{% endif %}>
   <label for="status-all">All</label>
-
+  <input type ="radio" name="activity_status" id="status-has" value ="has"
+            {% if request.GET.activity_status == "has" %}checked{% endif %}>
+ <label for="status-has">Has Activities</label>
+  {% comment %}
   <input type="radio" name="activity_status" id="status-volunteer" value="volunteer"
          {% if request.GET.activity_status == "volunteer" %}checked{% endif %}>
   <label for="status-volunteer">Volunteer</label>
@@ -21,10 +24,7 @@
   <input type="radio" name="activity_status" id="status-training" value="training"
          {% if request.GET.activity_status == "training" %}checked{% endif %}>
   <label for="status-training">Training</label>
-
-  <input type="radio" name="activity_status" id="status-both" value="both"
-         {% if request.GET.activity_status == "both" %}checked{% endif %}>
-  <label for="status-both">Both</label>
+{% endcomment %}
 
 
 
