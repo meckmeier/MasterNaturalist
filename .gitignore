@@ -49,4 +49,4 @@ Thumbs.db
 !orgs/data/state_parks.csv
 !orgs/data/recreation_area.csv
 !orgs/data/state_forest.csv
-!orgs/data/upload_template.csv
+!orgs/static/template.csv
