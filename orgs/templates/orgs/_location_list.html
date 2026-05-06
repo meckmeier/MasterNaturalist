@@ -18,7 +18,7 @@
           {% endif %}
         </div>
         <div class="me-card-sponsor">
-           {{loc.org.org_name}}
+           <a href="{% url "orgs" %}?{{loc.org.id}}">{{loc.org.org_name}}</a>
           {% if loc.location_url%}
             <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">{{ loc.location_url }}</a></span>
           {% endif %}
