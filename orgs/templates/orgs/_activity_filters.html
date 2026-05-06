@@ -48,6 +48,11 @@
         {{ filter_form.q }}
         {{ filter_form.q.errors}}
     </div>  
+    <div class="mb-3">
+        {{filter_form.ongoing}}
+        {{filter_form.ongoing.errors}}
+        {{filter_form.ongoing.label_tag}}
+    </div>
    <div class="me-filter-2colrow">
     <div class="me-filter-col">
         {{ filter_form.start_date.label_tag }}

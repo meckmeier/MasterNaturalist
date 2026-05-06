@@ -144,10 +144,14 @@ class EventFilterForm(forms.Form):
         ("", "All formats"),
         ("i", "In person"),
         ("o", "Online"),
+        ("s", "Self-directed"),
     ],
     widget=forms.RadioSelect
 )
-
+    ongoing = forms.BooleanField(
+        required=False,
+        label="Ongoing activities (no dates)"
+    )
     start_date = forms.DateField(
         required=False,
         input_formats=["%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y"],

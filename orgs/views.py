@@ -674,15 +674,18 @@ def activities(request):
 
         if data.get("categories"):
             queryset = queryset.filter(activity__categories__id__in=data["categories"]).distinct()
+        if data.get("ongoing"):
+            queryset = queryset.filter(ongoing=True)
         if data.get("start_date"):
             queryset = queryset.filter(start__gte=data["start_date"])
 
         if data.get("end_date"):
             queryset = queryset.filter(start__lte=data["end_date"])
         if data.get("session_mode") == "i":
-            queryset = queryset.filter(session_format__in=["i", "b"])
+            queryset = queryset.filter(session_format__in=["i", "b","s"])
         elif data.get("session_mode") == "o":
             queryset = queryset.filter(session_format__in=["o", "b"])
+     
         
     activity_id = request.GET.get("activity_id")
 
