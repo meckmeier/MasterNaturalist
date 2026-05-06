@@ -66,11 +66,11 @@ locations.forEach(loc => {
     let icon = icons.grey;
 
     if (loc.has_training && loc.has_volunteer) {
-        icon = icons.blue;
+        icon = icons.green;
     } else if (loc.has_training) {
         icon = icons.yellow;
     } else if (loc.has_volunteer) {
-        icon = icons.green;
+        icon = icons.blue;
     }
     const marker = L.marker([loc.latitude, loc.longitude], { icon: icon })
         .bindPopup(`<b>${loc.name}</b><br>${loc.county}

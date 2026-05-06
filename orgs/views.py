@@ -486,7 +486,7 @@ def locations(request):
         elif activity_status == "has":
             queryset = queryset.filter(
                 sessions__isnull=False
-            )
+            ).distinct()
         
         
     
