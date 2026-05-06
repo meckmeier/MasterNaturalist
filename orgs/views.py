@@ -291,7 +291,7 @@ def org_edit(request, org_id):
     org = get_object_or_404(Organization, id=org_id)
     if not (
         request.user.profile.staff or
-        org.managed.filter(pk=request.user.profile.org.id).exists()
+        org.managed.filter(profile=request.user.profile).exists()
     ):
         return HttpResponseForbidden("You do not have permission to edit this organization.")
        
