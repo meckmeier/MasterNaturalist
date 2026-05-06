@@ -278,7 +278,7 @@ def org_create(request):
                     profile=request.user.profile,
                     role='owner'  # if you added the role field
                 )
-            return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
+            return redirect("org_edit", org_id=org.id)
     else:
         form = OrgForm()
     return render(request, "orgs/org_detail.html", {
@@ -629,7 +629,6 @@ def profile_view(request):
 def activities(request):
     q = request.GET.get("q", "")
     
-
 
     today = timezone.now().date()
     # activities results... should i change this so we know what it is?

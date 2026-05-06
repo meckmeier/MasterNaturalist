@@ -64,6 +64,13 @@
             {{ form.training_url }}
             {{ form.training_url.errors }}
         </div>
+<!-- submit button INSIDE the form -->
+    
+        <button type="submit" class="me-btn">
+          <span><i class="bi bi-floppy me-btn-icon"></i></span>
+            <span class="me-btn-label">Save</span>
+        </button>
+        <div></div>
         <div class="form-field">
             Default Location:
             {{ form.default_location.errors }}
@@ -78,21 +85,18 @@
                     <span class="text-muted">No default location selected</span>
                 {% endif %}
             </div>                
+            {% if org.id %}
             <button type="button"
                 class="me-btn  open-location-search"
                 data-bs-toggle="modal"
                 data-bs-target="#locationSearchModal">
             <span><i class="bi bi-search me-btn-icon"></i></span>
             <span class="me-btn-label">Find Default Location</span>
+            {% endif %}
         </button>                     
     </div>
     </div>
-    <!-- submit button INSIDE the form -->
     
-        <button type="submit" class="me-btn">
-          <span><i class="bi bi-floppy me-btn-icon"></i></span>
-            <span class="me-btn-label">Save</span>
-        </button>
    
 </form>
 <p>Created :
