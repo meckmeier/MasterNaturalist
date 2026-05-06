@@ -66,31 +66,36 @@
               {% block filter_button %}{% endblock %}
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">Volunteer</a>
-            
+            <a class="nav-link dropdown-toggle" href="#" role="button"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              Volunteer
+            </a>
             <ul class="dropdown-menu">
-            <li >
-              <a class="dropdown-item" href="{% url 'activities' %}">Activities</a>
-            </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'activities' %}">Activities</a>
+              </li>
 
-            <li>
-              <a class="dropdown-item" href="{% url 'orgs' %}">Organizations</a>
-            </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'orgs' %}">Organizations</a>
+              </li>
 
-            <li>
-              <a class="dropdown-item" href="{% url 'locations' %}">Locations</a>
-            </li>
-</ul>
-</li>
- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">Organizer</a>
+              <li>
+                <a class="dropdown-item" href="{% url 'locations' %}">Locations</a>
+              </li>
+            </ul>
+
+            <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              Organizer
+            </a>
             <ul class="dropdown-menu">
-            <li>
-              <a class="dropdown-menu" href="{% url 'org_mgmt' %}">Manage Your Organizations</a>
+            <li class="dropdown-item">
+              <a class="nav-link" href="{% url 'org_mgmt' %}">Manage Your Organizations</a>
             </li>
-        </ul></li>
+            </ul></li>
+     
+
             <li class="nav-item">
               <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
             </li>
