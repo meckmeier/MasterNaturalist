@@ -102,10 +102,11 @@
               <span><i class="bi bi-arrow-up-right-square me-btn-icon" title="link to activity site"></i></span>
             <span class="me-btn-label">Contact</span></a>
       {% elif e.activity.contact_email%}
-           <a class="me-btn" href="mailto:{{ e.activity.contact_email }}">
-            <span>
+              {% with body_text="Hello, I found this opportunity on WildPaths Wisconsin and I'm interested in "|add:e.activity.title|add:" at "|add:e.activity.org.org_name|add:". Thank you." %}
+           <a class="me-btn" href="mailto:{{ e.activity.contact_email }}?subject={{ e.activity.title|urlencode }}&body={{ body_text|urlencode }}">
+            <span> 
           <i class="bi bi-envelope me-btn-icon" title="send email to contact person"></i></span>
-         <span class="me-btn-label">Contact</span></a>
+         <span class="me-btn-label">Contact</span></a>{% endwith %}
           
         {% endif %}
 

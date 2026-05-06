@@ -52,10 +52,12 @@
     <div class="me-card-header-right">
       <div class="me-icons">
           {% if e.contact_email%}
+           {% with body_text="Hello, I found this opportunity on WildPaths Wisconsin and I'm interested in "|add:e.activity.title|add:" at "|add:e.activity.org.org_name|add:". Thank you." %}
+          
            <a class="me-button-link" href="mailto:{{ e.contact_email }}"><i class="bi bi-envelope" title="send email to contact person"></i></a>
             {% elif e.activity_url %}
-           <a class="me-button-link" href="{{ e.activity_url }}" target="_blank">
-            <i class="bi bi-arrow-up-right-square" title="link to website"></i></a>
+           <a class="me-button-link" href="{{ e.activity_url }}?subject={{ e.activity.title|urlencode }}&body={{ body_text|urlencode }}" target="_blank">
+            <i class="bi bi-arrow-up-right-square" title="link to website"></i></a>{% endwith %}
             {% endif %}
      
     </div>  
