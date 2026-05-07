@@ -1,5 +1,6 @@
 {% load highlight %}
 {% load static %}
+{% load can_edit_filters %}
 
 {% for loc in locs %}
 <div class="me-card" id="loc-{{loc.id}}" >
@@ -32,50 +33,113 @@
           <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:75px;width:auto;" title="{{loc.region_name}}">
       </div>
   </div>
-  {% if loc.location_about %}
-  <div class="me-description-block"></p>
-    <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
-    <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>  
-  </div>
-  {% endif %}
+  
 
-  <div class="location-toggles mb-2">
-    {% if loc.volunteer %}
-        <button type="button"
-                class="location-toggle "
-                data-target="volunteer-{{ loc.id }}" style="background-color:#2C6FA3; color: white;">
-            Volunteer
-        </button>
-    {% endif %}
-
-    {% if loc.training %}
-        <button type="button"
-                class="location-toggle"
-                data-target="training-{{ loc.id }}" style="background-color:#FF7F11; color: white;"">
-           Training
-        </button>
-    {% endif %}
- </div>
-  <!-- Tab Content -->
-  {% if loc.volunteer %}
-    <div id="volunteer-{{ loc.id }}" class="location-section d-none">
-    {% for each in loc.volunteer %}
-        {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
-      {% endfor %}
-    </div>
-  {% endif %}
-  {% if loc.training %}
-    <div id="training-{{ loc.id }}" class="location-section d-none">   
-      {% for a in loc.training %}
-        {% include "orgs/_session_item.html" with e=a q=q %}          
-      {% endfor %}
-    </div>
-    {% endif %}
-
-<p class="small text-muted">
+ <!-- tab buttons -->
+    <ul class="me-tabs" id="locTabs{{ org.id }}" role="tablist" aria-orientation="vertical">
+      <li role="presentation">
+        <button class="me-tab-button active" 
+          id="v-pills-info-tab{{ loc.id }}" 
+          data-bs-toggle="pill" 
+          data-bs-target="#v-pills-info{{ loc.id }}" 
+          aria-controls="v-pills-info{{ loc.id }}"
+          aria-selected="true"
+          type="button" 
+          role="tab">Info</button>
+      </li>
+      {% if loc.volunteer %}
+        <li  role="presentation">
+          <button class="me-tab-button me-tree-tab" 
+            id="v-pills-events-tab{{ loc.id }}" 
+            data-bs-toggle="pill" 
+            data-bs-target="#v-pills-events{{ loc.id }}" 
+            aria-controls="v-pills-events{{ loc.id }}"
+            aria-selected="true"
+            type="button" 
+            role="tab">Volunteer<i class="bi bi-tree-fill"></i></button>
+        </li>
+      {% endif %}
+      {% if loc.training  %}
+      <li  role="presentation">
+        <button class="me-tab-button me-learn-tab" 
+        id="v-pills-trainings-tab{{ loc.id }}" 
+        data-bs-toggle="pill" 
+        data-bs-target="#v-pills-trainings{{ loc.id }}" 
+        aria-controls="v-pills-trainings{{ loc.id }}"
+        aria-selected="false"
+        type="button" 
+        role="tab">Trainings<i class="bi bi-mortarboard-fill"></i></button>
+      </li>
+        {% endif %}
+    </ul>
+       
+    <!-- Tab Content -->
+    <div class="me-tab-content tab-content" id="v-pills-tabContent{{ loc.id }}">
+      
+        <!-- Info Tab -->
+        <div class="tab-pane fade show active" id="v-pills-info{{ loc.id }}" aria-labelledby="v-pills-info-tab{{ loc.id }}" role="tabpanel">
+          <div class="me-card">
+            <div class="me-card-header">
+              <div class="me-card-header-left">
+                <div>
+                  {% if loc.org %} 
+                  Managed by:
+                    <a href="{% url 'orgs' %}?org_id={{loc.org.id}}"><strong></strong>{{loc.org.org_name}}</strong> </a>
+                    {% if loc == loc.org.default_location %}<span class="me-badge">Default Location</span>{% endif %}
+                    <br>        
+                  {% endif %}
+                </div>
+              </div>
+              <div class="me-card-header-right">
+                {% if loc.org and loc.org|can_edit:request.user %}
+                  <a class="me-button-link" href="{% url 'org_mgmt' %}#org-{{ loc.org.id }}"><i class="bi bi-gear-fill"></i></a>
+                  {% endif %}
+                <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="width:75px;">
+              </div>
+            </div> 
+            {% if loc.location_about %}
+            <div class="me-description-block"></p>
+              <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
+              <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>  
+            </div>
+            {% endif %}
+            <div class="me-card-sponsor">
+                Also used by these organizations: UNDER CONSTRUCTION
+                {% for each in loc.activities.org %}
+                  <a href="{% url 'orgs'%}?org_id={{each.id}}&view=list">{{ each.org_name }}</a>
+                  
+                {% endfor %}
+                <p class="small text-muted">
     Last updated: {{ loc.updated_at|date:"M j, Y" }}
   </p>
 
+            </div>
+                 
+            
+          <div>
+        </div>        
+      </div>
+</div>
+        <!-- Events Tab -->
+        <div class="tab-pane fade" id="v-pills-events{{ loc.id }}" aria-labelledby="v-pills-events-tab{{ loc.id }}" role="tabpanel">
+          
+          {% for each in loc.volunteer %}
+              {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
+          {% endfor %}
+        </div>
+
+        <!-- Trainings Tab -->
+        <div class="tab-pane fade" id="v-pills-trainings{{ loc.id }}" aria-labelledby="v-pills-trainings-tab{{ loc.id }}" role="tabpanel">          
+          {% for each in loc.training %}           
+               {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
+          {% endfor %}
+        </div>
+  </div> <!-- tabcontent-->
+ 
+ <!--cardbody-->
+<!-- orgcard-->
+
+  </div>
   </div>
 {% endfor %}
   </div>
