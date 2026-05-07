@@ -3,146 +3,167 @@
 {% load can_edit_filters %}
 
 {% for loc in locs %}
-<div class="me-card" id="loc-{{loc.id}}" >
+<div class="me-card" id="loc-{{ loc.id }}">
+
   <div class="me-card-header">
     <div class="me-card-header-left">
       <div class="me-card-title-row">       
-          {% if q %}
-            {{ loc.loc_name|highlight:q|safe }}
-          {% else %}
-            {{ loc.loc_name }}
-          {% endif %}
-
-          {%if request.user.profile.staff%}
-          <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location">
-                <i class="bi bi-pencil"></i></a>
-          {% endif %}
-        </div>
-        <div class="me-card-sponsor">
-           <a href="{% url "orgs" %}?org_id={{loc.org.id}}">{{loc.org.org_name}}</a>
-          {% if loc.location_url%}
-            <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">{{ loc.location_url }}</a></span>
-          {% endif %}
-          <br>  {{loc.address}}, {{loc.city_name}} | {{loc.county_id.county_name}} 
-      
-        </div>
-      </div>
-      
-      
-      <div class="me-card-header-right">          
-          <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:75px;width:auto;" title="{{loc.region_name}}">
-      </div>
-  </div>
-  
-
- <!-- tab buttons -->
-    <ul class="me-tabs" id="locTabs{{ org.id }}" role="tablist" aria-orientation="vertical">
-      <li role="presentation">
-        <button class="me-tab-button active" 
-          id="v-pills-info-tab{{ loc.id }}" 
-          data-bs-toggle="pill" 
-          data-bs-target="#v-pills-info{{ loc.id }}" 
-          aria-controls="v-pills-info{{ loc.id }}"
-          aria-selected="true"
-          type="button" 
-          role="tab">Info</button>
-      </li>
-      {% if loc.volunteer %}
-        <li  role="presentation">
-          <button class="me-tab-button me-tree-tab" 
-            id="v-pills-events-tab{{ loc.id }}" 
-            data-bs-toggle="pill" 
-            data-bs-target="#v-pills-events{{ loc.id }}" 
-            aria-controls="v-pills-events{{ loc.id }}"
-            aria-selected="true"
-            type="button" 
-            role="tab">Volunteer<i class="bi bi-tree-fill"></i></button>
-        </li>
-      {% endif %}
-      {% if loc.training  %}
-      <li  role="presentation">
-        <button class="me-tab-button me-learn-tab" 
-        id="v-pills-trainings-tab{{ loc.id }}" 
-        data-bs-toggle="pill" 
-        data-bs-target="#v-pills-trainings{{ loc.id }}" 
-        aria-controls="v-pills-trainings{{ loc.id }}"
-        aria-selected="false"
-        type="button" 
-        role="tab">Trainings<i class="bi bi-mortarboard-fill"></i></button>
-      </li>
+        {% if q %}
+          {{ loc.loc_name|highlight:q|safe }}
+        {% else %}
+          {{ loc.loc_name }}
         {% endif %}
-    </ul>
-       
-    <!-- Tab Content -->
-    <div class="me-tab-content tab-content" id="v-pills-tabContent{{ loc.id }}">
-      
-        <!-- Info Tab -->
-        <div class="tab-pane fade show active" id="v-pills-info{{ loc.id }}" aria-labelledby="v-pills-info-tab{{ loc.id }}" role="tabpanel">
-          <div class="me-card">
-            <div class="me-card-header">
-              <div class="me-card-header-left">
-                <div>
-                  {% if loc.org %} 
-                  Managed by:
-                    <a href="{% url 'orgs' %}?org_id={{loc.org.id}}"><strong></strong>{{loc.org.org_name}}</strong> </a>
-                    {% if loc == loc.org.default_location %}<span class="me-badge">Default Location</span>{% endif %}
-                    <br>        
-                  {% endif %}
-                </div>
-              </div>
-              <div class="me-card-header-right">
-                {% if loc.org and loc.org|can_edit:request.user %}
-                  <a class="me-button-link" href="{% url 'org_mgmt' %}#org-{{ loc.org.id }}"><i class="bi bi-gear-fill"></i></a>
-                  {% endif %}
-                <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="width:75px;">
-              </div>
-            </div> 
-            {% if loc.location_about %}
-            <div class="me-description-block"></p>
-              <div class = "me-desc-short"> {{ loc.location_about|truncatechars:250 }} </div> 
-              <div class="me-desc-full"> {{ loc.location_about|highlight:q|safe }} </div>  
-            </div>
-            {% endif %}
-            <div class="me-card-sponsor">
-                Also used by these organizations: UNDER CONSTRUCTION
-                {% for each in loc.activities.org %}
-                  <a href="{% url 'orgs'%}?org_id={{each.id}}&view=list">{{ each.org_name }}</a>
-                  
-                {% endfor %}
-                <p class="small text-muted">
-    Last updated: {{ loc.updated_at|date:"M j, Y" }}
-  </p>
 
-            </div>
-                 
-            
-          <div>
-        </div>        
+        {% if request.user.profile.staff %}
+          <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location">
+            <i class="bi bi-pencil"></i>
+          </a>
+        {% endif %}
       </div>
-</div>
-        <!-- Events Tab -->
-        <div class="tab-pane fade" id="v-pills-events{{ loc.id }}" aria-labelledby="v-pills-events-tab{{ loc.id }}" role="tabpanel">
-          
-          {% for each in loc.volunteer %}
-              {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
-          {% endfor %}
+
+      <div class="me-card-sponsor">
+        <a href="{% url 'orgs' %}?org_id={{ loc.org.id }}">{{ loc.org.org_name }}</a>
+
+        {% if loc.location_url %}
+          <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">
+            {{ loc.location_url }}
+          </a>
+        {% endif %}
+
+        <br>
+        {{ loc.address }}, {{ loc.city_name }} | {{ loc.county_id.county_name }}
+      </div>
+    </div>
+
+    <div class="me-card-header-right">          
+      <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:75px;width:auto;" title="{{ loc.region_name }}">
+    </div>
+  </div>
+
+  <!-- tab buttons -->
+  <ul class="me-tabs" id="locTabs{{ loc.id }}" role="tablist" aria-orientation="vertical">
+    <li role="presentation">
+      <button class="me-tab-button active" 
+        id="v-pills-info-tab{{ loc.id }}" 
+        data-bs-toggle="pill" 
+        data-bs-target="#v-pills-info{{ loc.id }}" 
+        aria-controls="v-pills-info{{ loc.id }}"
+        aria-selected="true"
+        type="button" 
+        role="tab">Info</button>
+    </li>
+
+    {% if loc.volunteer %}
+      <li role="presentation">
+        <button class="me-tab-button me-tree-tab" 
+          id="v-pills-events-tab{{ loc.id }}" 
+          data-bs-toggle="pill" 
+          data-bs-target="#v-pills-events{{ loc.id }}" 
+          aria-controls="v-pills-events{{ loc.id }}"
+          aria-selected="false"
+          type="button" 
+          role="tab">Volunteer <i class="bi bi-tree-fill"></i></button>
+      </li>
+    {% endif %}
+
+    {% if loc.training %}
+      <li role="presentation">
+        <button class="me-tab-button me-learn-tab" 
+          id="v-pills-trainings-tab{{ loc.id }}" 
+          data-bs-toggle="pill" 
+          data-bs-target="#v-pills-trainings{{ loc.id }}" 
+          aria-controls="v-pills-trainings{{ loc.id }}"
+          aria-selected="false"
+          type="button" 
+          role="tab">Trainings <i class="bi bi-mortarboard-fill"></i></button>
+      </li>
+    {% endif %}
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="me-tab-content tab-content" id="v-pills-tabContent{{ loc.id }}">
+
+    <!-- Info Tab -->
+    <div class="tab-pane fade show active"
+         id="v-pills-info{{ loc.id }}"
+         aria-labelledby="v-pills-info-tab{{ loc.id }}"
+         role="tabpanel">
+
+      <div class="me-card">
+        <div class="me-card-header">
+          <div class="me-card-header-left">
+            <div>
+            {% if loc.org %} 
+              Managed by:
+              <a href="{% url 'orgs' %}?org_id={{ loc.org.id }}">
+                <strong>{{ loc.org.org_name }}</strong>
+              </a>
+
+              {% if loc == loc.org.default_location %}
+                <span class="me-badge">Default</span>
+              {% endif %}
+              <br>        
+            {% endif %}
+            </div>
+          </div>
+
+          <div class="me-card-header-right">
+            {% if loc.org and loc.org|can_edit:request.user %}
+              <a class="me-button-link" href="{% url 'org_mgmt' %}#org-{{ loc.org.id }}">
+                <i class="bi bi-gear-fill"></i>
+              </a>
+            {% endif %}
+
+            <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="width:75px;">
+          </div>
         </div>
 
-        <!-- Trainings Tab -->
-        <div class="tab-pane fade" id="v-pills-trainings{{ loc.id }}" aria-labelledby="v-pills-trainings-tab{{ loc.id }}" role="tabpanel">          
-          {% for each in loc.training %}           
-               {% include "orgs/_session_item.html" with e=each q=q source='loc'%}
-          {% endfor %}
-        </div>
-  </div> <!-- tabcontent-->
- 
- <!--cardbody-->
-<!-- orgcard-->
+        {% if loc.location_about %}
+          <div class="me-description-block">
+            <div class="me-desc-short">{{ loc.location_about|truncatechars:250 }}</div> 
+            <div class="me-desc-full">{{ loc.location_about|highlight:q|safe }}</div>  
+          </div>
+        {% endif %}
 
-  </div>
-  </div>
+        <div class="me-card-sponsor">
+          Also used by these organizations: UNDER CONSTRUCTION
+
+          {% for each in loc.activities.org %}
+            <a href="{% url 'orgs' %}?org_id={{ each.id }}&view=list">{{ each.org_name }}</a>
+          {% endfor %}
+
+          <p class="small text-muted">
+            Last updated: {{ loc.updated_at|date:"M j, Y" }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Tab -->
+    <div class="tab-pane fade"
+         id="v-pills-events{{ loc.id }}"
+         aria-labelledby="v-pills-events-tab{{ loc.id }}"
+         role="tabpanel">
+      {% for each in loc.volunteer %}
+        {% include "orgs/_session_item.html" with e=each q=q source='loc' %}
+      {% endfor %}
+    </div>
+
+    <!-- Trainings Tab -->
+    <div class="tab-pane fade"
+         id="v-pills-trainings{{ loc.id }}"
+         aria-labelledby="v-pills-trainings-tab{{ loc.id }}"
+         role="tabpanel">          
+      {% for each in loc.training %}           
+        {% include "orgs/_session_item.html" with e=each q=q source='loc' %}
+      {% endfor %}
+    </div>
+
+  </div> <!-- end tab content -->
+
+</div> <!-- end loc card -->
 {% endfor %}
-  </div>
+
 <!-- Pagination -->
   <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
