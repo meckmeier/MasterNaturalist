@@ -3,7 +3,45 @@ from django.forms import inlineformset_factory, BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from collections import defaultdict
+from allauth.account.forms import SignupForm
+from django.contrib.auth.models import User
+
+from django.utils import timezone
 from .models import *
+
+
+
+class CustomSignupForm(SignupForm):
+    first_name = forms.CharField(max_length=150, required=False)
+    last_name = forms.CharField(max_length=150, required=False)
+
+    accept_terms = forms.BooleanField(
+        required=True,
+        label="I agree to the Terms of Service and Privacy Policy",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs["class"] = "form-check-input"
+            else:
+                field.widget.attrs["class"] = "form-control"
+
+    def save(self, request):
+        user = super().save(request)
+
+        user.first_name = self.cleaned_data.get("first_name", "").strip()
+        user.last_name = self.cleaned_data.get("last_name", "").strip()
+        user.save()
+
+        profile, created = Profile.objects.get_or_create(user=user)
+        profile.terms_accepted_at = timezone.now()
+        profile.save()
+
+        return user
+
 
 class OrgForm(forms.ModelForm):
     in_wisconsin = forms.BooleanField(
@@ -358,12 +396,65 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         model = Profile
-        fields = ["bio", "preferred_region", "include_online"]
+        fields = ["bio", "preferred_region", "include_online", "staff"]
         widgets = {
             "bio": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "preferred_region": forms.Select(attrs={"class": "form-select"}),
             "include_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "staff": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "form-control"
+
+class StaffUserSelectForm(forms.Form):
+    user_id = forms.ModelChoiceField(
+        queryset=User.objects.all().order_by("username"),
+        label="Choose user"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["user_id"].widget.attrs["class"] = "form-control"
+
+
+class StaffUserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email", "is_active", "is_staff"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs["class"] = "form-check-input"
+            else:
+                field.widget.attrs["class"] = "form-control"
+
+
+class StaffProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ["preferred_region", "include_online", "staff"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs["class"] = "form-check-input"
+            else:
+                field.widget.attrs["class"] = "form-control"
+
 
 class ActivityForm(forms.ModelForm):
     categories = forms.ModelMultipleChoiceField(

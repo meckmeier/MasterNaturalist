@@ -23,17 +23,6 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-EMAIL_BACKEND = "anymail.backends.postmark.EmailBackend"
-ANYMAIL = {
-    "POSTMARK_SERVER_TOKEN": os.environ.get("POSTMARK_API_KEY"),
-}
-
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "mary@eckmeier.com")
-EMAIL_TIMEOUT = 10  # seconds
-
-PASSWORD_RESET_TIMEOUT = 60*60*24
-SITE_ID = 1
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -42,6 +31,37 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
+
+
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "noreply@example.com"
+else:
+    EMAIL_BACKEND = "anymail.backends.postmark.EmailBackend"
+    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+
+ANYMAIL = {
+    "POSTMARK_SERVER_TOKEN": os.environ.get("POSTMARK_API_KEY"),
+}
+
+ADMINS = [
+    ("Mary", "mary@eckmeier.com"),
+]
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "mary@eckmeier.com")
+EMAIL_TIMEOUT = 10  # seconds
+
+PASSWORD_RESET_TIMEOUT = 60*60*24
+SITE_ID = 1
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_UNIQUE_EMAIL = True
+
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_METHODS = {"email", "username"}
+ACCOUNT_FORMS = {
+    "signup": "orgs.forms.CustomSignupForm",
+}
+LOGIN_REDIRECT_URL = "landing"
+LOGOUT_REDIRECT_URL = "landing"
 
 #all these were added per a warnings message from python manage.py check --deploy 
 #they should all be set correctly in production/ and configured here to work on dev too.
@@ -80,6 +100,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'anymail',
+    'allauth',
+    'allauth.account',
 ]
 
 MIDDLEWARE = [
@@ -91,6 +113,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'MasterNaturalist.urls'
@@ -135,6 +158,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
 
 # Internationalization

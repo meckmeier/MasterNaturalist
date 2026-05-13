@@ -6,7 +6,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
+from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError
@@ -15,6 +18,7 @@ from django.db.models import Q, Min, Prefetch, F
 from django.http import  Http404, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -28,7 +32,7 @@ import pandas as pd
 from .services.csv_importer import CSVImporter
 
 from collections import defaultdict
-
+from io import StringIO
 from orgs.models import *
 from .forms import *
 
@@ -39,6 +43,24 @@ def sort_key(x):
         return date.max
     return d
 
+@staff_member_required
+def run_update_latlng(request):
+    output = None
+
+    if request.method == "POST":
+        out = StringIO()
+
+        call_command(
+            "update_latlng",
+            stdout=out,
+            limit=10,
+        )
+
+        output = out.getvalue()
+
+    return render(request, "orgs/staff_run_update_latlng.html", {
+        "output": output,
+    })
 
 def landing(request):
      # view only shows the main landing page. all info is rendered in the html page.
@@ -208,7 +230,7 @@ def org_mgmt(request):
     locations_qs = Location.objects.active()
 
     # staff gets to see all the organizations
-    if request.user.profile.staff:
+    if request.user.is_staff:
         orgs = Organization.objects.active().prefetch_related(
             Prefetch(
                 "locations", 
@@ -283,14 +305,14 @@ def org_create(request):
         form = OrgForm()
     return render(request, "orgs/org_detail.html", {
         "form": form,
-        "staff": request.user.profile.staff if request.user.is_authenticated else False
+        "staff": request.user.is_staff if request.user.is_authenticated else False
         })
 
 def org_edit(request, org_id):
 
     org = get_object_or_404(Organization, id=org_id)
     if not (
-        request.user.profile.staff or
+        request.user.is_staff or
         org.managed.filter(profile=request.user.profile).exists()
     ):
         return HttpResponseForbidden("You do not have permission to edit this organization.")
@@ -323,7 +345,7 @@ def org_edit(request, org_id):
                 "org": org,
                 "events": [],
                 "form": form,
-                "staff": request.user.profile.staff if request.user.is_authenticated else False
+                "staff": request.user.is_staff if request.user.is_authenticated else False
 
                 })
 
@@ -611,8 +633,7 @@ def register(request):
             return render(request, "orgs/register.html", {
                 "message": "Username already taken."
             })
-        login(request, user)
-        return HttpResponseRedirect(reverse("landing"))
+        return redirect("account_email_verification_sent")
     else:
         return render(request, "orgs/register.html")
     
@@ -621,18 +642,95 @@ def profile_view(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
+        user_form=UserForm(request.POST, instance=request.user)
         form = ProfileForm(request.POST, instance=profile)
-        if form.is_valid():
+        if form.is_valid() and user_form.is_valid():
             form.save()
+            user_form.save()
             return redirect("profile")
     else:
+        user_form = UserForm(instance=request.user)
         form = ProfileForm(instance=profile)
 
-    return render(request, "orgs/profile.html", {"form": form})
-    
+    return render(request, "orgs/profile.html", {
+        "form": form,
+        "user_form": user_form,})
+
+def user_is_staff_profile(user):
+    return user.is_authenticated and hasattr(user, "profile") and user.is_staff
+
+
+@login_required
+def staff_user_manage(request):
+    if not user_is_staff_profile(request.user):
+        raise PermissionDenied
+
+    target_user = None
+    user_form = None
+    profile_form = None
+
+    created_orgs = updated_orgs = None
+    created_locations = updated_locations = None
+    created_activities = updated_activities = None
+
+    selected_user_id = request.GET.get("user_id") or request.POST.get("user_id")
+
+    if selected_user_id:
+        target_user = get_object_or_404(
+            User.objects.select_related("profile"),
+            id=selected_user_id
+        )
+
+        profile, created = Profile.objects.get_or_create(user=target_user)
+
+        if request.method == "POST":
+            user_form = StaffUserUpdateForm(request.POST, instance=target_user)
+            profile_form = StaffProfileUpdateForm(request.POST, instance=profile)
+
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                profile_form.save()
+                return redirect(f"{request.path}?user_id={target_user.id}")
+
+        else:
+            user_form = StaffUserUpdateForm(instance=target_user)
+            profile_form = StaffProfileUpdateForm(instance=profile)
+
+
+        created_orgs = Organization.objects.filter(created_by=profile).order_by("-created_at")
+        updated_orgs = Organization.objects.filter(updated_by=profile).order_by("-updated_at")
+
+        created_locations = Location.objects.filter(created_by=profile).order_by("-created_at")
+        updated_locations = Location.objects.filter(updated_by=profile).order_by("-updated_at")
+
+        created_activities = Activity.objects.filter(created_by=profile).order_by("-created_at")
+        updated_activities = Activity.objects.filter(updated_by=profile).order_by("-updated_at")
+
+    select_form = StaffUserSelectForm(
+        initial={"user_id": target_user} if target_user else None
+    )
+
+    return render(request, "orgs/staff_user_manage.html", {
+        "select_form": select_form,
+        "target_user": target_user,
+        "user_form": user_form,
+        "profile_form": profile_form,
+        "created_orgs": created_orgs,
+        "updated_orgs": updated_orgs,
+        "created_locations": created_locations,
+        "updated_locations": updated_locations,
+        "created_activities": created_activities,
+        "updated_activities": updated_activities,
+    })
+
+
 def activities(request):
     q = request.GET.get("q", "")
-    
+    activity_id = request.GET.get("activity_id", "")
+    current_activity = None
+
+    if activity_id:
+        current_activity = Activity.objects.filter(id=activity_id).first()
 
     today = timezone.now().date()
     # activities results... should i change this so we know what it is?
@@ -648,6 +746,7 @@ def activities(request):
 
     if "org_id" in get_data and "org" not in get_data:
         get_data["org"]=get_data["org_id"]
+        
 
     filter_form=EventFilterForm(get_data or None)
     if filter_form.is_valid():
@@ -695,12 +794,12 @@ def activities(request):
 
     if activity_id:
         queryset = queryset.filter(activity_id=activity_id)
+        
 
     clean_get = request.GET.copy()
     for p in ["page", "curr_page", "onl_page","ong_page"]:
         clean_get.pop(p, None)
     
-    thirty_days_ago = timezone.now() - timedelta(days=30)
 
     # Current: future start dates, sorted by start ascending
     upcoming_sessions = queryset.upcoming().order_by('start')
@@ -717,7 +816,8 @@ def activities(request):
                     "query_params": clean_get,
                     "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
                     "cats": EventCategory.objects.all(),
-                    "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html
+                    "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html,
+                    "current_activity": current_activity,
 
                   } )
 
@@ -738,7 +838,7 @@ def get_grouped_categories():
 def user_can_edit_org(request, org):
     if not request.user.is_authenticated:
         return False
-    return request.user.profile.staff or org.can_edit(request.user)
+    return request.user.is_staff or org.can_edit(request.user)
 
 def _activity_form_workflow(request, org, activity, is_new=False):
     confirm = request.POST.get("confirm_duplicate")
@@ -860,7 +960,7 @@ def activity_detail(request, activity_id=None):
 
     can_edit = False
     if request.user.is_authenticated:
-        if request.user.profile.staff or  org.can_edit(request.user):
+        if request.user.is_staff or  org.can_edit(request.user):
             can_edit = True
 
     if not can_edit:
@@ -1097,7 +1197,7 @@ def org_manager_add(request, org_id):
     org = get_object_or_404(Organization, pk=org_id)
 
     if not (
-        request.user.profile.staff
+        request.user.is_staff
         or org.managed.filter(id=request.user.profile.id).exists()
     ):
         return HttpResponseForbidden("You do not have permission to add managers.")
@@ -1151,7 +1251,7 @@ def org_manager_delete(request, pk):
         return redirect("org_mgmt")
 
     if not (
-        request.user.profile.staff
+        request.user.is_staff
         or org_manager.org.managed.filter(id=request.user.profile.id).exists()
     ):
         return HttpResponseForbidden("You do not have permission to delete this manager.") 
@@ -1214,7 +1314,7 @@ def upload_csv(request, org_id):
     org = get_object_or_404(Organization, id=org_id)
     print("Starting upload csv-step1",org)
 
-    if not (OrgManager.objects.filter(org=org, profile=request.user.profile).exists()  or request.user.profile.staff):
+    if not (OrgManager.objects.filter(org=org, profile=request.user.profile).exists()  or request.user.is_staff):
         return HttpResponseForbidden()
     
     if request.method == "POST":

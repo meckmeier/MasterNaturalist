@@ -3,6 +3,7 @@
 {% load can_edit_filters %}
 
  <div class="me-card">
+
  <!-- Right block: simple inline icons -->
 
   <!-- Header row -->
@@ -93,19 +94,23 @@
     </div>  </div>
      <div class="me-card-header-right"> 
     <div class="me-icons">
-    
+        {% if e.activity.org and e.activity.org|can_edit:request.user %}
+          <a class="me-button-link" href="{% url 'org_mgmt' %}?org={{ current_activity.org.id }}" title="Go to Organization Dashboard">
+            <i class="bi bi-gear-fill"></i>
+          </a>
+        {% endif %}
 
      {% if e.session_url %}
-            <a class="me-btn" href="{{ e.session_url }}" target="_blank">
-             <span><i class="bi bi-arrow-up-right-square me-btn-icon" title="link to session site"></i></span>
+            <a class="me-btn" href="{{ e.session_url }}" target="_blank"  title="link to session site">
+             <span><i class="bi bi-arrow-up-right-square me-btn-icon"></i></span>
               <span class="me-btn-label">Connect</span></a>
       {% elif e.activity.activity_url %}
-            <a class="me-btn" href="{{ e.activity.activity_url }}" target="_blank">
-              <span><i class="bi bi-arrow-up-right-square me-btn-icon" title="link to activity site"></i></span>
+            <a class="me-btn" href="{{ e.activity.activity_url }}" target="_blank"  title="link to activity site">
+              <span><i class="bi bi-arrow-up-right-square me-btn-icon"></i></span>
             <span class="me-btn-label">Contact</span></a>
       {% elif e.activity.contact_email%}
               {% with body_text="Hello, I found this opportunity on WildPaths Wisconsin and I'm interested in "|add:e.activity.title|add:" at "|add:e.activity.org.org_name|add:". Thank you." %}
-           <a class="me-btn" href="mailto:{{ e.activity.contact_email }}?subject={{ e.activity.title|urlencode }}&body={{ body_text|urlencode }}">
+           <a class="me-btn" href="mailto:{{ e.activity.contact_email }}?subject={{ e.activity.title|urlencode }}&body={{ body_text|urlencode }}" title="Send email to contact">
             <span> 
           <i class="bi bi-envelope me-btn-icon" title="send email to contact person"></i></span>
          <span class="me-btn-label">Contact</span></a>{% endwith %}

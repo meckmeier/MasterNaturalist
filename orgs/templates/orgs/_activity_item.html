@@ -51,6 +51,11 @@
     </div>
     <div class="me-card-header-right">
       <div class="me-icons">
+        
+              <a class="me-button-link" href="{% url 'org_mgmt' %}?org={{ current_activity.org.id }}">
+                <i class="bi bi-gear-fill"></i>
+              </a>
+           
           {% if e.contact_email%}
            {% with body_text="Hello, I found this opportunity on WildPaths Wisconsin and I'm interested in "|add:e.title|add:" at "|add:e.org.org_name|add:". Thank you." %}
       

@@ -3,7 +3,7 @@
 {% load static %}
 <div class="me-page">
 <div class="me-landing-content">
-     <img src="{% static 'orgs/images/white_only_transparent.png'%}" width ="150" class="img-fluid" style="background-color:#2e7d32;">
+     <img src="{% static 'orgs/images/newlogoCropped.jpg'%}" width ="200" class="img-fluid" style="background-color:#2e7d32;">
 <div>
 <h1>Welcome!</h1> 
 <h4>Find your way to support nature in Wisconsin.</h4>
@@ -28,7 +28,7 @@
 </a>
 <a class="me-btn" href="{% url 'locations' %}" title="See a map of locations">
     <span>
-            <i class="bi bi-geo-alt-fill me-btn-icon"></i>
+            <i class="bi bi-geo-alt-fill me-btn-icon  me-btn-brown-icon"></i>
         </span>
     <span class="me-btn-label">
         Locations</span>
@@ -50,7 +50,7 @@ can use this site to find ways to volunteer and access advanced training opportu
     <div class="me-muted">If you are an organization and want to manage locations or activities:</div><br>
     <a class="me-btn" href="{% url 'org_mgmt' %}" title="Manage YOUR organizations">
         <span>
-            <i class="bi bi-gear-fill me-btn-icon"></i>
+            <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i>
     </span>
      <span class="me-btn-label">
     Manage Organizations</span></a>
@@ -58,9 +58,9 @@ can use this site to find ways to volunteer and access advanced training opportu
 {%else%}
 <p>This website was designed to help Wisconsin Master Naturalists find volunteer and training opportunities. 
     </p> 
-    <a class="me-button-link" href="{% url 'register' %}">
+<a class="me-button-link" href="{% url 'account_signup' %}">
     Click here to get started</a>
-    Already have a login -> <a class="me-button-link" href="{% url 'login' %}">Login</a>
+    Already have a login -> <a class="me-button-link" href="{% url 'account_login' %}">Login</a>
      to gain full advantage of this system to connect you to your natural world.
 
 {%endif%}

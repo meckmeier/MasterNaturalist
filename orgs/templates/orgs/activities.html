@@ -19,6 +19,15 @@
   
   <h1>Activities</h1>
 
+  {% if current_activity %}
+    <div class="active-filter-banner">
+        Showing only one activity
+
+        <a href="{% url 'activities' %}" class="me-button-link">
+            Remove Filter
+        </a>
+    </div>
+  {% else %}
   <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3">
  
   <!-- Session Format -->
@@ -62,17 +71,18 @@
         More Filters</span>
     </button>
 </form>
+{% endif %}
 
     {% for a in upcoming %}
     
-      {% include "orgs/_session_item.html" with e=a q=q %} 
+      {% include "orgs/_session_item.html" with e=a q=q current_activity=current_activity %} 
 
     {% endfor %}
 
 <hr>
 
       {% for a in ongoing %}
-      {% include "orgs/_session_item.html" with e=a q=q %}
+      {% include "orgs/_session_item.html" with e=a q=q  current_activity=current_activity %}
 
     {% endfor %}
     

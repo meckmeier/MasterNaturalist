@@ -1,0 +1,25 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<div class="me-page">
+<h1>Update Location Latitude / Longitude</h1>
+
+<p>
+  This will run the geocoding command for locations missing latitude/longitude - 10 per click.
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="me-btn">
+    <span><i class="bi bi-gear me-btn-icon"></i></span>
+    <span class="me-btn-label">
+    Run Update</span>
+  </button>
+</form>
+
+{% if output %}
+  <h2>Results</h2>
+  <pre>{{ output }}</pre>
+{% endif %}
+</div>
+{% endblock %}

@@ -1,8 +1,7 @@
 {% extends "orgs/layout.html" %}
 {% load static %}
-{% block filter_button %}
 
-{% endblock %}
+
 
 {% block filters %}
 
@@ -28,7 +27,7 @@
     <span><i class="bi bi-plus-square me-btn-icon"></i></span>
     <span class="me-btn-label">Add New Organization</span></a>
 </div>
-{% if user.profile.staff %}
+{% if user.is_staff %}
 <form method="get" action="{{ request.path }}" class="mb-3" style="margin:10px;" id="org-quick-filter-form">
     {{ filter_form.org }}
     {% if filter_form.org.errors %}

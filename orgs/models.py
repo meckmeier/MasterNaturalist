@@ -5,6 +5,7 @@ from django.db.models import Q, Exists, OuterRef
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import timedelta
+from django.core.mail import mail_admins
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
 
@@ -125,6 +126,7 @@ class Profile(models.Model):
     preferred_region = models.CharField(max_length =100, choices = region_list, default='', blank=True)
      # Personalization Toggles
     include_online = models.BooleanField(default=True)
+    terms_accepted_at = models.DateTimeField(null=True, blank=True)
     
     def __str__(self):
         return f'{self.user.username}'
@@ -174,7 +176,7 @@ class Organization(models.Model):
         if not user.is_authenticated:
             return False
         return (
-            user.profile.staff
+            user.is_staff
             or self.managed.filter(profile=user.profile,
                                           role__in=["owner","admin","editor"]).exists()
     )
@@ -291,7 +293,7 @@ class Location(models.Model):
     def can_edit(self, user):
         if not user.is_authenticated:
             return False
-        if user.profile.staff:
+        if user.is_staff:
             return True
         if self.org is None:
             return False
@@ -372,7 +374,7 @@ class Activity(models.Model):
         if not user.is_authenticated:
             return False
         return (
-            user.profile.staff
+            user.is_staff
             or self.org.managed.filter(profile=user.profile,
                                           role__in=["owner","admin","editor"]).exists()
     )
@@ -650,3 +652,20 @@ class Feedback(models.Model):
     def __str__(self):
         who = self.name or self.email or "Anonymous"
         return f"{who} - {self.created_at:%Y-%m-%d %H:%M}"
+    
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+
+        super().save(*args, **kwargs)
+
+        if is_new:
+            mail_admins(
+                subject="New feedback received",
+                message=(
+                    f"New feedback was submitted.\n\n"
+                    f"Name: {self.name or 'Not provided'}\n"
+                    f"Email: {self.email or 'Not provided'}\n\n"
+                    f"Message:\n{self.note}"
+                ),
+                fail_silently=True,
+            )

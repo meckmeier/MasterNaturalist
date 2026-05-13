@@ -2,25 +2,50 @@
 {% load static %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="me-page">
 
-  <h2 class="mb-3">Profile for {{ request.user.get_full_name|default:request.user.username }}</h2>
+  
 
-  <div class="card shadow-sm p-4">
-
-    <form method="post">
+  <div class="me-card">
+    <div class="me-card-header">
+      <div class="me-card-header-left">
+        <h2 >User Info for {{ request.user.get_full_name|default:request.user.username }}</h2>
+      </div>
+      <div class="me-card-header-right">
+        <div class="me-card-icons">
+           <a href="{% url 'account_change_password' %}" class="me-button-link">
+              Change Password
+            </a>
+        </div>
+     </div>
+    </div>
+    <form method="post" novalidate>
       {% csrf_token %}
+      {{ user_form.non_field_errors}}
+
+      <div class="form-field-full">
+        {{user_form.first_name.label_tag}}
+        {{user_form.first_name}}
+        {{user_form.first_name.errors}}
+      </div>
+
+      <div class="form-field-full">
+        {{user_form.last_name.label_tag}}
+        {{user_form.last_name}}
+        {{user_form.last_name.errors}}
+      </div>      
+
+      {{ form.non_field_errors}}
 
       <!-- Bio -->
-      <div class="mb-4">
+      <div class="form-field-full">
         {{form.bio.label_tag }}
         {{form.bio  }}
-
         {{form.bio.errors }}
       </div>
 
       <!-- Preferred Region -->
-      <div class="mb-4">
+      <div class="form-field">
         {{ form.preferred_region.label_tag }}
         {{form.preferred_region}}
         {{ form.preferred_region.errors }}
@@ -28,7 +53,7 @@
       </div>
 
       <!-- Include Online Opportunities -->
-      <div class="form-check mb-4">
+      <div class="form-check form-field">
         {{ form.include_online }}
         {{ form.include_online.errors }}
         <label class="form-check-label" for="{{ form.include_online.id_for_label }}">
@@ -36,20 +61,15 @@
         </label>
       </div>
 
-      <button type="submit" class="me-btn">Save Preferences</button>
+      <button type="submit" class="me-btn">
+        <span><i class="bi bi-floppy me-btn-icon"></i></span>
+            <span class="me-btn-label">Save</span>
+        </button>
 
     </form>
   </div>
 
-  <!-- Display Current Settings -->
-  <div class="mt-4">
-    <h5 class="fw-semibold">Current Preferences:</h5>
-    <ul class="list-unstyled">
-      <li><strong>Bio:</strong> {{ form.instance.bio|default:"(none)" }}</li>
-      <li><strong>Preferred Region:</strong> {{ form.instance.preferred_region|default:"(none)" }}</li>
-      <li><strong>Include Online:</strong> {{ form.instance.include_online|yesno:"Yes,No" }}</li>
-    </ul>
-  </div>
+
 
 </div>
 {% endblock %}

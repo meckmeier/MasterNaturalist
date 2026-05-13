@@ -1,0 +1,30 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+
+<div class ="me-page">
+
+   <div class="container py-5" style="max-width: 700px;">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+            <h1 class="mb-3">Confirm Your Email</h1>
+
+            {% if confirmation %}
+                <p>Please confirm that this email address should be connected to your account.</p>
+
+                <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                    {% csrf_token %}
+                    <button type="submit" class="me-btn-simple">
+                        Confirm Email
+                    </button>
+                </form>
+            {% else %}
+                <p>This confirmation link is invalid or has already been used.</p>
+                <a href="{% url 'account_login' %}" class="me-btn-simple">Sign In</a>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

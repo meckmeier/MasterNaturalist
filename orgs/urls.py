@@ -36,11 +36,12 @@ urlpatterns = [
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
     path("profile/", views.profile_view, name="profile"),
+    path("staff/user/", views.staff_user_manage, name="staff_user_manage"),
     path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
     path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete" ),
-   
+    
     path("upload/<int:org_id>/", views.upload_csv, name="upload_csv"),
     path("upload/<int:upload_id>/map/", views.upload_map, name="upload_map"),
     path("upload/<int:upload_id>/stage/", views.upload_stage, name="upload_stage"),
@@ -53,6 +54,7 @@ urlpatterns = [
     path("upload/<int:upload_id>/reject/", views.upload_reject, name="upload_reject"),
     
     path("lookup-zip/", views.lookup_zip, name="lookup_zip"),
+    path("staff/update-latlng/", views.run_update_latlng, name="run_update_latlng"),
     path("test_email",views.test_email, name="test_email"),
     path("test_html", views.test_html, name="test_html"),
     path("admin/run-backfill/", views.run_backfill),

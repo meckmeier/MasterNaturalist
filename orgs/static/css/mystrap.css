@@ -8,7 +8,11 @@
   --med-green:  rgb(63,103,14);     /* Light Gray */
   --green: #2e7d32;
   --blue: #2C6FA3;
+  --logo-blue: #25408F;
+  --logo-black: #181818;
   --mustard: #FF7F11;   /* Yellow */
+  --logo-yellow: #D85D29;
+  --logo-brown: #6F1200;
   --nav-text: #2e7d32;        /* Deep Green-Gray */
   --nav-bar-background: ivory;
   --hover: #6B6F34;
@@ -91,6 +95,16 @@ a:active {
     color: var(--nav-bar-background);
     background-color: var(--hover);
 }
+.me-navbar .nav-link.active {
+    color: var(--nav-bar-background);
+    background-color: var(--hover);
+}
+.me-navbar .nav-item.dropdown.show > .nav-link,
+.me-navbar .nav-link.dropdown-toggle.show,
+.me-navbar .nav-link.dropdown-toggle[aria-expanded="true"] {
+    color: var(--nav-bar-background);
+    background-color: var(--hover);
+}
 /* Layout */
 .me-page {
   max-width: 1300px;
@@ -100,7 +114,7 @@ a:active {
 }
 .me-landing-content {
   text-align: center;
-  margin-top: 2rem;
+  
 }
 .me-form {
   background-color: var(--main-background);
@@ -307,11 +321,16 @@ a:active {
 }
 
 .me-btn-learn-icon {
-  background-color: var(--mustard);
+  background-color: var(--logo-yellow);
 }
-
+.me-btn-brown-icon{
+  background-color: var(--logo-brown);
+}
+.me-btn-black-icon{
+  background-color: var(--logo-black);
+}
 .me-btn-vol-icon {
-  background-color: var(--blue);
+  background-color: var(--logo-blue);
 }
 
 .me-btn:hover {
@@ -344,7 +363,7 @@ a:active {
 
   /* 🔑 YOUR COLORS */
   background-color: #2e7d32;   /* base */
-  color: #fff;
+  color: var(--button-text);
   border-color: #2e7d32;
 }
 

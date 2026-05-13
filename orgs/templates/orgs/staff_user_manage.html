@@ -1,0 +1,99 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+
+<div class="container py-4">
+
+    <h1>Manage User</h1>
+
+    <form method="get" class="mb-4">
+        <div class="mb-3">
+            {{ select_form.user_id.label_tag }}
+            {{ select_form.user_id }}
+        </div>
+
+        <button type="submit" class="me-btn-simple">
+            Load User
+        </button>
+    </form>
+
+    {% if target_user %}
+
+        <hr>
+
+        <h2>{{ target_user.username }}</h2>
+
+        <p><strong>Date joined:</strong> {{ target_user.date_joined|date:"M j, Y g:i A" }}</p>
+
+        <p>
+            <strong>Last login:</strong>
+            {% if target_user.last_login %}
+                {{ target_user.last_login|date:"M j, Y g:i A" }}
+            {% else %}
+                Never
+            {% endif %}
+        </p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <input type="hidden" name="user_id" value="{{ target_user.id }}">
+
+            <h3>Account</h3>
+
+            {{ user_form.non_field_errors }}
+
+
+            <div class="form-check mb-3">
+                {{ user_form.is_active }}
+                {{ user_form.is_active.label_tag }}
+                {{ user_form.is_active.errors }}
+            </div>
+            <div class="form-check mb-3">
+                {{ user_form.is_staff }}
+                {{ user_form.is_staff.label_tag }}
+                {{ user_form.is_staff.errors }}
+            </div>
+
+            {{ profile_form.non_field_errors }}
+
+ 
+
+            <div class="form-check mb-3">
+                {{ profile_form.staff }}
+                {{ profile_form.staff.label_tag }}
+                {{ profile_form.staff.errors }}
+            </div>
+
+            <button type="submit" class="me-btn-simple">
+                Save User
+            </button>
+        </form>
+
+        <hr>
+
+        <h3>User Activity</h3>
+
+        <h4>Organizations Created</h4>
+        {% include "orgs/_staff_object_list.html" with objects=created_orgs date_field="created_at" empty_message="No organizations created." %}
+
+        <h4>Organizations Updated</h4>
+        {% include "orgs/_staff_object_list.html" with objects=updated_orgs date_field="updated_at" empty_message="No organizations updated." %}
+
+        <h4>Locations Created</h4>
+        {% include "orgs/_staff_object_list.html" with objects=created_locations date_field="created_at" empty_message="No locations created." %}
+
+        <h4>Locations Updated</h4>
+        {% include "orgs/_staff_object_list.html" with objects=updated_locations date_field="updated_at" empty_message="No locations updated." %}
+
+        <h4>Activities Created</h4>
+        {% include "orgs/_staff_object_list.html" with objects=created_activities date_field="created_at" empty_message="No activities created." %}
+
+        <h4>Activities Updated</h4>
+        {% include "orgs/_staff_object_list.html" with objects=updated_activities date_field="updated_at" empty_message="No activities updated." %}
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

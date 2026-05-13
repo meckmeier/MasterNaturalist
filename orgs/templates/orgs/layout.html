@@ -27,11 +27,11 @@
 
     <!-- Brand -->
     <a class="navbar-brand" href="{% url 'landing' %}">
-      <img src="{% static 'orgs/images/white_only_transparent.png' %}"
+      <img src="{% static 'orgs/images/newlogonowords.jpg' %}"
            alt="Home"
-           width="50"
+           width="100"
            class="img-fluid"
-           style="background-color: #2e7d32; border: white 4px solid;">
+           style="background-color: #2e7d32; border: white 2px solid;">
     </a>
 
     <!-- Hamburger -->
@@ -71,16 +71,22 @@
               Volunteer
             </a>
             <ul class="dropdown-menu">
-              <li>
-                <a class="dropdown-item" href="{% url 'activities' %}">Activities</a>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'activities' %}">Activities</a>
               </li>
 
-              <li>
-                <a class="dropdown-item" href="{% url 'orgs' %}">Organizations</a>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'orgs' %}">Organizations</a>
               </li>
 
-              <li>
-                <a class="dropdown-item" href="{% url 'locations' %}">Locations</a>
+              <li  class="dropdown-item">
+                <a class="nav-link" href="{% url 'locations' %}">Locations</a><hr>
+              </li>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'profile' %}">Your Profile</a>
+              </li>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
               </li>
             </ul>
 
@@ -91,22 +97,40 @@
             </a>
             <ul class="dropdown-menu">
             <li class="dropdown-item">
-              <a class="nav-link" href="{% url 'org_mgmt' %}">Manage Your Organizations</a>
+              <a class="nav-link" href="{% url 'org_mgmt' %}">Manage Organizations</a>
             </li>
+            <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
+              </li>
             </ul></li>
+         {% if user.is_staff %}
      
-
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
-            </li>
+    
+             <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              Staff
+            </a>
+            <ul class="dropdown-menu">
+              <li class="dropdown-item">
+                <a class="nav-link" href="/admin/">Admin</a>
+                </li>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'staff_user_manage' %}">User Management</a>
+              </li>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'run_update_latlng' %}">Location Map Markers</a>"
+              </li>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'logos' %}">Logos</a>
+              </li>
+            </ul>
+           </li>
+          {% endif %}
 
             
 
-            {% if user.is_staff %}
-              <li class="nav-item">
-                <a class="nav-link" href="/admin/">Admin</a>
-              </li>
-            {% endif %}
+            
           {% endif %}
 
           <li class="nav-item">

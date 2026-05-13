@@ -1,0 +1,60 @@
+<table class="table table-sm table-striped mb-4">
+
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for obj in objects %}
+
+            <tr>
+
+                <td>
+
+                    {% if obj.org_name %}
+                        {{ obj.org_name }}
+
+                    {% elif obj.loc_name %}
+                        {{ obj.loc_name }}
+
+                    {% elif obj.title %}
+                        {{ obj.title }}
+
+                    {% else %}
+                        {{ obj }}
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if date_field == "created_at" %}
+                        {{ obj.created_at|date:"M j, Y g:i A" }}
+
+                    {% else %}
+                        {{ obj.updated_at|date:"M j, Y g:i A" }}
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        {% empty %}
+
+            <tr>
+                <td colspan="2">
+                    {{ empty_message }}
+                </td>
+            </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
