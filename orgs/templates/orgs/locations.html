@@ -13,7 +13,24 @@
 {% with query_params.urlencode as query_string %}
 
 <div class="me-page">
-<h1>Locations</h1>
+ <div class="me-card-header">
+    <div class="me-card-header-left">  
+      <h1>Locations</h1>
+    </div>
+    <div class="me-card-header-right">
+      {% if active_filters %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+              for:
+              {{ active_filters|join:", " }}
+          </div>
+      {% else %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+          </div>
+      {% endif %}
+    </div>
+  </div>
  <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3" id="view-toggle-form">
     <input type="hidden" name="county" value="{{ request.GET.county }}">
     <input type="hidden" name="region" value="{{ request.GET.region }}">

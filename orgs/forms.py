@@ -238,7 +238,7 @@ class EventFilterForm(forms.Form):
 )
     ongoing = forms.BooleanField(
         required=False,
-        label="Ongoing activities (no dates)"
+        label="Ongoing (no dates)"
     )
     start_date = forms.DateField(
         required=False,
@@ -271,7 +271,11 @@ class EventFilterForm(forms.Form):
     )  
     my_orgs = forms.BooleanField(
         required=False,
-        label="Show events my Favorite Organizations"
+        label="MyFavorite Organizations' events"
+    )
+    has_cost = forms.BooleanField(
+        required=False,
+        label="Free events (no cost)"
     )
     county = forms.ModelChoiceField(
         queryset = County.objects.all().order_by("county_name"),
@@ -308,7 +312,7 @@ class EventFilterForm(forms.Form):
         queryset=EventCategory.objects.all().order_by("name"),
         required=False,
         widget=forms.CheckboxSelectMultiple,
-        label="Event Categories"
+        label="Categories"
     )
 
     def __init__(self, *args, **kwargs):
@@ -515,7 +519,7 @@ class ActivityForm(forms.ModelForm):
 
     class Meta:        
         model = Activity
-        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost","no_cost", "contact_email", "time_description"] 
+        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost", "contact_email", "time_description"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "expire_date": forms.DateInput(attrs={"type": "date"}),

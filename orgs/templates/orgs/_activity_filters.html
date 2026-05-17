@@ -32,34 +32,39 @@
     <label for="type-training">Training</label>
   </div>
   </div>
-    <div class="mb-3">
-        Sponsor: 
-        {{ filter_form.org }}
-        {{ filter_form.org.errors }}
-    </div>
-     <input type="hidden" name="tab" id="tabInput" value="{{ request.GET.tab|default:'upcoming' }}">
-    <div class="mb-3">
-        {{ filter_form.my_orgs }}
-        {{ filter_form.my_orgs.label_tag }}
-        {{ filter_form.my_orgs.errors }}
-    </div>
-    <div class="mb-3"> 
+      <div class="mb-3"> 
         Word Search: 
         {{ filter_form.q }}
         {{ filter_form.q.errors}}
     </div>  
     <div class="mb-3">
+        Sponsor Organization: 
+        {{ filter_form.org }}
+        {{ filter_form.org.errors }}
+    </div>
+     <input type="hidden" name="tab" id="tabInput" value="{{ request.GET.tab|default:'upcoming' }}">
+    <div >
+        {{ filter_form.my_orgs }}
+        {{ filter_form.my_orgs.label_tag }}
+        {{ filter_form.my_orgs.errors }}
+    </div>
+    <div>{{filter_form.has_cost}}
+        {{ filter_form.has_cost.label_tag}} 
+        {{ filter_form.has_cost.errors }} </div>
+
+    <div >
         {{filter_form.ongoing}}
         {{filter_form.ongoing.errors}}
         {{filter_form.ongoing.label_tag}}
     </div>
+    <hr>
    <div class="me-filter-2colrow">
     <div class="me-filter-col">
         {{ filter_form.start_date.label_tag }}
         {{ filter_form.start_date }}
         {{ filter_form.start_date.errors }}
     </div>
-
+   
     <div class="me-filter-col">
         {{ filter_form.end_date.label_tag }}
         {{ filter_form.end_date }}
@@ -70,16 +75,18 @@
     <hr>
     <div class="me-filter-2colrow">
     <div class="me-filter-col">
-        {{ filter_form.county.label_tag}}
-        {{ filter_form.county }}
-    </div>
-    <div class="me-filter-col">
         {{ filter_form.region.label_tag}}
         {{ filter_form.region }}
     </div>
+    <div class="me-filter-col">
+        {{ filter_form.county.label_tag}}
+        {{ filter_form.county }}
+    </div>
+
     </div>
     <div class="mb-3">
-        <label class="form-label">Categories</label>
+        
+        
         <div class="d-flex flex-wrap gap-2">
              {% for group, choices in filter_form.category_groups %}
         <div class="category-group">

@@ -23,16 +23,10 @@ python manage.py update_latlng (now in a management form so it can be run from t
 Future Feature:
 Configure an upload process that will take in a csv or excel file and load it into Pending Locations, Pending Activities and Pending Sessions for audit/approval and push into the production tables. So we can automate the loading of data. (this is one way to automate getting activities into the system... maybe even extend this into an API thing so we can pull the data directly from connected organizations ultimately)
 
-X Add in email validation during registration process.
-X Send notification emails to me when feedback is entered.
-X Add in an administration dashboard where i can run the update_latlng.
-Create your version of the user driven change password
 Work on the upload process
 
-X Hide dates when ongoing is checked. / consider time description as a part of the session rather than the activity (?)
 Remove delete checkbox from session page. only way to delete an activity is on the managing orgs page. (or check out this f() ?)
 X Add a new organization > REGISTER and is a separate process. No more ADD from org mgmt
-Look into add some barrier to external users ($5 subscription?) so Master Naturalists have a perk.
 Filter on free activities
 X Change language: $ and a check instead of Free and a check.
  - added has_cost, form uses has_cost, and both _items show has_cost. Once in production, it will need to be adjusted so remove the old no_cost field.
@@ -43,11 +37,9 @@ Move time description to the Session.
 i button with info on the dates. Hide start/end when you click ongoing.
 
 
-
-
 Version Two:
 * one new field to Profile (terms_accepted_at)
-* added allauth framework (make sure it gets captures in requirements.txt)
+* added allauth framework along with turnstile captcha feature to mitigate bot logins. Verify email with password rules to help ensure that only legitmate users will be able to make changes to the database. Moved browse and search features to the public access.
 * replaced registration/ with accounts/ folder and all the associated user forms to have email be validated during registration.
 * menu changes included color fix, staff submenu for admin/ and user info screen. New edit profile option under Volunteer.
 * feedback will send me an email when someone submits.
@@ -57,7 +49,9 @@ Version Two:
  --- You really need to test all the pages again staff/ mgrs / and none -- 
 * added a link to org dashboard from session page... so when you edit you can get back more quickly.
 * changed colors on the landing page buttons to use the colors from the logo.
-
+* activity form enhancement to hide/show dates based on ongoing selection.
+* Adding a new organization is now a two step process... user is NOT required to be logged in for the organization to be created.
+* adding some filter context to the activity page - just added number found in results on the other two pages.
 
 Future wishlist - make a video that explains how to manage an org in this system.
 Talk to Sage about creating a way to 'register' for an activity in her system directly from here.

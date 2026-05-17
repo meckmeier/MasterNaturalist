@@ -16,9 +16,24 @@
 {% load highlight %}
 
 <div class="me-page">
-  
-  <h1>Activities</h1>
-
+ <div class="me-card-header">
+    <div class="me-card-header-left">  
+      <h1>Activities</h1>
+    </div>
+    <div class="me-card-header-right">
+      {% if active_filters %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+              for:
+              {{ active_filters|join:", " }}
+          </div>
+      {% else %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+          </div>
+      {% endif %}
+    </div>
+  </div>
   {% if current_activity %}
     <div class="active-filter-banner">
         Showing only one activity

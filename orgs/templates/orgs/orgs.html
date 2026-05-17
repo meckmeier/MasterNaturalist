@@ -15,7 +15,25 @@
 {% with query_params.urlencode as query_string %}
 
 <div class="me-page">
-<h1>Nature Based Organizations</h1>
+ <div class="me-card-header">
+    <div class="me-card-header-left">  
+      <h1>Nature Based Organizations</h1>
+    </div>
+    <div class="me-card-header-right">
+      {% if active_filters %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+              for:
+              {{ active_filters|join:", " }}
+          </div>
+      {% else %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+          </div>
+      {% endif %}
+    </div>
+  </div>
+
 <button class="me-btn"
             type="button"
             data-bs-toggle="offcanvas"

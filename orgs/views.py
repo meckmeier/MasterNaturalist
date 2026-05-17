@@ -73,6 +73,8 @@ def orgs(request):
     # view that runs the org list - this page has it's own filter page.
     q = request.GET.get("q", "")
     locations_qs = Location.objects.active()
+    active_filters = []
+
 
     volunteer_qs = (
     Activity.objects.volunteer().prefetch_related(
@@ -176,7 +178,8 @@ def orgs(request):
     #this is code to test the prefetch data sets.
     # for org in org_queryset[:5]:  # just first few
     #    print(org.org_name, getattr(org, 'pre_volunteer', []))
-
+    result_count = org_queryset.count()
+    
     return render(
         request,
         "orgs/orgs.html",
@@ -188,6 +191,8 @@ def orgs(request):
             "counties": counties,
             "query_params": clean_get,
             "orgs": all_orgs,
+            "active_filters": active_filters,
+            "result_count": result_count,
         }
     )
 
@@ -448,8 +453,10 @@ def locations(request):
     
     q = request.GET.get("q", "")
     today = timezone.now().date()
+    active_filters = []
 
     volunteer = Session.objects.current().filter(
+        
         activity__deleted=False,
         activity__org__deleted=False,
         activity__activity_type="v",
@@ -572,6 +579,7 @@ def locations(request):
         for loc in queryset
         if loc.latitude and loc.longitude
     ])
+    result_count = queryset.count()
 
     return render(
         request,
@@ -585,6 +593,8 @@ def locations(request):
             "query_params": clean_get,
             "orgs": all_locs,
             "json_locs": json_locs,
+            "result_count": result_count,
+            "active_filters": active_filters
         }
     )
 
@@ -762,10 +772,11 @@ def activities(request):
     q = request.GET.get("q", "")
     activity_id = request.GET.get("activity_id", "")
     current_activity = None
+    active_filters = []
 
     if activity_id:
         current_activity = Activity.objects.filter(id=activity_id).first()
-
+    
     today = timezone.now().date()
     # activities results... should i change this so we know what it is?
    
@@ -789,16 +800,20 @@ def activities(request):
         
         if data.get("org"):
             queryset=queryset.filter(activity__org__id=data["org"].id)
-
+            active_filters.append(f"Org: {data['org'].org_name}")
+            
         if data.get("my_orgs"):
             followed_orgs = request.user.profile.following_orgs.filter(deleted=False)
             queryset = queryset.filter(activity__org__id__in=followed_orgs)
-
+            
+            
         if data.get("county") :
             queryset=queryset.filter(location__county_id=data["county"]).distinct()
+            active_filters.append(f"County: {data['county']}")
 
         if data.get("region"):
             queryset=queryset.filter(location__region_name=data["region"]).distinct()
+            active_filters.append(f"Region: {data['region']}")
 
         if data.get("q"):
             queryset =queryset.filter(Q(activity__org__org_name__icontains=q) 
@@ -806,29 +821,46 @@ def activities(request):
                                       | Q(location__loc_name__icontains=q)
                                         | Q(activity__title__icontains=q)
                                       ).distinct()
+            active_filters.append(f"Search: {data['q']}")
+
         if data.get("activity_type"):
             queryset=queryset.filter(activity__activity_type=data["activity_type"]).distinct()
+            active_filters.append(f"Activity Type: {data['activity_type']}")
 
         if data.get("categories"):
             queryset = queryset.filter(activity__categories__id__in=data["categories"]).distinct()
+            active_filters.append(f"Categories: {', '.join([str(c) for c in data['categories']])}")
+
         if data.get("ongoing"):
             queryset = queryset.filter(ongoing=True)
+            active_filters.append("Ongoing")
+
+        if data.get("has_cost"):
+            queryset = queryset.filter(activity__has_cost=False).distinct()
+            active_filters.append("Free only")
+
         if data.get("start_date"):
             queryset = queryset.filter(start__gte=data["start_date"])
+            active_filters.append(f"Start on or after: {data['start_date']}")
 
         if data.get("end_date"):
             queryset = queryset.filter(start__lte=data["end_date"])
+            active_filters.append(f"Start on or before: {data['end_date']}")
+
         if data.get("session_mode") == "i":
             queryset = queryset.filter(session_format__in=["i", "b","s"])
+            active_filters.append("Session Mode: In-person or Hybrid")
+
         elif data.get("session_mode") == "o":
             queryset = queryset.filter(session_format__in=["o", "b"])
+            active_filters.append("Session Mode: Online or Hybrid")
      
         
     activity_id = request.GET.get("activity_id")
 
     if activity_id:
         queryset = queryset.filter(activity_id=activity_id)
-        
+        active_filters.append(f"Activity: {queryset.first().activity.title if queryset.exists() else 'N/A'}")
 
     clean_get = request.GET.copy()
     for p in ["page", "curr_page", "onl_page","ong_page"]:
@@ -841,6 +873,8 @@ def activities(request):
     # Ongoing: start <= now <= end, sorted by start ascending
     ongoing_sessions = queryset.ongoing().order_by('activity__title')
     #print("ongoing sessions", ongoing_sessions)
+    result_count = queryset.count()
+    
 
     # For client-side tab segmentation, pass the whole filtered queryset
     return render(request, "orgs/activities.html",{
@@ -852,6 +886,8 @@ def activities(request):
                     "cats": EventCategory.objects.all(),
                     "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html,
                     "current_activity": current_activity,
+                    "active_filters": active_filters,
+                    "result_count": result_count,
 
                   } )
 
