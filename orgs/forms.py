@@ -5,13 +5,14 @@ from django.contrib.auth.models import User
 from collections import defaultdict
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import User
-
+from turnstile.fields import TurnstileField
 from django.utils import timezone
 from .models import *
 
 
 
 class CustomSignupForm(SignupForm):
+    turnstile = TurnstileField()
     first_name = forms.CharField(max_length=150, required=False)
     last_name = forms.CharField(max_length=150, required=False)
 
@@ -42,7 +43,69 @@ class CustomSignupForm(SignupForm):
 
         return user
 
+class OrgEnrollmentForm(forms.ModelForm):
+    org_url = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org"})
+    )
+    volunteer_url = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/volunteer"})
+    )
+    training_url = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/training"})
+    )
 
+    class Meta:
+        model = OrganizationEnrollmentRequest
+        fields = [
+            "org_name",
+            "org_url",
+            "volunteer_url",
+            "training_url",
+            "about",
+            "contact_name",
+            "contact_email",
+            "contact_title",
+            "message",
+        ]
+        widgets = {
+            "about": forms.Textarea(attrs={"rows": 5}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        for field in ["org_url", "volunteer_url", "training_url"]:
+            url = cleaned_data.get(field)
+            if url:
+                url = url.strip()
+                if not url.startswith(("http://", "https://")):
+                    url = "https://" + url
+                cleaned_data[field] = url
+
+        return cleaned_data
+    def clean_org_name(self):
+        name = self.cleaned_data.get("org_name", "").strip()
+
+        # Check approved organizations
+        if Organization.objects.filter(org_name__iexact=name).exists():
+            raise forms.ValidationError(
+                "That organization already exists."
+            )
+
+        # Check pending enrollment requests
+        if OrganizationEnrollmentRequest.objects.filter(
+            org_name__iexact=name,
+            status="new"
+        ).exists():
+            raise forms.ValidationError(
+                "A request for that organization is already pending review."
+            )
+
+        return name
+    
 class OrgForm(forms.ModelForm):
     in_wisconsin = forms.BooleanField(
         label="WI",
@@ -85,19 +148,6 @@ class OrgForm(forms.ModelForm):
                 cleaned_data[field] = url
 
         return cleaned_data
-    def clean_org_name(self):
-        name = self.cleaned_data.get("org_name", "").strip()
-
-        qs = Organization.objects.filter(org_name__iexact=name)
-        if self.instance.pk:
-            qs = qs.exclude(pk=self.instance.pk)
-
-        if qs.exists():
-            raise forms.ValidationError(
-                "That organization already exists. Please search for it instead of creating a new one."
-            )
-
-        return name
 
 class LocModal(forms.ModelForm):
     class Meta:

@@ -20,6 +20,7 @@ admin.site.register(Pending_Activity)
 admin.site.register(Pending_Session)
 admin.site.register(Pending_Location)
 admin.site.register(ZipToCounty)
+admin.site.register(OrganizationEnrollmentRequest)
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):

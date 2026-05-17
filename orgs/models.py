@@ -1,4 +1,5 @@
 import re
+import secrets
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q, Exists, OuterRef
@@ -8,6 +9,7 @@ from datetime import timedelta
 from django.core.mail import mail_admins
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
+from django.conf import settings
 
 # fixed lists:
 #-------------------------------------------------------    
@@ -196,6 +198,76 @@ class Organization(models.Model):
             'orgs/images/default.jpg'
         )
 
+class OrganizationEnrollmentRequest(models.Model):
+    org_name = models.CharField(max_length=255)
+    org_url = models.URLField(blank=True)
+    volunteer_url = models.URLField(blank=True)
+    training_url = models.URLField(blank=True)
+    about = models.TextField(blank=True)
+    region_name = models.CharField(max_length=50, choices=region_list,blank=True)
+    contact_name = models.CharField(max_length=255)
+    contact_email = models.EmailField()
+    contact_title = models.CharField(max_length=255, blank=True)
+    message = models.TextField(blank=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("new", "New"),
+            ("approved", "Approved"),
+            ("denied", "Denied"),
+        ],
+        default="new",
+    )
+
+    created_org = models.ForeignKey(
+        "Organization",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="reviewed_org_enrollment_requests",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    def save(self, *args, **kwargs):
+        self.org_url = normalize_url(self.org_url)
+        self.volunteer_url = normalize_url(self.volunteer_url)
+        self.training_url = normalize_url(self.training_url)
+
+        super().save(*args, **kwargs)
+
+class OrgInvite(models.Model):
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="invites")
+    email = models.EmailField()
+    role = models.CharField(max_length=20, choices=[
+            ("owner", "Owner"),
+            ("admin", "Admin"),
+            ("editor", "Editor"),
+        ],
+        default="owner",
+    )
+    code = models.CharField(max_length=80, unique=True, blank=True)
+    used_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = secrets.token_urlsafe(32)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_used(self):
+        return self.used_at is not None
+    
 class FollowOrg(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followers')
     followOrg = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='following')

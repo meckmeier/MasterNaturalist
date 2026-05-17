@@ -1,0 +1,93 @@
+{% extends "orgs/layout.html" %}
+{% load static %}
+{% block body %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+     
+<div class="me-page">
+<form method="post" class="me-form">
+    {% csrf_token %}
+    <h2>Request to add your organization to WildPaths Wisconsin.</h2>
+    <p>After review, you will receive an email invitation to create your organization management account.</p>
+    <!-- Add your form fields here -->
+     {% if form.errors %}
+  <div class="alert alert-danger">
+    {{ form.errors }}
+  </div>
+{% endif %}
+     <div class = "form-grid">
+        <div class ="form-field-full">
+            Organization Name:
+            {{ form.org_name}}
+            {{ form.org_name.errors }}
+        </div>
+        <div class ="form-field-full">
+            {{ form.about.label_tag }} <i class="bi bi-info-circle" title="Please provide a brief description of your organization. This information will help us to approve your enrollment request."></i>
+            {{ form.about}}
+            {{ form.about.errors }} 
+            <div class="me-sponsor">Please note that Wild Paths Wisconsin is a platform for nature based organizations that provide training or volunteer opportunities to Master Naturalists. Be sure your description focuses on that aspect of your organization. This description will be presented to potential volunteers.</div>
+        </div>
+        <div class ="form-field">
+            Main URL:
+            {{ form.org_url}}
+            {{ form.org_url.errors }}
+        </div>
+        <div class ="form-field">
+
+        </div>
+         <div class ="form-field">
+            {{ form.region_name.label_tag }}
+            {{ form.region_name}}
+            {{ form.region_name.errors }}
+        </div>
+        
+        <div class="form-field">
+            URL for Volunteering Opportunities:
+            {{ form.volunteer_url }}
+            {{ form.volunteer_url.errors }}
+        </div>
+        <div class="form-field">
+        </div>
+        <div class="form-field">
+            URL for Trainings:
+            {{ form.training_url }}
+            {{ form.training_url.errors }}
+        </div>
+         <div class="form-field">
+            {{ form.contact_email.label_tag }}
+            {{ form.contact_email }}
+            {{ form.contact_email.errors }}
+        </div>
+        <div class="form-field">
+        </div>
+       <div class="form-field">
+            {{ form.contact_name.label_tag }}
+            {{ form.contact_name }}
+            {{ form.contact_name.errors }}
+        </div>
+        <div class="form-field">
+            {{ form.contact_title.label_tag }}
+            {{ form.contact_title }}
+            {{ form.contact_title.errors }}
+        </div>
+        <div class="form-field-full">
+            Please add any additional comments or questions here:
+            {{ form.message }}
+            {{ form.message.errors }}
+        </div>
+        
+     </div>
+     <button type="submit" class="me-btn">
+          <span><i class="bi bi-floppy me-btn-icon"></i></span>
+            <span class="me-btn-label">Save</span>
+        </button>
+</form>
+
+</div>
+
+{% endblock %}

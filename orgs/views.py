@@ -285,7 +285,41 @@ def org_mgmt(request):
         "filter_form": OrgFilterForm(request.GET or None),
             })
 
+def org_enroll(request):
+    print("org_enroll called with method", request.method)
+    if request.method == "POST":
+        form = OrgEnrollmentForm(request.POST)
+        print("org_enroll form errors", form.errors)
+        if form.is_valid():
+            enrollment = form.save()
+            # send email to you
+            send_mail(
+                subject="New Organization Enrollment Request",
+                message=(
+                    f"A new organization enrollment request has been submitted.\n\n"
+                    f"Organization Name: {enrollment.org_name}\n"
+                    f"Website: {enrollment.org_url}\n"
+                    f"Contact Name: {enrollment.contact_name}\n"
+                    f"Contact Email: {enrollment.contact_email}\n\n"
+                    f"About: {enrollment.about}\n"
+                    f"Review it in Django admin or your staff page."
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                fail_silently=False,
+            )
+
+            return redirect("org_enroll_thanks")
+    else:
+        form = OrgEnrollmentForm()
+
+    return render(request, "orgs/org_enroll.html", {"form": form})
+
+def org_enroll_thanks(request):
+    return render(request, "orgs/org_enroll_thanks.html")
+
 def org_create(request):
+    # this is the view for adding a new org - it is now an OrganizationEnrollmentRequest.
     if request.method == "POST":
         form = OrgForm(request.POST)
         if form.is_valid():

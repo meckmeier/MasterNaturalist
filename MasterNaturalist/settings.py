@@ -102,6 +102,7 @@ INSTALLED_APPS = [
     'anymail',
     'allauth',
     'allauth.account',
+    'turnstile',
 ]
 
 MIDDLEWARE = [
@@ -163,6 +164,8 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+TURNSTILE_SITEKEY = os.environ.get("TURNSTILE_SITEKEY")
+TURNSTILE_SECRET = os.environ.get("TURNSTILE_SECRET")
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

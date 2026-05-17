@@ -11,6 +11,8 @@ urlpatterns = [
     
     path("activities/", views.activities, name="activities"),
     path("orgs/", views.orgs, name="orgs"),
+    path("org/enroll/", views.org_enroll, name="org_enroll"),
+    path("org/enroll/thanks/", views.org_enroll_thanks, name="org_enroll_thanks"),
     path("org_mgmt/", views.org_mgmt, name="org_mgmt"),
         path("org/<int:org_id>/managers/add/", views.org_manager_add, name="org_manager_add"),
         path("org-managers/<int:pk>/delete/", views.org_manager_delete, name="org_manager_delete"),

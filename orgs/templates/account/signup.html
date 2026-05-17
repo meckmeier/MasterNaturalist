@@ -6,25 +6,16 @@
 <div class="container py-4" style="max-width:600px;">
 
     <h1>Create Account</h1>
-
+<p>We apologize for the inconvenience. Signups for Wildpaths have been suspended for the time being. It should be back in business later this week.</p>
+ <p>May 17, 2026.</p>   
+   <p> Mary Eckmeier.
+</p>
     <form method="post" novalidate >
 
         {% csrf_token %}
 
         {{ form.non_field_errors }}
-        You must agree to the terms of service: 
-        {% if form.accept_terms %}
-            <div class="form-check mb-3">
-            {{ form.accept_terms }}
-            <label class="form-check-label" for="{{ form.accept_terms.id_for_label }}">
-                I agree to the
-                <a href="{% url 'terms' %}" target="_blank">Terms of Service</a>
-                and
-                <a href="{% url 'privacy' %}" target="_blank">Privacy Policy</a>.
-            </label>
-            {{ form.accept_terms.errors }}
-            </div>
-            {% endif %}
+        
 
         <div class="form-field">
             {{ form.username.label_tag }}
@@ -50,8 +41,23 @@
             {{ form.password2 }}
             {{ form.password2.errors }}
         </div>
-
-
+You must agree to the terms of service: 
+        {% if form.accept_terms %}
+            <div class="form-check mb-3">
+            {{ form.accept_terms }}
+            <label class="form-check-label" for="{{ form.accept_terms.id_for_label }}">
+                I agree to the
+                <a href="{% url 'terms' %}" target="_blank">Terms of Service</a>
+                and
+                <a href="{% url 'privacy' %}" target="_blank">Privacy Policy</a>.
+            </label>
+            {{ form.accept_terms.errors }}
+            </div>
+            {% endif %}
+        <div class="mb-3">
+            {{ form.turnstile }}
+            {{ form.turnstile.errors }}
+        </div>
        
         <button type="submit" class="me-btn-simple">
             Create Account

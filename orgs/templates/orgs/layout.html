@@ -132,7 +132,9 @@
 
             
           {% endif %}
-
+           <li class="nav-item">
+            <a class="nav-link" href="{% url 'org_enroll'%}">Add Your Organization</a>
+           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'about' %}">About</a>
           </li>
@@ -163,8 +165,7 @@
 
   </div>
 </nav>
-{% if not user.is_authenticated %}<em>To access all features including activities and search - please login. </em>{% endif %}
-
+{
   <!-- OFFCANVAS PANEL (global UI) -->
   <!-- Filter side panel -->
 <div class="offcanvas offcanvas-start me-filter-panel"
