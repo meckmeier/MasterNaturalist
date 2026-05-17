@@ -69,34 +69,41 @@ document.addEventListener("DOMContentLoaded", function () {
     //function for session visibility -- hiding and showing appropriate session columns
     console.log("session visibility code")
     function updateSessionRowVisibility(row) {
-        const formatField = row.querySelector("select[name$='-session_format']");
-        const locationField = row.querySelector("select[name$='-location']");
-        const urlGroup = row.querySelector(".url-group");
-        const locationGroup = row.querySelector(".loc-group");
+    const formatField = row.querySelector("select[name$='-session_format']");
+    const locationField = row.querySelector("select[name$='-location']");
+    const urlGroup = row.querySelector(".url-group");
+    const locationGroup = row.querySelector(".loc-group");
+    const dateGroups = row.querySelectorAll(".date-content");
+    const ongoingField = row.querySelector("[name*='ongoing']");
+    
+    console.log("date-visibilty", { ongoingField, checked: ongoingField?.checked, dateGroupsFound: dateGroups.length > 0 });
+    if (!formatField) return;
+    
+    const format = formatField.value;
 
-        if (!formatField) return;
+    const showUrl = (format === "o" || format === "b");
+    const showLocation = (format === "i" || format === "b");
+    
+    dateGroups.forEach(group => {
+        group.style.display = ongoingField?.checked ? "none" : "";
+        });
 
-        const format = formatField.value;
-        console.log("visibility", { format, urlGroup, locationGroup, locationField });
-
-        const showUrl = (format === "o" || format === "b");
-        const showLocation = (format === "i" || format === "b");
-
-        if (urlGroup) {
-            urlGroup.style.display = showUrl ? "block" : "none";
-        }
-
-        if (locationGroup) {
-            locationGroup.style.display = showLocation ? "block" : "none";
-        }
-
-        // Clear location whenever this format should not keep a location
-        if (locationField && (format === "o" || format === "s")) {
-            locationField.value = "";
-        }
-
-        syncLocationDisplay(row);
+    if (urlGroup) {
+        urlGroup.style.display = showUrl ? "block" : "none";
     }
+
+    if (locationGroup) {
+        locationGroup.style.display = showLocation ? "block" : "none";
+    }
+
+   
+
+    if (locationField && (format === "o" || format === "s")) {
+        locationField.value = "";
+    }
+
+    syncLocationDisplay(row);
+}
 
     //-- function for sync'ing location display
     const activityForm = document.getElementById("activity-form");
@@ -124,6 +131,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const locationField = row.querySelector("select[name$='-location']");
         const startField = row.querySelector("input[name$='start']");
         const endField = row.querySelector("input[name$='end']");
+        const ongoingField = row.querySelector("input[name$='-ongoing']");
+
         console.log("running wiresessioncode")
         if (!formatField) return;
 
@@ -135,21 +144,28 @@ document.addEventListener("DOMContentLoaded", function () {
             const format = formatField.value;
             const currentLocation = locationField ? locationField.value : "";
 
-        updateSessionRowVisibility(row);
+            updateSessionRowVisibility(row);
 
-        syncLocationDisplay(row);
-    });
-
-    if (startField && endField) {
-        startField.addEventListener("change", function () {
-            if (!endField.value) {
-                endField.value = startField.value;
-            }
+            syncLocationDisplay(row);
         });
+
+        // ongoing checkbox changed
+        ongoingField?.addEventListener("change", function () {
+            console.log("ongoing changed", ongoingField.checked);
+            updateSessionRowVisibility(row);
+        });
+
+        if (startField && endField) {
+            startField.addEventListener("change", function () {
+                if (!endField.value) {
+                    endField.value = startField.value;
+                }
+            });
+        }
+
+        updateSessionRowVisibility(row);
     }
 
-    updateSessionRowVisibility(row);
-    }
     document.querySelectorAll(".formset-row").forEach(row => {
         if (!row.classList.contains("form-template")){
             wireSessionRow(row);

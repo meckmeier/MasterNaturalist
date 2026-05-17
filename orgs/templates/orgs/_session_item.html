@@ -37,7 +37,7 @@
     {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}
 
     
-    {%if not e.activity.no_cost %}   
+    {%if  e.activity.has_cost %}   
       | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
     {% endif %}
 

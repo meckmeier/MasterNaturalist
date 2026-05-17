@@ -427,6 +427,7 @@ class Activity(models.Model):
     expire_date = models.DateField(default=default_expire_date)
     activity_url = models.URLField(max_length=200, default="", blank=True)
     no_cost = models.BooleanField(default=True)
+    has_cost = models.BooleanField(default=False)
     contact_email = models.EmailField(default="", blank=True)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_acts', default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)

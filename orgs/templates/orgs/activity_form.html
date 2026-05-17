@@ -70,11 +70,11 @@
             <span class="error-text">{{ activity_form.activity_url.errors}}</span>
         </div>
         <div class="form-field">
-            Free<i class="bi bi-info-circle" title="UnCheck this box if your training session has a cost to participants."></i>
-            {{ activity_form.no_cost }}
+            <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+            {{ activity_form.has_cost }}
             
              <span class="error-text
-            <span class="error-text">{{ activity_form.no_cost.errors }}</span>
+            <span class="error-text">{{ activity_form.has_cost.errors }}</span>
         </div>
         <div class="form-field">
             Activity contact:<br>
@@ -124,7 +124,7 @@
                             <div class="url-group">
                             {{ form.session_url }}
                             {{ form.session_url.errors }}
-                            </div
+                            </div>
                         </td> 
                         <td>
                            <div  class="loc-group">
@@ -156,18 +156,19 @@
                             {{form.ongoing }}
                              {{form.ongoing.errors}}
                         </td>
-                        <td>
-
+                        <td class="date-group">
+                            <div class="date-content">
                             {{ form.start }}
                             {{ form.start.errors }}
-
+                            </div>
                         </td>       
-                        <td>
-
+                        <td class="date-group">
+                            <div class="date-content">
                             {{ form.end }}
                             {{ form.end.errors }}
-
+                            </div>
                         </td>    
+
                         <td>{{form.DELETE}}</td>
                     </tr>
                     

@@ -28,14 +28,15 @@ X Send notification emails to me when feedback is entered.
 X Add in an administration dashboard where i can run the update_latlng.
 Create your version of the user driven change password
 Work on the upload process
-Create a view that will summarize the feedback submitted
-Send email when a new org is created.
-Hide dates when ongoing is checked. / consider time description as a part of the session rather than the activity (?)
+
+X Hide dates when ongoing is checked. / consider time description as a part of the session rather than the activity (?)
 Remove delete checkbox from session page. only way to delete an activity is on the managing orgs page. (or check out this f() ?)
-Add a new organization > REGISTER and is a separate process. No more ADD from org mgmt
+X Add a new organization > REGISTER and is a separate process. No more ADD from org mgmt
 Look into add some barrier to external users ($5 subscription?) so Master Naturalists have a perk.
 Filter on free activities
-Change language: $ and a check instead of Free and a check.
+X Change language: $ and a check instead of Free and a check.
+ - added has_cost, form uses has_cost, and both _items show has_cost. Once in production, it will need to be adjusted so remove the old no_cost field.
+
 Register/ More info instead of contact.
 Add pre-requisite field to the activity.
 Move time description to the Session.

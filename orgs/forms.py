@@ -515,7 +515,7 @@ class ActivityForm(forms.ModelForm):
 
     class Meta:        
         model = Activity
-        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "no_cost", "contact_email", "time_description"] 
+        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost","no_cost", "contact_email", "time_description"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "expire_date": forms.DateInput(attrs={"type": "date"}),
