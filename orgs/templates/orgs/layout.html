@@ -26,13 +26,18 @@
   <div class="container-fluid">
 
     <!-- Brand -->
-    <a class="navbar-brand" href="{% url 'landing' %}">
+    {% if request.resolver_match.url_name != "landing" %}
+      <a class="navbar-brand" href="{% url 'landing' %}">
       <img src="{% static 'orgs/images/newlogonowords.jpg' %}"
            alt="Home"
            width="100"
            class="img-fluid"
            style="background-color: #2e7d32; border: white 2px solid;">
     </a>
+    {% else %}
+      <div></div>>
+      
+    {% endif %}
 
     <!-- Hamburger -->
     <button class="navbar-toggler"
@@ -61,7 +66,7 @@
       <div class="offcanvas-body">
         <ul class="navbar-nav">
 
-          {% if user.is_authenticated %}
+          
             <li class="nav-item">
               {% block filter_button %}{% endblock %}
             </li>
@@ -82,14 +87,16 @@
               <li  class="dropdown-item">
                 <a class="nav-link" href="{% url 'locations' %}">Locations</a><hr>
               </li>
+              {% if user.is_authenticated %}
               <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'profile' %}">Your Profile</a>
               </li>
+              {% endif %}
               <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
               </li>
             </ul>
-
+            {% if user.is_authenticated %}
             <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button"
               data-bs-toggle="dropdown" aria-expanded="false">

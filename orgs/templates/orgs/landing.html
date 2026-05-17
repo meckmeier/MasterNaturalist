@@ -6,9 +6,9 @@
      <img src="{% static 'orgs/images/newlogoCropped.jpg'%}" width ="200" class="img-fluid" style="background-color:#2e7d32;">
 <div>
 <h1>Welcome!</h1> 
-<h4>Find your way to support nature in Wisconsin.</h4>
+<h4>A Compass to Conservation in Wisconsin.</h4>
 
-{% if user.is_authenticated%}
+
 
     <a class="me-btn" href="{% url 'activities' %}?activity_type=v" ; font-weight: bold;color:black;">
      <span>
@@ -46,7 +46,7 @@
 can use this site to find ways to volunteer and access advanced training opportunities throughout the state.</p>
 
 <hr>
-
+{% if user.is_authenticated%}
     <div class="me-muted">If you are an organization and want to manage locations or activities:</div><br>
     <a class="me-btn" href="{% url 'org_mgmt' %}" title="Manage YOUR organizations">
         <span>
