@@ -92,9 +92,7 @@
                 <a class="nav-link" href="{% url 'profile' %}">Your Profile</a>
               </li>
               {% endif %}
-              <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
-              </li>
+              
             </ul>
             {% if user.is_authenticated %}
             <li class="nav-item dropdown">
@@ -122,6 +120,11 @@
               <li class="dropdown-item">
                 <a class="nav-link" href="/admin/">Admin</a>
                 </li>
+                <li>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'org_enrollment_list' %}">
+                  Approve New Orgs</a>
+              </li>
               <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'staff_user_manage' %}">User Management</a>
               </li>
@@ -142,6 +145,9 @@
            <li class="nav-item">
             <a class="nav-link" href="{% url 'org_enroll'%}">Add Your Organization</a>
            </li>
+           <li class="nav-item">
+                <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
+              </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'about' %}">About</a>
           </li>
@@ -172,7 +178,7 @@
 
   </div>
 </nav>
-{
+
   <!-- OFFCANVAS PANEL (global UI) -->
   <!-- Filter side panel -->
 <div class="offcanvas offcanvas-start me-filter-panel"
@@ -204,7 +210,9 @@
 {% block body %}{% endblock %}
 <footer class="site-footer">
   <div class="container text-center small text-muted py-3">
-    Information is provided by organizations and may change. Please confirm details with the hosting organization.
+    Information is provided by organizations and may change. Please confirm details with the hosting organization. 
+  External organization links are marked with <i class="bi bi-arrow-up-right-square "></i>.
+</p>
     <a href="{% url 'terms' %}">Terms of Service</a> | <a href="{% url 'privacy' %}">Privacy Policy</a>
   </div>
 </footer>

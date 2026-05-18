@@ -38,8 +38,8 @@
               {% endif %}
             {% endif %}
             {% if session.session_format == "o" or session.session_format == "b" and session.session_url %} | 
-               <strong>Online</strong> <a href="{{session.session_url}}">
-               <i class=" bi bi-arrow-up-right-square" title="Link to actual session url"></i></a>
+               <strong>Online</strong> <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
+               <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i></a>
             {% endif %}
               
           
@@ -64,8 +64,8 @@
             <i class="bi bi-envelope" title="send email to contact person"></i></a>
            {% endwith %}
             {% elif e.activity_url %}
-           <a class="me-button-link" href="{{ e.activity_url }}" target="_blank">
-            <i class="bi bi-arrow-up-right-square" title="link to website"></i></a>
+           <a class="me-button-link" href="{{ e.activity_url }}" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-arrow-up-right-square" title="External link to activity details."></i></a>
             {% endif %}
      
     </div>  

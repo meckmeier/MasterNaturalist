@@ -1,5 +1,6 @@
 import re
 import secrets
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q, Exists, OuterRef
@@ -211,13 +212,13 @@ class OrganizationEnrollmentRequest(models.Model):
     message = models.TextField(blank=True)
 
     status = models.CharField(
-        max_length=20,
+        max_length=1,
         choices=[
-            ("new", "New"),
-            ("approved", "Approved"),
-            ("denied", "Denied"),
+            ("p", "Pending"),
+            ("a", "Approved"),
+            ("d", "Denied"),
         ],
-        default="new",
+        default="p",
     )
 
     created_org = models.ForeignKey(
@@ -254,16 +255,20 @@ class OrgInvite(models.Model):
         ],
         default="owner",
     )
-    code = models.CharField(max_length=80, unique=True, blank=True)
-    used_at = models.DateTimeField(null=True, blank=True)
-    expires_at = models.DateTimeField(null=True, blank=True)
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    accepted=models.BooleanField(default=False)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+    Profile,
+    null=True,
+    blank=True,
+    on_delete=models.SET_NULL,
+)
 
-    def save(self, *args, **kwargs):
-        if not self.code:
-            self.code = secrets.token_urlsafe(32)
-        super().save(*args, **kwargs)
-
+    def __str__(self):
+        return f"{self.email} invite for {self.org.org_name}"
     @property
     def is_used(self):
         return self.used_at is not None

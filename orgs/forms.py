@@ -1,3 +1,5 @@
+from urllib import request
+
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from django.core.exceptions import ValidationError
@@ -22,13 +24,16 @@ class CustomSignupForm(SignupForm):
     )
 
     def __init__(self, *args, **kwargs):
+        
         super().__init__(*args, **kwargs)
+        
 
         for field in self.fields.values():
             if isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs["class"] = "form-check-input"
             else:
                 field.widget.attrs["class"] = "form-control"
+        
 
     def save(self, request):
         user = super().save(request)
@@ -40,6 +45,25 @@ class CustomSignupForm(SignupForm):
         profile, created = Profile.objects.get_or_create(user=user)
         profile.terms_accepted_at = timezone.now()
         profile.save()
+
+        token = request.session.pop("pending_org_invite_token", None)
+
+        if token:
+            invite = OrgInvite.objects.filter(
+                token=token,
+                accepted=False,
+            ).first()
+
+            if invite:
+                OrgManager.objects.get_or_create(
+                    profile=profile,
+                    org=invite.org,
+                    defaults={"role": invite.role},
+                )
+
+                invite.accepted = True
+                invite.accepted_at = timezone.now()
+                invite.save()
 
         return user
 

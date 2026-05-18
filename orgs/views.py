@@ -296,7 +296,12 @@ def org_enroll(request):
         form = OrgEnrollmentForm(request.POST)
         print("org_enroll form errors", form.errors)
         if form.is_valid():
-            enrollment = form.save()
+            enrollment = form.save(commit=False)
+
+            if request.user.is_authenticated:
+                enrollment.created_by = request.user.profile
+                                                                        
+            enrollment.save()
             # send email to you
             send_mail(
                 subject="New Organization Enrollment Request",
@@ -322,6 +327,135 @@ def org_enroll(request):
 
 def org_enroll_thanks(request):
     return render(request, "orgs/org_enroll_thanks.html")
+
+@staff_member_required
+def org_enrollment_list(request):
+
+    enrollments = OrganizationEnrollmentRequest.objects.order_by("-created_at")
+    return render(request, "orgs/org_enrollment_list.html", {"enrollments": enrollments})
+
+@staff_member_required
+def org_deny(request, enrollment_id):
+
+    enrollment = get_object_or_404(
+        OrganizationEnrollmentRequest,
+        id=enrollment_id
+    )
+
+    if request.method == "POST":
+        enrollment.status = "d"
+        enrollment.reviewed_at = timezone.now()
+        enrollment.reviewed_by = request.user.profile
+        enrollment.save()
+
+        messages.success(request, "Organization request denied.")
+
+    return redirect("org_enrollment_list")
+
+@staff_member_required
+@transaction.atomic
+def org_approve(request, enrollment_id):
+    enrollment = get_object_or_404(OrganizationEnrollmentRequest, id=enrollment_id)
+    if request.method != "POST":
+        return render(request, "orgs/org_approve.html", {"enrollment": enrollment})
+    if enrollment.status=="a":
+        messages.info(request, "This enrollment has already been approved.")
+        return redirect("org_enrollment_list")
+    if enrollment.status=="d":
+        messages.info(request, "This enrollment has already been denied.")
+        return redirect("org_enrollment_list")
+    
+    # Create the organization (it will be logged as created by the staff member approving it.)
+    org = Organization.objects.create(
+            org_name=enrollment.org_name,
+            about=enrollment.about,
+            org_url=enrollment.org_url,
+            volunteer_url=enrollment.volunteer_url,
+            training_url=enrollment.training_url,
+            region_name=enrollment.region_name,
+            in_wisconsin=True,
+            created_by=request.user.profile,
+            updated_by=request.user.profile,
+        )
+    # Optionally, you could also create an OrgManager entry for the contact person here if you want them to have immediate access.
+    email = enrollment.contact_email.lower().strip()
+    user=User.objects.filter(email__iexact=email).first()
+    if user and hasattr(user, "profile"):
+        OrgManager.objects.get_or_create(profile=user.profile, org=org, role="owner")
+    else:
+        invite = OrgInvite.objects.create(
+            org=org,
+            email=email,
+            role="owner",
+            created_by=request.user.profile,
+        )
+        invite_url = request.build_absolute_uri(reverse("accept_org_invite", args=[invite.token]))
+        send_mail(subject="You've been invited to manage an organization on WildPaths Wisconsin",
+                   message=f"""
+                        Hello,
+
+                        Your organization, {org.org_name}, has been approved for WildPaths Wisconsin.
+
+                        Please use this link to create your login and manage the organization:
+
+                        {invite_url}
+
+                        Thank you!
+                        """,
+                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                recipient_list=[email],
+                                fail_silently=False,
+                            )
+                                
+    # Mark the enrollment as approved
+    enrollment.status = "a"
+    enrollment.approved_by = request.user.profile
+    enrollment.approved_at = timezone.now()
+
+    enrollment.save()
+
+    messages.success(request, f"Organization '{org.org_name}' has been approved and created.")
+    return redirect("org_enrollment_list")
+
+def accept_org_invite(request, token):
+    invite = get_object_or_404(OrgInvite, token=token, accepted=False)
+    print("INVITE EMAIL STORED:", invite.email)
+    request.session["pending_org_invite_token"]=str(invite.token)
+    request.session["pending_org_invite_email"]=invite.email
+    
+    if not request.user.is_authenticated:
+        return redirect("account_signup")
+    
+    if request.user.email.lower() != invite.email.lower():
+        messages.error(request, "This invitation was sent to a different email address than your account email. Please log in with the correct account or contact support.")
+        return redirect("account_logout")
+    
+    OrgManager.objects.get_or_create(profile=request.user.profile, org=invite.org, role=invite.role)
+
+    invite.accepted = True
+    invite.accepted_at = timezone.now()
+    invite.save()
+    messages.success(request, f"You have accepted the invitation to manage {invite.org.org_name}.")
+    return redirect("org_mgmt")
+
+def apply_pending_org_invite(request):
+    token = request.session.pop("pending_org_invite_token", None)
+
+    if not token or not request.user.is_authenticated:
+        return
+
+    invite = OrgInvite.objects.filter(token=token, accepted=False).first()
+
+    if invite:
+        OrgManager.objects.get_or_create(
+            profile=request.user.profile,
+            org=invite.org,
+            defaults={"role": invite.role},
+        )
+
+        invite.accepted = True
+        invite.accepted_at = timezone.now()
+        invite.save()
 
 def org_create(request):
     # this is the view for adding a new org - it is now an OrganizationEnrollmentRequest.

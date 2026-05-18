@@ -664,3 +664,19 @@ li.inactive {
     font-size: 14px;
   }
 }
+.logo{
+  --logo-color-0: #FFFFFF;
+  --logo-color-1: #2e7d32;
+  --logo-color-2: #336732;
+  --logo-color-3: #326632;
+  --logo-color-4: #BA150F;
+  --logo-color-5: #F5B64D;
+  --logo-color-6: #306632; 
+  --logo-font-family: 'MyriadPro-Bold', sans-serif;
+  --logo-font-size: 177.404px;
+  --logo-letter-spacing: -4;
+  --logo-stroke-color: #1b5e20;
+  --logo-stroke-width: 12;
+
+  width: 500px;
+}

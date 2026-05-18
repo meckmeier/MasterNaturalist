@@ -54,7 +54,7 @@ PASSWORD_RESET_TIMEOUT = 60*60*24
 SITE_ID = 1
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_UNIQUE_EMAIL = True
-
+ACCOUNT_ADAPTER = "orgs.adapters.CustomAccountAdapter"
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_METHODS = {"email", "username"}
 ACCOUNT_FORMS = {

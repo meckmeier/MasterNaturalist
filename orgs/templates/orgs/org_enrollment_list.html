@@ -1,0 +1,52 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<h1>Organization Enrollment Requests</h1>
+
+{% if enrollments %}
+  {% for e in enrollments %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ e.org_name }}</h5>
+
+        {% if e.org_url %}
+          <p><a href="{{ e.org_url }}" target="_blank" rel="noopener noreferrer">{{ e.org_url }}</a></p>
+        {% endif %}
+
+        {% if e.about %}
+          <p>{{ e.about }}</p>
+        {% endif %}
+        {% if e.message %}
+          <p><strong>Message from the requester:</strong> {{ e.message }}</p>
+        {% endif %}
+
+        <p><strong>Requested by:</strong> {{ e.created_by }}</p>
+        <p><strong>Requested at:</strong> {{ e.created_at }}</p>
+        
+        {% if e.status == "a" %}
+          <p><strong>Status:</strong> Approved</p>
+        {% elif e.status == "d" %}
+          <p><strong>Status:</strong> Denied</p>
+        {% else %}
+          <p><strong>Status:</strong> Pending</p>
+          <div class="d-flex gap-2">
+              <form method="post" action="{% url 'org_approve' e.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Approve</button>
+            </form>
+
+            <form method="post" action="{% url 'org_deny' e.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Deny</button>
+            </form>
+        </div>
+        {% endif %}
+
+        
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>No pending organization requests.</p>
+{% endif %}
+{% endblock %}

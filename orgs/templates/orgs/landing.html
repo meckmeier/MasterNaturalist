@@ -5,9 +5,12 @@
 <div class="me-landing-content">
      <img src="{% static 'orgs/images/newlogoCropped.jpg'%}" width ="200" class="img-fluid" style="background-color:#2e7d32;">
 <div>
-<h1>Welcome!</h1> 
-<h4>A Compass to Conservation in Wisconsin.</h4>
+    <h1>Wild Paths Wisconsin</h1>
+<h4>A Compass to Conservation in Wisconsin</h4>
 
+ 
+Designed for <a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a>, the site will help 
+you discover YOUR path to conservation efforts in Wisconsin.</p>
 
 
     <a class="me-btn" href="{% url 'activities' %}?activity_type=v" ; font-weight: bold;color:black;">
@@ -42,8 +45,6 @@
 </a>
 </div>
 
-<a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a>
-can use this site to find ways to volunteer and access advanced training opportunities throughout the state.</p>
 
 <hr>
 {% if user.is_authenticated%}
@@ -58,10 +59,10 @@ can use this site to find ways to volunteer and access advanced training opportu
 {%else%}
 <p>This website was designed to help Wisconsin Master Naturalists find volunteer and training opportunities. 
     </p> 
-<a class="me-button-link" href="{% url 'account_signup' %}">
-    Click here to get started</a>
+<a class="me-button-link" href="{% url 'account_signup' %}" title="You need to sign up to save Favorites, or to manage organizations">
+    Signup</a>
     Already have a login -> <a class="me-button-link" href="{% url 'account_login' %}">Login</a>
-     to gain full advantage of this system to connect you to your natural world.
+     
 
 {%endif%}
 </div>

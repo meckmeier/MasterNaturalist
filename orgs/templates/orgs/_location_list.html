@@ -24,9 +24,9 @@
       <div class="me-card-sponsor">
         <a href="{% url 'orgs' %}?org_id={{ loc.org.id }}">{{ loc.org.org_name }}</a>
 
-        {% if loc.location_url %}
-          <a href="{{ loc.location_url }}" target="_blank" class="text-decoration-none">
-            {{ loc.location_url }}
+        {% if loc.org_loc_url %}
+          <a href="{{ loc.org_loc_url }}" target="_blank" class="text-decoration-none" rel="noopener noreferrer">
+           |  {{ loc.org_loc_url }}
           </a>
         {% endif %}
 

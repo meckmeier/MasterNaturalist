@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import *
 
+
 # Register your models here.
 admin.site.register(User)
 admin.site.register(Organization)
@@ -22,8 +23,35 @@ admin.site.register(Pending_Location)
 admin.site.register(ZipToCounty)
 admin.site.register(OrganizationEnrollmentRequest)
 
+
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = ["created_at", "name", "email", "page_url"]
     search_fields = ["name", "email", "note", "page_url"]
     ordering = ["-created_at"]
+
+@admin.register(OrgInvite)
+class OrgInviteAdmin(admin.ModelAdmin):
+    list_display = (
+        "email",
+        "org",
+        "role",
+        "token",
+        "accepted",
+        "created_at",
+    )
+
+    readonly_fields = ("token",)
+
+    search_fields = (
+        "email",
+        "org__org_name",
+    )
+
+    list_filter = (
+        "accepted",
+        "role",
+    )
+    ordering = (
+        "-created_at",
+    )

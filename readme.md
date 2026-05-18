@@ -26,15 +26,8 @@ Configure an upload process that will take in a csv or excel file and load it in
 Work on the upload process
 
 Remove delete checkbox from session page. only way to delete an activity is on the managing orgs page. (or check out this f() ?)
-X Add a new organization > REGISTER and is a separate process. No more ADD from org mgmt
-Filter on free activities
-X Change language: $ and a check instead of Free and a check.
- - added has_cost, form uses has_cost, and both _items show has_cost. Once in production, it will need to be adjusted so remove the old no_cost field.
-
-Register/ More info instead of contact.
 Add pre-requisite field to the activity.
 Move time description to the Session.
-i button with info on the dates. Hide start/end when you click ongoing.
 
 
 Version Two:
@@ -52,6 +45,10 @@ Version Two:
 * activity form enhancement to hide/show dates based on ongoing selection.
 * Adding a new organization is now a two step process... user is NOT required to be logged in for the organization to be created.
 * adding some filter context to the activity page - just added number found in results on the other two pages.
+* changed no cost to has cost, but still show free checkbox on form... seemed to make more sense this way. Show as $ without words on form.
+* i button with info on the dates. Hide start/end when you click ongoing
+* changed language: More info instead of contact for url links.
+* added Free to the activities filter.
 
 Future wishlist - make a video that explains how to manage an org in this system.
 Talk to Sage about creating a way to 'register' for an activity in her system directly from here.

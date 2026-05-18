@@ -57,7 +57,7 @@
         
       </h4>
       
-      <a href="{{ org.org_url }}" target="_blank" class="text-decoration-none">{{ org.org_url }}</a>
+      <a href="{{ org.org_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">{{ org.org_url }}</a>
       </div>
       </div>
       <div class="me-card-header-right">
@@ -134,8 +134,8 @@
                 <strong>{{org.default_location.loc_name}}</strong><br>
                           {{org.default_location.address}}, {{org.default_location.city_name}} {{org.default_location.county_id.county_name}}
                 {% endif %}
-                {% if org.volunteer_url%}<a href="{{org.volunteer_url}}">Volunteer site.</a>{% endif %}
-                {% if org.training_url%}<a href="{{org.training_url}}">Training site.</a>{% endif %}
+                {% if org.volunteer_url%}<a href="{{org.volunteer_url}}" target="_blank" rel="noopener noreferrer" title="External link to volunteer page at organization site.">Volunteer site.</a>{% endif %}
+                {% if org.training_url%}<a href="{{org.training_url}}" target="_blank" rel="noopener noreferrer" title="External link to training page at organization site.">Training site.</a>{% endif %}
               </div>
               <div class="me-card-header-right">
                 {% if org|can_edit:request.user %}
