@@ -45,7 +45,7 @@ Then move DNS to Cloudflare
 
 add 2fa
 X Install 2FA 
-Run migrations
+X Run migrations
 * note on login page: For added security you can enable 2FA authentication.
 * banner on OrgMgmt - For added security, organizers should enable two-factor authentication.
 * add menu option 
@@ -78,6 +78,7 @@ Version Two:
 * i button with info on the dates. Hide start/end when you click ongoing
 * changed language: More info instead of contact for url links.
 * added Free to the activities filter.
+* Hide references to favorites on public access... have created full experience for public viewers.
 
 Future wishlist - make a video that explains how to manage an org in this system.
 Talk to Sage about creating a way to 'register' for an activity in her system directly from here.

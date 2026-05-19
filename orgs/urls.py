@@ -3,6 +3,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
+from django.http import HttpResponse
+
 
 from . import views
 urlpatterns = [
@@ -40,7 +42,12 @@ urlpatterns = [
     path( "org/<int:org_id>/default-location/<int:loc_id>/",views.org_set_default_location,name="org_set_default_location"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
-    path("register", views.register, name="register"),
+    #path("register", views.register, name="register"),
+    path( "register",lambda request: HttpResponse(
+            "Registration temporarily disabled.",
+            status=503),
+        name="register",
+    ),
     path("profile/", views.profile_view, name="profile"),
     path("staff/user/", views.staff_user_manage, name="staff_user_manage"),
     path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
