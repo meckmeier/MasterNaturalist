@@ -24,9 +24,12 @@
             <label for="{{ form.note.id_for_label }}" class="form-label">Feedback</label>
             {{ form.note }}
         </div>
-
+        <div class="mb-3">
+        {{ form.turnstile }}
+        </div>
+        {{ form.non_field_errors }}
         {{ form.page_url }}
-
+        
         <button type="submit" class="me-btn">
             <span><i class="bi bi-send me-btn-icon"></i></span>
             <span class="me-btn-label">Submit Feedback</span></button>

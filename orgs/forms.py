@@ -723,6 +723,9 @@ class UploadFileForm(forms.ModelForm):
         fields = ["file"]
 
 class FeedbackForm(forms.ModelForm):
+
+    turnstile=TurnstileField()
+
     class Meta:
         model = Feedback
         fields = ["name", "email", "note", "page_url"]
