@@ -12,7 +12,7 @@ Orgs have a default location - and if you are creating a new session that is con
 
 
 PRODUCTION NOTE:
-make sure you upload the csv files and then runthe code that populates the tables:
+make sure you upload the csv files and then run the code that populates the tables:
 
 python manage.py load_locations_from_csv "orgs/data/state_parks.csv" "Wisconsin State Parks"
 python manage.py load_locations_from_csv "orgs/data/state_forests.csv" "Wisconsin State Forests"
@@ -28,6 +28,35 @@ Work on the upload process
 Remove delete checkbox from session page. only way to delete an activity is on the managing orgs page. (or check out this f() ?)
 Add pre-requisite field to the activity.
 Move time description to the Session.
+
+Friday:
+* restore/start Postmark
+* confirm outbound email works again
+* confirm entire login/registration process.
+* confirm add new organziation works in productions (there are multiple emails there)
+
+Then move DNS to Cloudflare
+* import DNS records carefully
+* verify:
+-Render app works
+-Postmark DKIM/SPF still valid
+-verification emails send
+-HTTPS works
+
+add 2fa
+X Install 2FA 
+Run migrations
+* note on login page: For added security you can enable 2FA authentication.
+* banner on OrgMgmt - For added security, organizers should enable two-factor authentication.
+* add menu option 
+<a href="{% url 'two_factor:setup' %}">Set up two-factor authentication</a>
+* later enforce it: add to org_mgmt view:
+if request.user.is_authenticated:
+    is_organizer = request.user.profile.managers.exists() or request.user.is_staff
+
+    if is_organizer and not request.user.is_verified():
+        return redirect("two_factor:setup")
+
 
 
 Version Two:

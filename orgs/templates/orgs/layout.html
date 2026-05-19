@@ -126,10 +126,10 @@
                   Approve New Orgs</a>
               </li>
               <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'staff_user_manage' %}">User Management</a>
+                <a class="nav-link" href="{% url 'staff_user_manage' %}">User Stats</a>
               </li>
               <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'run_update_latlng' %}">Location Map Markers</a>"
+                <a class="nav-link" href="{% url 'run_update_latlng' %}">Lat/Lng Updates</a>
               </li>
               <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'logos' %}">Logos</a>
@@ -166,10 +166,11 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'login' %}">Log In</a>
             </li>
-
+{% if False %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'register' %}">Register</a>
             </li>
+{% endif %}
           {% endif %}
 
         </ul>

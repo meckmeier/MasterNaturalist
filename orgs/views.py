@@ -934,7 +934,7 @@ def activities(request):
         
         if data.get("org"):
             queryset=queryset.filter(activity__org__id=data["org"].id)
-            active_filters.append(f"Org: {data['org'].org_name}")
+            active_filters.append(f"{data['org'].org_name} ")
             
         if data.get("my_orgs"):
             followed_orgs = request.user.profile.following_orgs.filter(deleted=False)
@@ -943,11 +943,11 @@ def activities(request):
             
         if data.get("county") :
             queryset=queryset.filter(location__county_id=data["county"]).distinct()
-            active_filters.append(f"County: {data['county']}")
+            active_filters.append(f"{data['county']} county ")
 
         if data.get("region"):
             queryset=queryset.filter(location__region_name=data["region"]).distinct()
-            active_filters.append(f"Region: {data['region']}")
+            active_filters.append(f"{data['region']} region ")
 
         if data.get("q"):
             queryset =queryset.filter(Q(activity__org__org_name__icontains=q) 
@@ -955,11 +955,15 @@ def activities(request):
                                       | Q(location__loc_name__icontains=q)
                                         | Q(activity__title__icontains=q)
                                       ).distinct()
-            active_filters.append(f"Search: {data['q']}")
+            active_filters.append(f"{data['q']} word search ")
 
         if data.get("activity_type"):
             queryset=queryset.filter(activity__activity_type=data["activity_type"]).distinct()
-            active_filters.append(f"Activity Type: {data['activity_type']}")
+            if data["activity_type"] == "t":
+                active_filters.append("Training")
+            elif data["activity_type"] == "v":
+                active_filters.append("Volunteer")
+            
 
         if data.get("categories"):
             queryset = queryset.filter(activity__categories__id__in=data["categories"]).distinct()
@@ -983,18 +987,18 @@ def activities(request):
 
         if data.get("session_mode") == "i":
             queryset = queryset.filter(session_format__in=["i", "b","s"])
-            active_filters.append("Session Mode: In-person or Hybrid")
+            active_filters.append("In-person or Hybrid ")
 
         elif data.get("session_mode") == "o":
             queryset = queryset.filter(session_format__in=["o", "b"])
-            active_filters.append("Session Mode: Online or Hybrid")
+            active_filters.append("Online or Hybrid ")
      
         
     activity_id = request.GET.get("activity_id")
 
     if activity_id:
         queryset = queryset.filter(activity_id=activity_id)
-        active_filters.append(f"Activity: {queryset.first().activity.title if queryset.exists() else 'N/A'}")
+        active_filters.append(f" {queryset.first().activity.title if queryset.exists() else 'N/A'}")
 
     clean_get = request.GET.copy()
     for p in ["page", "curr_page", "onl_page","ong_page"]:

@@ -59,8 +59,10 @@ you discover YOUR path to conservation efforts in Wisconsin.</p>
 {%else%}
 <p>This website was designed to help Wisconsin Master Naturalists find volunteer and training opportunities. 
     </p> 
+{% if false %}
 <a class="me-button-link" href="{% url 'account_signup' %}" title="You need to sign up to save Favorites, or to manage organizations">
     Signup</a>
+    {% endif %}
     Already have a login -> <a class="me-button-link" href="{% url 'account_login' %}">Login</a>
      
 

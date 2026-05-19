@@ -42,12 +42,14 @@
         {{ filter_form.org }}
         {{ filter_form.org.errors }}
     </div>
+    {% if user.is_authenticated %}
      <input type="hidden" name="tab" id="tabInput" value="{{ request.GET.tab|default:'upcoming' }}">
     <div >
         {{ filter_form.my_orgs }}
         {{ filter_form.my_orgs.label_tag }}
         {{ filter_form.my_orgs.errors }}
     </div>
+    {% endif %}
     <div>{{filter_form.has_cost}}
         {{ filter_form.has_cost.label_tag}} 
         {{ filter_form.has_cost.errors }} </div>
