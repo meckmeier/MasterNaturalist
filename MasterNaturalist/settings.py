@@ -44,10 +44,16 @@ ANYMAIL = {
     "POSTMARK_SERVER_TOKEN": os.environ.get("POSTMARK_API_KEY"),
 }
 
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL",
+    "mary@eckmeier.com"
+)
+
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
 ADMINS = [
     ("Mary", "mary@eckmeier.com"),
 ]
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "mary@eckmeier.com")
 EMAIL_TIMEOUT = 10  # seconds
 
 PASSWORD_RESET_TIMEOUT = 60*60*24
