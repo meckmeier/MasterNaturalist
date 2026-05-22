@@ -543,9 +543,10 @@ class ActivityForm(forms.ModelForm):
 
     class Meta:        
         model = Activity
-        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost", "contact_email", "time_description"] 
+        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost", "contact_email", "time_description", "prerequisites", "expire_date", "deleted"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
+            "prerequisites": forms.TextInput(attrs={"placeholder": "e.g. Previous training, experience, or materials needed"}),
             "expire_date": forms.DateInput(attrs={"type": "date"}),
             "date_description": forms.TextInput(attrs={"placeholder": "e.g., Ongoing or Wednesdays in June"}),
             "time_description": forms.TextInput(attrs={"placeholder": "e.g., 2 hours per week, or 9-11:30am"}),
@@ -721,6 +722,15 @@ class UploadFileForm(forms.ModelForm):
     class Meta:
         model = ActivityUpload
         fields = ["file"]
+
+class PendingForm(forms.Form):
+    confirm = forms.BooleanField(
+        required=True,
+        label="I have reviewed the pending data and confirm it is ready to be committed."
+    )
+    class Meta:
+        model = Pending_Activity
+        fields = ["confirm","org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost", "contact_email", "time_description", "prerequisites", "expire_date", "deleted"]
 
 class FeedbackForm(forms.ModelForm):
 

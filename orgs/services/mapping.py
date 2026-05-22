@@ -1,11 +1,23 @@
 import re
-def field_normalize(s):
-    if not s:
+import pandas as pd
+
+def field_normalize(value):
+    if value is None:
         return ""
-    s = s.strip().lower()
-    s = re.sub(r"[^\w\s]", "", s)   # remove punctuation
-    s = re.sub(r"\s+", "_", s)      # collapse spaces
-    return s
+
+    value = str(value).strip().lower()
+
+    # replace spaces and hyphens with underscores
+    value = re.sub(r"[\s\-]+", "_", value)
+
+    # remove anything not alphanumeric or underscore
+    value = re.sub(r"[^a-z0-9_]", "", value)
+
+    # collapse repeated underscores
+    value = re.sub(r"_+", "_", value)
+
+    return value.strip("_")
+
 
 def build_mapping(post_data, columns):
     mapping = {}

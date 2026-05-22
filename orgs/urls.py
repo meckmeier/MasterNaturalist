@@ -58,7 +58,10 @@ urlpatterns = [
     path("upload/<int:org_id>/", views.upload_csv, name="upload_csv"),
     path("upload/<int:upload_id>/map/", views.upload_map, name="upload_map"),
     path("upload/<int:upload_id>/stage/", views.upload_stage, name="upload_stage"),
-    path("upload/<int:upload_id>/review/", views.upload_review, name="upload_review"),
+    path("upload/<int:upload_id>/review_raw/", views.upload_review_raw, name="upload_review_raw"),
+    path("upload/<int:upload_id>/build_pending/", views.upload_build_pending, name="upload_build_pending"),
+    path("upload/<int:upload_id>/review_pending/", views.upload_review_pending, name="upload_review_pending"),
+    
     path("upload/<int:upload_id>/commit/", views.upload_commit, name="upload_commit"),
     path("upload/success/", views.upload_success, name="upload_success"),
     path("upload/<int:upload_id>/processing/", views.upload_processing, name="upload_processing"),

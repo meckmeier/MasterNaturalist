@@ -1132,6 +1132,7 @@ def activity_create(request):
         activity=activity,
         is_new=True,
     )
+
 def activity_edit(request, activity_id):
     activity = get_object_or_404(Activity, id=activity_id)
     org = activity.org
@@ -1142,6 +1143,7 @@ def activity_edit(request, activity_id):
         activity=activity,
         is_new=False,
     )   
+
 def activity_detail(request, activity_id=None):
     is_new = activity_id is None
     confirm = request.POST.get("confirm_duplicate")
@@ -1328,7 +1330,6 @@ def activity_delete(request,activity_id=None):
         "activity": activity
     })
 
-
 def map_view(request):
     training_qs = Activity.objects.training().filter(
         sessions__location=OuterRef("pk")
@@ -1362,7 +1363,6 @@ def map_view(request):
     context = {"locations": json.dumps(locations_json, cls=DjangoJSONEncoder)}
     # Render template
     return render(request, "orgs/map.html", context)
-
 
 def test_email(request):
     context = {}
@@ -1398,7 +1398,6 @@ def superuser_required(user):
 def run_backfill(request):
     update_new_fields()
     return HttpResponse("Backfill complete")
-
 
 @login_required
 def org_manager_add(request, org_id):
@@ -1515,29 +1514,44 @@ def debug_sessions(request):
         "today": today
     })
 
+from orgs.services.mapping import build_mapping, build_dropdown_options
+
 @login_required
 def upload_csv(request, org_id):
     #this code will get the csv file and log it into the upload table.
     
     org = get_object_or_404(Organization, id=org_id)
     print("Starting upload csv-step1",org)
-
+    #validate that you have permissions
     if not (OrgManager.objects.filter(org=org, profile=request.user.profile).exists()  or request.user.is_staff):
         return HttpResponseForbidden()
     
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
+
             upload = form.save(commit=False)
             upload.organization =org
             upload.uploaded_by = request.user
+
+            importer= CSVImporter(upload)
+            importer.read()
+            #validate that the file is csv and you can open it.
+            if importer.errors:
+                return render(request, "orgs/upload.html", {
+                    "form": UploadFileForm(), 
+                    "errors": importer.errors, 
+                    "upload": upload,
+                    "org": org
+                    })
+            
             upload.save()
             return redirect("upload_map", upload_id=upload.id)
     else:
         form = UploadFileForm()
-    return render(request, "orgs/upload.html", {"form": form})
+        return render(request, "orgs/upload.html", {"form": form})
 
-from orgs.services.mapping import build_mapping, build_dropdown_options
+
 
 # Step 1: Map columns from csv to rawloaddata fields
 def upload_map(request, upload_id):
@@ -1545,9 +1559,14 @@ def upload_map(request, upload_id):
     # status is considered :Staged in upload table.
     print("Starting upload_map for upload:", upload_id)
     upload = get_object_or_404(ActivityUpload, id=upload_id)
+    importer= CSVImporter(upload)
+    importer.read()
+    df= importer.df
+
+    if importer.errors:
+        form = UploadFileForm()
+        return render(request, "orgs/upload.html", {"form": form, "errors": importer.errors, "upload": upload})
     
-    # Read first row to show column headers
-    df = pd.read_csv(upload.file) if upload.file.name.endswith(".csv") else pd.read_excel(upload.file, engine="openpyxl")
     columns = list(df.columns)
     EXCLUDE_FIELDS = ["id", "upload", "row_number", "organization"]
     field_names = [(f.name) for f in RawLoadData._meta.get_fields() 
@@ -1575,7 +1594,6 @@ def upload_map(request, upload_id):
     return render(request, "orgs/upload_map.html", {
         "upload": upload, 
         "dropdown_options":dropdown_options})
-   
 
 # Step 2: Stage data
 def upload_stage(request, upload_id):
@@ -1588,15 +1606,28 @@ def upload_stage(request, upload_id):
 
     importer = CSVImporter(upload, mapping=mapping)
     importer.read()
-    importer.normalize()
-    importer.validate()
+    
 
     if importer.errors:
         request.session[f"errors_{upload_id}"] = importer.errors
         upload.status = "error"
         upload.save()
-        return redirect("upload_review", upload_id=upload.id)
-
+        return redirect("upload_review_raw", upload_id=upload.id)
+    
+    importer.normalize()
+    if importer.errors:
+        request.session[f"errors_{upload_id}"] = importer.errors
+        upload.status = "error"
+        upload.save()
+        return redirect("upload_review_raw", upload_id=upload.id)
+    
+    importer.validate()
+    if importer.errors:
+        request.session[f"errors_{upload_id}"] = importer.errors
+        upload.status = "error"
+        upload.save()
+        return redirect("upload_review_raw", upload_id=upload.id)
+    
     importer.process()
 
     if importer.warnings:
@@ -1605,11 +1636,11 @@ def upload_stage(request, upload_id):
     upload.status = "staged"
     upload.save()
 
-    return redirect("upload_review", upload_id=upload.id)
+    return redirect("upload_review_raw", upload_id=upload.id)
 
-# Step 3: Review / cleanup
-def upload_review(request, upload_id):
-    print("Starting upload_review for upload:", upload_id)
+# Step 3: Review Raw table/ cleanup
+def upload_review_raw(request, upload_id):
+    print("Starting upload_review_raw for upload:", upload_id)
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     
     # Fetch all staged rows
@@ -1623,14 +1654,68 @@ def upload_review(request, upload_id):
         # Handle row skipping
         skip_ids = request.POST.getlist("skip_row")
         RawLoadData.objects.filter(id__in=skip_ids).update(status="skipped")
-        return redirect("upload_commit", upload_id=upload.id)
+        return redirect("upload_build_pending", upload_id=upload.id)
 
-    return render(request, "orgs/upload_review.html", {
+    return render(request, "orgs/upload_review_raw.html", {
         "upload": upload,
         "staged_rows": staged_rows,
         "errors": errors,
         "warnings":warnings
     })
+
+from orgs.services.pending_builder import build_pending_for_upload
+
+@login_required
+def upload_build_pending(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+
+    result = build_pending_for_upload(upload)
+
+    if result.errors:
+        # show errors or redirect to review
+        
+        upload.status = "error"
+        upload.save()
+        request.session[f"errors_{upload_id}"] = result.errors
+        return redirect("upload_review_pending", upload_id=upload.id)
+    
+    request.session[f"warnings_{upload_id}"] = result.warnings
+    upload.status = "pending_built"
+    upload.save()
+
+    return redirect("upload_review_pending", upload_id=upload.id)
+
+def upload_review_pending(request, upload_id):
+    print("Starting upload_review_pending for upload:", upload_id)
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+    
+    # Fetch all staged rows
+    pending_activity =Pending_Activity.objects.filter(source_upload_id=upload_id)
+    pending_location = Pending_Location.objects.filter(source_upload_id=upload_id)
+    pending_session = Pending_Session.objects.filter(source_upload_id=upload_id)
+    
+    
+    # Fetch any errors from the staging process (from session)
+    errors = request.session.pop(f"errors_{upload_id}", [])
+    warnings = request.session.pop(f"warnings_{upload_id}",[])
+
+    if request.method == "POST":
+        # Handle row skipping
+        skip_ids = request.POST.getlist("skip_row")
+        Pending_Activity.objects.filter(id__in=skip_ids).update(processing_status="skipped")
+        Pending_Location.objects.filter(id__in=skip_ids).update(processing_status="skipped")
+        Pending_Session.objects.filter(id__in=skip_ids).update(processing_status="skipped")
+        return redirect("upload_commit", upload_id=upload.id)
+
+    return render(request, "orgs/upload_review_pending.html", {
+        "upload": upload,
+        "pending_locations": pending_location,
+        "pending_activities": pending_activity,
+        "pending_sessions": pending_session,
+        "errors": errors,
+        "warnings": warnings,
+    })
+
 # Step 4: Commit to final tables
 def upload_commit(request, upload_id):
     print("Starting upload_commit for upload:", upload_id)

@@ -11,6 +11,7 @@ from django.core.mail import mail_admins
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
 from django.conf import settings
+from orgs.services.helper_function import build_location_fingerprint
 
 # fixed lists:
 #-------------------------------------------------------    
@@ -91,8 +92,7 @@ class ZipToCounty (models.Model):
     def __str__(self):
         return self.zip
 
-
-        
+     
 class Commitment(models.Model):
     time= models.CharField(max_length=50)
 
@@ -301,7 +301,6 @@ class LocationQuerySet(models.QuerySet):
         return self.filter(deleted=False,
                            org__deleted=False)
 
-        
 class Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
     loc_name= models.CharField(max_length=255,help_text="Your location can be used system-wide. You may want to include your organization name to help make it unique e.g., 'MyOrg Main Location'.")
@@ -336,7 +335,13 @@ class Location(models.Model):
     all_objects = models.Manager()
 
     def build_fingerprint(self):
-        return f"{self.norm_loc_name}|{self.norm_address}|{self.norm_city}|{self.norm_state}"
+       return build_location_fingerprint(
+        org_id=self.org_id,
+        loc_name=self.loc_name,
+        address=self.address,
+        city_name=self.city_name,
+        state=self.state,
+    )
         
 
     def save(self, *args, **kwargs):
@@ -433,6 +438,7 @@ class Activity(models.Model):
     activity_url = models.URLField(max_length=200, default="", blank=True)
     
     has_cost = models.BooleanField(default=False)
+    prerequisites = models.CharField(max_length=200, blank=True, null=True)
     contact_email = models.EmailField(default="", blank=True)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_acts', default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)
@@ -463,8 +469,6 @@ class Activity(models.Model):
     @property
     def is_newly_added(self):
         return self.created_at >= timezone.now() - timedelta(days=15)
-
-
 
 class SessionQuerySet(models.QuerySet):
     def active(self):
@@ -615,7 +619,6 @@ class RawLoadData(models.Model):
     def __str__(self):
         return f"Row {self.row_number} - {self.title or 'No Title'}"
 
-
 class Pending_Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True, related_name="pending_locations")
     loc_name= models.CharField(max_length=255)
@@ -651,7 +654,13 @@ class Pending_Location(models.Model):
     fingerprint = models.CharField(max_length=500, unique=True, blank=True)
 
     def build_fingerprint(self):
-        return f"{self.norm_loc_name}|{self.norm_address}|{self.norm_city}|{self.norm_state}"
+        return build_location_fingerprint(
+        org_id=self.org_id,
+        loc_name=self.loc_name,
+        address=self.address,
+        city_name=self.city_name,
+        state=self.state,
+    )
     
     def save(self, *args, **kwargs):
         # 👇 ALWAYS populate normalized fields
@@ -675,8 +684,6 @@ class Pending_Location(models.Model):
             )
         ]
     
-
-
 class Pending_Activity(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="pending_activities")
     title = models.CharField(max_length=100)
@@ -684,12 +691,13 @@ class Pending_Activity(models.Model):
     activity_type = models.CharField(max_length=1,
                                   choices=[("v","Volunteer Opportunity"),("t","Training" )])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
+    time_description = models.CharField(max_length=100, default='', blank=True, null=True)
     categories = models.ManyToManyField(EventCategory, blank=True)
     date_description = models.CharField(max_length=100, default='', blank=True, null=True)
     expire_date = models.DateField(default=one_year_from_now())
     activity_url = models.URLField(max_length=200, default="", blank=True)
     has_cost = models.BooleanField(default=False)
-    contact_email = models.EmailField(default="", blank=True)
+    contact_email = models.EmailField(default="", blank=True, null=True)
     created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_pending_activities")
     created_at =models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_pending_activities")
@@ -716,7 +724,8 @@ class Pending_Session(models.Model):
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_pending_sessions"   )
     updated_at = models.DateTimeField(auto_now=True)
     processing_status = models.CharField(max_length=20, default="pending")  # pending, approved, rejected
-    
+    source_upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
+
     def __str__(self):
         return f"{self.activity.title} – {self.start}"  
     

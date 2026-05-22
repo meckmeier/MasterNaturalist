@@ -1,0 +1,110 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+<div class="container my-4">
+
+    <h2>Review Pending Upload</h2>
+
+    {% if errors %}
+    <div class="alert alert-danger">
+        <h5>Errors</h5>
+        <ul class="mb-0">
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if warnings %}
+    <div class="alert alert-warning">
+        <h5>Warnings</h5>
+        <ul class="mb-0">
+            {% for warning in warnings %}
+                <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <h4 class="mt-4">Locations</h4>
+
+    {% for loc in pending_locations %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>{{ loc.loc_name }}</h5>
+            <p class="mb-1">{{ loc.address }}</p>
+            <p class="mb-1">
+                {{ loc.city }}{% if loc.state %}, {{ loc.state }}{% endif %}
+                {% if loc.zip %} {{ loc.zip }}{% endif %}
+            </p>
+
+            {% if loc.real_location %}
+                <span class="badge bg-success">Matched existing location</span>
+            {% else %}
+                <span class="badge bg-primary">New location</span>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+        <p>No pending locations.</p>
+    {% endfor %}
+
+    <h4 class="mt-4">Activities</h4>
+
+    {% for activity in pending_activities %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>{{ activity.title }}</h5>
+            <p>{{ activity.description }}</p>
+
+            <p class="mb-1">
+                <strong>Type:</strong> {{ activity.activity_type }}
+            </p>
+
+            {% if activity.activity_url %}
+                <p><a href="{{ activity.activity_url }}" target="_blank">Activity Link</a></p>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+        <p>No pending activities.</p>
+    {% endfor %}
+
+    <h4 class="mt-4">Sessions</h4>
+
+    {% for session in pending_sessions %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <p class="mb-1">
+                <strong>Format:</strong> {{ session.session_format }}
+            </p>
+
+            <p class="mb-1">
+                <strong>Dates:</strong>
+                {% if session.ongoing %}
+                    Ongoing
+                {% else %}
+                    {{ session.start }}{% if session.end %} – {{ session.end }}{% endif %}
+                {% endif %}
+            </p>
+
+            {% if session.session_url %}
+                <p><a href="{{ session.session_url }}" target="_blank">Session Link</a></p>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+        <p>No pending sessions.</p>
+    {% endfor %}
+
+    {% if not errors %}
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">
+            Confirm and Continue
+        </button>
+    </form>
+    {% endif %}
+
+</div>
+{% endblock %}

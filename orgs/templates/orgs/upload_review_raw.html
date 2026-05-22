@@ -124,11 +124,10 @@
         <span class="me-btn-label">Update Skipped Rows</span></button>
         {% endif %}
 </form>
-{% if False %}
-<a href="{% url 'upload_commit' upload.id %}" class="me-btn">
+
+<a href="{% url 'upload_build_pending' upload.id %}" class="me-btn">
     <span><i class="bi bi-gear me-btn-icon"></i></span>
     <span class="me-btn-label">Continue</span></a>
-    {% endif %}
-    UNDER CONSTRUCTION
+
     <a href="{% url 'landing' %}" class="me-button-link">Return to main page</a>
 {% endblock %}

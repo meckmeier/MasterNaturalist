@@ -15,20 +15,64 @@ class CSVImporter:
     # Step 1: read file
     def read(self):
         try:
-            file=self.upload.file
+            file = self.upload.file
             file.open()
             file.seek(0)
 
-            if self.upload.file.name.endswith(".csv"):
-                self.df = pd.read_csv(self.upload.file)
-            else:
-                self.df = pd.read_excel(self.upload.file, engine="openpyxl")
-            #print("DF SHAPE:", self.df.shape)
-            #print("COLUMNS:", self.df.columns.tolist())
-            #print(self.df.head())
+            # only allow CSV files
+            if not self.upload.file.name.lower().endswith(".csv"):
+                self.errors.append("Only CSV files are supported.")
+                self.df = pd.DataFrame()
+                return
+
+            encodings = ["utf-8", "cp1252", "latin-1"]
+            last_error = None
+
+            for encoding in encodings:
+                try:
+                    file.seek(0)
+
+                    self.df = pd.read_csv(
+                        file,
+                        encoding=encoding,
+                    )
+
+                    self.df = self.df.replace("\xa0", " ", regex=True)
+
+                    # look for replacement characters
+                    bad_cells = []
+
+                    for col in self.df.columns:
+                        matches = self.df[self.df[col].astype(str).str.contains("�", na=False)]
+
+                        for _, row in matches.iterrows():
+                            value = str(row[col])
+
+                            bad_cells.append(
+                                f"Column '{col}' contains invalid characters: {value}"
+                            )
+
+                    if bad_cells:
+                        self.errors.extend(bad_cells)
+                        self.errors.append(
+                                "Your CSV contains invalid text characters. "
+                                "Try re-saving the file as 'CSV UTF-8' from Excel or Google Sheets."
+                            )
+                        self.df = pd.DataFrame()
+                        return
+                    self.encoding_used = encoding
+                    return
+
+                except UnicodeDecodeError as e:
+                    last_error = e
+
+            # if we get here, none of the encodings worked
+            self.errors.append(f"Unable to decode CSV file: {last_error}")
+            self.df = pd.DataFrame()
+
         except Exception as e:
             self.errors.append(f"Error reading file: {e}")
-            self.df = pd.DataFrame()  # empty DataFrame if error
+            self.df = pd.DataFrame()
 
     # Step 2: normalize / cleanup
     def add_warning(self, row_num, field, value, message):

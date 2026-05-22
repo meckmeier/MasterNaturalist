@@ -10,6 +10,19 @@
     </ul>
 {% endif %} 
 <h2>Upload Data</h2>
+{% if errors %}
+<div  id="upload-errors" class="alert alert-danger">
+
+    <h5>Upload Error</h5>
+
+    <ul class="mb-0">
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+
+</div>
+{% endif %}
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
@@ -35,4 +48,20 @@
         class="btn me-btn">
         <span><i class="bi bi-info me-btn-icon"></i></span>
         <span class="me-btn-label">FAQ -About using the upload process</span></a>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.querySelector('input[type="file"]');
+    const errorBox = document.getElementById("upload-errors");
+    console.log("File input:", fileInput);
+    console.log("Error box:", errorBox);
+    if (fileInput && errorBox) {
+        fileInput.addEventListener("change", function () {
+            errorBox.style.display = "none";
+        });
+    }
+});
+</script>
 {% endblock %}

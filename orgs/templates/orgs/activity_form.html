@@ -87,7 +87,11 @@
             {{ activity_form.description.errors }}
         </div>
         <div class="form-field-full">
-          
+            {{ activity_form.prerequisites.label_tag }}<br>
+            {{ activity_form.prerequisites }}
+            <span class="error-text">{{ activity_form.prerequisites.errors }}</span>
+        </div>
+        <div class="form-field-full">
     
     <div class="formset" data-prefix="locations">
     

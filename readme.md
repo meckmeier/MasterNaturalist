@@ -80,5 +80,19 @@ Version Two:
 * added Free to the activities filter.
 * Hide references to favorites on public access... have created full experience for public viewers.
 
+Upload process:
+* have data getting to pending tables.
+* need to deal with location matching issues.
+* get the happy path data into actual tables.
+* start testing ugly files to get all the other issues resolved.
+* build a good UI for the location matching and approval process.
+approval process
+Approval checks:
+- already linked to real_location? use it
+- exact fingerprint match? link it
+- possible fuzzy/name/city/org match? show choice
+- no match? create new Location
+
+
 Future wishlist - make a video that explains how to manage an org in this system.
 Talk to Sage about creating a way to 'register' for an activity in her system directly from here.
