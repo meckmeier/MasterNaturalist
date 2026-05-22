@@ -369,6 +369,7 @@ def org_approve(request, enrollment_id):
         messages.info(request, "This enrollment has already been denied.")
         return redirect("org_enrollment_list")
     
+    print("Creating org for enrollment:", enrollment.org_name)
     # Create the organization (it will be logged as created by the staff member approving it.)
     org = Organization.objects.create(
             org_name=enrollment.org_name,
@@ -381,6 +382,7 @@ def org_approve(request, enrollment_id):
             created_by=request.user.profile,
             updated_by=request.user.profile,
         )
+    print("Created org id:", org.id)
     # Optionally, you could also create an OrgManager entry for the contact person here if you want them to have immediate access.
     email = enrollment.contact_email.lower().strip()
     user=User.objects.filter(email__iexact=email).first()

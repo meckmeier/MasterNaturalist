@@ -742,17 +742,23 @@ class Feedback(models.Model):
     
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        print("Feedback save called. is_new =", is_new)
 
         super().save(*args, **kwargs)
 
         if is_new:
+            print("Sending feedback email via mail_admins")
+
             mail_admins(
                 subject="New feedback received",
                 message=(
                     f"New feedback was submitted.\n\n"
                     f"Name: {self.name or 'Not provided'}\n"
                     f"Email: {self.email or 'Not provided'}\n\n"
+                    f"Page: {self.page_url or 'Not provided'}\n\n"
                     f"Message:\n{self.note}"
                 ),
-                fail_silently=True,
+                fail_silently=False,
             )
+
+            print("Feedback email sent")
