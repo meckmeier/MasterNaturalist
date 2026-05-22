@@ -68,6 +68,7 @@ class CustomSignupForm(SignupForm):
         return user
 
 class OrgEnrollmentForm(forms.ModelForm):
+    turnstile = TurnstileField()
     org_url = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org"})

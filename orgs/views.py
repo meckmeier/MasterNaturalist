@@ -296,6 +296,7 @@ def org_enroll(request):
         form = OrgEnrollmentForm(request.POST)
         print("org_enroll form errors", form.errors)
         if form.is_valid():
+            print("org_enroll form is valid")
             enrollment = form.save(commit=False)
 
             if request.user.is_authenticated:
@@ -320,6 +321,9 @@ def org_enroll(request):
             )
 
             return redirect("org_enroll_thanks")
+        else:
+            print("org_enroll form errors:", form.errors.as_json())
+            print("POST data:", request.POST)
     else:
         form = OrgEnrollmentForm()
 
