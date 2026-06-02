@@ -30,6 +30,7 @@ import markdown
 import json
 import pandas as pd
 from .services.csv_importer import CSVImporter
+from orgs.services.activity_tracking import track_activity
 
 from collections import defaultdict
 from io import StringIO
@@ -201,6 +202,8 @@ def follow_org(request, org_id):
     # once done it returns from where it was called.
     next_url = request.POST.get("next") or request.GET.get("next")
     org = Organization.objects.get(id=org_id)
+
+    track_activity(request, "favorite_add", org=org)
     profile = Profile.objects.get(user=request.user)
     follow_relation, created = FollowOrg.objects.get_or_create(profile=profile, followOrg=org)
     
@@ -293,6 +296,7 @@ def org_mgmt(request):
 def org_enroll(request):
     print("org_enroll called with method", request.method)
     if request.method == "POST":
+        track_activity(request, "org_enroll", org=None)
         form = OrgEnrollmentForm(request.POST)
         print("org_enroll form errors", form.errors)
         if form.is_valid():
@@ -772,54 +776,10 @@ def org_set_default_location(request, org_id, loc_id):
     url = reverse("org_mgmt")
     return redirect(f"{url}#org-{org.id}")
 
-def login_view(request):
-    if request.method == "POST":
 
-        # Attempt to sign user in
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-
-        # Check if authentication successful
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect(reverse("landing"))
-        else:
-            return render(request, "orgs/login.html", {
-                "message": "Invalid username and/or password."
-            })
-    else:
-        return render(request, "orgs/login.html")
-
-def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("landing"))
 
-def register(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        email = request.POST["email"]
-
-        # Ensure password matches confirmation
-        password = request.POST["password"]
-        confirmation = request.POST["confirmation"]
-        if password != confirmation:
-            return render(request, "orgs/register.html", {
-                "message": "Passwords must match."
-            })
-
-        # Attempt to create new user
-        try:
-            user = User.objects.create_user(username, email, password)
-            user.save()
-            Profile.objects.create(user=user)
-        except IntegrityError:
-            return render(request, "orgs/register.html", {
-                "message": "Username already taken."
-            })
-        return redirect("account_email_verification_sent")
-    else:
-        return render(request, "orgs/register.html")
     
 @login_required
 def profile_view(request):
@@ -842,7 +802,6 @@ def profile_view(request):
 
 def user_is_staff_profile(user):
     return user.is_authenticated and hasattr(user, "profile") and user.is_staff
-
 
 @login_required
 def staff_user_manage(request):

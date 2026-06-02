@@ -66,9 +66,11 @@ ACCOUNT_LOGIN_METHODS = {"email", "username"}
 ACCOUNT_FORMS = {
     "signup": "orgs.forms.CustomSignupForm",
 }
-LOGIN_REDIRECT_URL = "landing"
-LOGOUT_REDIRECT_URL = "landing"
 
+LOGIN_REDIRECT_URL = "landing"
+
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_REDIRECT_URL = "landing"
 #all these were added per a warnings message from python manage.py check --deploy 
 #they should all be set correctly in production/ and configured here to work on dev too.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

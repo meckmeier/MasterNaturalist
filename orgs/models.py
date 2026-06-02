@@ -762,3 +762,41 @@ class Feedback(models.Model):
             )
 
             print("Feedback email sent")
+
+
+
+class ActivityLog(models.Model):
+    ACTION_CHOICES = [
+        ("visit", "Page visit"),
+        ("org_enroll", "Organization enrollment"),
+        ("favorite_add", "Favorite added"),
+        ("favorite_remove", "Favorite removed"),
+        ("login_attempt", "Login attempt"),
+        ("signup_attempt", "Signup attempt"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+
+    org = models.ForeignKey(
+        Organization,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    path = models.CharField(max_length=500, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["action"]),
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["org"]),
+        ]
+
+    def __str__(self):
+        return f"{self.action} - {self.created_at:%Y-%m-%d %H:%M}"

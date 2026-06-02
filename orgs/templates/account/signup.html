@@ -6,14 +6,17 @@
 <div class="container py-4" style="max-width:600px;">
 
     <h1>Create Account</h1>
-<p>We apologize for the inconvenience. Signups for Wildpaths have been suspended for the time being. It should be back in business later this week.</p>
- <p>May 17, 2026.</p>   
-   <p> Mary Eckmeier.
-</p>
+
+    
+
     <form method="post" novalidate >
 
         {% csrf_token %}
-
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {{ form.errors }}
+        </div>
+        {% endif %}
         {{ form.non_field_errors }}
         
 

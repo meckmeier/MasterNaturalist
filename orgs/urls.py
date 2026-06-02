@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 from django.http import HttpResponse
-
+from django.shortcuts import redirect
 
 from . import views
 urlpatterns = [
@@ -40,20 +40,16 @@ urlpatterns = [
     path("locations/", views.locations, name="locations"),
     path("follow_org/<int:org_id>", views.follow_org, name="follow_org"),
     path( "org/<int:org_id>/default-location/<int:loc_id>/",views.org_set_default_location,name="org_set_default_location"),
-    path("login", views.login_view, name="login"),
-    path("logout", views.logout_view, name="logout"),
-    #path("register", views.register, name="register"),
-    path( "register",lambda request: HttpResponse(
-            "Registration temporarily disabled.",
-            status=503),
-        name="register",
-    ),
     path("profile/", views.profile_view, name="profile"),
     path("staff/user/", views.staff_user_manage, name="staff_user_manage"),
-    path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
-    path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
-    path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
-    path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete" ),
+
+    
+    path("login", lambda request: redirect("account_login"), name="login"),
+    path("logout", lambda request: redirect("account_logout"), name="logout"),
+    path("register", lambda request: redirect("account_signup"), name="register"),
+    #path( "register",lambda request: HttpResponse("Registration temporarily disabled.",status=200), name="register"),
+    path("password_reset/", lambda request: redirect("account_reset_password"), name="password_reset"),
+
     
     path("upload/<int:org_id>/", views.upload_csv, name="upload_csv"),
     path("upload/<int:upload_id>/map/", views.upload_map, name="upload_map"),
