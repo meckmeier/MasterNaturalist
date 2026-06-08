@@ -22,6 +22,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.db.models import Count, Q
 
 from datetime import date, timedelta
 from pathlib import Path
@@ -43,6 +44,26 @@ def sort_key(x):
     if d is None:
         return date.max
     return d
+
+@staff_member_required
+def run_cleanup_old_imports(request):
+    output = None
+
+    if request.method == "POST":
+        out = StringIO()
+
+        call_command(
+            "cleanup_old_imports",
+            days=10,
+            delete=True,
+            stdout=out,
+        )
+
+        output = out.getvalue()
+
+    return render(request, "orgs/staff_run_cleanup_imports.html", {
+        "output": output,
+    })
 
 @staff_member_required
 def run_update_latlng(request):
@@ -742,22 +763,14 @@ def locations(request):
         }
     )
 
+from orgs.services.helper_function import get_county_region_from_zip
+
 def lookup_zip(request):
-    zip_code = request.GET.get("zip_code", "").strip()
-    #print("zip_code",zip_code)
-    if not zip_code:
-        return JsonResponse({"county_id": None, "region": None})
+    county, region = get_county_region_from_zip(request.GET.get("zip_code"))
 
-    try:
-        zip_row = ZipToCounty.objects.select_related("county").get(zip=zip_code)
-    except ZipToCounty.DoesNotExist:
-        return JsonResponse({"county_id": None, "region": None})
-
-    county = zip_row.county
-    #print("county", county)
     return JsonResponse({
-        "county_id": county.id,
-        "region": county.region_name,  # adjust if needed
+        "county_id": county.id if county else None,
+        "region": region,
     })
 
 @login_required
@@ -869,6 +882,7 @@ def staff_user_manage(request):
 
 def activities(request):
     q = request.GET.get("q", "")
+
     activity_id = request.GET.get("activity_id", "")
     current_activity = None
     active_filters = []
@@ -891,12 +905,13 @@ def activities(request):
     if "org_id" in get_data and "org" not in get_data:
         get_data["org"]=get_data["org_id"]
         
-
+    
     filter_form=EventFilterForm(get_data or None)
     if filter_form.is_valid():
     
         data = filter_form.cleaned_data
-        
+        if data.get("upload"):
+            queryset = queryset.filter()
         if data.get("org"):
             queryset=queryset.filter(activity__org__id=data["org"].id)
             active_filters.append(f"{data['org'].org_name} ")
@@ -916,10 +931,10 @@ def activities(request):
 
         if data.get("q"):
             queryset =queryset.filter(Q(activity__org__org_name__icontains=q) 
-                                      | Q(activity__description__icontains=q)
-                                      | Q(location__loc_name__icontains=q)
+                                    | Q(activity__description__icontains=q)
+                                    | Q(location__loc_name__icontains=q)
                                         | Q(activity__title__icontains=q)
-                                      ).distinct()
+                                    ).distinct()
             active_filters.append(f"{data['q']} word search ")
 
         if data.get("activity_type"):
@@ -957,13 +972,13 @@ def activities(request):
         elif data.get("session_mode") == "o":
             queryset = queryset.filter(session_format__in=["o", "b"])
             active_filters.append("Online or Hybrid ")
-     
+    
         
-    activity_id = request.GET.get("activity_id")
+        activity_id = request.GET.get("activity_id")
 
-    if activity_id:
-        queryset = queryset.filter(activity_id=activity_id)
-        active_filters.append(f" {queryset.first().activity.title if queryset.exists() else 'N/A'}")
+        if activity_id:
+            queryset = queryset.filter(activity_id=activity_id)
+            active_filters.append(f" {queryset.first().activity.title if queryset.exists() else 'N/A'}")
 
     clean_get = request.GET.copy()
     for p in ["page", "curr_page", "onl_page","ong_page"]:
@@ -1072,9 +1087,9 @@ def _activity_form_workflow(request, org, activity, is_new=False):
 
             return redirect(f"{reverse('activities')}?activity_id={activity.id}")
 
-    #print("Session formset errors:", session_formset.errors)
-    #print("Management errors:", session_formset.management_form.errors)
-    #print("Main form errors:", activity_form.errors)
+    print("Session formset errors:", session_formset.errors)
+    print("Management errors:", session_formset.management_form.errors)
+    print("Main form errors:", activity_form.errors)
 
     return render(request, "orgs/activity_form.html", {
         "activity": activity,
@@ -1238,8 +1253,10 @@ def location_search(request):
     def serialize(loc):
         return {
             "id": loc.id,
+            "loc_name": loc.loc_name,
             "label": loc.loc_name,
-            "city": loc.city_name,
+            "city_name": loc.city_name,
+            "state": loc.state,
             "org_name": loc.org.org_name if loc.org else "",
         }
     
@@ -1479,68 +1496,111 @@ def debug_sessions(request):
         "today": today
     })
 
-from orgs.services.mapping import build_mapping, build_dropdown_options
+from orgs.services.mapping import build_mapping, build_dropdown_options, validate_mapping
 
 @login_required
 def upload_csv(request, org_id):
-    #this code will get the csv file and log it into the upload table.
-    
     org = get_object_or_404(Organization, id=org_id)
-    print("Starting upload csv-step1",org)
-    #validate that you have permissions
-    if not (OrgManager.objects.filter(org=org, profile=request.user.profile).exists()  or request.user.is_staff):
+
+    if not (
+        OrgManager.objects.filter(org=org, profile=request.user.profile).exists()
+        or request.user.is_staff
+    ):
         return HttpResponseForbidden()
-    
+
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
 
+        if form.is_valid():
             upload = form.save(commit=False)
-            upload.organization =org
+            upload.organization = org
             upload.uploaded_by = request.user
 
-            importer= CSVImporter(upload)
+            importer = CSVImporter(upload)
             importer.read()
-            #validate that the file is csv and you can open it.
+
             if importer.errors:
                 return render(request, "orgs/upload.html", {
-                    "form": UploadFileForm(), 
-                    "errors": importer.errors, 
-                    "upload": upload,
-                    "org": org
-                    })
-            
+                    "form": form,
+                    "errors": importer.errors,
+                    "org": org,
+                })
+
             upload.save()
             return redirect("upload_map", upload_id=upload.id)
+
     else:
         form = UploadFileForm()
-        return render(request, "orgs/upload.html", {"form": form})
 
-
+    return render(request, "orgs/upload.html", {
+        "form": form,
+        "org": org,
+        "errors": [],
+    })
 
 # Step 1: Map columns from csv to rawloaddata fields
 def upload_map(request, upload_id):
     #this code will map the fields from the upload file to the fields in the RawDataLoad table... 
     # status is considered :Staged in upload table.
-    print("Starting upload_map for upload:", upload_id)
+
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     importer= CSVImporter(upload)
     importer.read()
-    df= importer.df
 
     if importer.errors:
+        upload.status = "error"
+        upload.save()
+
+        UploadLog.objects.create(
+            upload=upload,
+            stage="csv_load",
+            step="reading file",
+            status="error",
+            source_count=0,
+            created_count=0,
+            warning_count=0,
+            error_count=len(importer.errors),
+            message="\n".join(str(e) for e in importer.errors),
+        )
+
         form = UploadFileForm()
-        return render(request, "orgs/upload.html", {"form": form, "errors": importer.errors, "upload": upload})
+        return render(request, "orgs/upload_map.html", {"form": form, "errors": importer.errors, "upload": upload})
     
+    df= importer.df
     columns = list(df.columns)
     EXCLUDE_FIELDS = ["id", "upload", "row_number", "organization"]
     field_names = [(f.name) for f in RawLoadData._meta.get_fields() 
                if not f.many_to_many and not f.one_to_many and f.name not in EXCLUDE_FIELDS] 
     
+    # GET request → show mapping form
+    dropdown_options = build_dropdown_options(columns, field_names)
+
     if request.method == "POST":
         # Example: user-submitted mapping comes as mapping_ColumnName fields
         mapping = build_mapping(request.POST, columns)
-    
+        errors = validate_mapping(mapping)
+
+        if errors:
+            UploadLog.objects.create(
+                upload=upload,
+                stage="mapping",
+                step="field mapping",
+                status="error",
+                error_count=len(errors),
+                message="\n".join(errors),
+            )
+
+            return render(
+                request,
+                "orgs/upload_map.html",
+                {
+                    "errors": errors,
+                    "columns": columns,
+                    "field_names": field_names,
+                    "upload": upload,
+                    "dropdown_options":dropdown_options
+                }
+            )
         # Save mapping in session (or a model if you prefer)
         request.session[f"mapping_{upload_id}"] = mapping
         #print("Received mapping:", mapping)  # Debug log
@@ -1552,13 +1612,16 @@ def upload_map(request, upload_id):
         # Redirect to staging step
         return redirect("upload_stage", upload_id=upload.id)
 
-    # GET request → show mapping form
-    dropdown_options = build_dropdown_options(columns, field_names)
+    
     
     
     return render(request, "orgs/upload_map.html", {
         "upload": upload, 
-        "dropdown_options":dropdown_options})
+        "dropdown_options":dropdown_options,
+        "errors": []
+        })
+
+
 
 # Step 2: Stage data
 def upload_stage(request, upload_id):
@@ -1570,65 +1633,92 @@ def upload_stage(request, upload_id):
         return redirect("upload_map", upload_id=upload.id)
 
     importer = CSVImporter(upload, mapping=mapping)
+    def fail_upload(step):
+        upload.status = "error"
+        upload.save()
+
+        UploadLog.objects.create(
+            upload=upload,
+            stage="csv_load",
+            step=step,
+            status="error",
+            source_count=RawLoadData.objects.filter(upload=upload).count(),
+            created_count=0,
+            warning_count=0,
+            error_count=len(importer.errors),
+            message="\n".join(str(e) for e in importer.errors),
+        )
+
+        return render(request, "orgs/upload_review_raw.html", {
+            "upload": upload,
+            "errors": importer.errors,
+            "warnings": importer.warnings,
+        })
     importer.read()
     
-
     if importer.errors:
-        request.session[f"errors_{upload_id}"] = importer.errors
-        upload.status = "error"
-        upload.save()
-        return redirect("upload_review_raw", upload_id=upload.id)
-    
+        return fail_upload("reading file")
+
     importer.normalize()
     if importer.errors:
-        request.session[f"errors_{upload_id}"] = importer.errors
-        upload.status = "error"
-        upload.save()
-        return redirect("upload_review_raw", upload_id=upload.id)
-    
+        return fail_upload("normalizing data")
+
     importer.validate()
     if importer.errors:
-        request.session[f"errors_{upload_id}"] = importer.errors
-        upload.status = "error"
-        upload.save()
-        return redirect("upload_review_raw", upload_id=upload.id)
+        return fail_upload("validating data")
     
-    importer.process()
+    try:
+        importer.process()
+    except Exception as e:
+        importer.errors.append(str(e))
+        return fail_upload("saving raw data")
 
-    if importer.warnings:
-        request.session[f"warnings_{upload_id}"] = importer.warnings
-
-    upload.status = "staged"
+    upload.status = "review_raw"
     upload.save()
-
+    
+    UploadLog.objects.create(
+                upload=upload,
+                stage="review_raw",
+                step="upload_stage",
+                status="success",
+                source_count=RawLoadData.objects.filter(upload=upload).count(),
+                skipped_count=RawLoadData.objects.filter(upload=upload, status="skipped").count(),
+                created_count=RawLoadData.objects.filter(upload=upload, status="valid").count(),
+                warning_count=RawLoadData.objects.filter(upload=upload, status="warning").count(),
+                error_count=RawLoadData.objects.filter(upload=upload, status="error").count(),
+                message="\n".join(str(w) for w in importer.warnings),
+            )
     return redirect("upload_review_raw", upload_id=upload.id)
 
 # Step 3: Review Raw table/ cleanup
+@login_required
 def upload_review_raw(request, upload_id):
     print("Starting upload_review_raw for upload:", upload_id)
+
     upload = get_object_or_404(ActivityUpload, id=upload_id)
-    
-    # Fetch all staged rows
+
     staged_rows = RawLoadData.objects.filter(upload=upload)
-    
-    # Fetch any errors from the staging process (from session)
-    errors = request.session.pop(f"errors_{upload_id}", [])
-    warnings = request.session.pop(f"warnings_{upload_id}",[])
 
     if request.method == "POST":
-        # Handle row skipping
         skip_ids = request.POST.getlist("skip_row")
-        RawLoadData.objects.filter(id__in=skip_ids).update(status="skipped")
+
+        RawLoadData.objects.filter(upload=upload).update(status="valid")
+
+        RawLoadData.objects.filter(
+            upload=upload,
+            id__in=skip_ids
+        ).update(status="skipped")
+
         return redirect("upload_build_pending", upload_id=upload.id)
 
     return render(request, "orgs/upload_review_raw.html", {
         "upload": upload,
         "staged_rows": staged_rows,
-        "errors": errors,
-        "warnings":warnings
+        "errors": [],
+        "warnings": [],
     })
 
-from orgs.services.pending_builder import build_pending_for_upload
+from orgs.services.pending import build_pending_for_upload
 
 @login_required
 def upload_build_pending(request, upload_id):
@@ -1637,176 +1727,530 @@ def upload_build_pending(request, upload_id):
     result = build_pending_for_upload(upload)
 
     if result.errors:
-        # show errors or redirect to review
-        
         upload.status = "error"
         upload.save()
-        request.session[f"errors_{upload_id}"] = result.errors
-        return redirect("upload_review_pending", upload_id=upload.id)
-    
-    request.session[f"warnings_{upload_id}"] = result.warnings
-    upload.status = "pending_built"
+
+        UploadLog.objects.create(
+            upload=upload,
+            stage="build_pending",
+            step="building pending records",
+            status="error",
+            source_count=RawLoadData.objects.filter(upload=upload).count(),
+            created_count=0,
+            warning_count=len(result.warnings),
+            error_count=len(result.errors),
+            message="\n".join(str(e) for e in result.errors),
+        )
+
+        pending_locations = Pending_Location.objects.filter(
+            source_upload=upload
+        ).prefetch_related("pending_sessions").select_related("real_location")
+
+        return render(request, "orgs/upload_review_locations.html", {
+            "upload": upload,
+            "pending_locations": pending_locations,
+            "errors": result.errors,
+            "warnings": result.warnings,
+        })
+
+    upload.status = "review_locations"
     upload.save()
 
-    return redirect("upload_review_pending", upload_id=upload.id)
+    UploadLog.objects.create(
+        upload=upload,
+        stage="build_pending",
+        step="building pending records",
+        status="success",
+        source_count=RawLoadData.objects.filter(upload=upload).count(),
+        created_count=Pending_Location.objects.filter(source_upload=upload).count(),
+        warning_count=len(result.warnings),
+        error_count=0,
+        message="\n".join(str(w) for w in result.warnings),
+    )
 
-def upload_review_pending(request, upload_id):
-    print("Starting upload_review_pending for upload:", upload_id)
+    return redirect("upload_review_locations", upload_id=upload.id)
+
+@login_required
+def upload_review_locations(request, upload_id):
+    print("Starting upload_review_locations for upload:", upload_id)
+
     upload = get_object_or_404(ActivityUpload, id=upload_id)
-    
-    # Fetch all staged rows
-    pending_activity =Pending_Activity.objects.filter(source_upload_id=upload_id)
-    pending_location = Pending_Location.objects.filter(source_upload_id=upload_id)
-    pending_session = Pending_Session.objects.filter(source_upload_id=upload_id)
-    
-    
-    # Fetch any errors from the staging process (from session)
-    errors = request.session.pop(f"errors_{upload_id}", [])
-    warnings = request.session.pop(f"warnings_{upload_id}",[])
+
+    def get_pending_locations():
+        return (
+            Pending_Location.objects
+            .filter(source_upload=upload)
+            .exclude(processing_status="merged")
+            .prefetch_related("pending_sessions")
+            .select_related("real_location")
+            .order_by("loc_name", "city_name", "address")
+        )
+
+    pending_locations = get_pending_locations()
+    errors = []
+    warnings = []
 
     if request.method == "POST":
-        # Handle row skipping
-        skip_ids = request.POST.getlist("skip_row")
-        Pending_Activity.objects.filter(id__in=skip_ids).update(processing_status="skipped")
-        Pending_Location.objects.filter(id__in=skip_ids).update(processing_status="skipped")
-        Pending_Session.objects.filter(id__in=skip_ids).update(processing_status="skipped")
-        return redirect("upload_commit", upload_id=upload.id)
+        action = request.POST.get("action")
 
-    return render(request, "orgs/upload_review_pending.html", {
+        if action == "continue":
+            form_errors = []
+            locations = list(pending_locations)
+
+            try:
+                with transaction.atomic():
+                    for location in locations:
+                        decision = request.POST.get(f"decision_{location.id}")
+                        merge_into_id = request.POST.get(f"merge_into_{location.id}")
+                        real_location_id = request.POST.get(f"real_location_{location.id}")
+
+                        if decision == "confirm":
+                            location.processing_status = "confirmed"
+                            location.save(update_fields=["processing_status"])
+
+                        elif decision == "existing":
+                            if not real_location_id:
+                                form_errors.append(f"{location.loc_name}: choose an existing location.")
+                                continue
+
+                            real_location = Location.objects.filter(id=real_location_id).first()
+
+                            if not real_location:
+                                form_errors.append(
+                                    f"{location.loc_name}: existing Location ID {real_location_id} was not found."
+                                )
+                                continue
+
+                            location.real_location = real_location
+                            location.processing_status = "confirmed"
+                            location.save(update_fields=["real_location", "processing_status"])
+
+                        elif decision == "merge":
+                            if not merge_into_id:
+                                form_errors.append(f"{location.loc_name}: choose a location to merge into.")
+                                continue
+
+                            if str(location.id) == str(merge_into_id):
+                                form_errors.append(f"{location.loc_name}: cannot merge a location into itself.")
+                                continue
+
+                            parent = Pending_Location.objects.filter(
+                                id=merge_into_id,
+                                source_upload=upload,
+                            ).first()
+
+                            if not parent:
+                                form_errors.append(f"{location.loc_name}: merge location was not found.")
+                                continue
+
+                            Pending_Session.objects.filter(
+                                location=location,
+                                source_upload=upload,
+                            ).update(location=parent)
+
+                            location.processing_status = "merged"
+                            location.save(update_fields=["processing_status"])
+
+                        elif decision == "skip":
+                            Pending_Session.objects.filter(
+                                location=location,
+                                source_upload=upload,
+                            ).update(location=None)
+
+                            location.real_location = None
+                            location.processing_status = "skip"
+                            location.save(update_fields=["real_location", "processing_status"])
+
+                        else:
+                            form_errors.append(f"{location.loc_name}: no decision was selected.")
+
+                    if form_errors:
+                        raise ValueError("Location review has form errors.")
+
+            except ValueError:
+                UploadLog.objects.create(
+                    upload=upload,
+                    stage="upload_review_locations",
+                    step="location decisions",
+                    status="error",
+                    source_count=Pending_Location.objects.filter(source_upload=upload).count(),
+                    created_count=Pending_Location.objects.filter(
+                        source_upload=upload,
+                        processing_status="confirmed",
+                    ).count(),
+                    merged_count=Pending_Location.objects.filter(
+                        source_upload=upload,
+                        processing_status="merged",
+                    ).count(),
+                    skipped_count=Pending_Location.objects.filter(
+                        source_upload=upload,
+                        processing_status="skip",
+                    ).count(),
+                    warning_count=0,
+                    error_count=len(form_errors),
+                    message="\n".join(str(e) for e in form_errors),
+                )
+
+                return render(request, "orgs/upload_review_locations.html", {
+                    "upload": upload,
+                    "pending_locations": get_pending_locations(),
+                    "errors": form_errors,
+                    "warnings": warnings,
+                })
+
+            UploadLog.objects.create(
+                upload=upload,
+                stage="upload_review_locations",
+                step="location decisions",
+                status="success",
+                source_count=Pending_Location.objects.filter(source_upload=upload).count(),
+                created_count=Pending_Location.objects.filter(
+                    source_upload=upload,
+                    processing_status="confirmed",
+                ).count(),
+                merged_count=Pending_Location.objects.filter(
+                    source_upload=upload,
+                    processing_status="merged",
+                ).count(),
+                skipped_count=Pending_Location.objects.filter(
+                    source_upload=upload,
+                    processing_status="skip",
+                ).count(),
+                warning_count=0,
+                error_count=0,
+            )
+
+            upload.status = "review_activities"
+            upload.save()
+
+            messages.success(request, "Location decisions saved.")
+            return redirect("upload_review_activities", upload_id=upload.id)
+
+    return render(request, "orgs/upload_review_locations.html", {
         "upload": upload,
-        "pending_locations": pending_location,
-        "pending_activities": pending_activity,
-        "pending_sessions": pending_session,
+        "pending_locations": pending_locations,
         "errors": errors,
         "warnings": warnings,
     })
 
-# Step 4: Commit to final tables
-def upload_commit(request, upload_id):
-    print("Starting upload_commit for upload:", upload_id)
-    upload = get_object_or_404(ActivityUpload, id=upload_id)
-    staged_rows = RawLoadData.objects.filter(upload=upload, status="valid")
-    
-    # Implement logic to insert into your final Activity/Location tables here
-    # e.g., for row in staged_rows: Activity.objects.create(...)
+@login_required
+def upload_review_activities(request, upload_id):
+    print("Starting upload_review_activities for upload:", upload_id)
 
-    upload.processed = True
-    upload.status = "completed"
-    upload.save()
-    return redirect("upload_processing", upload_id=upload.id)
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+
+    def get_pending_sessions():
+        return (
+            Pending_Session.objects
+            .filter(source_upload=upload)
+            .select_related(
+                "activity",
+                "location",
+                "location__real_location",
+            )
+            .order_by("activity__title", "start")
+        )
+
+    pending_sessions = get_pending_sessions()
+
+    errors = []
+    warnings = []
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "continue":
+            skip_ids = request.POST.getlist("skip_session")
+
+            # Reset all sessions to valid first
+            Pending_Session.objects.filter(
+                source_upload=upload
+            ).update(processing_status="valid")
+
+            # Then mark checked sessions as skipped
+            Pending_Session.objects.filter(
+                source_upload=upload,
+                id__in=skip_ids,
+            ).update(processing_status="skip")
+
+            # Skip activities that now have zero publishable sessions
+            activities_to_skip = (
+                Pending_Activity.objects
+                .filter(source_upload=upload)
+                .annotate(
+                    publishable_session_count=Count(
+                        "pending_sessions",
+                        filter=~Q(pending_sessions__processing_status="skip"),
+                    )
+                )
+                .filter(publishable_session_count=0)
+            )
+
+            skipped_activity_count = activities_to_skip.count()
+            activities_to_skip.update(processing_status="skip")
+
+            if skipped_activity_count:
+                warnings.append(
+                    f"{skipped_activity_count} activity record(s) were marked skipped because all of their sessions were skipped."
+                )
+
+            # Optional safety check
+            valid_session_count = Pending_Session.objects.filter(
+                source_upload=upload,
+                processing_status="valid",
+            ).count()
+
+            if valid_session_count == 0:
+                errors.append("You cannot publish because all sessions are skipped.")
+
+            if errors:
+                UploadLog.objects.create(
+                    upload=upload,
+                    stage="upload_review_activities",
+                    step="activity/session decisions",
+                    status="error",
+                    source_count=Pending_Session.objects.filter(source_upload=upload).count(),
+                    created_count=Pending_Session.objects.filter(
+                        source_upload=upload,
+                        processing_status="valid",
+                    ).count(),
+                    skipped_count=Pending_Session.objects.filter(
+                        source_upload=upload,
+                        processing_status="skip",
+                    ).count(),
+                    warning_count=len(warnings),
+                    error_count=len(errors),
+                    message="\n".join(str(e) for e in errors),
+                )
+
+                return render(request, "orgs/upload_review_activities.html", {
+                    "upload": upload,
+                    "pending_sessions": get_pending_sessions(),
+                    "errors": errors,
+                    "warnings": warnings,
+                })
+
+            UploadLog.objects.create(
+                upload=upload,
+                stage="upload_review_activities",
+                step="activity/session decisions",
+                status="success",
+                source_count=Pending_Session.objects.filter(source_upload=upload).count(),
+                created_count=Pending_Session.objects.filter(
+                    source_upload=upload,
+                    processing_status="valid",
+                ).count(),
+                skipped_count=Pending_Session.objects.filter(
+                    source_upload=upload,
+                    processing_status="skip",
+                ).count(),
+                warning_count=len(warnings),
+                error_count=0,
+                message="\n".join(str(w) for w in warnings),
+            )
+
+            return redirect("upload_publish", upload_id=upload.id)
+
+    return render(request, "orgs/upload_review_activities.html", {
+        "upload": upload,
+        "pending_sessions": pending_sessions,
+        "errors": errors,
+        "warnings": warnings,
+    })
 
 # Success page
-def upload_success(request):
-    print("Starting upload_success for upload:", upload_id)
-    return render(request, "orgs/upload_success.html")
+def upload_success(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+    return render(request, "orgs/upload_success.html", {
+        "upload": upload,
+        "location_count": Location.objects.filter(source_upload=upload).count(),
+        "activity_count": Activity.objects.filter(source_upload=upload).count(),
+        "session_count": Session.objects.filter(source_upload=upload).count(),
+    })
 
+def upload_rollback(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+    with transaction.atomic():
+        Session.objects.filter(source_upload=upload).delete()
+        Activity.objects.filter(source_upload=upload).delete()
+        Location.objects.filter(source_upload=upload).delete()
+
+        upload.status = "rollback"
+        upload.save(update_fields=["status"])
+        messages.success(request, "Upload rolled back successfully.")
+
+    url = reverse("upload_dashboard")
+    return redirect(f"{url}?upload={upload_id}")
+    
+        
 def normalize(text):
     return text.strip().lower() if text else ""
 
-def upload_processing(request, upload_id):
-    #Purpose: Take the raw rows and map them into your four pending tables:
-    #Location_Pending
-    #Session_Pending
-    #Activity_Pending
-    print("Starting upload_processing for upload:", upload_id)
-    upload_info = get_object_or_404(ActivityUpload, id=upload_id)
-    rows = RawLoadData.objects.filter(upload_id=upload_id)
 
-    for row in rows:
-        with transaction.atomic():
-           # print(f"Processing row {row.id}")
+from orgs.services.publish import publish_pending_upload
 
-            # -----------------------------
-            # Normalize
-            # -----------------------------
-            lkp_loc_name = normalize(row.location_name)
-            lkp_city = normalize(row.city)
-            lkp_address = normalize(row.address)
-            lkp_title = normalize(row.title)
-
-            # -----------------------------
-            # 1. Check Pending_Location FIRST
-            # -----------------------------
-            pending_location = Pending_Location.objects.filter(
-                loc_name__iexact=lkp_loc_name,
-                city_name__iexact=lkp_city,
-                address__iexact=lkp_address
-            ).first()
-
-            if pending_location:
-                # ✅ Already staged — reuse it
-                pass
-
-            else:
-                # -----------------------------
-                # 2. Check real Location
-                # -----------------------------
-                matched_location = Location.objects.filter(
-                    loc_name__iexact=lkp_loc_name,
-                    city_name__iexact=lkp_city
-                    
-                ).first()
-
-                # -----------------------------
-                # 3. Create Pending_Location
-                # -----------------------------
-                if matched_location:
-                    pending_location = Pending_Location.objects.create(
-                        loc_name=matched_location.loc_name,
-                        city_name=matched_location.city_name,
-                        address=matched_location.address,
-                        real_location=matched_location,
-                        processing_status="matched",
-                        source_upload_id=upload_id,
-                        org=upload_info.organization
-                    )
-                else:
-                    pending_location = Pending_Location.objects.create(
-                        loc_name=row.location_name,
-                        city_name=row.city,
-                        address=row.address,
-                        processing_status="new",
-                        source_upload_id=upload_id,
-                        org=upload_info.organization
-                    )
-
-   
-    #Wrap each row (or batch) in transaction.atomic() to avoid partial inserts.
-    return redirect("upload_approval", upload_id=upload_id)
-
-
-def upload_approval(request, upload_id):
-    print("Starting upload_approval for upload:", upload_id)
-    # GET (this is the only query you need)
-    sessions = Pending_Session.objects.select_related(
-            "activity",
-            "location",
-            "location__real_location"
-        ).filter(activity__source_upload_id=upload_id)
-    return render(request, "orgs/upload_approval.html", {
-        "sessions": sessions
-    })
-
+@login_required
 def upload_publish(request, upload_id):
     print("Starting upload_publish for upload:", upload_id)
-    #urpose: Move approved rows from pending tables into production.
-    #Logic:
-    #Promote locations first (Location_Pending → Location)
-    #Promote sessions (Session_Pending → Session)
-    #Promote activities (Activity_Pending → Activity)
-    #Wrap the entire promotion in a transaction per row (or per batch).
-    #Mark pending rows as archived or approved for audit.
-    #URL example: /promote_pending_activity/
-    return render(request, "orgs/upload_success.html")
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
 
-def upload_reject(request, upload_id):
-    print("Starting upload_reject for upload:", upload_id)
-    #Purpose: Mark rows as rejected and optionally log reasons.
-    #Logic:
-    #Update pending rows with status “rejected” and save any user comments.
-    #Optionally, move rejected rows to a separate table for audit.
-    #URL example: /reject_pending_activity/
-    return render(request, "orgs/upload_success.html")
+    try:
+        publish_pending_upload(upload_id, request.user.profile)
+        messages.success(request, "Upload published successfully.")
+        UploadLog.objects.create(
+                        upload=upload,
+                        stage="Activities/Sessions",
+                        step="activities published",
+                        status="success",
+                        source_count=RawLoadData.objects.filter(upload=upload).count(),
+                        created_count=Pending_Activity.objects.filter(source_upload=upload, processing_status="valid").count(),
+                        skipped_count=Pending_Activity.objects.filter(source_upload=upload, processing_status="skip").count(),
+                        warning_count=0,
+                        error_count=0,
+                    )
+        UploadLog.objects.create(
+                        upload=upload,
+                        stage="Locations",
+                        step="locations published",
+                        status="success",
+                        source_count=RawLoadData.objects.filter(upload_id=upload_id).count(),
+                        created_count=Pending_Location.objects.filter(source_upload=upload, processing_status="confirmed").count(),
+                        merged_count=Pending_Location.objects.filter(source_upload=upload, processing_status="merged").count(),
+                        skipped_count=Pending_Location.objects.filter(source_upload=upload, processing_status="skip").count(),
+                        warning_count=0,
+                        error_count=0,
+                    )
+        url = reverse("upload_dashboard")
+        return redirect(f"{url}?upload={upload_id}")
+
+    except Exception as e:
+        print("PUBLISH ERROR:", e)
+        messages.error(request, f"Upload could not be published: {e}")
+        UploadLog.objects.create(
+                        upload=upload,
+                        stage="Publish",
+                        step="Publish Error",
+                        status="error",
+                        source_count=RawLoadData.objects.filter(upload_id=upload_id).count(),
+                        created_count=Pending_Location.objects.filter(source_upload=upload, processing_status="confirmed").count(),
+                        merged_count=Pending_Location.objects.filter(source_upload=upload, processing_status="merged").count(),
+                        skipped_count=Pending_Location.objects.filter(source_upload=upload, processing_status="skip").count(),
+                        warning_count=0,
+                        error_count=0,
+                    )
+        return redirect("upload_review_activities", upload_id=upload_id)
+
+
+@login_required
+def upload_dashboard(request):
+    upload_id = request.GET.get("upload")
+
+    if request.user.is_staff:
+        uploads = ActivityUpload.objects.select_related(
+            "organization", "uploaded_by"
+        ) .prefetch_related("stage_logs").order_by("-uploaded_at")
+    else:
+        uploads = ActivityUpload.objects.filter(
+            uploaded_by=request.user
+        ).select_related(
+            "organization", "uploaded_by"
+        ).prefetch_related("stage_logs").order_by("-uploaded_at")
+
+    if upload_id:
+        uploads = uploads.filter(id=upload_id)
+
+    return render(request, "orgs/upload_dashboard.html", {
+        "uploads": uploads,
+
+    })
+from types import SimpleNamespace
+
+def upload_results(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+
+   
+    base_sessions = (
+        Session.objects
+        .filter(
+            activity__source_upload=upload,
+            activity__deleted=False,
+            activity__org__deleted=False,
+        )
+        .select_related("activity", "activity__org", "location")
+        .prefetch_related("activity__categories")
+        .order_by("activity__title", "start")
+    )
+
+    volunteer = base_sessions.filter(activity__activity_type="v")
+    training = base_sessions.filter(activity__activity_type="t")
+
+    queryset = (
+        Location.objects
+        .filter(
+            deleted=False,
+            sessions__activity__source_upload=upload,
+        )
+        .distinct()
+        .order_by("loc_name")
+        .select_related("org")
+        .prefetch_related(
+            Prefetch("sessions", queryset=volunteer, to_attr="volunteer"),
+            Prefetch("sessions", queryset=training, to_attr="training"),
+        )
+    )
+
+    no_location_volunteer = volunteer.filter(location__isnull=True)
+    no_location_training = training.filter(location__isnull=True)
+
+    no_location = SimpleNamespace(
+        id="noloc",
+        loc_name="No Location",
+        volunteer=list(no_location_volunteer),
+        training=list(no_location_training),
+    )
+    locs = list(queryset)
+
+    if no_location.volunteer or no_location.training:
+            locs.append(no_location)
+    print("UPLOAD:", upload.id)
+
+    print("activities:", Activity.objects.filter(source_upload=upload).count())
+
+    print("volunteer activities:", Activity.objects.filter(
+        source_upload=upload,
+        activity_type="v"
+    ).count())
+
+    print("training activities:", Activity.objects.filter(
+        source_upload=upload,
+        activity_type="t"
+    ).count())
+
+    print("sessions:", Session.objects.filter(
+        activity__source_upload=upload
+    ).count())
+
+    print("sessions with location:", Session.objects.filter(
+        activity__source_upload=upload,
+        location__isnull=False
+    ).count())
+
+    print("volunteer sessions:", volunteer.count())
+    print("training sessions:", training.count())
+
+    for loc in locs:
+        print(
+            loc.loc_name,
+            "vol:", len(loc.volunteer),
+            "train:", len(loc.training)
+        )
+    return render(request, "orgs/upload_results.html", {
+        "upload": upload,
+        "locs": locs,
+
+    })
+
+
 
 def test_html(request):
     activity=Activity.objects.first()
@@ -1841,8 +2285,6 @@ def render_markdown(request, filename):
         "content": html,
         "title": filename.capitalize()
     })
-
-
 
 def feedback_view(request):
     if request.method == "POST":

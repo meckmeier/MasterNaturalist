@@ -1,4 +1,7 @@
+from datetime import date, timedelta
 import re
+
+
 ADDRESS_MAP = {
     "street": "st",
     "st.": "st",
@@ -35,6 +38,9 @@ def normalize_address(addr):
    
     return (addr or "").strip().lower()
 
+def default_expire_date():
+    return date.today() + timedelta(days=365)
+
 def normalize_url(url):
         if url:
             url = url.strip()
@@ -52,3 +58,20 @@ def build_location_fingerprint(*, org_id, loc_name, address=None, city_name=None
         return f"addr|{name}|{address}|{city}|{state}"
 
     return f"org|{org_id}|{name}|{city}|{state}"
+
+
+
+def get_county_region_from_zip(zip_code):
+    from orgs.models import ZipToCounty
+    zip_code = (zip_code or "").strip()
+
+    if not zip_code:
+        return None, None
+
+    try:
+        zip_row = ZipToCounty.objects.select_related("county").get(zip=zip_code)
+    except ZipToCounty.DoesNotExist:
+        return None, None
+
+    county = zip_row.county
+    return county, county.region_name

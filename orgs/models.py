@@ -3,7 +3,7 @@ import secrets
 import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import Q, Exists, OuterRef
+from django.db.models import Q, SET_NULL, Exists, OuterRef
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import timedelta
@@ -48,41 +48,8 @@ ADDRESS_MAP = {
 }
 # functions to help with matching and loading locations
 #-------------------------------------------------------
-def default_expire_date():
-    return date.today() + timedelta(days=365)
+from orgs.services.helper_function import *
 
-def normalize_text(val):
-    if not val:
-        return ""
-    val = val.lower().strip()
-    val = re.sub(r"\s+", " ", val)
-    return val
-
-def normalize_address(addr):
-    if not addr:
-        return ""
-
-    addr = addr.lower().strip()
-    addr = re.sub(r"[.,]", "", addr)
-
-    for k, v in ADDRESS_MAP.items():
-        addr = addr.replace(k, v)
-
-    # remove unit info
-    addr = re.sub(r"(apt|suite|ste|#)\s*\w+", "", addr)
-
-    addr = re.sub(r"\s+", " ", addr)
-    return addr.strip()
-
-def normalize_url(url):
-        if url:
-            url = url.strip()
-            if not url.startswith(("http://", "https://")):
-                return "https://" + url
-        return url
-
-def one_year_from_now():
-    return now().date() + timedelta(days=365)
 
 #actual classes for models
 #-------------------------------------------------------
@@ -295,7 +262,55 @@ class OrgManager(models.Model):
 
     def __str__(self):
         return f'{self.profile.user.username} manages {self.org.org_name}'
-    
+
+class ActivityUpload(models.Model):
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="uploads", blank=True, null=True)
+    file = models.FileField(upload_to="uploads/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    processed = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, default="csv_load")  # raw_warning, raw_review, error, pending_review, published
+    notes = models.TextField(blank=True)
+    published_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="published_uploads")
+    published_at = models.DateTimeField(null=True, blank=True)
+    locations_created = models.PositiveIntegerField(default=0)
+    locations_matched = models.PositiveIntegerField(default=0)
+    locations_skipped = models.PositiveIntegerField(default=0)
+    locations_merged = models.PositiveIntegerField(default=0)
+    activities_created = models.PositiveIntegerField(default=0)
+    activities_skipped = models.PositiveIntegerField(default=0)
+    sessions_created = models.PositiveIntegerField(default=0)
+    sessions_skipped = models.PositiveIntegerField(default=0)
+    load_errors = models.JSONField(default=list, blank=True)
+    database_error_count = models.IntegerField(default=0)
+    load_messages =  models.JSONField(default=list, blank=True)
+    def __str__(self):
+        return f"{self.file.name} ({self.uploaded_at}, {self.id})"
+
+class UploadLog(models.Model):
+    upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE,related_name="stage_logs")
+
+    stage = models.CharField(max_length=50)
+    step = models.CharField(max_length=50, blank=True)  # optional finer-grained step within stage
+    status = models.CharField( max_length=20, choices=[
+            ("started", "Started"),
+            ("success", "Success"),
+            ("warning", "Warning"),
+            ("error", "Error"),],)
+
+    source_count = models.IntegerField(default=0)
+    created_count = models.IntegerField(default=0)
+    matched_count = models.IntegerField(default=0)
+    merged_count = models.IntegerField(default=0)
+    skipped_count = models.IntegerField(default=0)
+    warning_count = models.IntegerField(default=0)
+    error_count = models.IntegerField(default=0)
+
+    message = models.TextField(blank=True)
+    details = models.JSONField(default=dict, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
 class LocationQuerySet(models.QuerySet):
     def active(self):
         return self.filter(deleted=False,
@@ -320,6 +335,7 @@ class Location(models.Model):
     created_at =models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="updated_locations")
     updated_at = models.DateTimeField(auto_now=True)
+    source_upload = models.ForeignKey(ActivityUpload, null=True, blank=True, on_delete=SET_NULL)
 
      # 👇 MACHINE FIELDS
     latitude = models.FloatField(null=True, blank=True)
@@ -343,19 +359,10 @@ class Location(models.Model):
         state=self.state,
     )
         
-
-    def save(self, *args, **kwargs):
-        self.org_url = self._normalize_url(self.org_url)
-        self.volunteer_url = self._normalize_url(self.volunteer_url)
-        self.training_url = self._normalize_url(self.training_url)
-        self.org_loc_url = self._normalize_url(self.org_loc_url)
-
-        super().save(*args, **kwargs)
-        
     def save(self, *args, **kwargs):
         # 👇 ALWAYS populate normalized fields
         self.norm_loc_name = normalize_text(self.loc_name)
-        self.norm_city = self.norm_city = normalize_text(self.city_name or "")
+        self.norm_city =  normalize_text(self.city_name or "")
         self.norm_state = normalize_text(self.state or "wi")
         self.norm_address = normalize_address(self.address or "")
 
@@ -367,7 +374,6 @@ class Location(models.Model):
 
     class Meta:
         ordering = ['loc_name']  # sort by loc_name by default  
-        
         
     def __str__(self):
         return f"{self.loc_name}"
@@ -427,7 +433,7 @@ class ActivityQuerySet(models.QuerySet):
 class Activity(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="activities")
     title = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     activity_type = models.CharField(max_length=1,
                                   choices=[("v","Volunteer Opportunity"),("t","Training" )])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
@@ -435,11 +441,11 @@ class Activity(models.Model):
     date_description = models.CharField(max_length=100, default='', blank=True, null=True)
     time_description = models.CharField(max_length=100, default='', blank=True, null=True)
     expire_date = models.DateField(default=default_expire_date)
-    activity_url = models.URLField(max_length=200, default="", blank=True)
+    activity_url = models.URLField(max_length=200, default="", blank=True, null=True)
     
     has_cost = models.BooleanField(default=False)
+    contact_email = models.EmailField(default="", blank=True, null=True)
     prerequisites = models.CharField(max_length=200, blank=True, null=True)
-    contact_email = models.EmailField(default="", blank=True)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_acts', default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -447,7 +453,7 @@ class Activity(models.Model):
     created_at =models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_activities")
     updated_at = models.DateTimeField(auto_now=True)
-
+    source_upload = models.ForeignKey(ActivityUpload, null=True, blank=True, on_delete=SET_NULL)
     objects = ActivityQuerySet().as_manager()       # default behavior
     all_objects = models.Manager()
 
@@ -509,6 +515,7 @@ class Session(models.Model):
     created_at =models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_sessions")
     updated_at = models.DateTimeField(auto_now=True)
+    source_upload = models.ForeignKey(ActivityUpload, null=True, blank=True, on_delete=SET_NULL)
 
     objects = SessionQuerySet.as_manager()
     all_objects = models.Manager()
@@ -557,18 +564,7 @@ class Session(models.Model):
             'orgs/images/default.jpg'
         )
 
-class ActivityUpload(models.Model):
-    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="uploads", blank=True, null=True)
-    file = models.FileField(upload_to="uploads/")
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    processed = models.BooleanField(default=False)
-    status = models.CharField(max_length=20, default="pending")  # pending, processed, failed
-    notes = models.TextField(blank=True)
 
-    def __str__(self):
-        return f"{self.file.name} ({self.uploaded_at}, {self.id})"
-    
 class RawLoadData(models.Model):
     upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
     row_number = models.IntegerField()
@@ -599,12 +595,12 @@ class RawLoadData(models.Model):
 
     expire_date = models.DateField(null=True, blank=True)
     activity_url = models.CharField(max_length=200, null=True, blank=True)
-
+    
     has_cost = models.BooleanField(null=True)   # ✅ changed
     session_format = models.CharField(max_length=1, null=True, blank=True)    # ✅ changed
 
     contact_email = models.CharField(max_length=200, null=True, blank=True)
-
+    prerequisites = models.CharField(max_length=200, blank=True, null=True)
     # 🔹 VALIDATION OUTPUT
     validation_errors = models.JSONField(default=dict)
     validation_warnings = models.JSONField(default=dict)
@@ -651,7 +647,7 @@ class Pending_Location(models.Model):
     norm_city = models.CharField(max_length=100, blank=True)
     norm_state = models.CharField(max_length=2, blank=True)
 
-    fingerprint = models.CharField(max_length=500, unique=True, blank=True)
+    fingerprint = models.CharField(max_length=500)
 
     def build_fingerprint(self):
         return build_location_fingerprint(
@@ -676,28 +672,36 @@ class Pending_Location(models.Model):
     def __str__(self):
         return f"{self.loc_name} ({self.org})"
     
+    @property
+    def region_image(self):
+        return REGION_IMAGE_MAP.get(
+            self.region_name,
+            'orgs/images/default.jpg'
+        )
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["fingerprint"],
-                name="unique_pending_location_fp"
+                fields=["source_upload", "fingerprint"],
+                name="unique_pending_location_per_upload_fingerprint",
             )
         ]
     
 class Pending_Activity(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="pending_activities")
     title = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     activity_type = models.CharField(max_length=1,
                                   choices=[("v","Volunteer Opportunity"),("t","Training" )])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
     time_description = models.CharField(max_length=100, default='', blank=True, null=True)
     categories = models.ManyToManyField(EventCategory, blank=True)
     date_description = models.CharField(max_length=100, default='', blank=True, null=True)
-    expire_date = models.DateField(default=one_year_from_now())
-    activity_url = models.URLField(max_length=200, default="", blank=True)
+    expire_date = models.DateField(default=default_expire_date)
+    activity_url = models.URLField(max_length=200, default="", blank=True, null=True)
     has_cost = models.BooleanField(default=False)
     contact_email = models.EmailField(default="", blank=True, null=True)
+    prerequisites = models.CharField(max_length=200, blank=True, null=True)
     created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_pending_activities")
     created_at =models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_pending_activities")
@@ -713,7 +717,7 @@ class Pending_Session(models.Model):
     session_format = models.CharField(max_length=1 ,
                               choices=[("o","Online"),("i","InPerson" ),("b","Hybrid")])
     location = models.ForeignKey( Pending_Location, null=True, blank=True, on_delete=models.SET_NULL, related_name="pending_sessions")
-    session_url = models.URLField(max_length=200, default="", blank=True)
+    session_url = models.URLField(max_length=200, default="", blank=True, null=True)
     ongoing = models.BooleanField(default=False)
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)

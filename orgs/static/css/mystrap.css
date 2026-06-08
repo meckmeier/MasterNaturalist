@@ -202,7 +202,10 @@ a:active {
   min-width:0;
   gap: 0.25rem;
 }
-
+/* Right block: inline icons */
+.me-card-header-right {
+  flex: 0 0 auto;
+}
 /* Title row: inline icons + title + edit */
 .me-card-title-row {
   display: inline-flex;
@@ -219,11 +222,18 @@ a:active {
   color: var(--green);
 }
 
-/* Right block: inline icons */
-.me-card-header-right {
-  flex: 0 0 auto;
+
+.me-card-split {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
 }
 
+.me-card-split-left,
+.me-card-split-right {
+  flex: 1 1 0;
+  min-width: 0;
+}
 /* Description */
 .description-block {
   font-size: 0.95rem;

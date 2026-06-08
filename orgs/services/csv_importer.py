@@ -74,7 +74,6 @@ class CSVImporter:
             self.errors.append(f"Error reading file: {e}")
             self.df = pd.DataFrame()
 
-    # Step 2: normalize / cleanup
     def add_warning(self, row_num, field, value, message):
         self.errors.append(
             f"Row {row_num}, {field}: {message}. Original value: {value!r}"
@@ -180,6 +179,14 @@ class CSVImporter:
         warnings.append(f"contact_email: invalid email '{val}'")
         return None
     
+    def required_text(self, value, field_name, errors):
+        value = str(value or "").strip()
+
+        if not value:
+            errors.append(f"{field_name} is required")
+
+        return value
+    
     def normalize(self):
         if self.df is None or self.df.empty:
             return
@@ -196,7 +203,7 @@ class CSVImporter:
         errors = []
 
         cleaned = {
-            "title": self.get_val(row, "title"),
+            "title": str(self.get_val(row, "title")).strip(),
             "description": self.get_val(row, "description"),
             "city": self.get_val(row, "city"),
             "location_name": self.get_val(row, "location_name"),
@@ -221,6 +228,12 @@ class CSVImporter:
             "date_description": self.get_val(row, "date_description"),
         }
 
+        cleaned["title"] = self.required_text(
+            self.get_val(row, "title"),
+            "Title",
+            errors,
+        )
+        
         # derived / rule-based fields that depend on cleaned values
         cleaned["activity_type"] = self.parse_activity_type(
             self.get_val(row, "activity_type"),
@@ -257,19 +270,13 @@ class CSVImporter:
             row_num = i + 1
 
             cleaned, warnings, errors = self.clean_row(row)
-
+            database_errors = []
             if errors:
-                self.errors.append(
-                    f"Row {row_num} NOT LOADED: " + "; ".join(errors)
-                )
-                continue
-
-            status = "warning" if warnings else "valid"
-
-            if warnings:
-                self.errors.append(
-                    f"Row {row_num} loaded with warnings: " + "; ".join(warnings)
-                )
+                status = "error"
+            elif warnings:
+                status = "warning"
+            else:
+                status = "valid"
 
             try:
                 RawLoadData.objects.create(
@@ -305,7 +312,13 @@ class CSVImporter:
                 )
 
             except Exception as e:
-                self.errors.append(f"Row {row_num} database error: {e}")
+                database_errors.append(
+                        f"Row {row_num} database error: {e}"
+                    )
+                self.upload.load_errors = database_errors
+                self.upload.database_error_count = len(database_errors)
+                self.upload.save()
+                
     # Helper to handle mapping with defaults
     def _src_col(self, field_name):
         # Returns the CSV/Excel column mapped to this field, or fallback to the same name

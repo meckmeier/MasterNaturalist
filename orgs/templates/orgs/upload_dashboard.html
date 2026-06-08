@@ -1,0 +1,163 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+
+<h1 class="mb-4">Uploads</h1>
+
+{% for upload in uploads %}
+
+<div class="card mb-4 shadow-sm">
+
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div>
+      <strong>{{ upload.organization }}</strong>
+      <div class="text-muted small">
+        ID: {{upload.id}} | Uploaded {{ upload.uploaded_at|date:"M j, Y g:i A" }}
+        by {{ upload.uploaded_by }}
+      </div>
+    </div>
+
+    <span class="badge 
+      {% if upload.status == 'published' %}bg-success
+      {% elif upload.status == 'error' %}bg-danger
+      {% elif upload.status == 'rollback' %}bg-secondary
+      {% else %}bg-primary
+      {% endif %}
+    ">
+      {{ upload.status }}
+    </span>
+  </div>
+
+  <div class="card-body">
+
+    <div class="mb-3">
+      {% if upload.status == "published" or upload.status == "rollback" %}
+              <a class="btn btn-sm btn-outline-success" href="{% url 'upload_results' upload.id %}">
+          View published activities
+        </a>
+      
+        <a class="btn btn-sm btn-outline-danger ms-2" href="{% url 'upload_rollback' upload.id %}">
+          Rollback
+        </a>
+      {% else %}
+        <a class="btn btn-sm btn-primary" href="{% url 'upload_map' upload.id %}">
+          Continue mapping
+        </a>
+      
+        <a class="btn btn-sm btn-primary" href="{% url 'upload_review_raw' upload.id %}">
+          Review raw data
+        </a>
+      
+        <a class="btn btn-sm btn-primary" href="{% url 'upload_review_locations' upload.id %}">
+          Review locations
+        </a>
+      
+        <a class="btn btn-sm btn-primary" href="{% url 'upload_review_activities' upload.id %}">
+          Review activities</a>
+        {% endif %}
+      
+    </div>
+
+    <h6 class="mb-2">Load history</h6>
+
+    {% if upload.stage_logs.all %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Stage</th>
+              <th>Status</th>
+              <th>Step</th>
+              <th>Source</th>
+              <th>Created</th>
+              <th>Merged</th>
+              <th>Skipped</th>
+              <th>Warnings</th>
+              <th>Errors</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in upload.stage_logs.all %}
+              <tr>
+                <td>{{ log.get_stage_display|default:log.stage }}</td>
+                <td>{{ log.step }}</td>
+                <td>
+                  <span class="badge
+                    {% if log.status == 'success' %}bg-success
+                    {% elif log.status == 'warning' %}bg-warning text-dark
+                    {% elif log.status == 'error' %}bg-danger
+                    {% else %}bg-secondary
+                    {% endif %}
+                  ">
+                    {{ log.status }}
+                  </span>
+                </td>
+
+                <td>{{ log.source_count }}</td>
+                <td>{{ log.created_count }}</td>
+                <td>{{ log.matched_count }}</td>
+                <td>{{ log.merged_count }}</td>
+                <td>{{ log.skipped_count }}</td>
+                <td>{{ log.warning_count }}</td>
+                <td>{{ log.error_count }}</td>
+                <td>{{ log.message }}</td>
+              </tr>
+            {% endfor %}
+            <tr>
+              <td>Final</td>
+                <td>Locations</td>
+                <td>Published rows</td>
+
+                <td></td>
+                <td>{{ upload.locations_created }}</td>
+                <td>{{ upload.locations_matched }}</td>
+                <td>{{ upload.locations_merged }}</td>
+                <td>{{ upload.locations_skipped }}</td>
+                <td>{{ upload.load_warnings }}</td>
+                <td>{{ upload.load_errors }}</td>
+                <td>{{ upload.load_message }}</td>
+            </tr>
+             <tr>
+              <td>Final</td>
+                <td>Activities</td>
+                <td>Published rows</td>
+
+                <td></td>
+                <td>{{ upload.activities_created }}</td>
+                <td></td>
+                <td></td>
+                <td>{{ upload.activities_skipped }}</td>
+                <td>{{ upload.load_warnings }}</td>
+                <td>{{ upload.load_errors }}</td>
+                <td>{{ upload.load_message }}</td>
+            </tr>
+            <tr>
+              <td>Final</td>
+                <td>Sessions</td>
+                                  <td>Published rows</td>
+
+                <td></td>
+                <td>{{ upload.sessions_created }}</td>
+                <td></td>
+                <td></td>
+                <td>{{ upload.sessions_skipped }}</td>
+                <td>{{ upload.load_warnings }}</td>
+                <td>{{ upload.load_errors }}</td>
+                <td>{{ upload.load_message }}</td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">No stage logs yet.</p>
+    {% endif %}
+
+  </div>
+</div>
+
+{% empty %}
+  <p>No uploads yet.</p>
+{% endfor %}
+
+{% endblock %}

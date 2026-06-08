@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from turnstile.fields import TurnstileField
 from django.utils import timezone
 from .models import *
-
+from .services.helper_function import default_expire_date, normalize_url
 
 
 class CustomSignupForm(SignupForm):
@@ -544,7 +544,7 @@ class ActivityForm(forms.ModelForm):
 
     class Meta:        
         model = Activity
-        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost", "contact_email", "time_description", "prerequisites", "expire_date", "deleted"] 
+        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost", "contact_email", "time_description", "prerequisites", "expire_date",  "deleted"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "prerequisites": forms.TextInput(attrs={"placeholder": "e.g. Previous training, experience, or materials needed"}),
@@ -559,6 +559,11 @@ class ActivityForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if not self.instance.pk:
+            self.fields["expire_date"].initial = (
+                default_expire_date()
+            )
 
         self.fields["activity_type"].required = True
 

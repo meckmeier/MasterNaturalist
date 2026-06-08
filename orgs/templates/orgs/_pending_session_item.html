@@ -1,0 +1,99 @@
+{% load static %}
+
+
+<div class="me-card">
+  <div class="form-check form-check-inline">
+  <input class="form-check-input"
+        type="checkbox"
+        name="skip_session"
+        value="{{ session.id }}"
+        id="skip_session_{{ session.id }}">
+
+      <label class="form-check-label"
+            for="skip_{{ session.id }}">
+          Skip publication
+      </label>
+</div>
+ <!-- Right block: simple inline icons -->
+
+  <!-- Header row -->
+  <div class="me-card-header">
+    <!-- Left block -->
+    <div class="me-card-header-left">        
+      <div class="me-card-title-row">
+         
+        {% if e.activity.activity_type == "t" %}
+      <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
+    {% else %}
+      <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
+    {% endif %}  
+    
+       
+          {{ e.activity.title }}
+        
+      </div>
+        <div class="me-card-date">
+    {% if e.ongoing %}<strong>Ongoing</strong>
+    {% elif e.start %}{{ e.start }}{% endif %}
+
+    {% if e.end and e.start != e.end %} - {{ e.end }}{% endif %}
+    {% if e.activity.date_description %}<br><em>{{ e.activity.date_description }}</em>{% endif %}
+    {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}
+
+    
+    {%if  e.activity.has_cost %}   
+      | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+    {% endif %}
+
+  </div>
+
+    </div>
+   <div class="me-card-header-right"> 
+    <div class="me-icons">
+      {% if e.location %}
+      <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
+      style="height:75px; width:auto;">
+    {% endif %}
+   
+
+    </div></div>
+  </div> <!-- header -->
+  <!-- Date line -->
+
+  <!-- Description -->
+  <div class="me-description-block expanded">
+   
+    <div class="me-desc-full">
+      {{ e.activity.description}}
+    </div>
+    
+  </div>
+  <div class="me-card-sponsor">
+    Sponsored by: {{ e.activity.org.org_name }}
+
+    <p> Location: {{ e.location.loc_name }} 
+      {% if e.location.real_location %} (matches existing location) 
+      {% else %} (will be added in upload) {% endif %}
+    {% if e.session_format == "o"  %}| Location: <strong>Online</strong>{% endif %}
+    {% if e.session_format == "s" %}| Location: <strong>Self selected locations </strong>{% endif %}
+    {% if e.session_format == "b" %} and <strong>Online</strong> {% endif %}
+    </p>
+   
+    </div> 
+
+    <div class="me-card-sponsor">  
+
+     {% if e.session_url %}
+            {{ e.session_url }}
+            
+      {% elif e.activity.activity_url %}
+           {{ e.activity.activity_url }}
+      {% elif e.activity.contact_email%}
+              {{ e.activity.contact_email }}
+          
+        {% endif %}
+
+
+    
+  </div>
+</div>

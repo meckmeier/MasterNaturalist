@@ -3,7 +3,17 @@
 {% block body %}
 <h2>Upload Successful</h2>
 <p>Your activities were successfully imported.</p>
+{{ upload.id }}
+{{upload.organization }}
+{{ upload.uploaded_by }}
+{{ upload.published_at|date:"M j, Y g:i A" }}
+<h4>Summary</h4>
+<ul>
+    <li>Number of pending locations: {{ pending_locations_count }}</li>
+    <li>Number of pending activities: {{ pending_activities_count }}</li>   
+    <li>Number of pending sessions: {{ pending_sessions_count }}</li>
+</ul>
 
-<a href="{% url 'org_mgmt' %}" class="me-button-link">Return to the Org Dashboard</a>
+<a href="{% url 'org_mgmt' %}?org={{ upload.organization.id }}" class="me-button-link">Return to the Org Dashboard</a>
 {% endblock %}
 

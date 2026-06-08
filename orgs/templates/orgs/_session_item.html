@@ -65,6 +65,9 @@
     <div class="me-desc-full">{{ e.activity.description }}</div>
     {% endif %}
   </div>
+    <div class="me-card-sponsor">
+     Prerequisites: {{e.activity.prerequisites }}
+  </div>
 
   <!-- Badges -->
   <div class="me-stack">
@@ -86,6 +89,9 @@
   <br>Activity added: {{ e.created_at|date:"M j, Y" }}
     {% if e.activity.is_newly_added %}
        <span class="me-badge">* New *</span>
+    {% endif %}
+    {% if e.activity.source_upload %}
+        <span class="me-badge">* Upload ID : {{e.activity.source_upload.id }} </span>
     {% endif %}
     {% if e.updated_at > e.created_at or e.activity.updated_at > e.created_at %} | Last update: 
     {% if e.updated_at > e.activity.updated_at %} {{ e.updated_at|date:"M j, Y" }}

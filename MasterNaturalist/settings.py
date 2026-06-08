@@ -111,9 +111,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'turnstile',
-    'django_otp',
-    'django_otp.plugins.otp_totp',
-    'two_factor',
+
 ]
 
 MIDDLEWARE = [
@@ -126,7 +124,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'django_otp.middleware.OTPMiddleware',
+
 ]
 
 ROOT_URLCONF = 'MasterNaturalist.urls'

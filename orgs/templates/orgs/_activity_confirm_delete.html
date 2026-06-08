@@ -10,7 +10,18 @@
 
 <form method="post">
   {% csrf_token %}
-  <button class="me-btn" type="submit">Yes, delete</button>
-  <a href="{% url 'org_mgmt' %}#org-{{ activity.org.id }}">Cancel</a>
+  <button class="me-btn" type="submit">
+    <span>
+            <i class="bi bi-trash me-btn-icon me-btn-learn-icon"></i>
+    </span>
+    <span class="me-btn-label">
+        Yes, Delete</span> 
+</button>
+
+  <a class="me-btn" href="{% url 'org_mgmt' %}#org-{{ activity.org.id }}">
+    <span>
+      <i class="bi bi-backspace me-btn-icon"></i>
+    </span>
+    <span class="me-btn-label">Cancel</span></a>
 </form>
 {% endblock %}

@@ -25,23 +25,15 @@ Configure an upload process that will take in a csv or excel file and load it in
 
 Work on the upload process
 
-Remove delete checkbox from session page. only way to delete an activity is on the managing orgs page. (or check out this f() ?)
-Add pre-requisite field to the activity.
+4. step thru bad file issues - to ensure that errors are captured and shown appropriately.
+5. update template file.
+6. add in a post load location MERGE step (for staff) to clean up multiple locations.
+
+verify that the email sent when createing a new org actually creates the new user account.
+test that with other people.
+
 Move time description to the Session.
 
-Friday:
-* restore/start Postmark
-* confirm outbound email works again
-* confirm entire login/registration process.
-* confirm add new organziation works in productions (there are multiple emails there)
-
-Then move DNS to Cloudflare
-* import DNS records carefully
-* verify:
--Render app works
--Postmark DKIM/SPF still valid
--verification emails send
--HTTPS works
 
 add 2fa
 X Install 2FA 
@@ -57,6 +49,13 @@ if request.user.is_authenticated:
     if is_organizer and not request.user.is_verified():
         return redirect("two_factor:setup")
 
+Add Rate Limiting (you can only do something so many times)
+* login, signin, registration, etc.
+- pip install django-ratelimit
+- add to views
+from django_ratelimit.decorators import ratelimit
+@ratelimit(key='ip', rate='5/m', method='POST')
+def my_view(request):
 
 
 Version Two:
@@ -79,6 +78,8 @@ Version Two:
 * changed language: More info instead of contact for url links.
 * added Free to the activities filter.
 * Hide references to favorites on public access... have created full experience for public viewers.
+* Add prerequisite field to activities.
+* DNS is now on cloudflare.
 
 Upload process:
 * have data getting to pending tables.

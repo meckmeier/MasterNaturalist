@@ -1,0 +1,372 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<div class="me-page">
+
+<h1>Review Pending Locations</h1>
+
+{% if errors %}
+    <div class="alert alert-danger">
+        <h5>Errors</h5>
+        <ul class="mb-0">
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+{% if warnings %}
+<div class="alert alert-warning">
+    <h5>Warnings</h5>
+    <ul class="mb-0">
+        {% for warning in warnings %}
+            <li>{{ warning }}</li>
+        {% endfor %}
+    </ul>   
+</div>
+{% endif %}
+
+<h4 class="mt-4">Locations</h4>
+
+{% if not errors %}
+<form method="post">
+    {% csrf_token %}
+{% endif %}
+
+    {% for loc in pending_locations %}
+        <div class="card mb-3">
+            <div class="card-body">
+
+            {% if loc.processing_status == "skip" %}
+                <span class="badge bg-secondary">Skipped</span>
+            {% elif loc.processing_status == "merged" %}
+                <span class="badge bg-info">Merged</span>
+            {% elif loc.real_location %}
+                <span class="badge bg-warning text-dark">Existing Match</span>
+            {% else %}
+                <span class="badge bg-primary">New Location</span>
+            {% endif %}
+
+            <div class="me-card-split">
+            <div class="me-card-split-left">
+                <h5 class="mt-2">{{ loc.loc_name }}</h5>
+                {{ loc.address }} <br>
+                {{ loc.city_name }}{% if loc.state %}, {{ loc.state }}{% endif %}
+                {% if loc.zip_code %} {{ loc.zip_code }}{% endif %}<br>
+
+                {% if loc.county_id %}
+                    <p>County: {{ loc.county_id }} | Region: {{ loc.region_name }}</p>
+                {% endif %}
+
+                 <strong>Activities using this location</strong>
+
+            {% for session in loc.pending_sessions.all %}
+                <div class="border rounded p-2 mb-2">
+                    {{ session.activity.title }} |
+                    <small>{{ session.session_format }}
+                        {% if session.ongoing %} | Ongoing
+                        {% else %}
+                        {% if session.start %}| {{ session.start }} {% endif %}
+                        {% if session.end %}- {{ session.end }}{% endif %}
+                        {% endif %}
+
+                        {% if session.activity.date_description %}| {{ session.activity.date_description }}{% endif %}
+
+                        {% if session.activity.time_description %} | {{ session.activity.time_description }}{% endif %}
+
+                        {% if session.activity.has_cost %}| Has cost for participants {% endif %}</small>
+                    </div>
+            {% empty %}
+                <p class="text-muted">No pending activities for this location.</p>
+            {% endfor %}
+            </div>
+            <div class="me-card-split-right">
+            {% if loc.real_location %}
+                <div class="alert alert-warning mt-3">
+                    <strong>Existing match:</strong><br>
+                    {{ loc.real_location.loc_name }}<br>
+                    {{ loc.real_location.address }}<br>
+                    {{ loc.real_location.city_name }}{% if loc.real_location.state %}, {{ loc.real_location.state }}{% endif %}
+                    {% if loc.real_location.zip_code %} {{ loc.real_location.zip_code }}{% endif %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning mt-3">
+                {% if loc.processing_status == "skip" %}
+                 <strong>Location will be skipped:</strong><br>
+                 Activities will be loaded with no location session (this is for online only session format)
+                {% elif loc.processing_status == "merged" %}
+                <strong>Location has been merged</strong><br>
+                All child activities will be moved to the merged location, and this location will be dropped.
+                {% else %}
+                    <strong>This location will be created:</strong><br>
+                    {{ loc.loc_name }}<br>
+                    {{ loc.address }}<br>
+                    {{ loc.city_name }}{% if loc.state %}, {{ loc.state }}{% endif %}
+                    {% if loc.zip_code %} {{ loc.zip_code }}{% endif %}
+                {% endif %}
+                </div>
+            {% endif %}
+            </div>
+            </div>
+            <hr>
+
+           
+{% if not errors %}
+<hr>
+<h6>Decision</h6>
+
+<div class="form-check form-check-inline">
+  <input type="radio" class="form-check-input decision-radio"
+         name="decision_{{ loc.id }}"
+         id="confirm_{{ loc.id }}"
+         value="confirm"
+         data-loc-id="{{ loc.id }}"
+         autocomplete="off"
+         {% if loc.processing_status != "skip" and loc.processing_status != "merged" %}checked{% endif %}>
+  <label class="form-check-label" for="confirm_{{ loc.id }}">
+    Confirm
+  </label>
+</div>
+<div class="form-check form-check-inline">
+  <input type="radio" class="form-check-input decision-radio"
+         name="decision_{{ loc.id }}"
+         id="existing_{{ loc.id }}"
+         value="existing"
+         data-loc-id="{{ loc.id }}"
+         autocomplete="off">
+  <label class="form-check-label" for="existing_{{ loc.id }}">
+    Pick Other Existing Location
+  </label>
+</div>
+<div class="form-check form-check-inline">
+  <input type="radio" class="form-check-input decision-radio"
+         name="decision_{{ loc.id }}"
+         id="merge_{{ loc.id }}"
+         value="merge"
+         data-loc-id="{{ loc.id }}"
+         autocomplete="off"
+         {% if loc.processing_status == "merged" %}checked{% endif %}>
+  <label class="form-check-label" for="merge_{{ loc.id }}">
+    Merge With Other Location
+  </label>
+</div>
+<div class="form-check form-check-inline">
+  <input type="radio" class="form-check-input decision-radio"
+         name="decision_{{ loc.id }}"
+         id="skip_{{ loc.id }}"
+         value="skip"
+         data-loc-id="{{ loc.id }}"
+         autocomplete="off"
+         {% if loc.processing_status == "skip" %}checked{% endif %}>
+  <label class="form-check-label" for="skip_{{ loc.id }}">
+    Skip - Activities will have NO location
+  </label>
+</div>
+
+
+
+    <div id="existing-section-{{ loc.id }}"
+        class="decision-detail mt-2 mx-4 mb-2 {% if loc.processing_status == 'merged' or loc.processing_status == 'skip' %}d-none{% endif %}">
+
+    <input type="hidden"
+            name="real_location_{{ loc.id }}"
+            id="real-location-{{ loc.id }}"
+            value="{{ loc.real_location.id|default:'' }}">
+
+    <button type="button"
+            class="me-btn open-location-search"
+            data-pending-location-id="{{ loc.id }}"
+            data-bs-toggle="modal"
+            data-bs-target="#locationSearchModal">
+        <span>
+                <i class="bi bi-search me-btn-icon"></i>
+        </span>
+        <span class="me-btn-label"> Find existing location</span>
+    </button>
+
+
+
+    <span id="selected-location-display-{{ loc.id }}" class="small mt-1">
+        {% if loc.real_location %}
+        Selected: {{ loc.real_location.loc_name }}
+        {% else %}
+        No existing location selected
+        {% endif %}
+    </span>
+    </div>
+
+    <div id="merge-section-{{ loc.id }}"
+        class="decision-detail mt-2 mx-4 mb-2 {% if loc.processing_status != 'merged' %}d-none{% endif %}">
+
+    <select class="form-select form-select-sm"
+            name="merge_into_{{ loc.id }}"
+            id="merge_into_{{ loc.id }}">
+        <option value="">Merge into uploaded location...</option>
+
+        {% for other_loc in pending_locations %}
+        {% if other_loc.id != loc.id %}
+            <option value="{{ other_loc.id }}">
+            {{ other_loc.loc_name }}
+            {% if other_loc.address %} — {{ other_loc.address }}{% endif %}
+            {% if other_loc.city_name %} — {{ other_loc.city_name }}{% endif %}
+            </option>
+        {% endif %}
+        {% endfor %}
+    </select>
+    </div>
+    </div>
+    </div>
+
+{% endif %}
+{% empty %}
+    <p>Locations must exist for load to proceed.</p>
+{% endfor %}
+
+    {% if not errors %}
+        <div class="mt-4">
+            <button type="submit"
+                    name="action"
+                    value="continue"
+                    class="me-btn">
+                <span><i class="bi bi-check me-btn-icon"></i> </span>
+                <span class="me-btn-label">Confirm Location Decisions</span>
+            </button>
+        </div>
+        {% include "orgs/search_location_modal.html"   %}
+    
+    </form>
+    {% endif %}
+
+
+{% if not errors %}
+<a href="{% url 'upload_review_activities' upload.id %}" class="me-btn">
+    <span><i class="bi bi-gear me-btn-icon"></i></span>
+    <span class="me-btn-label">Continue</span></a>
+{% endif %}
+    <a href="{% url 'landing' %}" class="me-button-link">Return to main page</a>
+</div>
+{% endblock %}
+{% block extrajs %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  let activePendingLocationId = null;
+
+  document.querySelectorAll(".open-location-search").forEach(button => {
+    button.addEventListener("click", function () {
+      activePendingLocationId = this.dataset.pendingLocationId;
+      document.getElementById("modal-location-id").value = activePendingLocationId;
+
+      document.getElementById("location-search-input").value = "";
+      document.getElementById("org-location-results").innerHTML =
+        '<div class="text-muted small">Start typing to search.</div>';
+      document.getElementById("other-location-results").innerHTML =
+        '<div class="text-muted small">Start typing to search.</div>';
+    });
+  });
+
+  const searchInput = document.getElementById("location-search-input");
+
+  searchInput.addEventListener("input", function () {
+    const query = this.value.trim();
+
+    if (query.length < 2) {
+      document.getElementById("org-location-results").innerHTML =
+        '<div class="text-muted small">Type at least 2 characters.</div>';
+      document.getElementById("other-location-results").innerHTML =
+        '<div class="text-muted small">Type at least 2 characters.</div>';
+      return;
+    }
+
+    fetch(`/locations/search/?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        renderLocationResults("org-location-results", data.org_locations || []);
+        renderLocationResults("other-location-results", data.other_locations || []);
+      });
+  });
+
+  function renderLocationResults(containerId, locations) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+
+    if (!locations.length) {
+      container.innerHTML = '<div class="text-muted small">No matches found.</div>';
+      return;
+    }
+
+    locations.forEach(location => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "list-group-item list-group-item-action";
+
+      button.innerHTML = `
+        <strong>${location.label}</strong><br>
+        <span class="small text-muted">
+          ${location.city_name || ""} ${location.state || ""}
+          ${location.org_name ? " — " + location.org_name : ""}
+        </span>
+      `;
+
+      button.addEventListener("click", function () {
+        selectLocation(location);
+      });
+
+      container.appendChild(button);
+    });
+  }
+
+  function selectLocation(location) {
+  console.log("location clicked:", location);
+  console.log("activePendingLocationId:", activePendingLocationId);
+
+  if (!activePendingLocationId) {
+    alert("No pending location row is active.");
+    return;
+  }
+
+  const hiddenInput = document.getElementById(`real-location-${activePendingLocationId}`);
+  const displayDiv = document.getElementById(`selected-location-display-${activePendingLocationId}`);
+
+  if (!hiddenInput) {
+    alert(`Missing hidden input: real-location-${activePendingLocationId}`);
+    return;
+  }
+
+  if (!displayDiv) {
+    alert(`Missing display div: selected-location-display-${activePendingLocationId}`);
+    return;
+  }
+
+  hiddenInput.value = location.id;
+  displayDiv.innerHTML = `Selected: ${location.label || location.loc_name}`;
+
+  const modalElement = document.getElementById("locationSearchModal");
+  const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+  modal.hide();
+}
+ function updateDecisionSections(locId, decision) {
+    const existingSection = document.getElementById(`existing-section-${locId}`);
+    const mergeSection = document.getElementById(`merge-section-${locId}`);
+
+    if (existingSection) {
+      existingSection.classList.toggle("d-none", decision !== "existing");
+    }
+
+    if (mergeSection) {
+      mergeSection.classList.toggle("d-none", decision !== "merge");
+    }
+  }
+
+  document.querySelectorAll(".decision-radio").forEach(function (radio) {
+    radio.addEventListener("change", function () {
+      updateDecisionSections(this.dataset.locId, this.value);
+    });
+
+    if (radio.checked) {
+      updateDecisionSections(radio.dataset.locId, radio.value);
+    }
+  });
+});
+</script>
+{% endblock %}

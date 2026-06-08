@@ -132,8 +132,13 @@
                 <a class="nav-link" href="{% url 'run_update_latlng' %}">Lat/Lng Updates</a>
               </li>
               <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'run_cleanup_old_imports' %}">Clean up old imports </a>
+              </li>
+              <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'logos' %}">Logos</a>
               </li>
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'upload_dashboard' %}">Upload Dashboard</a>
             </ul>
            </li>
           {% endif %}
@@ -179,7 +184,15 @@
 
   </div>
 </nav>
-
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
   <!-- OFFCANVAS PANEL (global UI) -->
   <!-- Filter side panel -->
 <div class="offcanvas offcanvas-start me-filter-panel"

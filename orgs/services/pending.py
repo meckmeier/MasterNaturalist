@@ -4,7 +4,8 @@ from unittest import result
 
 from django.db import transaction
 from django.utils import timezone
-from orgs.models import (RawLoadData, Pending_Location, Pending_Activity, Pending_Session, Location, normalize_text)
+from orgs.models import (RawLoadData, Pending_Location, Pending_Activity, Pending_Session, Location, ZipToCounty)
+from orgs.services.helper_function import get_county_region_from_zip
 
 class PendingBuildResult:
     def __init__(self):
@@ -20,7 +21,7 @@ class PendingBuildResult:
 def build_pending_for_upload(upload):
    
     result = PendingBuildResult()
-    raw_rows = RawLoadData.objects.filter(upload=upload).order_by("row_number")
+    raw_rows = RawLoadData.objects.filter(upload=upload).exclude(status__in=["error", "skipped"]).order_by("row_number")
     print(f"Found {raw_rows.count()} raw rows for upload {upload.id}")
 
     if not raw_rows.exists():
@@ -42,7 +43,7 @@ def build_pending_for_upload(upload):
     if result.errors:
         raise Exception("; ".join(result.errors))
 
-    upload.status = "pending_built"
+    upload.status = "review_pending"
     upload.save()
 
     return result
@@ -79,16 +80,20 @@ from orgs.services.helper_function import build_location_fingerprint
 #Creates Pending_Location only if no real Location matched.
 def get_or_create_pending_location(raw, org, upload):
     
-    fingerprint = build_location_fingerprint(org_id=org,
-    loc_name=raw.location_name,
-    address=raw.address,
-    city_name=raw.city,
-    state=raw.state,)
+    rawfingerprint = build_location_fingerprint(org_id=org.id,
+        loc_name=raw.location_name,
+        address=raw.address,
+        city_name=raw.city,
+        state=raw.state,)
+    print (f"Built fingerprint: {rawfingerprint} for location: {raw.location_name}, {raw.address}, {raw.city}, {raw.state}")
+    
 
     # 1. already created in this upload?
     pending_location = Pending_Location.objects.filter(
-        fingerprint=fingerprint,
-    ).first()
+            source_upload=upload,
+            fingerprint=rawfingerprint,
+        ).first()
+    print(f"Existing pending location for this row: {pending_location}")
 
     if pending_location:
         done="none"
@@ -96,7 +101,7 @@ def get_or_create_pending_location(raw, org, upload):
     
      # 2. exists in production?
     real_location = Location.objects.filter(
-        fingerprint=fingerprint,
+        fingerprint=rawfingerprint,
         deleted=False,
     ).first()
 
@@ -107,9 +112,18 @@ def get_or_create_pending_location(raw, org, upload):
 
     try:
      # 3. always create at least ONE Pending_Location for this upload
+        county, region = get_county_region_from_zip(raw.zip)
+
+        if raw.session_format == "o":
+            default_status = "skip"
+        elif real_location is not None:
+            default_status = "confirmed"
+        else:
+            default_status = "create"
+
         pending_location = Pending_Location.objects.create(
             source_upload=upload,
-            processing_status="pending",
+            processing_status = default_status,
             org=org,
         
             loc_name=raw.location_name[:255], #make sure only 255 characters
@@ -117,7 +131,8 @@ def get_or_create_pending_location(raw, org, upload):
             city_name=raw.city[:255] if raw.city else "",
             state=raw.state[:2] if raw.state else "WI", #if blank just use WI
             zip_code=raw.zip[:5] if raw.zip else "", #only use the first 5 digits of zip code
-
+            county_id = county,
+            region_name=region,
             fingerprint=build_location_fingerprint(org_id=org, loc_name=raw.location_name, address=raw.address, city_name=raw.city, state=raw.state),
             created_at=timezone.now(),
             
@@ -126,6 +141,7 @@ def get_or_create_pending_location(raw, org, upload):
             # filled only if matched
             real_location=real_location,
         )
+    
     except Exception as e:
         raise Exception(f"Error creating pending location: {str(e)}")
         
@@ -141,14 +157,14 @@ def build_pending_activity(raw, org, upload):
         pending_activity = Pending_Activity.objects.create(
             source_upload=upload,
             org=org,
-        
+            processing_status="valid",
             title=raw.title,
             description=raw.description,
             activity_type=raw.activity_type,
             activity_url=raw.activity_url,
             date_description=raw.date_description,
             time_description=raw.time_description,
-            time_commitment=raw.time_commitment,  
+            #time_commitment=raw.time_commitment,  
             has_cost=raw.has_cost,     
             contact_email=raw.contact_email,
             created_at=timezone.now(),
@@ -171,6 +187,7 @@ def build_pending_session(raw, pending_activity, pending_location,  upload):
             ongoing=raw.ongoing,
             start=raw.start_date,
             end=raw.end_date,
+            processing_status="valid",
 
             created_at=timezone.now(),
         )

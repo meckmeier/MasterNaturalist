@@ -47,3 +47,17 @@ def build_dropdown_options(columns, field_names):
         }
 
     return dropdown_options
+
+def validate_mapping(mapping):
+    errors = []
+
+    required_fields = [
+        "title",
+        "activity_type",
+    ]
+
+    for field in required_fields:
+        if not mapping.get(field):
+            errors.append(f"Required field '{field}' was not mapped.")
+
+    return errors

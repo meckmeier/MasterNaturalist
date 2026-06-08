@@ -103,7 +103,7 @@
         {% endif %}
 
         {% if row.validation_errors.messages %}
-            <tr class="table-danger" style="color:red;">
+            <tr class="table-danger" style="background-color:red;">
             <td colspan="18">
                 <strong>Errors:</strong>
                 <ul class="mb-0">
@@ -118,11 +118,11 @@
         {% endfor %}
         </tbody>
     </table>
-    {% if False %}
+    
     <button type="submit" class="me-btn">
         <span><i class="bi bi-save me-btn-icon"></i></span>
         <span class="me-btn-label">Update Skipped Rows</span></button>
-        {% endif %}
+    
 </form>
 
 <a href="{% url 'upload_build_pending' upload.id %}" class="me-btn">

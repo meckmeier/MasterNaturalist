@@ -1,0 +1,68 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<div class="me-page">
+
+    <h2>Review Pending Activities</h2>
+    {% if errors %}
+        <div class="alert alert-danger">
+            <h5>Errors</h5>
+            <ul class="mb-0">
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if warnings %}
+        <div class="alert alert-warning">
+            <h5>Warnings</h5>
+            <ul class="mb-0">
+                {% for warning in warnings %}
+                    <li>{{ warning }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <button type="submit" name="action" value="continue" class="me-btn">
+            <span><i class="bi bi-gear me-btn-icon"></i></span>
+            <span class="me-btn-label">Submit and LOAD data</span></button>
+            
+        {% for e in pending_sessions %}
+            {% include "orgs/_pending_session_item.html" with session=e %}
+        {% endfor %}
+        
+        <button type="submit" name="action" value="continue" class="me-btn">
+            <span><i class="bi bi-gear me-btn-icon"></i></span>
+            <span class="me-btn-label">Submit and LOAD data</span></button>
+    </form>
+</div>
+{% endblock %}
+{% block extrajs %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.getElementById("approve-all")
+        .addEventListener("click", function () {
+
+            document.querySelectorAll(".approve-checkbox")
+                .forEach(cb => cb.checked = true);
+        });
+
+    document.getElementById("unapprove-all")
+        .addEventListener("click", function () {
+
+            document.querySelectorAll(".approve-checkbox")
+                .forEach(cb => cb.checked = false);
+        });
+
+});
+</script>
+{% endblock %}
