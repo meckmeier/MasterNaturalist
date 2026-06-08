@@ -1702,13 +1702,16 @@ def upload_review_raw(request, upload_id):
     if request.method == "POST":
         skip_ids = request.POST.getlist("skip_row")
 
-        RawLoadData.objects.filter(upload=upload).update(status="valid")
+        RawLoadData.objects.filter(
+        upload=upload
+                ).exclude(status="error").update(status="valid")
 
         RawLoadData.objects.filter(
             upload=upload,
             id__in=skip_ids
         ).update(status="skipped")
 
+        
         return redirect("upload_build_pending", upload_id=upload.id)
 
     return render(request, "orgs/upload_review_raw.html", {

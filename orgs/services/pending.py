@@ -16,6 +16,9 @@ class PendingBuildResult:
         self.errors = []
         self.warnings = []
 
+def clean(value):
+    return (value or "").strip()
+
 #Main coordinator - RawLoadData rows -> pending locations/activities/sessions
 
 def build_pending_for_upload(upload):
@@ -81,10 +84,10 @@ from orgs.services.helper_function import build_location_fingerprint
 def get_or_create_pending_location(raw, org, upload):
     
     rawfingerprint = build_location_fingerprint(org_id=org.id,
-        loc_name=raw.location_name,
-        address=raw.address,
-        city_name=raw.city,
-        state=raw.state,)
+        loc_name=clean(raw.location_name),
+        address=clean(raw.address),
+        city_name=clean(raw.city),
+        state=clean(raw.state),)
     print (f"Built fingerprint: {rawfingerprint} for location: {raw.location_name}, {raw.address}, {raw.city}, {raw.state}")
     
 
@@ -120,20 +123,23 @@ def get_or_create_pending_location(raw, org, upload):
             default_status = "confirmed"
         else:
             default_status = "create"
-
+        loc_name = str(raw.location_name or "")[:255]
+        address = str(raw.address or "")[:255]
+        city_name = str(raw.city or "")[:255]
+        state = str(raw.state or "WI").strip().upper()
         pending_location = Pending_Location.objects.create(
             source_upload=upload,
             processing_status = default_status,
             org=org,
         
-            loc_name=raw.location_name[:255], #make sure only 255 characters
-            address=raw.address[:255] if raw.address else "",
-            city_name=raw.city[:255] if raw.city else "",
-            state=raw.state[:2] if raw.state else "WI", #if blank just use WI
-            zip_code=raw.zip[:5] if raw.zip else "", #only use the first 5 digits of zip code
-            county_id = county,
+            loc_name=loc_name, #make sure only 255 characters
+            address=address,
+            city_name=city_name,
+            state=state, #if blank just use WI
+            zip_code=str(raw.zip or "")[:5], #only use the first 5 digits of zip code
+            county_id = county ,
             region_name=region,
-            fingerprint=build_location_fingerprint(org_id=org, loc_name=raw.location_name, address=raw.address, city_name=raw.city, state=raw.state),
+            fingerprint=build_location_fingerprint(org_id=org, loc_name=loc_name, address=address, city_name=city_name, state=state),
             created_at=timezone.now(),
             
             physical_location=True,

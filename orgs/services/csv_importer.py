@@ -35,6 +35,8 @@ class CSVImporter:
                     self.df = pd.read_csv(
                         file,
                         encoding=encoding,
+                        quotechar='"',
+                        skipinitialspace=True,
                     )
 
                     self.df = self.df.replace("\xa0", " ", regex=True)
