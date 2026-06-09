@@ -51,6 +51,9 @@ class CSVImporter:
                     ]
 
                     removed = before - len(self.df)
+                    self.warnings.append(
+                        f"{removed} completely blank row(s) were skipped during import."
+                    )
                     # look for replacement characters
                     bad_cells = []
 
@@ -275,6 +278,7 @@ class CSVImporter:
     # Step 4: process → insert into staging
     def process(self):
         RawLoadData.objects.filter(upload=self.upload).delete()
+        
         if self.df is None or self.df.empty:
             return
 

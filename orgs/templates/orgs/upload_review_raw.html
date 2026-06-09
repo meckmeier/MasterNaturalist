@@ -129,5 +129,9 @@
     <span><i class="bi bi-gear me-btn-icon"></i></span>
     <span class="me-btn-label">Continue</span></a>
 
-    <a href="{% url 'landing' %}" class="me-button-link">Return to main page</a>
+    <a href="{% url 'upload_cancel_confirm' upload.id %}?next={{ request.path }}" class="me-btn">
+        <span><i class = "bi bi-backspace me-btn-icon"></i></span>
+        <span class="me-btn-label">Cancel upload</span>
+    </a>
+    
 {% endblock %}

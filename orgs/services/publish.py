@@ -130,8 +130,7 @@ def publish_pending_upload(upload_id, user):
         
         
     # 4. Mark upload complete
-
-    
+  
     upload.published_at = timezone.now()
     upload.published_by = user
     upload.locations_created = Location.objects.filter(source_upload=upload).count()

@@ -104,13 +104,16 @@
             <li class="dropdown-item">
               <a class="nav-link" href="{% url 'org_mgmt' %}">Manage Organizations</a>
             </li>
+            
+             <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'upload_dashboard' %}">Upload Dashboard</a>
+                </li>
+             
             <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
               </li>
             </ul></li>
          {% if user.is_staff %}
-     
-    
              <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button"
               data-bs-toggle="dropdown" aria-expanded="false">
@@ -139,8 +142,9 @@
               </li>
               <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'upload_dashboard' %}">Upload Dashboard</a>
+                </li>
             </ul>
-           </li>
+           
           {% endif %}
 
             

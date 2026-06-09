@@ -1520,12 +1520,13 @@ def upload_csv(request, org_id):
             importer.read()
 
             if importer.errors:
+                
                 return render(request, "orgs/upload.html", {
                     "form": form,
                     "errors": importer.errors,
                     "org": org,
                 })
-
+            upload.status = "csv_load"
             upload.save()
             return redirect("upload_map", upload_id=upload.id)
 
@@ -1549,7 +1550,7 @@ def upload_map(request, upload_id):
 
     if importer.errors:
         upload.status = "error"
-        upload.save()
+        upload.save(update_fields=["status"])
 
         UploadLog.objects.create(
             upload=upload,
@@ -1581,6 +1582,8 @@ def upload_map(request, upload_id):
         errors = validate_mapping(mapping)
 
         if errors:
+            upload.status = "error"
+            upload.save(update_fields=["status"])
             UploadLog.objects.create(
                 upload=upload,
                 stage="mapping",
@@ -1603,24 +1606,20 @@ def upload_map(request, upload_id):
             )
         # Save mapping in session (or a model if you prefer)
         request.session[f"mapping_{upload_id}"] = mapping
-        #print("Received mapping:", mapping)  # Debug log
+        
 
         # Update upload status
-        upload.status = "mapped"
-        upload.save()
+        upload.status = "csv_mapped"
+        upload.save(update_fields=["status"])
 
         # Redirect to staging step
         return redirect("upload_stage", upload_id=upload.id)
-
-    
-    
     
     return render(request, "orgs/upload_map.html", {
         "upload": upload, 
         "dropdown_options":dropdown_options,
         "errors": []
         })
-
 
 
 # Step 2: Stage data
@@ -1635,7 +1634,7 @@ def upload_stage(request, upload_id):
     importer = CSVImporter(upload, mapping=mapping)
     def fail_upload(step):
         upload.status = "error"
-        upload.save()
+        upload.save(update_fields=["status"])
 
         UploadLog.objects.create(
             upload=upload,
@@ -1673,8 +1672,8 @@ def upload_stage(request, upload_id):
         importer.errors.append(str(e))
         return fail_upload("saving raw data")
 
-    upload.status = "review_raw"
-    upload.save()
+    upload.status = "raw_review"
+    upload.save(update_fields=["status"])
     
     UploadLog.objects.create(
                 upload=upload,
@@ -1711,8 +1710,7 @@ def upload_review_raw(request, upload_id):
             id__in=skip_ids
         ).update(status="skipped")
 
-        
-        return redirect("upload_build_pending", upload_id=upload.id)
+        return redirect("upload_review_raw", upload_id=upload.id)
 
     return render(request, "orgs/upload_review_raw.html", {
         "upload": upload,
@@ -1731,7 +1729,7 @@ def upload_build_pending(request, upload_id):
 
     if result.errors:
         upload.status = "error"
-        upload.save()
+        upload.save(update_fields=["status"])
 
         UploadLog.objects.create(
             upload=upload,
@@ -1757,7 +1755,7 @@ def upload_build_pending(request, upload_id):
         })
 
     upload.status = "review_locations"
-    upload.save()
+    upload.save(update_fields=["status"])
 
     UploadLog.objects.create(
         upload=upload,
@@ -1871,6 +1869,8 @@ def upload_review_locations(request, upload_id):
                         raise ValueError("Location review has form errors.")
 
             except ValueError:
+                upload.status="error"
+                upload.save(update_fields=["status"])
                 UploadLog.objects.create(
                     upload=upload,
                     stage="upload_review_locations",
@@ -1900,7 +1900,8 @@ def upload_review_locations(request, upload_id):
                     "errors": form_errors,
                     "warnings": warnings,
                 })
-
+            upload.status="review_locations"
+            upload.save(update_fields=["status"])
             UploadLog.objects.create(
                 upload=upload,
                 stage="upload_review_locations",
@@ -1923,11 +1924,8 @@ def upload_review_locations(request, upload_id):
                 error_count=0,
             )
 
-            upload.status = "review_activities"
-            upload.save()
-
             messages.success(request, "Location decisions saved.")
-            return redirect("upload_review_activities", upload_id=upload.id)
+            return redirect("upload_review_locations", upload_id=upload.id)
 
     return render(request, "orgs/upload_review_locations.html", {
         "upload": upload,
@@ -2007,6 +2005,8 @@ def upload_review_activities(request, upload_id):
                 errors.append("You cannot publish because all sessions are skipped.")
 
             if errors:
+                upload.status="error"
+                upload.save(update_fields=["status"])
                 UploadLog.objects.create(
                     upload=upload,
                     stage="upload_review_activities",
@@ -2032,7 +2032,8 @@ def upload_review_activities(request, upload_id):
                     "errors": errors,
                     "warnings": warnings,
                 })
-
+            upload.status="review_activities"
+            upload.save(update_fields=["status"])
             UploadLog.objects.create(
                 upload=upload,
                 stage="upload_review_activities",
@@ -2052,7 +2053,7 @@ def upload_review_activities(request, upload_id):
                 message="\n".join(str(w) for w in warnings),
             )
 
-            return redirect("upload_publish", upload_id=upload.id)
+            return redirect("upload_review_activities", upload_id=upload.id)
 
     return render(request, "orgs/upload_review_activities.html", {
         "upload": upload,
@@ -2071,15 +2072,73 @@ def upload_success(request, upload_id):
         "session_count": Session.objects.filter(source_upload=upload).count(),
     })
 
+
+@login_required
+def upload_cancel_confirm(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+    next_url = request.GET.get("next")
+
+    if not request.user.is_staff and upload.uploaded_by != request.user:
+        messages.error(request, "You do not have permission to cancel this upload.")
+        return redirect("upload_dashboard")
+
+    if request.method == "POST":
+
+        location_count = Pending_Location.objects.filter(source_upload=upload).count()
+        activity_count = Pending_Activity.objects.filter(source_upload=upload).count()
+        session_count = Pending_Session.objects.filter(source_upload=upload).count()
+        msg = (
+            f"Deleted {location_count} locations, "
+            f"{activity_count} activities, and "
+            f"{session_count} sessions."
+        )
+        Pending_Session.objects.filter(source_upload=upload).delete()
+        Pending_Activity.objects.filter(source_upload=upload).delete()
+        Pending_Location.objects.filter(source_upload=upload).delete()
+        RawLoadData.objects.filter(upload=upload).delete()
+
+        upload.status = "canceled"
+        upload.save(update_fields=["status"])
+        UploadLog.objects.create(
+                upload=upload,
+                stage="cancelled",
+                step="removed staging tables",
+                status="cancel",
+                message = msg
+            )
+        messages.success(request, "Upload canceled and staged records removed.")
+        return redirect("upload_dashboard")
+
+    return render(request, "orgs/upload_cancel_confirm.html", {
+        "upload": upload,
+        "next": next_url,
+    })
+
 def upload_rollback(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     with transaction.atomic():
+        location_count = Location.objects.filter(source_upload=upload).count()
+        activity_count = Activity.objects.filter(source_upload=upload).count()
+        session_count = Session.objects.filter(source_upload=upload).count()
+        msg = (
+            f"Deleted {location_count} locations, "
+            f"{activity_count} activities, and "
+            f"{session_count} sessions."
+        )
+        UploadLog.objects.create(
+                upload=upload,
+                stage="rollback",
+                step="removed uploaded data from production",
+                status="rollback",
+                message = msg
+            )
         Session.objects.filter(source_upload=upload).delete()
         Activity.objects.filter(source_upload=upload).delete()
         Location.objects.filter(source_upload=upload).delete()
 
         upload.status = "rollback"
         upload.save(update_fields=["status"])
+        
         messages.success(request, "Upload rolled back successfully.")
 
     url = reverse("upload_dashboard")
@@ -2100,6 +2159,8 @@ def upload_publish(request, upload_id):
     try:
         publish_pending_upload(upload_id, request.user.profile)
         messages.success(request, "Upload published successfully.")
+        upload.status="published"
+        upload.save(update_fields=["status"])
         UploadLog.objects.create(
                         upload=upload,
                         stage="Activities/Sessions",
@@ -2129,6 +2190,8 @@ def upload_publish(request, upload_id):
     except Exception as e:
         print("PUBLISH ERROR:", e)
         messages.error(request, f"Upload could not be published: {e}")
+        upload.status="error"
+        upload.save(update_fields=["status"])
         UploadLog.objects.create(
                         upload=upload,
                         stage="Publish",
@@ -2154,9 +2217,10 @@ def upload_dashboard(request):
         ) .prefetch_related("stage_logs").order_by("-uploaded_at")
     else:
         uploads = ActivityUpload.objects.filter(
-            uploaded_by=request.user
+            Q(uploaded_by=request.user) |
+            Q(published_by=request.user.profile)
         ).select_related(
-            "organization", "uploaded_by"
+            "organization", "published_by", "uploaded_by"
         ).prefetch_related("stage_logs").order_by("-uploaded_at")
 
     if upload_id:

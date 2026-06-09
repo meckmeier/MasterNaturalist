@@ -22,7 +22,10 @@ def clean(value):
 #Main coordinator - RawLoadData rows -> pending locations/activities/sessions
 
 def build_pending_for_upload(upload):
-   
+    Pending_Session.objects.filter(source_upload=upload).delete()
+    Pending_Activity.objects.filter(source_upload=upload).delete()
+    Pending_Location.objects.filter(source_upload=upload).delete()
+    
     result = PendingBuildResult()
     raw_rows = RawLoadData.objects.filter(upload=upload).exclude(status__in=["error", "skipped"]).order_by("row_number")
     print(f"Found {raw_rows.count()} raw rows for upload {upload.id}")
@@ -46,15 +49,13 @@ def build_pending_for_upload(upload):
     if result.errors:
         raise Exception("; ".join(result.errors))
 
-    upload.status = "review_pending"
-    upload.save()
 
     return result
 
 #Process one row of RawLoadData: find or create pending location, build pending activity, build pending session.
 def build_pending_row(raw_row, upload, result):
     org = upload.organization
-
+    
     pending_location, done = get_or_create_pending_location(raw_row, org, upload)
         
     if pending_location and done=="matched":
@@ -149,10 +150,9 @@ def get_or_create_pending_location(raw, org, upload):
         )
     
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        print("FAILED ROW:", raw.row_number)
-        raise
+        result.errors.append(
+            f"Row {raw.row_number}: Error creating pending location: {e}"
+        )
             
     return pending_location, done
 

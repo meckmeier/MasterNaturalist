@@ -32,5 +32,10 @@
     <button type="submit" class="me-btn">
         <span><i class="bi bi-floppy me-btn-icon"></i></span>
         <span class="me-btn-label">Save Mapping</span></button>
+    <a href="{% url 'upload_cancel_confirm' upload.id %}?next={{ request.path }}" class="me-btn">
+        <span><i class = "bi bi-backspace me-btn-icon"></i></span>
+        <span class="me-btn-label">Cancel upload</span>
+    </a>
+</form>
 </form>
 {% endblock %}

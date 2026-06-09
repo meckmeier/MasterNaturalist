@@ -108,6 +108,9 @@ class Profile(models.Model):
     def following_count(self):
         return self.following.count()
     
+    def has_published_uploads(self):
+        return self.published_uploads.exists()
+
 class OrgQuerySet(models.QuerySet):
     def active(self):
         return self.filter(deleted=False)
@@ -264,12 +267,25 @@ class OrgManager(models.Model):
         return f'{self.profile.user.username} manages {self.org.org_name}'
 
 class ActivityUpload(models.Model):
-    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    STATUS_CHOICES = [
+        ("csv_load", "CSV load"),
+        ("csv_mapped", "Mapped columns"),
+        ("staged", "Raw data staged"),
+        ("raw_review", "Raw data has been reviewed"),
+        ("build_pending", "Pending records built"),
+        ("review_locations", "Reviewing Pending locations"),
+        ("review_activities", "Reviewing Pending activities"),
+        ("published", "Published"),
+        ("rollback", "Published records rolled back"),
+        ("error", "Error"),
+        ("canceled", "Canceled before publish"),
+    ]
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name ="uploads")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="uploads", blank=True, null=True)
     file = models.FileField(upload_to="uploads/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
     processed = models.BooleanField(default=False)
-    status = models.CharField(max_length=20, default="csv_load")  # raw_warning, raw_review, error, pending_review, published
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="csv_load")  # raw_warning, raw_review, error, pending_review, published
     notes = models.TextField(blank=True)
     published_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="published_uploads")
     published_at = models.DateTimeField(null=True, blank=True)

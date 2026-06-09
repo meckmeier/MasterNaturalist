@@ -60,6 +60,7 @@ urlpatterns = [
     path("upload/<int:upload_id>/review_activities/", views.upload_review_activities, name="upload_review_activities"),
     path("upload/<int:upload_id>/publish/", views.upload_publish, name="upload_publish"),
     path("upload/<int:upload_id>/success/", views.upload_success, name="upload_success"),
+    path("upload/<int:upload_id>/cancel/", views.upload_cancel_confirm, name="upload_cancel_confirm"),
     path("upload/<int:upload_id>/rollback/", views.upload_rollback, name="upload_rollback"),
     path("uploads/<int:upload_id>/results/",views.upload_results,name="upload_results"),
     path("lookup-zip/", views.lookup_zip, name="lookup_zip"),

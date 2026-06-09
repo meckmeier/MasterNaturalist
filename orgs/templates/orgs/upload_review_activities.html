@@ -31,17 +31,25 @@
 
         {% csrf_token %}
 
-        <button type="submit" name="action" value="continue" class="me-btn">
-            <span><i class="bi bi-gear me-btn-icon"></i></span>
-            <span class="me-btn-label">Submit and LOAD data</span></button>
+    
             
         {% for e in pending_sessions %}
             {% include "orgs/_pending_session_item.html" with session=e %}
         {% endfor %}
         
         <button type="submit" name="action" value="continue" class="me-btn">
+            <span><i class="bi bi-check me-btn-icon"></i></span>
+            <span class="me-btn-label">Confirm Skipped Activities</span></button>
+            <br>
+        {% if not errors %}
+        <a href="{% url 'upload_publish' upload.id %}" class="me-btn">
             <span><i class="bi bi-gear me-btn-icon"></i></span>
-            <span class="me-btn-label">Submit and LOAD data</span></button>
+            <span class="me-btn-label">Continue and PUBLISH</span></a>
+        {% endif %}
+        <a href="{% url 'upload_cancel_confirm' upload.id %}?next={{ request.path }}" class="me-btn">
+            <span><i class = "bi bi-backspace me-btn-icon"></i></span>
+            <span class="me-btn-label">Cancel upload</span>
+        </a>
     </form>
 </div>
 {% endblock %}

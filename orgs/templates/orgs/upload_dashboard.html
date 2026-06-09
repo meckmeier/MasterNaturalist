@@ -5,7 +5,7 @@
 
 {% for upload in uploads %}
 
-<div class="card mb-4 shadow-sm">
+<div class="me-card mb-4 shadow-sm">
 
   <div class="card-header d-flex justify-content-between align-items-center">
     <div>
@@ -157,7 +157,9 @@
 </div>
 
 {% empty %}
+<div class="me-card mb-4 shadow-sm">
   <p>No uploads yet.</p>
+  </div>
 {% endfor %}
 
 {% endblock %}

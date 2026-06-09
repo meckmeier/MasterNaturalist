@@ -1,0 +1,30 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+<div class="me-page">
+
+<h1>Cancel upload?</h1>
+
+<p>
+    This will remove all staged records for this upload. This cannot be undone.
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button class="me-btn" type="submit">
+    <span>
+            <i class="bi bi-trash me-btn-icon me-btn-learn-icon"></i>
+    </span>
+    <span class="me-btn-label">
+        Yes, Cancel this upload</span> 
+</button>
+     <a class="me-btn" href="{{ next|default:'/uploads/' }}">
+    <span>
+      <i class="bi bi-backspace me-btn-icon"></i>
+    </span>
+    <span class="me-btn-label">
+        No, keep working
+    </a>
+</form>
+
+</div>
+{% endblock %}
