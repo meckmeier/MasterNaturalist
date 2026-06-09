@@ -149,8 +149,11 @@ def get_or_create_pending_location(raw, org, upload):
         )
     
     except Exception as e:
-        raise Exception(f"Error creating pending location: {str(e)}")
-        
+        import traceback
+        traceback.print_exc()
+        print("FAILED ROW:", raw.row_number)
+        raise
+            
     return pending_location, done
 
     

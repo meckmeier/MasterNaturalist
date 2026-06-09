@@ -40,7 +40,17 @@ class CSVImporter:
                     )
 
                     self.df = self.df.replace("\xa0", " ", regex=True)
+                    before = len(self.df)
 
+                    self.df = self.df.dropna(how="all")
+                    self.df = self.df[
+                        self.df.apply(
+                            lambda row: any(str(value).strip() and str(value).strip().lower() != "nan" for value in row),
+                            axis=1
+                        )
+                    ]
+
+                    removed = before - len(self.df)
                     # look for replacement characters
                     bad_cells = []
 
