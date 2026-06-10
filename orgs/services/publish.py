@@ -30,7 +30,7 @@ def publish_pending_upload(upload_id, user):
     for pending_loc in pending_locations:
         if pending_loc.real_location:
             # Already matched to existing location
-            pending_loc.processing_status = "confirmed"
+            pending_loc.processing_status = "matched"
             pending_loc.save(update_fields=[ "processing_status"])
 
             continue
@@ -115,6 +115,7 @@ def publish_pending_upload(upload_id, user):
         if pending_session.location:
             real_location = pending_session.location.real_location
 
+        
         Session.objects.create(
             activity=real_activity,
             location=real_location,
@@ -136,7 +137,7 @@ def publish_pending_upload(upload_id, user):
     upload.locations_created = Location.objects.filter(source_upload=upload).count()
     upload.activities_created = Activity.objects.filter(source_upload=upload).count()
     upload.sessions_created = Session.objects.filter(source_upload = upload).count()
-    upload.locations_matched = Pending_Location.objects.filter(source_upload=upload, processing_status="confirmed").count()
+    upload.locations_matched = Pending_Location.objects.filter(source_upload=upload, processing_status="matched").count()
     upload.locations_skipped = Pending_Location.objects.filter(source_upload=upload, processing_status="skip").count()
     upload.locations_merged = Pending_Location.objects.filter(source_upload=upload, processing_status="merged").count()
     upload.activities_skipped = Pending_Activity.objects.filter(source_upload=upload, processing_status="skip").count()

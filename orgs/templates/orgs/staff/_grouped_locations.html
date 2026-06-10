@@ -1,0 +1,108 @@
+ <section class="card mb-4 p-3">
+
+    <h2>
+      {{ group.name }}
+      <span class="badge bg-warning">{{ group.count }} matches</span>
+    </h2>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>City</th>
+          <th>Address</th>
+          <th>Current Org</th>
+          <th>Activities</th>
+          <th>Sessions</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for loc in group.locations %}
+          <tr>
+            <td>{{ loc.loc_name }}</td>
+            <td>{{ loc.city_name }}</td>
+            <td>{{ loc.address }}</td>
+            <td>{{ loc.org.org_name|default:"No org" }}</td>
+            <td>{{ loc.activity_count }}</td>
+            <td>{{ loc.session_count }}</td>
+
+            <td>
+        <form method="post" action="{% url 'location_action' loc.id %}">
+    {% csrf_token %}
+        <div class="form-check mb-2">
+        <input class="form-check-input"
+               type="radio"
+               name="action"
+               value="update_org"
+               id="org_{{ loc.id }}">
+
+        <label class="form-check-label" for="org_{{ loc.id }}">
+            Change owner organization
+        </label>
+
+        <select name="org_id" class="form-select mt-1">
+            <option value="">No owner org</option>
+
+            {% for org in organizations %}
+                <option value="{{ org.id }}"
+                    {% if loc.org_id == org.id %}selected{% endif %}>
+                    {{ org.org_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-check mb-2">
+        <input class="form-check-input"
+               type="radio"
+               name="action"
+               value="merge"
+               id="merge_{{ loc.id }}">
+
+        <label class="form-check-label" for="merge_{{ loc.id }}">
+            Merge into
+        </label>
+
+        <select name="merge_into_id" class="form-select mt-1">
+            <option value="">Choose target location</option>
+
+            {% for target in group.locations %}
+                {% if target.id != loc.id %}
+                    <option value="{{ target.id }}">
+                        {{target.loc_name}} | {{target.org.org_name}} ({{ target.city_name }})
+                       
+                    </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+
+    {% if loc.session_count == 0 %}
+        <div class="form-check mb-2">
+            <input class="form-check-input"
+                   type="radio"
+                   name="action"
+                   value="delete"
+                   id="delete_{{ loc.id }}">
+
+            <label class="form-check-label"
+                   for="delete_{{ loc.id }}">
+                Delete empty location
+            </label>
+        </div>
+    {% endif %}
+
+    <button type="submit" class="me-btn">
+        <span><i class="bi bi-arrow-right-square me-btn-icon"></i></span>
+        <span class="me-btn-label">Apply</span>
+    </button>
+</form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </section>

@@ -1,0 +1,194 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+<div class="me-page">
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h1>Review uploaded rows</h1>
+<p>
+  Review the rows from this upload before building pending records.
+</p>
+<p><strong>Total rows:</strong> {{ total_count }}</p>
+
+<form method="post">
+  {% csrf_token %}
+      
+  {% if error_rows %}
+    <section class="review-section error-section"></section>
+      <h4>Errors — these rows will not be loaded</h2>
+      
+      <p>
+        These rows have problems that prevent them from being processed. 
+        <em>You could cancel this upload, fix them in the CSV file and build a new upload - or add them manually.</em>
+      </p>
+      <p><strong>Error rows:</strong> {{ error_count }}</p>
+      <table class="table">
+        <thead>
+          <tr>
+           
+            <th>Row</th>
+            
+            <th>Activity</th>
+            <th>Location</th>
+            <th>Ongoing</th>
+            <th>Start date</th>
+            <th>End date</th>
+            <th>Has Cost</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in error_rows %}
+            <tr>
+              
+              <td>{{ row.row_number }}</td>
+              <td>{{ row.title }}</td>
+              <td>{{ row.location_name }}</td>
+              <td>{{ row.ongoing }}</td>
+              <td>{{ row.start_date }}</td>
+              <td>{{ row.end_date }}</td>
+              <td>{{ row.has_cost }}</td>
+              <td>{{ row.activity_type }}</td>
+            </tr>
+            <tr><td colspan="7" class="text-danger">
+              
+              {% for msg in row.validation_errors.messages %}
+                        {{ msg }}<br>
+              {% endfor %}
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </section>
+    {% else %}
+      <p>No error rows are available to continue.</p>
+  {% endif %}
+
+
+  {% if warning_rows %}
+    <section class="review-section warning-section">
+      <h4>Warnings — review before continuing</h4>
+      <p class="muted-text">
+        These rows can continue into the next step, but some fields may not be populated. 
+         <em>You can fix them in the system once the activity is loaded. Otherwise, you can skip
+         them and add them manually.</em>
+      </p>
+      <p><strong>Warning rows:</strong> {{ warning_count }}</p>
+      
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Skip?</th>
+            <th>Row</th>
+            <th>Warning</th>
+            <th>Activity</th>
+            <th>Location</th>
+            <th>Ongoing</th>
+            <th>Start date</th>
+            <th>End date</th>
+            <th>Has Cost</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in warning_rows %}
+            <tr>
+              <td>
+                <input
+                  type="checkbox"
+                  name="skip_row"
+                  value="{{ row.id }}"
+                  id="skip_accepted_{{ row.id }}"
+                >
+              </td>
+              <td>{{ row.row_number }}</td>
+              <td>{{ row.title }}</td>
+              <td>{{ row.location_name }}</td>
+              <td>{{ row.ongoing }}</td>
+              <td>{{ row.start_date }}</td>
+              <td>{{ row.end_date }}</td>
+              <td>{{ row.has_cost }}</td>
+              <td>{{ row.activity_type }}</td>
+            </tr>
+            <tr><td colspan="7" class="text-danger">
+              
+              {% for msg in row.validation_warnings.messages %}
+                        {{ msg }}<br>
+              {% endfor %}
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No warning rows are available to continue.</p>
+    {% endif %}
+    </section>
+
+  <section class="review-section accepted-section">
+    <h4>Accepted rows</h4>
+    <p>
+      These rows passed review and will move into the next step.
+    </p>
+
+    <div class="summary-card">
+      
+      <p><strong>Accepted rows:</strong> {{ accepted_count }}</p>
+    </div>
+
+    {% if accepted_rows %}
+      <table class="table">
+        <thead>
+          <tr>
+            
+            <th>Row</th>
+            <th>Activity</th>
+            <th>Location</th>
+            <th>Ongoing</th>
+            <th>Start date</th>
+            <th>End date</th>
+            <th>Has Cost</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in accepted_rows %}
+            <tr>
+              
+              <td>{{ row.row_number }}</td>
+              <td>{{ row.title }}</td>
+              <td>{{ row.location_name }}</td>
+              <td>{{ row.ongoing }}</td>
+              <td>{{ row.start_date }}</td>
+              <td>{{ row.end_date }}</td>
+              <td>{{ row.has_cost }}</td>
+              <td>{{ row.activity_type }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No accepted rows are available to continue.</p>
+    {% endif %}
+  </section>
+
+
+  <div class="form-actions">
+    <button type="submit" name="action" value="continue" class="me-btn">
+       <span><i class="bi bi-gear me-btn-icon"></i></span>
+      <span class="me-btn-label">Continue</span>
+    </button>
+
+    <a href="{% url 'upload_cancel_confirm' upload.id %}" class="me-btn">
+        <span><i class="bi bi-backspace me-btn-icon"></i></span>
+      <span class="me-btn-label">Cancel</span>
+    </a>
+  </div>
+
+</form>
+</div>
+{% endblock %}

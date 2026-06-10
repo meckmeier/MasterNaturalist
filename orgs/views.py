@@ -18,7 +18,6 @@ from django.db.models import Q, Min, Prefetch, F
 from django.http import  Http404, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
-from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -32,6 +31,8 @@ import json
 import pandas as pd
 from .services.csv_importer import CSVImporter
 from orgs.services.activity_tracking import track_activity
+from orgs.services.helper_function import get_county_region_from_zip, normalize_address_key, similarity, normalize_location_name
+
 
 from collections import defaultdict
 from io import StringIO
@@ -61,7 +62,7 @@ def run_cleanup_old_imports(request):
 
         output = out.getvalue()
 
-    return render(request, "orgs/staff_run_cleanup_imports.html", {
+    return render(request, "orgs/upload/staff_run_cleanup_imports.html", {
         "output": output,
     })
 
@@ -83,6 +84,97 @@ def run_update_latlng(request):
     return render(request, "orgs/staff_run_update_latlng.html", {
         "output": output,
     })
+
+@staff_member_required
+def org_enrollment_list(request):
+
+    enrollments = OrganizationEnrollmentRequest.objects.order_by("-created_at")
+    return render(request, "orgs/org_enrollment_list.html", {"enrollments": enrollments})
+
+@staff_member_required
+def org_deny(request, enrollment_id):
+
+    enrollment = get_object_or_404(
+        OrganizationEnrollmentRequest,
+        id=enrollment_id
+    )
+
+    if request.method == "POST":
+        enrollment.status = "d"
+        enrollment.reviewed_at = timezone.now()
+        enrollment.reviewed_by = request.user.profile
+        enrollment.save()
+
+        messages.success(request, "Organization request denied.")
+
+    return redirect("org_enrollment_list")
+
+@staff_member_required
+@transaction.atomic
+def org_approve(request, enrollment_id):
+    enrollment = get_object_or_404(OrganizationEnrollmentRequest, id=enrollment_id)
+    if request.method != "POST":
+        return render(request, "orgs/org_approve.html", {"enrollment": enrollment})
+    if enrollment.status=="a":
+        messages.info(request, "This enrollment has already been approved.")
+        return redirect("org_enrollment_list")
+    if enrollment.status=="d":
+        messages.info(request, "This enrollment has already been denied.")
+        return redirect("org_enrollment_list")
+    
+    print("Creating org for enrollment:", enrollment.org_name)
+    # Create the organization (it will be logged as created by the staff member approving it.)
+    org = Organization.objects.create(
+            org_name=enrollment.org_name,
+            about=enrollment.about,
+            org_url=enrollment.org_url,
+            volunteer_url=enrollment.volunteer_url,
+            training_url=enrollment.training_url,
+            region_name=enrollment.region_name,
+            in_wisconsin=True,
+            created_by=request.user.profile,
+            updated_by=request.user.profile,
+        )
+    print("Created org id:", org.id)
+    # Optionally, you could also create an OrgManager entry for the contact person here if you want them to have immediate access.
+    email = enrollment.contact_email.lower().strip()
+    user=User.objects.filter(email__iexact=email).first()
+    if user and hasattr(user, "profile"):
+        OrgManager.objects.get_or_create(profile=user.profile, org=org, role="owner")
+    else:
+        invite = OrgInvite.objects.create(
+            org=org,
+            email=email,
+            role="owner",
+            created_by=request.user.profile,
+        )
+        invite_url = request.build_absolute_uri(reverse("accept_org_invite", args=[invite.token]))
+        send_mail(subject="You've been invited to manage an organization on WildPaths Wisconsin",
+                   message=f"""
+                        Hello,
+
+                        Your organization, {org.org_name}, has been approved for WildPaths Wisconsin.
+
+                        Please use this link to create your login and manage the organization:
+
+                        {invite_url}
+
+                        Thank you!
+                        """,
+                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                recipient_list=[email],
+                                fail_silently=False,
+                            )
+                                
+    # Mark the enrollment as approved
+    enrollment.status = "a"
+    enrollment.approved_by = request.user.profile
+    enrollment.approved_at = timezone.now()
+
+    enrollment.save()
+
+    messages.success(request, f"Organization '{org.org_name}' has been approved and created.")
+    return redirect("org_enrollment_list")
 
 def landing(request):
      # view only shows the main landing page. all info is rendered in the html page.
@@ -357,96 +449,6 @@ def org_enroll(request):
 def org_enroll_thanks(request):
     return render(request, "orgs/org_enroll_thanks.html")
 
-@staff_member_required
-def org_enrollment_list(request):
-
-    enrollments = OrganizationEnrollmentRequest.objects.order_by("-created_at")
-    return render(request, "orgs/org_enrollment_list.html", {"enrollments": enrollments})
-
-@staff_member_required
-def org_deny(request, enrollment_id):
-
-    enrollment = get_object_or_404(
-        OrganizationEnrollmentRequest,
-        id=enrollment_id
-    )
-
-    if request.method == "POST":
-        enrollment.status = "d"
-        enrollment.reviewed_at = timezone.now()
-        enrollment.reviewed_by = request.user.profile
-        enrollment.save()
-
-        messages.success(request, "Organization request denied.")
-
-    return redirect("org_enrollment_list")
-
-@staff_member_required
-@transaction.atomic
-def org_approve(request, enrollment_id):
-    enrollment = get_object_or_404(OrganizationEnrollmentRequest, id=enrollment_id)
-    if request.method != "POST":
-        return render(request, "orgs/org_approve.html", {"enrollment": enrollment})
-    if enrollment.status=="a":
-        messages.info(request, "This enrollment has already been approved.")
-        return redirect("org_enrollment_list")
-    if enrollment.status=="d":
-        messages.info(request, "This enrollment has already been denied.")
-        return redirect("org_enrollment_list")
-    
-    print("Creating org for enrollment:", enrollment.org_name)
-    # Create the organization (it will be logged as created by the staff member approving it.)
-    org = Organization.objects.create(
-            org_name=enrollment.org_name,
-            about=enrollment.about,
-            org_url=enrollment.org_url,
-            volunteer_url=enrollment.volunteer_url,
-            training_url=enrollment.training_url,
-            region_name=enrollment.region_name,
-            in_wisconsin=True,
-            created_by=request.user.profile,
-            updated_by=request.user.profile,
-        )
-    print("Created org id:", org.id)
-    # Optionally, you could also create an OrgManager entry for the contact person here if you want them to have immediate access.
-    email = enrollment.contact_email.lower().strip()
-    user=User.objects.filter(email__iexact=email).first()
-    if user and hasattr(user, "profile"):
-        OrgManager.objects.get_or_create(profile=user.profile, org=org, role="owner")
-    else:
-        invite = OrgInvite.objects.create(
-            org=org,
-            email=email,
-            role="owner",
-            created_by=request.user.profile,
-        )
-        invite_url = request.build_absolute_uri(reverse("accept_org_invite", args=[invite.token]))
-        send_mail(subject="You've been invited to manage an organization on WildPaths Wisconsin",
-                   message=f"""
-                        Hello,
-
-                        Your organization, {org.org_name}, has been approved for WildPaths Wisconsin.
-
-                        Please use this link to create your login and manage the organization:
-
-                        {invite_url}
-
-                        Thank you!
-                        """,
-                                from_email=settings.DEFAULT_FROM_EMAIL,
-                                recipient_list=[email],
-                                fail_silently=False,
-                            )
-                                
-    # Mark the enrollment as approved
-    enrollment.status = "a"
-    enrollment.approved_by = request.user.profile
-    enrollment.approved_at = timezone.now()
-
-    enrollment.save()
-
-    messages.success(request, f"Organization '{org.org_name}' has been approved and created.")
-    return redirect("org_enrollment_list")
 
 def accept_org_invite(request, token):
     invite = get_object_or_404(OrgInvite, token=token, accepted=False)
@@ -763,63 +765,8 @@ def locations(request):
         }
     )
 
-from orgs.services.helper_function import get_county_region_from_zip
-
-def lookup_zip(request):
-    county, region = get_county_region_from_zip(request.GET.get("zip_code"))
-
-    return JsonResponse({
-        "county_id": county.id if county else None,
-        "region": region,
-    })
-
-@login_required
-def org_set_default_location(request, org_id, loc_id):
-    org = get_object_or_404(Organization, id=org_id)
-    loc = get_object_or_404(Location, id=loc_id, org=org)
-
-    if not org.can_edit(request.user):
-        return HttpResponseForbidden()
-
-    org.default_location = loc
-    org.save(update_fields=["default_location"])
-
-    messages.success(request, f"{loc.loc_name} is now the default location.")
-    #return redirect("org_mgmt")
-    url = reverse("org_mgmt")
-    return redirect(f"{url}#org-{org.id}")
-
-
-    logout(request)
-    return HttpResponseRedirect(reverse("landing"))
-
-    
-@login_required
-def profile_view(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
-
-    if request.method == "POST":
-        user_form=UserForm(request.POST, instance=request.user)
-        form = ProfileForm(request.POST, instance=profile)
-        if form.is_valid() and user_form.is_valid():
-            form.save()
-            user_form.save()
-            return redirect("profile")
-    else:
-        user_form = UserForm(instance=request.user)
-        form = ProfileForm(instance=profile)
-
-    return render(request, "orgs/profile.html", {
-        "form": form,
-        "user_form": user_form,})
-
-def user_is_staff_profile(user):
-    return user.is_authenticated and hasattr(user, "profile") and user.is_staff
-
-@login_required
+@staff_member_required
 def staff_user_manage(request):
-    if not user_is_staff_profile(request.user):
-        raise PermissionDenied
 
     target_user = None
     user_form = None
@@ -878,6 +825,232 @@ def staff_user_manage(request):
         "created_activities": created_activities,
         "updated_activities": updated_activities,
     })
+
+
+@staff_member_required
+def location_manage(request):
+    duplicate_groups = (
+        Location.objects
+        .filter(deleted=False)
+        .values("loc_name")
+        .annotate(location_count=Count("id"))
+        .filter(location_count__gt=1)
+        .order_by("loc_name")
+    )
+
+    grouped_locations = []
+
+    for group in duplicate_groups:
+        locs = (
+            Location.objects
+            .filter(deleted=False, loc_name=group["loc_name"])
+            .select_related("org", "county_id")
+            .annotate(
+                session_count=Count("sessions", distinct=True),
+                activity_count=Count("sessions__activity", distinct=True),
+            )
+            .order_by("city_name", "address", "org__org_name")
+        )
+
+        grouped_locations.append({
+            "name": group["loc_name"],
+            "count": group["location_count"],
+            "locations": locs,
+        })
+
+    all_locations = list(
+        Location.objects
+        .filter(deleted=False)
+        .select_related("org", "county_id")
+        .annotate(
+            session_count=Count("sessions", distinct=True),
+            activity_count=Count("sessions__activity", distinct=True),
+        )
+        .order_by("loc_name", "city_name", "address")
+    )
+
+    close_match_groups = []
+    used_ids = set()
+
+    for loc in all_locations:
+        if loc.id in used_ids:
+            continue
+
+        matches = []
+
+        for other in all_locations:
+            if loc.id == other.id or other.id in used_ids:
+                continue
+
+            score = similarity(loc.loc_name, other.loc_name)
+
+            if score >= 0.88:
+                matches.append(other)
+
+        if matches:
+            group_locations = [loc] + matches
+
+            for item in group_locations:
+                used_ids.add(item.id)
+
+            close_match_groups.append({
+                "name": loc.loc_name,
+                "count": len(group_locations),
+                "locations": group_locations,
+            })
+    
+    address_buckets = defaultdict(list)
+
+    for loc in all_locations:
+        address_key = normalize_address_key(loc)
+
+        if address_key:
+            address_buckets[address_key].append(loc)
+
+    address_match_groups = []
+
+    for address_key, locs in address_buckets.items():
+        unique_names = {
+            normalize_location_name(loc.loc_name)
+            for loc in locs
+            if loc.loc_name
+        }
+
+        if len(locs) > 1 and len(unique_names) > 1:
+            address_match_groups.append({
+                "name": locs[0].address,
+                "count": len(locs),
+                "locations": locs,
+            })
+    organizations = Organization.objects.filter(deleted=False).order_by("org_name")
+
+    return render(request, "orgs/staff/location_manage.html", {
+        "grouped_locations": grouped_locations,
+        "organizations": organizations,
+        "close_match_groups": close_match_groups,
+        "address_match_groups": address_match_groups,
+    })
+
+@staff_member_required
+@transaction.atomic
+def location_action(request, location_id):
+    location = get_object_or_404(Location, id=location_id, deleted=False)
+
+    if request.method != "POST":
+        return redirect("location_manage")
+
+    action = request.POST.get("action")
+
+    if action == "update_org":
+        org_id = request.POST.get("org_id")
+
+        if org_id:
+            org = get_object_or_404(Organization, id=org_id, deleted=False)
+            location.org = org
+        else:
+            location.org = None
+
+        location.save(update_fields=["org"])
+        messages.success(request, f"Updated owner organization for {location.loc_name}.")
+
+    elif action == "merge":
+        merge_into_id = request.POST.get("merge_into_id")
+
+        if not merge_into_id:
+            messages.error(request, "Choose a location to merge into.")
+            return redirect("location_manage")
+
+        target = get_object_or_404(Location, id=merge_into_id, deleted=False)
+
+        if target.id == location.id:
+            messages.error(request, "You cannot merge a location into itself.")
+            return redirect("location_manage")
+
+        moved_sessions = Session.objects.filter(
+            location=location,
+            deleted=False,
+        ).update(location=target)
+
+        location.deleted = True
+        location.save(update_fields=["deleted"])
+
+        messages.success(
+            request,
+            f"Merged {location.loc_name} into {target.loc_name}. "
+            f"Moved {moved_sessions} session(s)."
+        )
+
+    elif action == "delete":
+        active_sessions = Session.objects.filter(
+            location=location,
+            deleted=False,
+            activity__deleted=False,
+        ).count()
+
+        if active_sessions > 0:
+            messages.error(request, "You cannot delete a location that has sessions.")
+            return redirect("location_manage")
+
+        location.deleted = True
+        location.save(update_fields=["deleted"])
+
+        messages.success(request, f"Deleted empty location: {location.loc_name}.")
+
+    else:
+        messages.error(request, "Choose an action.")
+
+    return redirect("location_manage")
+
+
+
+def lookup_zip(request):
+    county, region = get_county_region_from_zip(request.GET.get("zip_code"))
+
+    return JsonResponse({
+        "county_id": county.id if county else None,
+        "region": region,
+    })
+
+@login_required
+def org_set_default_location(request, org_id, loc_id):
+    org = get_object_or_404(Organization, id=org_id)
+    loc = get_object_or_404(Location, id=loc_id, org=org)
+
+    if not org.can_edit(request.user):
+        return HttpResponseForbidden()
+
+    org.default_location = loc
+    org.save(update_fields=["default_location"])
+
+    messages.success(request, f"{loc.loc_name} is now the default location.")
+    #return redirect("org_mgmt")
+    url = reverse("org_mgmt")
+    return redirect(f"{url}#org-{org.id}")
+
+
+    logout(request)
+    return HttpResponseRedirect(reverse("landing"))
+
+    
+@login_required
+def profile_view(request):
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        user_form=UserForm(request.POST, instance=request.user)
+        form = ProfileForm(request.POST, instance=profile)
+        if form.is_valid() and user_form.is_valid():
+            form.save()
+            user_form.save()
+            return redirect("profile")
+    else:
+        user_form = UserForm(instance=request.user)
+        form = ProfileForm(instance=profile)
+
+    return render(request, "orgs/profile.html", {
+        "form": form,
+        "user_form": user_form,})
+
 
 
 def activities(request):
@@ -1496,7 +1669,7 @@ def debug_sessions(request):
         "today": today
     })
 
-from orgs.services.mapping import build_mapping, build_dropdown_options, validate_mapping
+from orgs.services.mapping import build_mapping, build_dropdown_options, validate_mapping, build_default_mapping
 
 @login_required
 def upload_csv(request, org_id):
@@ -1521,7 +1694,7 @@ def upload_csv(request, org_id):
 
             if importer.errors:
                 
-                return render(request, "orgs/upload.html", {
+                return render(request, "orgs/upload/upload.html", {
                     "form": form,
                     "errors": importer.errors,
                     "org": org,
@@ -1533,7 +1706,7 @@ def upload_csv(request, org_id):
     else:
         form = UploadFileForm()
 
-    return render(request, "orgs/upload.html", {
+    return render(request, "orgs/upload/upload.html", {
         "form": form,
         "org": org,
         "errors": [],
@@ -1541,85 +1714,72 @@ def upload_csv(request, org_id):
 
 # Step 1: Map columns from csv to rawloaddata fields
 def upload_map(request, upload_id):
-    #this code will map the fields from the upload file to the fields in the RawDataLoad table... 
-    # status is considered :Staged in upload table.
-
     upload = get_object_or_404(ActivityUpload, id=upload_id)
-    importer= CSVImporter(upload)
+    importer = CSVImporter(upload)
     importer.read()
 
     if importer.errors:
         upload.status = "error"
         upload.save(update_fields=["status"])
+        return render(request, "orgs/upload/upload_map.html", {
+            "errors": importer.errors,
+            "upload": upload,
+        })
 
-        UploadLog.objects.create(
-            upload=upload,
-            stage="csv_load",
-            step="reading file",
-            status="error",
-            source_count=0,
-            created_count=0,
-            warning_count=0,
-            error_count=len(importer.errors),
-            message="\n".join(str(e) for e in importer.errors),
-        )
-
-        form = UploadFileForm()
-        return render(request, "orgs/upload_map.html", {"form": form, "errors": importer.errors, "upload": upload})
-    
-    df= importer.df
+    df = importer.df
     columns = list(df.columns)
+
     EXCLUDE_FIELDS = ["id", "upload", "row_number", "organization"]
-    field_names = [(f.name) for f in RawLoadData._meta.get_fields() 
-               if not f.many_to_many and not f.one_to_many and f.name not in EXCLUDE_FIELDS] 
-    
-    # GET request → show mapping form
+
+    field_names = [
+        f.name for f in RawLoadData._meta.get_fields()
+        if not f.many_to_many
+        and not f.one_to_many
+        and f.name not in EXCLUDE_FIELDS
+    ]
+
     dropdown_options = build_dropdown_options(columns, field_names)
 
+    # Try automatic/default mapping first
+    default_mapping = build_default_mapping(columns, field_names)
+    default_errors = validate_mapping(default_mapping)
+
+    if request.method == "GET" and not default_errors:
+        request.session[f"mapping_{upload_id}"] = default_mapping
+
+        upload.status = "csv_mapped"
+        upload.save(update_fields=["status"])
+
+        return redirect("upload_stage", upload_id=upload.id)
+
     if request.method == "POST":
-        # Example: user-submitted mapping comes as mapping_ColumnName fields
         mapping = build_mapping(request.POST, columns)
         errors = validate_mapping(mapping)
 
         if errors:
             upload.status = "error"
             upload.save(update_fields=["status"])
-            UploadLog.objects.create(
-                upload=upload,
-                stage="mapping",
-                step="field mapping",
-                status="error",
-                error_count=len(errors),
-                message="\n".join(errors),
-            )
 
-            return render(
-                request,
-                "orgs/upload_map.html",
-                {
-                    "errors": errors,
-                    "columns": columns,
-                    "field_names": field_names,
-                    "upload": upload,
-                    "dropdown_options":dropdown_options
-                }
-            )
-        # Save mapping in session (or a model if you prefer)
+            return render(request, "orgs/upload/upload_map.html", {
+                "errors": errors,
+                "columns": columns,
+                "field_names": field_names,
+                "upload": upload,
+                "dropdown_options": dropdown_options,
+            })
+
         request.session[f"mapping_{upload_id}"] = mapping
-        
 
-        # Update upload status
         upload.status = "csv_mapped"
         upload.save(update_fields=["status"])
 
-        # Redirect to staging step
         return redirect("upload_stage", upload_id=upload.id)
-    
-    return render(request, "orgs/upload_map.html", {
-        "upload": upload, 
-        "dropdown_options":dropdown_options,
-        "errors": []
-        })
+
+    return render(request, "orgs/upload/upload_map.html", {
+        "upload": upload,
+        "dropdown_options": dropdown_options,
+        "errors": default_errors,
+    })
 
 
 # Step 2: Stage data
@@ -1648,7 +1808,7 @@ def upload_stage(request, upload_id):
             message="\n".join(str(e) for e in importer.errors),
         )
 
-        return render(request, "orgs/upload_review_raw.html", {
+        return render(request, "orgs/upload/upload_review_raw.html", {
             "upload": upload,
             "errors": importer.errors,
             "warnings": importer.warnings,
@@ -1697,26 +1857,42 @@ def upload_review_raw(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
 
     staged_rows = RawLoadData.objects.filter(upload=upload)
+    error_rows = staged_rows.filter(status="error")
+    warning_rows = staged_rows.filter(status = "warning")
+    skipped_rows = staged_rows.filter(status="skipped")
+    accepted_rows = staged_rows.exclude(
+            status__in=["warning", "error", "skipped"]
+        )
 
     if request.method == "POST":
-        skip_ids = request.POST.getlist("skip_row")
 
-        RawLoadData.objects.filter(
-        upload=upload
-                ).exclude(status="error").update(status="valid")
+        action = request.POST.get("action")
+        skip_ids = request.POST.getlist("skip_row")
 
         RawLoadData.objects.filter(
             upload=upload,
             id__in=skip_ids
         ).update(status="skipped")
 
+        if action == "continue":
+            return redirect("upload_build_pending", upload_id=upload.id)
+
         return redirect("upload_review_raw", upload_id=upload.id)
 
-    return render(request, "orgs/upload_review_raw.html", {
+    return render(request, "orgs/upload/upload_review_raw.html", {
         "upload": upload,
         "staged_rows": staged_rows,
-        "errors": [],
-        "warnings": [],
+
+        "error_rows": error_rows,
+        "warning_rows": warning_rows,
+        "accepted_rows": accepted_rows,
+        "skipped_rows": skipped_rows,
+
+        "total_count": staged_rows.count(),
+        "error_count": error_rows.count(),
+        "warning_count": warning_rows.count(),
+        "accepted_count": accepted_rows.count(),
+        "skipped_count": skipped_rows.count(),
     })
 
 from orgs.services.pending import build_pending_for_upload
@@ -1747,7 +1923,7 @@ def upload_build_pending(request, upload_id):
             source_upload=upload
         ).prefetch_related("pending_sessions").select_related("real_location")
 
-        return render(request, "orgs/upload_review_locations.html", {
+        return render(request, "orgs/upload/upload_review_locations.html", {
             "upload": upload,
             "pending_locations": pending_locations,
             "errors": result.errors,
@@ -1805,11 +1981,13 @@ def upload_review_locations(request, upload_id):
                         merge_into_id = request.POST.get(f"merge_into_{location.id}")
                         real_location_id = request.POST.get(f"real_location_{location.id}")
 
-                        if decision == "confirm":
-                            location.processing_status = "confirmed"
+                        if decision == "matched":
+                            
+
+                            location.processing_status = "matched"
                             location.save(update_fields=["processing_status"])
 
-                        elif decision == "existing":
+                        elif decision == "different":
                             if not real_location_id:
                                 form_errors.append(f"{location.loc_name}: choose an existing location.")
                                 continue
@@ -1823,7 +2001,7 @@ def upload_review_locations(request, upload_id):
                                 continue
 
                             location.real_location = real_location
-                            location.processing_status = "confirmed"
+                            location.processing_status = "matched"
                             location.save(update_fields=["real_location", "processing_status"])
 
                         elif decision == "merge":
@@ -1852,6 +2030,11 @@ def upload_review_locations(request, upload_id):
                             location.processing_status = "merged"
                             location.save(update_fields=["processing_status"])
 
+                        elif decision == "create":
+                            location.real_location = None
+                            location.processing_status = "create"
+                            location.save(update_fields=["real_location", "processing_status"])
+                            
                         elif decision == "skip":
                             Pending_Session.objects.filter(
                                 location=location,
@@ -1879,7 +2062,7 @@ def upload_review_locations(request, upload_id):
                     source_count=Pending_Location.objects.filter(source_upload=upload).count(),
                     created_count=Pending_Location.objects.filter(
                         source_upload=upload,
-                        processing_status="confirmed",
+                        processing_status="matched",
                     ).count(),
                     merged_count=Pending_Location.objects.filter(
                         source_upload=upload,
@@ -1894,7 +2077,7 @@ def upload_review_locations(request, upload_id):
                     message="\n".join(str(e) for e in form_errors),
                 )
 
-                return render(request, "orgs/upload_review_locations.html", {
+                return render(request, "orgs/upload/upload_review_locations.html", {
                     "upload": upload,
                     "pending_locations": get_pending_locations(),
                     "errors": form_errors,
@@ -1910,7 +2093,7 @@ def upload_review_locations(request, upload_id):
                 source_count=Pending_Location.objects.filter(source_upload=upload).count(),
                 created_count=Pending_Location.objects.filter(
                     source_upload=upload,
-                    processing_status="confirmed",
+                    processing_status="matched",
                 ).count(),
                 merged_count=Pending_Location.objects.filter(
                     source_upload=upload,
@@ -1927,7 +2110,7 @@ def upload_review_locations(request, upload_id):
             messages.success(request, "Location decisions saved.")
             return redirect("upload_review_locations", upload_id=upload.id)
 
-    return render(request, "orgs/upload_review_locations.html", {
+    return render(request, "orgs/upload/upload_review_locations.html", {
         "upload": upload,
         "pending_locations": pending_locations,
         "errors": errors,
@@ -2026,7 +2209,7 @@ def upload_review_activities(request, upload_id):
                     message="\n".join(str(e) for e in errors),
                 )
 
-                return render(request, "orgs/upload_review_activities.html", {
+                return render(request, "orgs/upload/upload_review_activities.html", {
                     "upload": upload,
                     "pending_sessions": get_pending_sessions(),
                     "errors": errors,
@@ -2055,7 +2238,7 @@ def upload_review_activities(request, upload_id):
 
             return redirect("upload_review_activities", upload_id=upload.id)
 
-    return render(request, "orgs/upload_review_activities.html", {
+    return render(request, "orgs/upload/upload_review_activities.html", {
         "upload": upload,
         "pending_sessions": pending_sessions,
         "errors": errors,
@@ -2065,7 +2248,7 @@ def upload_review_activities(request, upload_id):
 # Success page
 def upload_success(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
-    return render(request, "orgs/upload_success.html", {
+    return render(request, "orgs/upload/upload_success.html", {
         "upload": upload,
         "location_count": Location.objects.filter(source_upload=upload).count(),
         "activity_count": Activity.objects.filter(source_upload=upload).count(),
@@ -2109,7 +2292,7 @@ def upload_cancel_confirm(request, upload_id):
         messages.success(request, "Upload canceled and staged records removed.")
         return redirect("upload_dashboard")
 
-    return render(request, "orgs/upload_cancel_confirm.html", {
+    return render(request, "orgs/upload/upload_cancel_confirm.html", {
         "upload": upload,
         "next": next_url,
     })
@@ -2178,7 +2361,7 @@ def upload_publish(request, upload_id):
                         step="locations published",
                         status="success",
                         source_count=RawLoadData.objects.filter(upload_id=upload_id).count(),
-                        created_count=Pending_Location.objects.filter(source_upload=upload, processing_status="confirmed").count(),
+                        created_count=Pending_Location.objects.filter(source_upload=upload, processing_status="matched").count(),
                         merged_count=Pending_Location.objects.filter(source_upload=upload, processing_status="merged").count(),
                         skipped_count=Pending_Location.objects.filter(source_upload=upload, processing_status="skip").count(),
                         warning_count=0,
@@ -2198,7 +2381,7 @@ def upload_publish(request, upload_id):
                         step="Publish Error",
                         status="error",
                         source_count=RawLoadData.objects.filter(upload_id=upload_id).count(),
-                        created_count=Pending_Location.objects.filter(source_upload=upload, processing_status="confirmed").count(),
+                        created_count=Pending_Location.objects.filter(source_upload=upload, processing_status="matched").count(),
                         merged_count=Pending_Location.objects.filter(source_upload=upload, processing_status="merged").count(),
                         skipped_count=Pending_Location.objects.filter(source_upload=upload, processing_status="skip").count(),
                         warning_count=0,
@@ -2226,7 +2409,7 @@ def upload_dashboard(request):
     if upload_id:
         uploads = uploads.filter(id=upload_id)
 
-    return render(request, "orgs/upload_dashboard.html", {
+    return render(request, "orgs/upload/upload_dashboard.html", {
         "uploads": uploads,
 
     })
@@ -2311,7 +2494,7 @@ def upload_results(request, upload_id):
             "vol:", len(loc.volunteer),
             "train:", len(loc.training)
         )
-    return render(request, "orgs/upload_results.html", {
+    return render(request, "orgs/upload/upload_results.html", {
         "upload": upload,
         "locs": locs,
 

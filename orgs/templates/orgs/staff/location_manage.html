@@ -1,0 +1,32 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<div class="me-page">
+
+<h1>Manage Duplicate Locations</h1>
+
+{% for group in grouped_locations %}
+    {% include "orgs/staff/_grouped_locations.html" with group=group badge_class="bg-warning" badge_text="exact matches" %}
+{% empty %}
+  <p>No exact duplicate location names found.</p>
+{% endfor %}
+
+
+ 
+<h1>Close Match Locations</h1>
+
+{% for group in close_match_groups %}
+{% include "orgs/staff/_grouped_locations.html" with group=group badge_class="bg-info" badge_text="close matches" %}
+{% empty %}
+  <p>No near duplicate location names found.</p>
+{% endfor %}
+ 
+<h1>Same Address, Different Location Names</h1>
+
+{% for group in address_match_groups %}
+  {% include "orgs/staff/_grouped_locations.html" with group=group badge_class="bg-secondary" badge_text="address matches" %}
+{% empty %}
+  <p>No same-address location conflicts found.</p>
+{% endfor %}
+
+{% endblock %}

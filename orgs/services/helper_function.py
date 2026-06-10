@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 import re
+from difflib import SequenceMatcher
 
 
 ADDRESS_MAP = {
@@ -75,3 +76,53 @@ def get_county_region_from_zip(zip_code):
 
     county = zip_row.county
     return county, county.region_name
+
+
+
+
+def normalize_location_name(name):
+    if not name:
+        return ""
+
+    name = name.lower().strip()
+
+    replacements = {
+        "&": "and",
+        " ctr": " center",
+        " ctr.": " center",
+        " natl": " national",
+        " natl.": " national",
+        " nature ctr": " nature center",
+        " inc": "",
+        " inc.": "",
+        ",": "",
+        ".": "",
+        "-": " ",
+    }
+
+    for old, new in replacements.items():
+        name = name.replace(old, new)
+
+    return " ".join(name.split())
+
+
+def similarity(a, b):
+    return SequenceMatcher(
+        None,
+        normalize_location_name(a),
+        normalize_location_name(b)
+    ).ratio()
+
+def normalize_address_key(loc):
+    parts = [
+        loc.address,
+        loc.city_name,
+        loc.state,
+        loc.zip_code,
+    ]
+
+    return "|".join(
+        str(part).lower().strip()
+        for part in parts
+        if part
+    )

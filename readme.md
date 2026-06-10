@@ -22,17 +22,34 @@ python manage.py update_latlng (now in a management form so it can be run from t
 
 Future Feature:
 Configure an upload process that will take in a csv or excel file and load it into Pending Locations, Pending Activities and Pending Sessions for audit/approval and push into the production tables. So we can automate the loading of data. (this is one way to automate getting activities into the system... maybe even extend this into an API thing so we can pull the data directly from connected organizations ultimately)
+Move time description to the Session.
 
+START HERE:
 Work on the upload process
+1. Action needed on all pages of the upload.
+X my row names => wildpaths' row names
+X first time here -- overview or map of the upload process.
+X move template and instructions to the top.
 
-4. step thru bad file issues - to ensure that errors are captured and shown appropriately.
-5. update template file.
-6. add in a post load location MERGE step (for staff) to clean up multiple locations.
+X map: save / cancel only. only show if their are unmapped fields.
+
+X stage - do better format. only show the error or warnings - what will be omitted from the load, what will go in that you might want to edit, and what was accepted.
+
+Xlocation - do a fuzzy match on name... 
+adjust the decision box - use a drop down. add a feature to ignore match and use my location (you need to check on all the status values in this table)
+
+work the session format better on what you see for locations.
+(if you have a location and o session format... then ask if it should be changed)
+
+Final Review - for review activities.
+change skip to REMOVE and don't save here, just continue.
+
+add a rollback confirmation.
+
+
 
 verify that the email sent when createing a new org actually creates the new user account.
 test that with other people.
-
-Move time description to the Session.
 
 
 add 2fa

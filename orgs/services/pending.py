@@ -56,12 +56,19 @@ def build_pending_for_upload(upload):
 def build_pending_row(raw_row, upload, result):
     org = upload.organization
     
-    pending_location, done = get_or_create_pending_location(raw_row, org, upload)
+    pending_location, status = get_or_create_pending_location(
+        raw=raw_row,
+        org=upload.organization,
+        upload=upload,
+        result=result,
+    )
         
-    if pending_location and done=="matched":
+    if status == "matched":
         result.matched_locations += 1
-    elif pending_location and done=="created":
+    elif status == "create":
         result.created_locations += 1
+    elif status == "existing_pending":
+        pass
     
     
     pending_activity = build_pending_activity(raw_row, org, upload)
@@ -80,81 +87,81 @@ def build_pending_row(raw_row, upload, result):
     
 
 from orgs.services.helper_function import build_location_fingerprint
+from orgs.services.location_matcher import find_best_location_match
 
 #Creates Pending_Location only if no real Location matched.
-def get_or_create_pending_location(raw, org, upload):
-    
-    rawfingerprint = build_location_fingerprint(org_id=org.id,
-        loc_name=clean(raw.location_name),
-        address=clean(raw.address),
-        city_name=clean(raw.city),
-        state=clean(raw.state),)
-    print (f"Built fingerprint: {rawfingerprint} for location: {raw.location_name}, {raw.address}, {raw.city}, {raw.state}")
-    
+def get_or_create_pending_location(raw, org, upload, result=None):
+    matched_location = None
+    score = 0
+    reason = ""
+    done = "created"
 
-    # 1. already created in this upload?
+    loc_name = str(raw.location_name or "")[:255]
+    address = str(raw.address or "")[:255]
+    city_name = str(raw.city or "")[:255]
+    state = str(raw.state or "WI").strip().upper()[:2]
+    zip_code = str(raw.zip or "")[:5]
+
+    fingerprint = build_location_fingerprint(
+        org_id=org.id,
+        loc_name=clean(loc_name),
+        address=clean(address),
+        city_name=clean(city_name),
+        state=clean(state),
+    )
+
     pending_location = Pending_Location.objects.filter(
-            source_upload=upload,
-            fingerprint=rawfingerprint,
-        ).first()
-    print(f"Existing pending location for this row: {pending_location}")
-
-    if pending_location:
-        done="none"
-        return pending_location, done
-    
-     # 2. exists in production?
-    real_location = Location.objects.filter(
-        fingerprint=rawfingerprint,
-        deleted=False,
+        source_upload=upload,
+        fingerprint=fingerprint,
     ).first()
 
-    if real_location:
-        done="matched"
+    if pending_location:
+        return pending_location, "existing_pending"
+
+    # Online sessions do not need a real physical location match
+    if raw.session_format == "o":
+        default_status = "skip"
     else:
-        done="created"
+        matched_location, score, reason = find_best_location_match(raw, org)
 
-    try:
-     # 3. always create at least ONE Pending_Location for this upload
-        county, region = get_county_region_from_zip(raw.zip)
-
-        if raw.session_format == "o":
-            default_status = "skip"
-        elif real_location is not None:
-            default_status = "confirmed"
+        if matched_location:
+            default_status = "matched"
         else:
             default_status = "create"
-        loc_name = str(raw.location_name or "")[:255]
-        address = str(raw.address or "")[:255]
-        city_name = str(raw.city or "")[:255]
-        state = str(raw.state or "WI").strip().upper()
+
+    try:
+        county, region = get_county_region_from_zip(zip_code)
+
         pending_location = Pending_Location.objects.create(
             source_upload=upload,
-            processing_status = default_status,
+            processing_status=default_status,
             org=org,
-        
-            loc_name=loc_name, #make sure only 255 characters
+
+            loc_name=loc_name,
             address=address,
             city_name=city_name,
-            state=state, #if blank just use WI
-            zip_code=str(raw.zip or "")[:5], #only use the first 5 digits of zip code
-            county_id = county ,
+            state=state,
+            zip_code=zip_code,
+            county_id=county,
             region_name=region,
-            fingerprint=build_location_fingerprint(org_id=org, loc_name=loc_name, address=address, city_name=city_name, state=state),
-            created_at=timezone.now(),
-            
-            physical_location=True,
+            fingerprint=fingerprint,
 
-            # filled only if matched
-            real_location=real_location,
+            real_location=matched_location,
+
+            # if you added these fields:
+            match_score=score,
+            match_reason=reason,
         )
-    
+
+        return pending_location, done
+
     except Exception as e:
-        result.errors.append(
-            f"Row {raw.row_number}: Error creating pending location: {e}"
-        )
-            
-    return pending_location, done
+        if result is not None:
+            result.errors.append(
+                f"Row {raw.row_number}: Error creating pending location: {e}"
+            )
+
+        raise
 
     
 # put in the real activities fields.

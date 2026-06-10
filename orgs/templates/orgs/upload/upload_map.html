@@ -16,6 +16,8 @@
 <form method="post">
     {% csrf_token %}
     <table>
+        <th><td>My Column Names</td>
+        <td>WildPath Table names</td></th>
             {% for col, options in dropdown_options.items %}
             <tr> <td>{{ col }}</td>
             <td>
@@ -31,10 +33,10 @@
     </table>
     <button type="submit" class="me-btn">
         <span><i class="bi bi-floppy me-btn-icon"></i></span>
-        <span class="me-btn-label">Save Mapping</span></button>
+        <span class="me-btn-label">Save</span></button>
     <a href="{% url 'upload_cancel_confirm' upload.id %}?next={{ request.path }}" class="me-btn">
         <span><i class = "bi bi-backspace me-btn-icon"></i></span>
-        <span class="me-btn-label">Cancel upload</span>
+        <span class="me-btn-label">Cancel</span>
     </a>
 </form>
 </form>

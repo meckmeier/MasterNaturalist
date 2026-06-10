@@ -141,23 +141,26 @@ class CSVImporter:
         return None
 
     def parse_session_format(self, val, location_name, url, errors):
-        val = self.clean_value(val)
-        if val:
-            first = str(val).lower()[0]
-            if first in ["i", "b", "o", "s"]:
-                return first
-            errors.append(f"session_format must start with I, B, O, or S; got '{val}'")
-            return None
-        #derive if blank
+        # Always derive session_format.
+        # Do not consume or validate the uploaded session_format value.
+
+        location_name = self.clean_value(location_name)
+        url = self.clean_value(url)
+        if val and str(val).lower().startswith("o"):
+            return "o"
+        
         has_location = bool(location_name)
         has_url = bool(url)
+
         if has_location and has_url:
             return "b"
         if has_location:
-            return"i"
+            return "i"
         if has_url:
             return "o"
-        return "s"
+        if not has_location and not has_url:
+            return "s"
+        
     
     def parse_zip(self, val, warnings):
         val = self.clean_value(val)
@@ -210,6 +213,12 @@ class CSVImporter:
 
         self.df.columns = self.df.columns.str.strip()
 
+        # Drop blank spreadsheet columns like Unnamed: 17
+        self.df = self.df.loc[
+            :, ~self.df.columns.str.startswith("Unnamed:")
+        ]
+        self.df = self.df.fillna("")
+        
         # Optional: also standardize
         self.df.columns = [str(c) for c in self.df.columns]
 
@@ -223,21 +232,13 @@ class CSVImporter:
             "city": self.get_val(row, "city"),
             "location_name": self.get_val(row, "location_name"),
             "address": self.get_val(row, "address"),
-
             "start_date": self.parse_date(self.get_val(row, "start_date"), "start_date", warnings),
-
             "end_date": self.parse_date(self.get_val(row, "end_date"),"end_date", warnings ),
-
             "zip": self.parse_zip( self.get_val(row, "zip"), warnings),
-
             "has_cost": self.parse_bool_presence(self.get_val(row, "has_cost")),
-
             "ongoing": self.parse_bool_presence(self.get_val(row, "ongoing")),
-
             "activity_url": self.parse_url(self.get_val(row, "activity_url"),warnings),
-
             "contact_email": self.parse_email(self.get_val(row, "contact_email"), warnings),
-
             "time_commitment": self.get_val(row, "time_commitment"),
             "time_description": self.get_val(row, "time_description"),
             "date_description": self.get_val(row, "date_description"),
@@ -263,6 +264,7 @@ class CSVImporter:
         )
 
         return cleaned, warnings, errors
+    
     # Step 3: validate
     def validate(self):
         if self.df is None or self.df.empty:
@@ -274,6 +276,14 @@ class CSVImporter:
             if col not in self.df.columns:
                 self.errors.append(f"Missing required column: {col} for field {field}")
 
+        for idx, row in self.df.iterrows():
+            has_location = bool(self.clean_value(row.get("location_name")))
+            has_url = bool(self.clean_value(row.get("activity_url")))
+ 
+            if not has_location and not has_url:
+                self.warnings.append(
+                    f"Row {idx + 2}: Event has neither a location nor a URL."
+                )
 
     # Step 4: process → insert into staging
     def process(self):
@@ -281,6 +291,7 @@ class CSVImporter:
         
         if self.df is None or self.df.empty:
             return
+        database_errors=[]
 
         for i, row in self.df.iterrows():
             row_num = i + 1
@@ -292,9 +303,10 @@ class CSVImporter:
             elif warnings:
                 status = "warning"
             else:
-                status = "valid"
+                status = "accepted"
 
             try:
+
                 RawLoadData.objects.create(
                     upload=self.upload,
                     row_number=row_num,
@@ -328,11 +340,23 @@ class CSVImporter:
                 )
 
             except Exception as e:
+                error_message =f"Database error while saving row: {e}"
                 database_errors.append(
                         f"Row {row_num} database error: {e}"
                     )
+                RawLoadData.objects.create(
+                    upload=self.upload,
+                    row_number=row_num,
+                    organization=self.upload.organization,
+                    status="error",
+                    validation_errors={"messages": [error_message]},
+                    validation_warnings={"messages": warnings},
+                )
+                
+            if database_errors:
                 self.upload.load_errors = database_errors
                 self.upload.database_error_count = len(database_errors)
+                self.upload.status="error"
                 self.upload.save()
                 
     # Helper to handle mapping with defaults

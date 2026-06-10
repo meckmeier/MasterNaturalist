@@ -3,7 +3,7 @@
 {% block body %}
 <div class="me-page">
 
-    <h2>Review Pending Activities</h2>
+    <h2>Final Review</h2>
     {% if errors %}
         <div class="alert alert-danger">
             <h5>Errors</h5>
@@ -25,16 +25,14 @@
             </ul>
         </div>
     {% endif %}
-
+        <p>Review the cards to ensure that the activity will publish as you would like. 
+            If something looks wrong, you have the option to remove an individual activity from the publish.</p>
 
     <form method="post">
 
-        {% csrf_token %}
-
-    
-            
+        {% csrf_token %}       
         {% for e in pending_sessions %}
-            {% include "orgs/_pending_session_item.html" with session=e %}
+            {% include "orgs/upload/_pending_session_item.html" with session=e %}
         {% endfor %}
         
         <button type="submit" name="action" value="continue" class="me-btn">
@@ -44,7 +42,7 @@
         {% if not errors %}
         <a href="{% url 'upload_publish' upload.id %}" class="me-btn">
             <span><i class="bi bi-gear me-btn-icon"></i></span>
-            <span class="me-btn-label">Continue and PUBLISH</span></a>
+            <span class="me-btn-label">PUBLISH</span></a>
         {% endif %}
         <a href="{% url 'upload_cancel_confirm' upload.id %}?next={{ request.path }}" class="me-btn">
             <span><i class = "bi bi-backspace me-btn-icon"></i></span>

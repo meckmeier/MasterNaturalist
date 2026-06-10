@@ -58,7 +58,7 @@
     </div>
 
     <h6 class="mb-2">Load history</h6>
-
+    
     {% if upload.stage_logs.all %}
       <div class="table-responsive">
         <table class="table table-sm align-middle mb-0">
@@ -77,6 +77,7 @@
             </tr>
           </thead>
           <tbody>
+            {% if request.user.is_staff %}
             {% for log in upload.stage_logs.all %}
               <tr>
                 <td>{{ log.get_stage_display|default:log.stage }}</td>
@@ -103,6 +104,7 @@
                 <td>{{ log.message }}</td>
               </tr>
             {% endfor %}
+            {% endif %}
             <tr>
               <td>Final</td>
                 <td>Locations</td>

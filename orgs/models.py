@@ -580,7 +580,6 @@ class Session(models.Model):
             'orgs/images/default.jpg'
         )
 
-
 class RawLoadData(models.Model):
     upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
     row_number = models.IntegerField()
@@ -650,10 +649,22 @@ class Pending_Location(models.Model):
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="updated_pending_locations"  )
     updated_at = models.DateTimeField(auto_now=True)
     source_upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
-    processing_status = models.CharField(max_length=20, default="pending")  # pending, approved, rejected
+    processing_status = models.CharField(max_length=20,
+            choices=[
+                ("match", "Matched existing location"),
+                ("create", "Create new location"),
+                ("merge", "Merge with selected location"),
+                ("skip", "Skip"),
+            ],
+            default="create",)
+        
+
     real_location = models.ForeignKey(
         Location, null=True, blank=True, on_delete=models.SET_NULL
     )  # points to production if this is a match
+
+    match_score = models.IntegerField(default=0, blank=True)
+    match_reason = models.CharField(max_length=255, blank=True)
 
      # 👇 MACHINE FIELDS
     latitude = models.FloatField(null=True, blank=True)

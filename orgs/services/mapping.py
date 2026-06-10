@@ -61,3 +61,26 @@ def validate_mapping(mapping):
             errors.append(f"Required field '{field}' was not mapped.")
 
     return errors
+
+def build_default_mapping(columns, field_names):
+    mapping = {}
+
+    normalized_fields = {
+        field.lower().strip(): field
+        for field in field_names
+    }
+
+    for col in columns:
+        col = str(col).strip()
+
+        # ignore blank / unnamed spreadsheet columns
+        if not col or col.lower().startswith("unnamed:"):
+            continue
+
+        normalized_col = col.lower().strip()
+
+        if normalized_col in normalized_fields:
+            field_name = normalized_fields[normalized_col]
+            mapping[field_name] = col
+
+    return mapping

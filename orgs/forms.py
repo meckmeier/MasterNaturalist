@@ -250,6 +250,35 @@ LocationFormSet = inlineformset_factory(
     formset=BaseLocationFormSet,
 )
 
+class LocationOrgForm(forms.Form):
+    org = forms.ModelChoiceField(
+        queryset=Organization.objects.filter(deleted=False).order_by("org_name"),
+        required=False,
+        label="Owner organization"
+    )
+
+
+class LocationMergeForm(forms.Form):
+    from_location = forms.ModelChoiceField(
+        queryset=Location.objects.filter(deleted=False).order_by("physical_location", "city_name"),
+        label="Merge this location"
+    )
+
+    to_location = forms.ModelChoiceField(
+        queryset=Location.objects.filter(deleted=False).order_by("physical_location", "city_name"),
+        label="Into this location"
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        from_location = cleaned.get("from_location")
+        to_location = cleaned.get("to_location")
+
+        if from_location and to_location and from_location == to_location:
+            raise forms.ValidationError("You cannot merge a location into itself.")
+
+        return cleaned
+    
 class EventFilterForm(forms.Form):
     session_mode = forms.ChoiceField(
     required=False,
