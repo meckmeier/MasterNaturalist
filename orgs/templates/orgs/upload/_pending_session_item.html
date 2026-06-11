@@ -72,22 +72,21 @@
   </div>
   <div class="me-card-sponsor">
     Sponsored by: {{ e.activity.org.org_name }}
-    {{ e.location.processing_status }}
 
     <p>Location: 
       {% if e.location %}
-      {{ e.location }} {% if e.location.processing_status == "create" %} 
+      {{ e.location.loc_name }} ({{e.location.real_location.org.org_name}}) {% if e.location.processing_status == "create" %} 
         (will be added by load)
        {% endif %} 
        {% endif %}
     
              {% if e.session_url %}
-           | {{ e.session_url }}
+           <br> {{ e.session_url }}
             
       {% elif e.activity.activity_url %}
-          | {{ e.activity.activity_url }}
+          <br> {{ e.activity.activity_url }}
       {% elif e.activity.contact_email%}
-           |   {{ e.activity.contact_email }}
+          <br>   {{ e.activity.contact_email }}
           
         {% endif %} 
     </p>
