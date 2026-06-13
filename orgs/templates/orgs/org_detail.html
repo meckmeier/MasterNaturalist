@@ -11,7 +11,7 @@
      
 <div class="me-page">
    
-<form method="post" id="org-form" data-org-id="{{ org.id }}" class="me-form">
+<form method="post" id="org-form" data-org-id="{{ org.id }}" class="me-form" autocomplete="off">
     {% csrf_token %}
    {{form.id}}
     

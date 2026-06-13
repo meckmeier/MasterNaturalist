@@ -22,7 +22,7 @@ admin.site.register(Pending_Session)
 admin.site.register(Pending_Location)
 admin.site.register(ZipToCounty)
 admin.site.register(OrganizationEnrollmentRequest)
-
+admin.site.register(ActivityLog)
 admin.site.register(UploadLog)
 
 @admin.register(Feedback)

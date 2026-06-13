@@ -23,7 +23,9 @@
     </div>
 {% endif %}
 
-<form class="me-form"method="post" id="activity-form" data-default-location="{{ default_location_id }}" data-org-id="{{ activity.org.id }}" novalidate>
+<form class="me-form"method="post" id="activity-form" 
+    data-default-location="{{ default_location_id }}" data-org-id="{{ activity.org.id }}" 
+    novalidate autocomplete="off">
  {% csrf_token %}
  <input type="hidden" name="org" value="{{ request.GET.org }}">
  <input type="hidden" name="location" value="{{ request.GET.location }}">

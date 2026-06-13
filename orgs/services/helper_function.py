@@ -60,11 +60,50 @@ def build_location_fingerprint(*, org_id, loc_name, address=None, city_name=None
 
     return f"org|{org_id}|{name}|{city}|{state}"
 
+def normalize_zip_code(value):
+    """
+    Convert raw zip input into a clean 5-digit ZIP string.
+    Returns None if the value cannot be normalized.
+    """
+
+    if value is None:
+        return None
+
+    value = str(value).strip()
+
+    if not value:
+        return None
+
+    # Handle Excel/pandas-style values like 53217.0
+    if value.endswith(".0"):
+        value = value[:-2]
+
+    # Handle ZIP+4
+    if "-" in value:
+        value = value.split("-")[0].strip()
+
+    # Keep only digits
+    value = "".join(ch for ch in value if ch.isdigit())
+
+    if not value:
+        return None
+
+    # Pad leading zero ZIPs if needed
+    if len(value) < 5:
+        value = value.zfill(5)
+
+    # Use only the first 5 digits
+    value = value[:5]
+
+    if len(value) != 5:
+        return None
+
+    return value
 
 
 def get_county_region_from_zip(zip_code):
     from orgs.models import ZipToCounty
-    zip_code = (zip_code or "").strip()
+    zip_code = normalize_zip_code(zip_code)
 
     if not zip_code:
         return None, None
@@ -75,7 +114,9 @@ def get_county_region_from_zip(zip_code):
         return None, None
 
     county = zip_row.county
-    return county, county.region_name
+    region = county.region_name if county else None
+
+    return county, region
 
 
 

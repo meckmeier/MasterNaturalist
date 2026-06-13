@@ -1,0 +1,36 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+
+<h2>Confirm Rollback</h2>
+
+<p>
+    This will permanently delete:
+</p>
+
+<ul>
+    <li>{{ location_count }} locations</li>
+    <li>{{ activity_count }} activities</li>
+    <li>{{ session_count }} sessions</li>
+</ul>
+
+<p><strong>This action cannot be undone.</strong></p>
+
+<form method="post" action="{% url 'upload_rollback' upload.id %}">
+    {% csrf_token %}
+
+     <button class="me-btn" type="submit">
+    <span>
+            <i class="bi bi-trash me-btn-icon me-btn-learn-icon"></i>
+    </span>
+    <span class="me-btn-label">
+        Yes, Confirm Rollback</span> 
+</button>
+
+
+    <a class="me-btn" href="{% url 'upload_dashboard' %}?upload={{ upload.id }}">
+    <span>
+      <i class="bi bi-backspace me-btn-icon"></i>
+    </span>
+    <span class="me-btn-label">Cancel</span></a>
+</form>
+{% endblock %}

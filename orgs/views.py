@@ -102,9 +102,26 @@ def org_deny(request, enrollment_id):
     if request.method == "POST":
         enrollment.status = "d"
         enrollment.reviewed_at = timezone.now()
-        enrollment.reviewed_by = request.user.profile
+        enrollment.reviewed_by = request.user
+        
         enrollment.save()
+        email = enrollment.contact_email.lower().strip()
+        send_mail(subject="Your request to add an organization on WildPaths Wisconsin has been DENIED",
+                   message=f"""
+                        Hello,
 
+                        Your organization, {enrollment.org_name}, has been denied for WildPaths Wisconsin.
+
+                        If you believe this request was denied unjustly, you may respond to this email with an explanation.
+
+
+                        Thank you!
+                        """,
+                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                recipient_list=[email],
+                                fail_silently=False,
+                            )
+                                
         messages.success(request, "Organization request denied.")
 
     return redirect("org_enrollment_list")
@@ -135,12 +152,31 @@ def org_approve(request, enrollment_id):
             created_by=request.user.profile,
             updated_by=request.user.profile,
         )
+    path = reverse("org_mgmt")
+    org_url = f"{settings.SITE_URL}{path}?org={org.id}"
     print("Created org id:", org.id)
     # Optionally, you could also create an OrgManager entry for the contact person here if you want them to have immediate access.
     email = enrollment.contact_email.lower().strip()
     user=User.objects.filter(email__iexact=email).first()
     if user and hasattr(user, "profile"):
         OrgManager.objects.get_or_create(profile=user.profile, org=org, role="owner")
+        
+        send_mail(subject="Organization Approved on WildPaths Wisconsin",
+                   message=f"""
+                        Hello,
+
+                        Your organization, {org.org_name}, has been approved for WildPaths Wisconsin.
+
+                        Please use this link to see the new organization:
+
+                        {org_url}
+
+                        Thank you!
+                        """,
+                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                recipient_list=[email],
+                                fail_silently=False,
+                            )
     else:
         invite = OrgInvite.objects.create(
             org=org,
@@ -148,8 +184,9 @@ def org_approve(request, enrollment_id):
             role="owner",
             created_by=request.user.profile,
         )
+
         invite_url = request.build_absolute_uri(reverse("accept_org_invite", args=[invite.token]))
-        send_mail(subject="You've been invited to manage an organization on WildPaths Wisconsin",
+        send_mail(subject="Organization Approved on WildPaths Wisconsin",
                    message=f"""
                         Hello,
 
@@ -159,6 +196,9 @@ def org_approve(request, enrollment_id):
 
                         {invite_url}
 
+                        Note: you will be asked to reconfirm your email during this process. Once you have
+                        successfully create your username and are able to login, you may use this link to see the 
+                        newly created organization management page: {org_url}
                         Thank you!
                         """,
                                 from_email=settings.DEFAULT_FROM_EMAIL,
@@ -420,7 +460,15 @@ def org_enroll(request):
                 enrollment.created_by = request.user.profile
                                                                         
             enrollment.save()
-            # send email to you
+            
+            print("Enrollment saved:", enrollment.id)
+            # send email to staff
+            staff_emails = list(
+                User.objects.filter(is_staff=True)
+                .exclude(email="")
+                .values_list("email", flat=True)
+            )
+            print("staff emails", staff_emails)
             send_mail(
                 subject="New Organization Enrollment Request",
                 message=(
@@ -430,10 +478,10 @@ def org_enroll(request):
                     f"Contact Name: {enrollment.contact_name}\n"
                     f"Contact Email: {enrollment.contact_email}\n\n"
                     f"About: {enrollment.about}\n"
-                    f"Review it in Django admin or your staff page."
+                    f"Review it in on your staff page."
                 ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                recipient_list=staff_emails,
                 fail_silently=False,
             )
 
@@ -688,7 +736,7 @@ def locations(request):
             queryset =queryset.filter(Q(org__org_name__icontains=q) 
                                       | Q(org__about__icontains=q)
                                       | Q(loc_name__icontains=q)
-                                      | Q(about__icontains=q)
+                                      | Q(location_about__icontains=q)
                                       ).distinct()
         activity_status = data.get("activity_status")
             
@@ -2297,6 +2345,25 @@ def upload_cancel_confirm(request, upload_id):
         "next": next_url,
     })
 
+@login_required
+def upload_rollback_confirm(request, upload_id):
+    upload = get_object_or_404(ActivityUpload, id=upload_id)
+
+    context = {
+        "upload": upload,
+        "location_count": Location.objects.filter(source_upload=upload).count(),
+        "activity_count": Activity.objects.filter(source_upload=upload).count(),
+        "session_count": Session.objects.filter(source_upload=upload).count(),
+    }
+
+    return render(
+        request,
+        "orgs/upload/upload_confirm_rollback.html",
+        context,
+    )
+
+@login_required
+@require_POST
 def upload_rollback(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
     with transaction.atomic():

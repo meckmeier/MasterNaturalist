@@ -631,6 +631,7 @@ class RawLoadData(models.Model):
         return f"Row {self.row_number} - {self.title or 'No Title'}"
 
 class Pending_Location(models.Model):
+    
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True, related_name="pending_locations")
     loc_name= models.CharField(max_length=255)
     physical_location = models.BooleanField(default=True)

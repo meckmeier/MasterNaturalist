@@ -42,7 +42,7 @@ urlpatterns = [
     #path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),
     path("locations/", views.locations, name="locations"),
     path("follow_org/<int:org_id>", views.follow_org, name="follow_org"),
-    path( "org/<int:org_id>/default-location/<int:loc_id>/",views.org_set_default_location,name="org_set_default_location"),
+    path("org/<int:org_id>/default-location/<int:loc_id>/",views.org_set_default_location,name="org_set_default_location"),
     path("profile/", views.profile_view, name="profile"),
     path("staff/user/", views.staff_user_manage, name="staff_user_manage"),
 
@@ -50,7 +50,7 @@ urlpatterns = [
     path("login", lambda request: redirect("account_login"), name="login"),
     path("logout", lambda request: redirect("account_logout"), name="logout"),
     path("register", lambda request: redirect("account_signup"), name="register"),
-    #path( "register",lambda request: HttpResponse("Registration temporarily disabled.",status=200), name="register"),
+    #path("register",lambda request: HttpResponse("Registration temporarily disabled.",status=200), name="register"),
     path("password_reset/", lambda request: redirect("account_reset_password"), name="password_reset"),
 
     path("uploads/", views.upload_dashboard, name="upload_dashboard"),
@@ -64,6 +64,8 @@ urlpatterns = [
     path("upload/<int:upload_id>/publish/", views.upload_publish, name="upload_publish"),
     path("upload/<int:upload_id>/success/", views.upload_success, name="upload_success"),
     path("upload/<int:upload_id>/cancel/", views.upload_cancel_confirm, name="upload_cancel_confirm"),
+    path("upload/<int:upload_id>/rollback-confirm/",views.upload_rollback_confirm,name="upload_rollback_confirm",),
+
     path("upload/<int:upload_id>/rollback/", views.upload_rollback, name="upload_rollback"),
     path("uploads/<int:upload_id>/results/",views.upload_results,name="upload_results"),
     path("lookup-zip/", views.lookup_zip, name="lookup_zip"),
