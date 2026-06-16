@@ -213,17 +213,18 @@
     </form>
     {% endif %}
 
+<div class="me-form-actions">
 
-  {% if not errors %}
-  <a href="{% url 'upload_review_activities' upload.id %}" class="me-btn">
-      <span><i class="bi bi-gear me-btn-icon"></i></span>
-      <span class="me-btn-label">Continue</span></a>
-  {% endif %}
   <a href="{% url 'upload_cancel_confirm' upload.id %}?next={{ request.path }}" class="me-btn">
-    <span><i class = "bi bi-backspace me-btn-icon"></i></span>
+    <span><i class = "bi bi-backspace me-btn-icon me-btn-brown-icon"></i></span>
     <span class="me-btn-label">Cancel</span>
   </a>
-
+  {% if not errors %}
+  <a href="{% url 'upload_review_activities' upload.id %}" class="me-btn">
+      <span><i class="bi bi-arrow-right-square-fill me-btn-icon"></i></span>
+      <span class="me-btn-label">Continue</span></a>
+  {% endif %}
+</div>
 </div>
 {% endblock %}
 {% block extrajs %}

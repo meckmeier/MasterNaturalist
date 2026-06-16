@@ -2,7 +2,7 @@
 
 
 <div class="me-card">
-  <div class="form-check form-check-inline">
+<div class="form-check form-check-inline" style="background-color:#d6e076;")>
  <input class="form-check-input"
        type="checkbox"
        name="skip_session"
@@ -52,8 +52,8 @@
     </div>
    <div class="me-card-header-right"> 
     <div class="me-icons">
-      {% if e.location %}
-      <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
+      {% if e.location.region_name %}
+      <img src="{% static e.location.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
       style="height:75px; width:auto;">
     {% endif %}
    

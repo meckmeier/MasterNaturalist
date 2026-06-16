@@ -22,17 +22,26 @@
 
 </head>
 <body>
+  {% if messages %}
+  <div >
+    {% for message in messages %}
+      <div class="me-message alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
 <nav class="navbar navbar-dark me-navbar">
   <div class="container-fluid">
 
     <!-- Brand -->
     {% if request.resolver_match.url_name != "landing" %}
       <a class="navbar-brand" href="{% url 'landing' %}">
-      <img src="{% static 'orgs/images/newlogonowords.jpg' %}"
+      <img src="{% static 'orgs/images/wpwlogo13_1.png' %}"
            alt="Home"
            width="100"
            class="img-fluid"
-           style="background-color: #2e7d32; border: white 2px solid;">
+           style="background-color: black; border: white 2px solid;">
     </a>
     {% else %}
       <div></div>>
@@ -191,15 +200,7 @@
 
   </div>
 </nav>
-{% if messages %}
-  <div class="container mt-3">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
+
   <!-- OFFCANVAS PANEL (global UI) -->
   <!-- Filter side panel -->
 <div class="offcanvas offcanvas-start me-filter-panel"

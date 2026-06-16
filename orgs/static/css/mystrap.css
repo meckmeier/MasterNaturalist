@@ -56,6 +56,11 @@ a:visited {
 a:active {
   color: #FF7F11;
 }
+.me-message {
+  background-color: var(--light-green);
+  border-color: var(--green);
+  padding: .5em
+}
 .me-navbar {
     background-color:var(--green);  
     border-bottom: .5px solid var(--main-border);
@@ -121,6 +126,9 @@ a:active {
   padding: 1rem;
   border:#666 solid 1px;
   border-radius: 8px;
+} 
+.me-form-actions{
+   text-align: right;
 }
 /* Tabs */
 .me-tabs {
@@ -340,6 +348,9 @@ a:active {
   background-color: var(--logo-black);
 }
 .me-btn-vol-icon {
+  background-color: var(--logo-blue);
+}
+.me-btn-blue-icon{
   background-color: var(--logo-blue);
 }
 

@@ -39,15 +39,19 @@
             <span><i class="bi bi-check me-btn-icon"></i></span>
             <span class="me-btn-label">Confirm Skipped Activities</span></button>
             <br>
-        {% if not errors %}
-        <a href="{% url 'upload_publish' upload.id %}" class="me-btn">
-            <span><i class="bi bi-gear me-btn-icon"></i></span>
-            <span class="me-btn-label">PUBLISH</span></a>
-        {% endif %}
+
+        <div class="me-form-actions">
         <a href="{% url 'upload_cancel_confirm' upload.id %}?next={{ request.path }}" class="me-btn">
-            <span><i class = "bi bi-backspace me-btn-icon"></i></span>
+            <span><i class = "bi bi-backspace me-btn-icon me-btn-brown-icon"></i></span>
             <span class="me-btn-label">Cancel upload</span>
         </a>
+        {% if not errors %}
+        <a href="{% url 'upload_publish' upload.id %}" class="me-btn">
+            <span><i class="bi bi-arrow-right-square-fill me-btn-icon"></i></span>
+            <span class="me-btn-label">PUBLISH</span></a>
+        {% endif %}
+
+        </div>
     </form>
 </div>
 {% endblock %}

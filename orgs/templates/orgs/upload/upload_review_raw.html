@@ -173,18 +173,16 @@
       <p>No accepted rows are available to continue.</p>
     {% endif %}
   </section>
-
-
-  <div class="form-actions">
-    <button type="submit" name="action" value="continue" class="me-btn">
-       <span><i class="bi bi-gear me-btn-icon"></i></span>
-      <span class="me-btn-label">Continue</span>
-    </button>
-
+  <div class="me-form-actions">
     <a href="{% url 'upload_cancel_confirm' upload.id %}" class="me-btn">
-        <span><i class="bi bi-backspace me-btn-icon"></i></span>
+        <span><i class="bi bi-backspace me-btn-icon me-btn-brown-icon"></i></span>
       <span class="me-btn-label">Cancel</span>
     </a>
+
+    <button type="submit" name="action" value="continue" class="me-btn">
+       <span><i class="bi bi-arrow-right-square-fill me-btn-icon"></i></span>
+      <span class="me-btn-label">Continue</span>
+    </button>
   </div>
 
 </form>

@@ -3,15 +3,12 @@
 {% load static %}
 <div class="me-page">
 <div class="me-landing-content">
-     <img src="{% static 'orgs/images/newlogoCropped.jpg'%}" width ="200" class="img-fluid" style="background-color:#2e7d32;">
-<div>
+     <img src="{% static 'orgs/images/wpwlogo13_1.png'%}" width ="300" class="img-fluid" ">
 
 <h4>A Compass to Conservation in Wisconsin</h4>
-
  
 Designed for <a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a>, the site will help 
 you discover YOUR path to conservation efforts in Wisconsin.</p>
-
 
     <a class="me-btn" href="{% url 'activities' %}?activity_type=v" ; font-weight: bold;color:black;">
      <span>
@@ -43,8 +40,6 @@ you discover YOUR path to conservation efforts in Wisconsin.</p>
     <span class="me-btn-label">
         Organizations</span>
 </a>
-</div>
-
 
 <hr>
 {% if user.is_authenticated%}
@@ -57,8 +52,7 @@ you discover YOUR path to conservation efforts in Wisconsin.</p>
     Manage Organizations</span></a>
 
 {%else%}
-<p>This website was designed to help Wisconsin Master Naturalists find volunteer and training opportunities. 
-    </p> 
+
 {% if false %}
 <a class="me-button-link" href="{% url 'account_signup' %}" title="You need to sign up to save Favorites, or to manage organizations">
     Signup</a>

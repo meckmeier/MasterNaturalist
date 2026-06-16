@@ -392,7 +392,13 @@ def org_mgmt(request):
 
     # staff gets to see all the organizations
     if request.user.is_staff:
-        orgs = Organization.objects.active().prefetch_related(
+        orgs = (Organization.objects
+        .active()
+        .annotate(
+            hasUploads =Exists(
+                    ActivityUpload.objects.filter(organization=OuterRef("pk"))
+                ))
+        .prefetch_related(
             Prefetch(
                 "locations", 
                 queryset=locations_qs,
@@ -409,28 +415,33 @@ def org_mgmt(request):
                 to_attr="pre_mgrs"
             )
             )
+        )
     # if you are not staff, you have to be in the OrgManagers table to see the org on this page.
     else:
         orgs = (
             Organization.objects.active()
             .filter(managed__profile=request.user.profile)
             .distinct()
+            .annotate(
+                has_uploads=Exists(
+                    ActivityUpload.objects.filter(organization=OuterRef("pk"))
+                ))
             .prefetch_related(
                 Prefetch(
                     "locations",
                     queryset=locations_qs,
                     to_attr="pre_locs"  # optional: access as org.active_locs in template
                 ),
-            Prefetch(
-                "activities",
-                queryset=activities_qs,
-                to_attr="pre_activities"  # optional: access as org.active_activities
-            ),
-            Prefetch(
-                "managed",
-                queryset=managers_qs,
-                to_attr="pre_mgrs"
-            )
+                Prefetch(
+                    "activities",
+                    queryset=activities_qs,
+                    to_attr="pre_activities"  # optional: access as org.active_activities
+                ),
+                Prefetch(
+                    "managed",
+                    queryset=managers_qs,
+                    to_attr="pre_mgrs"
+                )
             )
         )
     get_data = request.GET.copy()
@@ -441,6 +452,7 @@ def org_mgmt(request):
         if data.get("org"):
             orgs=orgs.filter(id=data["org"].id)
 
+    
     return render(request, "orgs/org_mgmt.html", {
         "organizations": orgs,
         "filter_form": OrgFilterForm(request.GET or None),
@@ -2460,7 +2472,9 @@ def upload_publish(request, upload_id):
 @login_required
 def upload_dashboard(request):
     upload_id = request.GET.get("upload")
+    org_id = request.GET.get("org")
 
+    
     if request.user.is_staff:
         uploads = ActivityUpload.objects.select_related(
             "organization", "uploaded_by"
@@ -2476,10 +2490,13 @@ def upload_dashboard(request):
     if upload_id:
         uploads = uploads.filter(id=upload_id)
 
+    if org_id:
+        uploads = uploads.filter(organization=org_id)
+        
     return render(request, "orgs/upload/upload_dashboard.html", {
         "uploads": uploads,
-
     })
+
 from types import SimpleNamespace
 
 def upload_results(request, upload_id):

@@ -31,12 +31,14 @@
 
     <div class="mb-3">
       {% if upload.status == "published" or upload.status == "rollback" %}
-              <a class="btn btn-sm btn-outline-success" href="{% url 'upload_results' upload.id %}">
-          View published activities
+          <a class="me-btn" href="{% url 'upload_results' upload.id %}">
+            <span><i class="bi bi-tree-fill me-btn-icon me-btn-vol-icon"></i></span>
+            <span class="me-btn-label">View published activities</span>
         </a>
       
-        <a class="btn btn-sm btn-outline-danger ms-2" href="{% url 'upload_rollback_confirm' upload.id %}">
-          Rollback
+        <a class="me-btn" href="{% url 'upload_rollback_confirm' upload.id %}">
+          <span><i class="bi bi-trash me-btn-icon me-btn-brown-icon"></i></span>
+          <span class="me-btn-label">Rollback</span>
         </a>
       {% else %}
         <a class="btn btn-sm btn-primary" href="{% url 'upload_map' upload.id %}">

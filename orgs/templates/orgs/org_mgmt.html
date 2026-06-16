@@ -59,10 +59,17 @@
             Default Location: {{ org.default_location.loc_name }}
         </div>
     <div class="me-card-header-right">
+    {% if org.hasUploads %}
+        <a href="{% url 'upload_dashboard'%}?org={{org.id}}" class="me-btn">
+        <span><i class="bi bi-gear me-btn-icon me-btn-blue-icon"></i></span>
+        <span class="me-btn-label">Upload Dashboard</span>
+        </a>
+    {% endif %}
     <a href="{% url 'upload_csv' org.id%}" class="me-btn">
-        <span><i class="bi bi-arrow-up-square-fill me-btn-icon"></i></i></span>
+        <span><i class="bi bi-arrow-up-square-fill me-btn-icon"></i></span>
         <span class="me-btn-label">Upload Activities</span></a>
     </div>
+
     </div>
 
     
