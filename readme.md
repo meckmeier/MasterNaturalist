@@ -36,16 +36,20 @@ X map: save / cancel only. only show if their are unmapped fields.
 X stage - do better format. only show the error or warnings - what will be omitted from the load, what will go in that you might want to edit, and what was accepted.
 
 Xlocation - do a fuzzy match on name... 
-adjust the decision box - use a drop down. add a feature to ignore match and use my location (you need to check on all the status values in this table)
+Xadjust the decision box - use a drop down. add a feature to ignore match and use my location (you need to check on all the status values in this table)
 
-work the session format better on what you see for locations.
-(if you have a location and o session format... then ask if it should be changed)
+x duplicate location management
 
-Final Review - for review activities.
-change skip to REMOVE and don't save here, just continue.
+session url should be the field loaded... and it would by default be the url for the activity. 
+if its online it needs a session url/ and the activity needs either a url OR a contact email.
+you need to apply the same rules on the upload process.
+the remove button on the activities doesn't actually skip the activities in the load.
+
+
+xFinal Review - for review activities.
+xchange skip to REMOVE and don't save here, just continue.
 
 add a rollback confirmation.
-
 
 
 verify that the email sent when createing a new org actually creates the new user account.
