@@ -6,14 +6,16 @@
   --light-green: #d6e076;
   --dark-green: rgb(12,67,11);      
   --med-green:  rgb(63,103,14);     /* Light Gray */
-  --green: #2e7d32;
+  --old-green: #2e7d32;
+  --green:rgb(12,67,11) ;
   --blue: #2C6FA3;
   --logo-blue: #25408F;
   --logo-black: #181818;
+  --logo-green: rgb(12,67,11);
   --mustard: #FF7F11;   /* Yellow */
   --logo-yellow: #D85D29;
   --logo-brown: #6F1200;
-  --nav-text: #2e7d32;        /* Deep Green-Gray */
+  --nav-text: rgb(12,67,11);        /* Deep Green-Gray */
   --nav-bar-background: ivory;
   --hover: #6B6F34;
   --hover-text: #FFEF91;
@@ -57,7 +59,7 @@ a:active {
   color: #FF7F11;
 }
 .me-message {
-  background-color: var(--light-green);
+  background-color: white;
   border-color: var(--green);
   padding: .5em
 }
@@ -313,7 +315,7 @@ a:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #2e7d32;
+  background-color: rgb(12,67,11);
   color: white;
   font-size: 1.25rem;
   width: 44px;        /* cleaner than padding for fixed icon block */
@@ -353,7 +355,9 @@ a:active {
 .me-btn-blue-icon{
   background-color: var(--logo-blue);
 }
-
+.me-btn-green-icon{
+  background-color: var(--logo-green);
+}
 .me-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.25);
@@ -665,7 +669,7 @@ li.inactive {
 
 /* selected option */
 .me-toggle input[type="radio"]:checked + label {
-  background: #2e7d32;
+  background: var(--dark-green);
   color: white;
 }
 
