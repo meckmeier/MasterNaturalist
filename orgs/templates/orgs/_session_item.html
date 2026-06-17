@@ -101,7 +101,7 @@
      <div class="me-card-header-right"> 
     <div class="me-icons">
         {% if e.activity.org and e.activity.org|can_edit:request.user %}
-          <a class="me-btn-simple" href="{% url 'org_mgmt' %}?org={{ current_activity.org.id }}" title="Go to Organization Dashboard">
+          <a class="me-icon-btn" href="{% url 'org_mgmt' %}?org={{ current_activity.org.id }}" title="Go to Organization Dashboard">
             <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i>
           </a>
         {% endif %}

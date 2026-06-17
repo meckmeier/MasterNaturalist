@@ -17,44 +17,44 @@
    {{form.id}}
       
     
-    <div class = "form-grid {% if view_only %}view-mode{% endif %}">
-        <div class ="form-field-full">
+    <div class = "me-form-grid {% if view_only %}view-mode{% endif %}">
+        <div class ="me-form-field-full">
             Location Name:
             {{ form.loc_name}}
             {{ form.loc_name.errors }}
             {% if form.loc_name.help_text %}
-                <div class="form-text">
+                <div class="me-form-text">
                     {{ form.loc_name.help_text }}
                 </div>
             {% endif %}
         </div>
-                <div class ="form-field-full">
+                <div class ="me-form-field-full">
             {{ form.address.label_tag }}
             {{ form.address}}
             {{ form.address.errors }} 
         </div>
-        <div class ="form-field">
+        <div class ="me-form-field">
             {{ form.city_name.label_tag }}
             {{ form.city_name}}
             {{ form.city_name.errors }}
         </div>
-        <div class ="form-field">
+        <div class ="me-form-field">
             {{ form.state.label_tag }}
             {{ form.state}}
             {{ form.state.errors }}
         </div>
-        <div class ="form-field">
+        <div class ="me-form-field">
             {{ form.zip_code.label_tag }}
             {{ form.zip_code}}
             {{ form.zip_code.errors }}
         </div>
-        <div class="form-field-full">
+        <div class="me-form-field-full">
             {{ form.location_about.label_tag}}
             {{ form.location_about}}
             {{ form.location_about.errors}}
         </div>
        
-        <div class ="form-field">
+        <div class ="me-form-field">
             Location website:
             {{ form.org_loc_url}}
             {{ form.org_loc_url.errors }}
@@ -63,7 +63,7 @@
             {{ form.contact_email.errors }}
         </div>
          <div></div>
-         <div class ="form-field">
+         <div class ="me-form-field">
             {{ form.region_name.label_tag }}
             {{ form.region_name}}
             {{ form.region_name.errors }}

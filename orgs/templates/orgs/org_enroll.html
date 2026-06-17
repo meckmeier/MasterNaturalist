@@ -20,67 +20,67 @@
     {{ form.errors }}
   </div>
 {% endif %}
-     <div class = "form-grid">
-        <div class ="form-field-full">
+     <div class = "me-form-grid">
+        <div class ="me-form-field-full">
             Organization Name:
             {{ form.org_name}}
             {{ form.org_name.errors }}
         </div>
-        <div class ="form-field-full">
+        <div class ="me-form-field-full">
             {{ form.about.label_tag }} <i class="bi bi-info-circle" title="Please provide a brief description of your organization. This information will help us to approve your enrollment request."></i>
             {{ form.about}}
             {{ form.about.errors }} 
             <div class="me-sponsor">Please note that Wild Paths Wisconsin is a platform for nature based organizations that provide training or volunteer opportunities to Master Naturalists. Be sure your description focuses on that aspect of your organization. This description will be presented to potential volunteers.</div>
         </div>
-        <div class ="form-field">
+        <div class ="me-form-field">
             Main URL:
             {{ form.org_url}}
             {{ form.org_url.errors }}
         </div>
-        <div class ="form-field">
+        <div class ="me-form-field">
 
         </div>
-         <div class ="form-field">
+         <div class ="me-form-field">
             {{ form.region_name.label_tag }}
             {{ form.region_name}}
             {{ form.region_name.errors }}
         </div>
         
-        <div class="form-field">
+        <div class="me-form-field">
             URL for Volunteering Opportunities:
             {{ form.volunteer_url }}
             {{ form.volunteer_url.errors }}
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             URL for Trainings:
             {{ form.training_url }}
             {{ form.training_url.errors }}
         </div>
-         <div class="form-field">
+         <div class="me-form-field">
             {{ form.contact_email.label_tag }}
             {{ form.contact_email }}
             {{ form.contact_email.errors }}
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
         </div>
-       <div class="form-field">
+       <div class="me-form-field">
             {{ form.contact_name.label_tag }}
             {{ form.contact_name }}
             {{ form.contact_name.errors }}
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             {{ form.contact_title.label_tag }}
             {{ form.contact_title }}
             {{ form.contact_title.errors }}
         </div>
-        <div class="form-field-full">
+        <div class="me-form-field-full">
             Please add any additional comments or questions here:
             {{ form.message }}
             {{ form.message.errors }}
         </div>
-        <div class="mb-3">
+        <div class="me-form-field-full">
             {{ form.turnstile }}
         </div>
      </div>

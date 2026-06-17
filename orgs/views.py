@@ -1580,11 +1580,15 @@ def map_view(request):
     return render(request, "orgs/map.html", context)
 
 def test_email(request):
+    print("starting email test")
     context = {}
+    print("DEBUG =", settings.DEBUG)
+    print("EMAIL_BACKEND =", settings.EMAIL_BACKEND)
 
     if request.method == "POST":
+        
         sendto = request.POST.get("sendto")
-
+        
         try:
             send_mail(
                 subject="Test Email from Postmark",
@@ -2590,6 +2594,7 @@ def test_html(request):
     activity=Activity.objects.first()
     activity_form = ActivityForm(instance=activity)
     default_location_id =""
+
     return render(request, "orgs/test_html.html", {
         "activity": activity,
         "activity_form": activity_form,

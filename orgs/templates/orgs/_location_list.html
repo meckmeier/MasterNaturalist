@@ -109,7 +109,7 @@
 
           <div class="me-card-header-right">
             {% if loc.org and loc.org|can_edit:request.user %}
-              <a class="me-btn-simple" href="{% url 'org_mgmt' %}#org-{{ loc.org.id }}">
+              <a class="me-icon-btn" href="{% url 'org_mgmt' %}#org-{{ loc.org.id }}">
                 <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon" title="Go to management view"></i>
               </a>
             {% endif %}

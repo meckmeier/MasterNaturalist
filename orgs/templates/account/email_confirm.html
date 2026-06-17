@@ -15,13 +15,16 @@
 
                 <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
                     {% csrf_token %}
-                    <button type="submit" class="me-btn-simple">
-                        Confirm Email
+                    <button type="submit" class="me-btn">
+                        <span><i class="bi bi-check me-btn-icon"></i></span>
+                        <span class="me-btn-label">Confirm Email</span>
                     </button>
                 </form>
             {% else %}
                 <p>This confirmation link is invalid or has already been used.</p>
-                <a href="{% url 'account_login' %}" class="me-btn-simple">Sign In</a>
+                <a href="{% url 'account_login' %}" class="me-btn">
+                    <span><i class="bi bi-box-arrow-in-right me-btn-icon"></i></span>
+                    <span>Sign In</span></a>
             {% endif %}
 
         </div>

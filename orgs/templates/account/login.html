@@ -27,9 +27,10 @@
         <a href="{% url 'account_reset_password' %}">Forgot password?</a>
     </div>
 
-    <input class="me-btn-simple" type="submit" value="Login">
+   <button class="me-text-btn" type="submit">Login</button>
 </form>
 
-    Don't have an account? <a href="{% url 'account_signup' %}" class="me-button-link">Register here.</a>
+    Don't have an account? <a href="{% url 'account_signup' %}" class="me-btn-text">
+       Register here</a>
 </div>
 {% endblock %}

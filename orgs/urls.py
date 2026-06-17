@@ -50,7 +50,6 @@ urlpatterns = [
     path("login", lambda request: redirect("account_login"), name="login"),
     path("logout", lambda request: redirect("account_logout"), name="logout"),
     path("register", lambda request: redirect("account_signup"), name="register"),
-    #path("register",lambda request: HttpResponse("Registration temporarily disabled.",status=200), name="register"),
     path("password_reset/", lambda request: redirect("account_reset_password"), name="password_reset"),
 
     path("uploads/", views.upload_dashboard, name="upload_dashboard"),

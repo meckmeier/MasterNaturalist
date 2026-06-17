@@ -132,6 +132,62 @@ a:active {
 .me-form-actions{
    text-align: right;
 }
+
+/* form-grid is the TOP form*/
+.me-form-grid{
+    display: grid;
+    grid-template-columns: 1fr .25fr 1fr;
+    gap: 1rem;
+}
+.me-form-field.title{
+    grid-column: span 3;
+    font-size:25px;
+    font-weight:bold
+}
+.me-form-grid.view-mode label {
+    display: block;
+}
+.me-form-field-full{
+    grid-column: span 3;
+}
+.me-categories-wrapper {
+    display: flex !important;      /* force flex inside the grid cell */
+    flex-wrap: wrap !important;    /* allow wrapping */
+    gap: 10px;                     /* spacing between checkboxes */
+}
+
+.me-categories-wrapper .me-form-check {
+    display: flex;                 /* inline for checkbox + label */
+    align-items: center;
+    margin: 0;                     /* gaps handled by container */
+}
+
+.me-categories-wrapper .-me-form-check-input {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;             /* small gap between checkbox + label */
+}
+
+.me-categories-wrapper .me-form-check-input {
+    width: 16px;
+    height: 16px;
+}
+
+.me-form-grid input, 
+.me-form-grid textarea, 
+.me-form-grid select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.me-form-grid.view-mode input,
+.me-form-grid.view-mode textarea, 
+.me-form-grid.view-mode select {
+    border: none;
+    background-color: transparent;
+
+}
 /* Tabs */
 .me-tabs {
   display: flex;
@@ -373,11 +429,10 @@ a:active {
   text-decoration: none;
   color: inherit;
 }
-.me-btn-simple {
+.me-icon-btn{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   height: 50px;
   padding: 0 ;
   font-size: 1rem;
@@ -389,9 +444,7 @@ a:active {
   text-align: center;
   text-decoration: none;
   box-shadow: 5px 4px 4px rgba(0,0,0,0.35);
-  
   margin: 10px;
-
   /* 🔑 YOUR COLORS */
   background-color: var(--button);   /* base */
   color: var(--button-text);
@@ -399,24 +452,82 @@ a:active {
 }
 
 /* hover */
-.me-btn-simple:hover
-.me-btn-simple:focus {
+.me-icon-btn:hover
+.me-icon-btn:focus {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.25);
 }
 
 /* active (click) */
-.me-btn-simple:active {
+.me-icon-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.me-icon-btn:link,
+.me-icon-btn:visited {
+  color: var(--light-green);
+  text-decoration: none;
+}
+/* disabled */
+.me-icon-btn:disabled,
+.me-icon-btn.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.me-text-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 40px;
+  padding: 10px;
+  box-sizing: border-box;
+
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.5;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  border-radius: 0.375rem;
+  border: 1px solid var(--button);
+
+  background: var(--button);
+  color: var(--button-text);
+
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+
+  box-shadow: 5px 4px 4px rgba(0,0,0,0.35);
+  margin: 10px;
+}
+
+.me-text-btn:link,
+.me-text-btn:visited {
+  color: var(--button-text);
+  text-decoration: none;
+}
+
+.me-text-btn:hover,
+.me-btn-text:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
+.me-text-btn:active {
   transform: translateY(1px);
   box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-/* disabled */
-.me-btn-simple:disabled,
-.me-btn-simple.disabled {
+.me-text-btn:disabled,
+.me-btn-text.disabled {
   opacity: 0.65;
   cursor: not-allowed;
 }
+
 a.me-button-link {
     display: inline-block;       /* Makes it behave like a button */
     height: 50px;

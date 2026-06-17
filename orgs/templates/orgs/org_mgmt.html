@@ -53,7 +53,7 @@
      <div class="me-card-header">
         <div class="me-card-header-left">
         <h4 class="me-card-title">
-            {{ org.org_name }}  <a href="{% url 'org_edit' org.id %}" title="manage organization details"><i class="bi bi-pencil"></i></a>
+            {{ org.org_name }}  <a href="{% url 'org_edit' org.id %}" class="me-icon-btn" title="manage organization details"><i  style="width: 50px;" class="bi bi-pencil"></i></a>
             </h4>
             <a href="{{org.org_url}}" target="_blank" rel="noopener noreferrer">{{org.org_url}}</a>
             Default Location: {{ org.default_location.loc_name }}
@@ -100,7 +100,7 @@
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 
-                                <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}" title="edit location">
+                                <a href="{% url 'loc_edit' loc.id %}?org={{ org.id }}"  title="edit location">
                                     <i class="bi bi-pencil"></i>
                                 </a>
                             </div>

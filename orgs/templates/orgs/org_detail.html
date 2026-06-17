@@ -20,58 +20,59 @@
             {{ form.non_field_errors }}
         </div>
     {% endif %}
-    <div class = "form-grid {% if view_only %}view-mode{% endif %}">
-        <div class ="form-field-full">
+    <div class = "me-form-grid {% if view_only %}view-mode{% endif %}">
+        <div class ="me-form-field-full">
             Organization Name:
             {{ form.org_name}}
             {{ form.org_name.errors }}
         </div>
-        <div class ="form-field-full">
+        <div class ="me-form-field-full">
             {{ form.about.label_tag }}
             {{ form.about}}
             {{ form.about.errors }} 
         </div>
-        <div class ="form-field">
+        <div class ="me-form-field">
             Main URL:
             {{ form.org_url}}
             {{ form.org_url.errors }}
         </div>
-        <div class ="form-field">
+        <div class ="me-form-field">
             {{ form.in_wisconsin.label_tag }}
             {{ form.in_wisconsin}}
             {{ form.in_wisconsin.errors }}
             
         </div>
-         <div class ="form-field">
+         <div class ="me-form-field">
             {{ form.region_name.label_tag }}
             {{ form.region_name}}
             {{ form.region_name.errors }}
         </div>
         
-        <div class="form-field">
+        <div class="me-form-field">
             URL for Volunteering Opportunities:
             {{ form.volunteer_url }}
             {{ form.volunteer_url.errors }}
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
            {% if staff %} 
            Master Naturalist Host
             {{ form.host}}
             {{ form.host.errors }} {% endif %}
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             URL for Trainings:
             {{ form.training_url }}
             {{ form.training_url.errors }}
         </div>
 <!-- submit button INSIDE the form -->
-    
+        <div class="me-form-field">
         <button type="submit" class="me-btn">
           <span><i class="bi bi-floppy me-btn-icon"></i></span>
             <span class="me-btn-label">Save</span>
         </button>
+        </div>
         <div></div>
-        <div class="form-field">
+        <div class="me-form-field">
             Default Location:
             {{ form.default_location.errors }}
             <div class="d-none">

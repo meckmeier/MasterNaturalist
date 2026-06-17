@@ -58,51 +58,51 @@
 
 <fieldset>
        <div class="error-text"> {{ activity_form.non_field_errors }}</div>
-    <div class = "form-grid {% if view_only %}view-mode{% endif %}">
-        <div class="form-field">
+    <div class = "me-form-grid {% if view_only %}view-mode{% endif %}">
+        <div class="me-form-field">
             {{ activity_form.title.label_tag }}<br>
             {{ activity_form.title }}
             <span class="error-text">{{ activity_form.title.errors }}</span>
         </div>
 
-         <div class="form-field">
+         <div class="me-form-field">
             Type:<br>
             {{ activity_form.activity_type }}
             {{ activity_form.activity_type.errors }}
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             {{ activity_form.org.label_tag }}
             {{ activity_form.org }}
             {{ activity_form.org.errors }}
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             URL for Activity
             {{ activity_form.activity_url}}
             <span class="error-text">{{ activity_form.activity_url.errors}}</span>
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
             {{ activity_form.has_cost }}
             
              <span class="error-text
             <span class="error-text">{{ activity_form.has_cost.errors }}</span>
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             Activity contact:<br>
             {{ activity_form.contact_email }}
             <span class="error-text">{{ activity_form.contact_email.errors }}</span>
         </div>
-                <div class ="form-field-full">
+                <div class ="me-form-field-full">
             {{ activity_form.description.label_tag }}<br>
             {{ activity_form.description }}
             {{ activity_form.description.errors }}
         </div>
-        <div class="form-field-full">
+        <div class="me-form-field-full">
             {{ activity_form.prerequisites.label_tag }}<br>
             {{ activity_form.prerequisites }}
             <span class="error-text">{{ activity_form.prerequisites.errors }}</span>
         </div>
-        <div class="form-field-full">
+        <div class="me-form-field-full">
     
     <div class="formset" data-prefix="locations">
     
@@ -232,21 +232,21 @@
     {% endif %}
  {% endif %}    
     </div>
-    <div class ="form-field-full">
+    <div class ="me-form-field-full">
              <legend>Details</legend>
            <span class="me-muted">These fields are optional but you can use them to display additional information regarding dates and times.</span>
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             {{ activity_form.date_description.label_tag }}<br>
             {{ activity_form.date_description }}
             {{ activity_form.date_description.errors }}
         </div>
-        <div class="form-field">
+        <div class="me-form-field">
             Time: <br>
             {{ activity_form.time_commitment }}
             {{ activity_form.time_commitment.errors }}
         </div> 
-        <div class="form-field">
+        <div class="me-form-field">
             {{ activity_form.time_description.label_tag }}<br>
             {{ activity_form.time_description }}
             {{ activity_form.time_description.errors }}
@@ -255,7 +255,7 @@
 
        
 
-<div class="form-field-full">
+<div class="me-form-field-full">
      <legend>Keywords (to help with volunteer searches)</legend>
 
     {% for group, choices in activity_form.category_groups %}
@@ -285,8 +285,8 @@
 </div>
 
     </fieldset>
-<div class="form-grid">
-<div class="form-field">      
+<div class="me-form-grid">
+<div class="me-form-field">      
 {% if duplicate_warning %}
   <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
     ⚠️ An activity with this name already exists for this organization.
@@ -311,7 +311,7 @@
 {% endif %}
 </div>  
 <div></div>
-<div class="form-field text-muted">
+<div class="me-form-field text-muted">
     {{ activity_form.expire_date.label_tag }}<br>
     {{ activity_form.expire_date }}
     {{ activity_form.expire_date.errors }}

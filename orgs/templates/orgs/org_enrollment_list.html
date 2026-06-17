@@ -32,12 +32,12 @@
           <div class="d-flex gap-2">
               <form method="post" action="{% url 'org_approve' e.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-success">Approve</button>
+                <button type="submit" class="me-text-btn">Approve</button>
             </form>
 
             <form method="post" action="{% url 'org_deny' e.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Deny</button>
+                <button type="submit" class="me-text-btn btn-danger">Deny</button>
             </form>
         </div>
         {% endif %}
