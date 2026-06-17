@@ -1,34 +1,29 @@
 <form method="get" action="{{ request.path }}" class="me-form">
     <input type="hidden" name="view" value="{{ request.GET.view }}">
     <div class="mb-3">
+        Has: 
+        <div class="me-toggle" role="group">
+  
+    <input type="radio" name="activity_status" id="status-all" value=""
+            {% if not request.GET.activity_status %}checked{% endif %}>
+    <label for="status-all">All</label>
+    <input type ="radio" name="activity_status" id="status-has" value ="has"
+                {% if request.GET.activity_status == "has" %}checked{% endif %}>
+    <label for="status-has">Has Activities</label>
+
+</div></div>
+   <div class="mb-3"> 
+        Word Search:
+        {{ filter_form.q }}
+        {{ filter_form.q.errors }}
+    </div>      
+ 
+    <div class="mb-3">
         {{ filter_form.org.label_tag }}
         {{ filter_form.org }}
         {{ filter_form.org.errors }}
     </div>
 
-    <div class="mb-3">
-        Has: 
-        <div class="me-toggle" role="group">
-  
-  <input type="radio" name="activity_status" id="status-all" value=""
-         {% if not request.GET.activity_status %}checked{% endif %}>
-  <label for="status-all">All</label>
-  <input type ="radio" name="activity_status" id="status-has" value ="has"
-            {% if request.GET.activity_status == "has" %}checked{% endif %}>
- <label for="status-has">Has Activities</label>
-  {% comment %}
-  <input type="radio" name="activity_status" id="status-volunteer" value="volunteer"
-         {% if request.GET.activity_status == "volunteer" %}checked{% endif %}>
-  <label for="status-volunteer">Volunteer</label>
-
-  <input type="radio" name="activity_status" id="status-training" value="training"
-         {% if request.GET.activity_status == "training" %}checked{% endif %}>
-  <label for="status-training">Training</label>
-{% endcomment %}
-
-
-
-</div></div>
     <div class="mb-3">
       {{filter_form.loc.label_tag}}
       {{filter_form.loc}}
@@ -44,11 +39,6 @@
         {{ filter_form.region }}
         {{ filter_form.region.errors }}
     </div>
-    <div class="mb-3"> 
-        Word Search:
-        {{ filter_form.q }}
-        {{ filter_form.q.errors }}
-    </div>      
     
     <div class="d-flex gap-2">
          <button type="submit"  class="me-btn">

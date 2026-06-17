@@ -50,7 +50,16 @@
         <label for="view-map">Map View</label>
 
     </div>
- <button class="me-btn"
+    <div class="me-toggle" role="group"  style="margin: 15px;">
+      
+      <input type="radio" name="activity_status" id="quick-status-all" value=""
+            {% if not request.GET.activity_status %}checked{% endif %}>
+      <label for="quick-status-all">All</label>
+      <input type ="radio" name="activity_status" id="quick-status-has" value ="has"
+                {% if request.GET.activity_status == "has" %}checked{% endif %}>
+      <label for="quick-status-has">Has Activities</label>
+    </div>
+ <button class="me-btn me-btn-compact-mobile"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#filterPanel"
@@ -80,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!form) return;
 
-    const radios = form.querySelectorAll("input[name='view']");
+    const radios = form.querySelectorAll("input[name='view'], input[name='activity_status']");
     console.log("view radios found", radios.length);
 
     radios.forEach(radio => {

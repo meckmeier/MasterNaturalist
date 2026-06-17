@@ -11,9 +11,9 @@
 <h4>A Compass to Conservation in Wisconsin</h4>
  
 Designed for <a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists</a>, the site will help 
-you discover YOUR path to conservation efforts in Wisconsin.</p>
+you discover your path to conservation efforts in Wisconsin.</p>
 
-    <a class="me-btn" href="{% url 'activities' %}?activity_type=v" ; font-weight: bold;color:black;">
+    <a class="me-btn" href="{% url 'activities' %}?activity_type=v" ; font-weight: bold;color:black;" title="See Volunteer activities by date">
      <span>
             <i class="bi bi-tree-fill me-btn-icon me-btn-vol-icon"></i>
     </span>
@@ -22,7 +22,7 @@ you discover YOUR path to conservation efforts in Wisconsin.</p>
     </span>
 </a>
 
-<a class="me-btn" href="{% url 'activities' %}?activity_type=t" ;font-weight: bold;color:black;">
+<a class="me-btn" href="{% url 'activities' %}?activity_type=t" ;font-weight: bold;color:black;"  title="See Training activities by date">
     <span>
             <i class="bi bi-mortarboard-fill me-btn-icon me-btn-learn-icon"></i>
     </span>
@@ -47,7 +47,7 @@ you discover YOUR path to conservation efforts in Wisconsin.</p>
 <hr>
 {% if user.is_authenticated%}
     <div class="me-muted">If you are an organization and want to manage locations or activities:</div><br>
-    <a class="me-btn" href="{% url 'org_mgmt' %}" title="Manage YOUR organizations">
+    <a class="me-btn" href="{% url 'org_mgmt' %}" title="Manage your organizations">
         <span>
             <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i>
     </span>

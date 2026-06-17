@@ -18,7 +18,7 @@
 <div class="me-page">
  <div class="me-card-header">
     <div class="me-card-header-left">  
-      <h1>Activities</h1>
+      <h2>Activities By Date</h2>
     </div>
     <div class="me-card-header-right">
       {% if active_filters %}
@@ -76,7 +76,7 @@
            {% if request.GET.activity_type == "t" %}checked{% endif %}>
     <label for="main-type-training">Training</label>
   </div>
-<button class="me-btn"
+<button class="me-btn me-btn-compact-mobile"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#filterPanel"

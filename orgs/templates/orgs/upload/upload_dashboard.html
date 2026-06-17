@@ -31,30 +31,30 @@
 
     <div class="mb-3">
       {% if upload.status == "published" or upload.status == "rollback" %}
-          <a class="me-btn" href="{% url 'upload_results' upload.id %}">
+          <a class="me-btn me-btn-compact-mobile" href="{% url 'upload_results' upload.id %}">
             <span><i class="bi bi-tree-fill me-btn-icon me-btn-vol-icon"></i></span>
             <span class="me-btn-label">View published activities</span>
         </a>
       
-        <a class="me-btn" href="{% url 'upload_rollback_confirm' upload.id %}">
+        <a class="me-btn me-btn-compact-mobile" href="{% url 'upload_rollback_confirm' upload.id %}">
           <span><i class="bi bi-trash me-btn-icon me-btn-brown-icon"></i></span>
           <span class="me-btn-label">Rollback</span>
         </a>
       {% else %}
-        <a class="btn btn-sm btn-primary" href="{% url 'upload_map' upload.id %}">
-          Continue mapping
+
+        <a class="me-btn me-btn-compact-mobile" href="{% url 'upload_review_raw' upload.id %}">
+          <span><i class="bi bi-filetype-raw me-btn-icon" title="Review raw data"></i></span>
+          <span class="me-btn-label">Review raw data</span>
         </a>
       
-        <a class="btn btn-sm btn-primary" href="{% url 'upload_review_raw' upload.id %}">
-          Review raw data
+        <a class="me-btn me-btn-compact-mobile" href="{% url 'upload_review_locations' upload.id %}">
+          <span><i class="bi bi-geo-alt me-btn-icon" title="Review locations"></i></span>
+            <span class="me-btn-label">Review locations</span>
         </a>
       
-        <a class="btn btn-sm btn-primary" href="{% url 'upload_review_locations' upload.id %}">
-          Review locations
-        </a>
-      
-        <a class="btn btn-sm btn-primary" href="{% url 'upload_review_activities' upload.id %}">
-          Review activities</a>
+        <a class="me-btn me-btn-compact-mobile" href="{% url 'upload_review_activities' upload.id %}">
+          <span><i class="bi bi-tree me-btn-icon" title="Review activities"></i></span>
+          <span class="me-btn-label">Review activities</span></a>
         {% endif %}
       
     </div>

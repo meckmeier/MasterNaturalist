@@ -60,12 +60,12 @@
         </div>
     <div class="me-card-header-right">
     {% if org.hasUploads %}
-        <a href="{% url 'upload_dashboard'%}?org={{org.id}}" class="me-btn">
-        <span><i class="bi bi-gear me-btn-icon me-btn-blue-icon"></i></span>
+        <a href="{% url 'upload_dashboard'%}?org={{org.id}}" class="me-btn me-btn-compact-mobile">
+        <span><i class="bi bi-card-checklist me-btn-icon me-btn-blue-icon"></i></span>
         <span class="me-btn-label">Upload Dashboard</span>
         </a>
     {% endif %}
-    <a href="{% url 'upload_csv' org.id%}" class="me-btn">
+    <a href="{% url 'upload_csv' org.id%}" class="me-btn me-btn-compact-mobile">
         <span><i class="bi bi-arrow-up-square-fill me-btn-icon"></i></span>
         <span class="me-btn-label">Upload Activities</span></a>
     </div>
@@ -142,10 +142,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Managers</span>
                     <button type="button"
-                    class="btn btn-sm btn-outline-primary"
+                    class="btn btn-sm"
                     data-bs-toggle="modal"
                     data-bs-target="#addManagerModal-{{ org.id }}">
-                <i class="bi bi-plus-circle"></i>
+                <i class="bi bi-plus-circle" title="Add a new manager"></i>
             </button>
                    
                 </div>
@@ -158,7 +158,7 @@
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm"
                                         onclick="return confirm('Remove this manager?');">
-                                    <i class="bi bi-trash"></i>
+                                    <i class="bi bi-trash" title="Remove manager"></i>
                                 </button>
                             </form>
                             {% endif %}

@@ -1,7 +1,7 @@
 :root {
   --main-background: ivory;   /* Dodger Blue */
   --main-border: rgba(203, 213, 207, 0.5); 
-  --button: #6c757d;    
+  --button: rgb(12,67,11);    
   --button-text: IVORY;
   --light-green: #d6e076;
   --dark-green: rgb(12,67,11);      
@@ -374,8 +374,12 @@ a:active {
   color: inherit;
 }
 .me-btn-simple {
-  display: inline-block;
-  padding: 0.375rem 0.75rem;   /* matches Bootstrap */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 50px;
+  padding: 0 ;
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.5;
@@ -384,31 +388,27 @@ a:active {
   cursor: pointer;
   text-align: center;
   text-decoration: none;
-  transition: all 0.15s ease-in-out;
+  box-shadow: 5px 4px 4px rgba(0,0,0,0.35);
+  
+  margin: 10px;
 
   /* 🔑 YOUR COLORS */
-  background-color: #2e7d32;   /* base */
+  background-color: var(--button);   /* base */
   color: var(--button-text);
-  border-color: #2e7d32;
+  border-color: var(--button);
 }
 
 /* hover */
-.me-btn-simple:hover {
-  background-color: var(--light-green);   /* darker */
-  border-color: var(--dark-green);
-  color: #fff;
+.me-btn-simple:hover
+.me-btn-simple:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
 }
 
 /* active (click) */
 .me-btn-simple:active {
-  background-color: #1e5120;
-  border-color: #1e5120;
-}
-
-/* focus (keyboard accessibility) */
-.me-btn-simple:focus {
-  outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.4);
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 /* disabled */
@@ -419,6 +419,7 @@ a:active {
 }
 a.me-button-link {
     display: inline-block;       /* Makes it behave like a button */
+    height: 50px;
     padding: 5px 10px;          /* Space inside the button */
     background-color: var(--green);   /* Button background color */
     color: var(--button-text);                /* Text color */
@@ -459,7 +460,7 @@ errorlist {
     margin: 0;
 }
 .me-filter-panel {
-  --bs-offcanvas-width: 500px;
+  --bs-offcanvas-width: 700px;
 }
 .me-filter-2colrow {
   display: grid;
@@ -626,7 +627,7 @@ li.inactive {
 /* whole segmented control */
 .me-toggle {
   display: inline-flex;
-  height: 50px;                 /* same as your .me-btn */
+  height: 36px;                 /* same as your .me-btn */
   border: 1px solid #ccc;
   border-radius: 8px;
   overflow: hidden;
@@ -652,7 +653,8 @@ li.inactive {
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 0 1rem;
+  padding: 0 .75rem;
+  font-size:0.9rem;
   margin: 0;
   background: white;
   color: var(--dark-green);
@@ -704,4 +706,21 @@ li.inactive {
   --logo-stroke-width: 12;
 
   width: 500px;
+}
+
+@media (max-width: 768px) {
+
+  .me-btn-compact-mobile .me-btn-label {
+    display: none;
+  }
+
+  .me-btn-compact-mobile {
+    width: 50px;
+    margin: 4px;
+  }
+
+  .me-btn-compact-mobile .me-btn-icon {
+    width: 50px;
+   
+  }
 }
