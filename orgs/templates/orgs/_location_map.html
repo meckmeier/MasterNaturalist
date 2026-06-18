@@ -79,6 +79,24 @@ locations.forEach(loc => {
     markers.push({ marker: marker, county: loc.county });
 });
 
+const legend = L.control({ position: 'bottomright' });
+
+legend.onAdd = function () {
+    const div = L.DomUtil.create('div', 'map-legend');
+
+    div.innerHTML = `
+        <h5>Legend</h5>
+        <div><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" width="18"> Training & Volunteer</div>
+        <div><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png" width="18"> Training Only</div>
+        <div><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" width="18"> Volunteer Only</div>
+        <div><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png" width="18"> No Activity</div>
+    `;
+
+    return div;
+};
+
+legend.addTo(map);
+
 // Load US counties GeoJSON
 fetch("{% static 'orgs/geo/gz_2010_us_050_00_500k.json' %}")
 .then(res => res.json())

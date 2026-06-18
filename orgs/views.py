@@ -770,12 +770,14 @@ def locations(request):
             ).distinct()
 
         elif activity_status == "none":
-            queryset = queryset.filter(
-                sessions__isnull=True
+            queryset = queryset.exclude(
+                Q(sessions__in=training) |
+                Q(sessions__in=volunteer)
             )
         elif activity_status == "has":
             queryset = queryset.filter(
-                sessions__isnull=False
+                Q(sessions__in=training) |
+                Q(sessions__in=volunteer)
             ).distinct()
         
         

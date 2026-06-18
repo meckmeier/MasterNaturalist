@@ -126,7 +126,12 @@
         {% endif %}
 
         <div class="me-card-sponsor">
-          Also used by these organizations: UNDER CONSTRUCTION
+          {% if loc.organizations %}
+            Also used by these organizations: 
+            {% for org in loc.organizations %}
+                {{ org.org_name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          {% endif %}
 
           {% for each in loc.activities.org %}
             <a href="{% url 'orgs' %}?org_id={{ each.id }}&view=list">{{ each.org_name }}</a>

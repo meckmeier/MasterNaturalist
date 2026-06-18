@@ -412,7 +412,16 @@ class Location(models.Model):
             self.region_name,
             'orgs/images/default.jpg'
         )
-    
+    @property
+    def organizations(self):
+        orgs = {
+            session.activity.org.id: session.activity.org
+            for session in self.sessions.select_related("activity__org")
+            if session.activity_id and session.activity.org_id
+        }
+
+        return sorted(orgs.values(), key=lambda o: o.org_name)
+
 class ActivityQuerySet(models.QuerySet):
     def base(self):
         return self.filter(
