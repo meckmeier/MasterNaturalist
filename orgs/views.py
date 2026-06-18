@@ -2405,7 +2405,11 @@ def upload_rollback(request, upload_id):
         Location.objects.filter(source_upload=upload).delete()
 
         upload.status = "rollback"
-        upload.save(update_fields=["status"])
+        upload.activities_created=activity_count*-1
+        upload.sessions_created = session_count*-1
+        upload.locations_created = location_count*-1
+
+        upload.save(update_fields=["status", "activities_created", "sessions_created","locations_created"])
         
         messages.success(request, "Upload rolled back successfully.")
 

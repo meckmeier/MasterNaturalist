@@ -20,7 +20,7 @@
           <p><strong>Message from the requester:</strong> {{ e.message }}</p>
         {% endif %}
 
-        <p><strong>Requested by:</strong> {{ e.created_by }}</p>
+        <p><strong>Requested by:</strong> {{e.contact_name}} | {{ e.contact_email }} </p>
         <p><strong>Requested at:</strong> {{ e.created_at }}</p>
         
         {% if e.status == "a" %}

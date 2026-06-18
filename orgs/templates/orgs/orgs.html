@@ -33,8 +33,9 @@
       {% endif %}
     </div>
   </div>
-
-<button class="me-btn"
+  <div class="d-flex justify-content-between align-items-top mb-4">
+    <div class="mb-0">
+<button class="me-btn me-btn-compact-mobile"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#filterPanel"
@@ -42,6 +43,13 @@
        <span> <i class="bi bi-funnel me-btn-icon"></i></span>
        <span class="me-btn-label">Filter</span>
     </button>
+    </div>
+
+    <a href="{% url 'orgs'%}" class ="me-btn me-btn-compact-mobile">
+      <span><i class="bi bi-funnel-fill me-btn-icon"></i></span>
+      <span class="me-btn-label">Clear</span></a>  
+
+      </div>
 {% for org in organizations %}
 
 <div class="me-card orgcard" id="org-{{org.id}}">

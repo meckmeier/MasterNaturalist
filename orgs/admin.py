@@ -24,6 +24,7 @@ admin.site.register(ZipToCounty)
 admin.site.register(OrganizationEnrollmentRequest)
 admin.site.register(ActivityLog)
 admin.site.register(UploadLog)
+admin.site.register(Region)
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):

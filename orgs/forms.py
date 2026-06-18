@@ -93,6 +93,7 @@ class OrgEnrollmentForm(forms.ModelForm):
             "contact_name",
             "contact_email",
             "contact_title",
+            "authorized",
             "message",
         ]
         widgets = {

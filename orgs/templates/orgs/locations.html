@@ -31,6 +31,9 @@
       {% endif %}
     </div>
   </div>
+    <div class="d-flex justify-content-between align-items-top mb-4">
+
+    <div class="mb-0">
  <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3" id="view-toggle-form">
     <input type="hidden" name="county" value="{{ request.GET.county }}">
     <input type="hidden" name="region" value="{{ request.GET.region }}">
@@ -59,7 +62,7 @@
                 {% if request.GET.activity_status == "has" %}checked{% endif %}>
       <label for="quick-status-has">Has Activities</label>
     </div>
- <button class="me-btn me-btn-compact-mobile"
+ <button class="me-btn me-btn-small me-btn-compact-mobile"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#filterPanel"
@@ -68,8 +71,12 @@
         <span class="me-btn-label">
         More Filters</span>
     </button>
+  </div>
+    <a href="{% url 'locations'%}" class ="me-btn me-btn-compact-mobile me-btn-small">
+        <span><i class="bi bi-funnel-fill me-btn-icon" title="clear all filters"></i></span>
+        <span class="me-btn-label">Clear</span></a>    
 </form>
-
+</div>
 
 <div id="listContainer">
 {% if request.GET.view == "list" %}

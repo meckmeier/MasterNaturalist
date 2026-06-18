@@ -30,7 +30,10 @@
             {{ form.about.label_tag }} <i class="bi bi-info-circle" title="Please provide a brief description of your organization. This information will help us to approve your enrollment request."></i>
             {{ form.about}}
             {{ form.about.errors }} 
-            <div class="me-sponsor">Please note that Wild Paths Wisconsin is a platform for nature based organizations that provide training or volunteer opportunities to Master Naturalists. Be sure your description focuses on that aspect of your organization. This description will be presented to potential volunteers.</div>
+            <div class="me-sponsor">Please note that Wild Paths Wisconsin is a platform for nature based organizations that 
+                provide training or volunteer opportunities to Master Naturalists and other nature-oriented volunteers. 
+                Be sure your description focuses on that aspect of your organization. 
+                This description will be presented to potential volunteers.</div>
         </div>
         <div class ="me-form-field">
             Main URL:
@@ -46,18 +49,7 @@
             {{ form.region_name.errors }}
         </div>
         
-        <div class="me-form-field">
-            URL for Volunteering Opportunities:
-            {{ form.volunteer_url }}
-            {{ form.volunteer_url.errors }}
-        </div>
-        <div class="me-form-field">
-        </div>
-        <div class="me-form-field">
-            URL for Trainings:
-            {{ form.training_url }}
-            {{ form.training_url.errors }}
-        </div>
+       
          <div class="me-form-field">
             {{ form.contact_email.label_tag }}
             {{ form.contact_email }}
@@ -75,6 +67,12 @@
             {{ form.contact_title }}
             {{ form.contact_title.errors }}
         </div>
+        <div class="me-form-field">
+            {{ form.authorized.label_tag}}
+            {{ form.authorized }}
+            {{ form.authorized.errors }}
+        </div>
+        <div>Indicate if you are authorized to represent this organization. </div>
         <div class="me-form-field-full">
             Please add any additional comments or questions here:
             {{ form.message }}

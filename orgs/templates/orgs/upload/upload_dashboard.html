@@ -1,8 +1,15 @@
 {% extends "orgs/layout.html" %}
 {% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="mb-0">Uploads</h1>
 
-<h1 class="mb-4">Uploads</h1>
-
+  <a class="me-btn me-btn-compact-mobile" href="{% url 'org_mgmt' %}" title="Manage your organizations">
+        <span>
+            <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i></span>
+     <span class="me-btn-label">
+        Manage Organizations</span>
+    </a>
+</div>
 {% for upload in uploads %}
 
 <div class="me-card mb-4 shadow-sm">
@@ -38,7 +45,7 @@
       
         <a class="me-btn me-btn-compact-mobile" href="{% url 'upload_rollback_confirm' upload.id %}">
           <span><i class="bi bi-trash me-btn-icon me-btn-brown-icon"></i></span>
-          <span class="me-btn-label">Rollback</span>
+          <span class="me-btn-label">Undo Upload</span>
         </a>
       {% else %}
 

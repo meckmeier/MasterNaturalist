@@ -76,16 +76,26 @@ class EventCategory(models.Model):
     def __str__(self):
         return self.name
 
+class Region(models.Model):
+    code = models.CharField(max_length=2, unique=True)
+    name = models.CharField(max_length=100)
+    map_filename = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+    
 class County(models.Model):
     county_name=models.CharField(max_length=100)
     region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
-
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name="regions", blank=True, null=True)
     class Meta:
         ordering = ["county_name"]
             
     def __str__(self):
         return self.county_name
-    
+
+
+        
 class User(AbstractUser):
     pass
 
@@ -179,6 +189,7 @@ class OrganizationEnrollmentRequest(models.Model):
     contact_name = models.CharField(max_length=255)
     contact_email = models.EmailField()
     contact_title = models.CharField(max_length=255, blank=True)
+    authorized = models.BooleanField(default=False)
     message = models.TextField(blank=True)
 
     status = models.CharField(
@@ -289,13 +300,13 @@ class ActivityUpload(models.Model):
     notes = models.TextField(blank=True)
     published_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="published_uploads")
     published_at = models.DateTimeField(null=True, blank=True)
-    locations_created = models.PositiveIntegerField(default=0)
+    locations_created = models.IntegerField(default=0)
     locations_matched = models.PositiveIntegerField(default=0)
     locations_skipped = models.PositiveIntegerField(default=0)
     locations_merged = models.PositiveIntegerField(default=0)
-    activities_created = models.PositiveIntegerField(default=0)
+    activities_created = models.IntegerField(default=0)
     activities_skipped = models.PositiveIntegerField(default=0)
-    sessions_created = models.PositiveIntegerField(default=0)
+    sessions_created = models.IntegerField(default=0)
     sessions_skipped = models.PositiveIntegerField(default=0)
     load_errors = models.JSONField(default=list, blank=True)
     database_error_count = models.IntegerField(default=0)
