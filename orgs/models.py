@@ -414,11 +414,23 @@ class Location(models.Model):
         )
     @property
     def organizations(self):
-        orgs = {
-            session.activity.org.id: session.activity.org
-            for session in self.sessions.select_related("activity__org")
-            if session.activity_id and session.activity.org_id
-        }
+        orgs = {}
+
+        for session in (
+            Session.objects.current()
+            .filter(location=self)
+            .select_related("activity__org")
+        ):
+            org = session.activity.org
+
+            if not org:
+                continue
+
+            # Exclude the owning org
+            if self.org_id and org.id == self.org_id:
+                continue
+
+            orgs[org.id] = org
 
         return sorted(orgs.values(), key=lambda o: o.org_name)
 
