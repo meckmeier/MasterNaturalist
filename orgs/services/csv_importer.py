@@ -298,6 +298,9 @@ class CSVImporter:
             row_num = i + 1
 
             cleaned, warnings, errors = self.clean_row(row)
+            if cleaned["title"] == "REQUIRED":
+                continue
+            
             database_errors = []
             if errors:
                 status = "error"
@@ -307,7 +310,7 @@ class CSVImporter:
                 status = "accepted"
 
             try:
-
+                
                 RawLoadData.objects.create(
                     upload=self.upload,
                     row_number=row_num,

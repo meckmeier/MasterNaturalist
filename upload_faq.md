@@ -59,15 +59,18 @@ Use the menu option under Organizer to view the Organization Management for your
 "city" | City of the location.,
 "zip"| 5-digit zip code of the location - if this is in Wisconsin we will use the zip to find the region and county. This field will also be important to create a Flag for the map.|
 "activity_type"| REQUIRED. activity type - v for volunteer opportunity and t for training session.|
-"ongoing"| Put an "x" in this column if your event does not have start-end dates but is simply an ongoing schedule.|
+"ongoing"| Any non-blank value in this column will be used to set the value to Ongoing. Leave blank if your events has dates instead. |
 "start_date"| If ongoing is blank, you must put in a start date. The date should be in this format YYYY-MM-DD format.|
 "end_date"| If start_date is NOT blank and this field IS blank it will default to the start_date. If your event crosses multiple date, put the last date of the event here in this format YYYY-MM-DD format.|
-"date_description"| OPTIONAL. To create a longer description about the date, you can complete this field. You can leave it blank if you just want to show start - end date; or the phrase ongoing for ongoing. But if you want a longer description - like "Wednesdays in April" you may optionally fill this in.|
+"time_commitment"| OPTIONAL. You may use this to indicate how long participants should expect to commit to this event. Free-form text.
+"date_description"| OPTIONAL. Indicate additional info (beyond start-end dates, or the ongoing flag) regarding dates here. Free-form text that will appear below the Activity title. |
+"time_description"| OPTIONAL. Indicate something about the time for your activity here. This is a free-form text that will appear below your activity.|
 "activity_url"| If your activity is online you must include this field. It will also be used at the activity level for the Connect link.|
-"contact_email"| If you want the Connect link to go to an email address. You must provide either the activity url or a contact email. One of these is required.|
+"contact_email"| You must provide either the activity url or a contact email. One of these is required.|
 "has_cost"| If your activity is free, leave this blank. If there is a value in this column it will be set with a $ on the form.|
-"categories" | You can list the categories for your activity here with a comma between each one. Here are the values you can use: aq=Aquatic Life, cs=Citizen Science, eco=Ecology, edu=Education, geo=Geology, hc=Human Connections, pla=Plants, ste=Stewardship, wat=Water, wea=Weather & Climate, and wil=Wildlife. You must use the 2-3 letter codes, inside double quotes separated by commas. For example, "cs, wil, edu".
 "prerequisities"| OPTIONAL. This field can be used to indicate any prerequisites for your activity.
+"categories" | You can list the categories for your activity here with a comma between each one. Here are the values you can use: aq=Aquatic Life, cs=Citizen Science, eco=Ecology, edu=Education, geo=Geology, hc=Human Connections, pla=Plants, ste=Stewardship, wat=Water, wea=Weather & Climate, and wil=Wildlife. You must use the 2-3 letter codes, inside double quotes separated by commas. For example, "cs, wil, edu".
+
 
 ### NOTE
 If you have a system that can generate a download file for you, you may find that you have different column NAMES that our template uses. That's OK, if the field names in your CSV file don't match our template settings, you will have an option to map YOUR field names into our database NAMES.
