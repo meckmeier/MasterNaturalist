@@ -242,6 +242,9 @@ class CSVImporter:
             "time_commitment": self.get_val(row, "time_commitment"),
             "time_description": self.get_val(row, "time_description"),
             "date_description": self.get_val(row, "date_description"),
+            "prerequisites": self.get_val(row, "prerequisites"),
+            "categories": self.get_val(row, "categories"),
+            "expire_date": self.parse_date(self.get_val(row, "expire_date"),"expire_date", warnings ),
         }
 
         cleaned["title"] = self.required_text(
@@ -333,7 +336,8 @@ class CSVImporter:
                     date_description=cleaned["date_description"],
                     activity_url=cleaned["activity_url"],
                     contact_email=cleaned["contact_email"],
-
+                    prerequisites=cleaned["prerequisites"],
+                    categories=cleaned["categories"],
                     status=status,
                     validation_warnings={ "messages": warnings},
                     validation_errors={"messages": errors},

@@ -70,6 +70,7 @@ class EventCategory(models.Model):
     name=models.CharField(max_length=50, unique=True)
     description=models.CharField(max_length=200, blank=True, null=True)
     category_class = models.CharField(max_length=200, blank=True, null=True)
+    cat_code = models.CharField(max_length=3, blank=True, null=True)
     class Meta:
         ordering =["name"]
 
@@ -648,6 +649,7 @@ class RawLoadData(models.Model):
 
     contact_email = models.CharField(max_length=200, null=True, blank=True)
     prerequisites = models.CharField(max_length=200, blank=True, null=True)
+    categories = models.CharField(max_length=200, null=True, blank=True)
     # 🔹 VALIDATION OUTPUT
     validation_errors = models.JSONField(default=dict)
     validation_warnings = models.JSONField(default=dict)
@@ -755,7 +757,7 @@ class Pending_Activity(models.Model):
                                   choices=[("v","Volunteer Opportunity"),("t","Training" )])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
     time_description = models.CharField(max_length=100, default='', blank=True, null=True)
-    categories = models.ManyToManyField(EventCategory, blank=True)
+    
     date_description = models.CharField(max_length=100, default='', blank=True, null=True)
     expire_date = models.DateField(default=default_expire_date)
     activity_url = models.URLField(max_length=200, default="", blank=True, null=True)
@@ -768,6 +770,8 @@ class Pending_Activity(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     source_upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
     processing_status = models.CharField(max_length=20, default="pending")  # pending, approved, rejected
+    categories =  models.ManyToManyField(EventCategory, blank=True, related_name="category_pending_activities")
+    raw_category_text = models.CharField(max_length=200, null=True, blank=True)
     
     def __str__(self):
         return f"{self.title} ({self.org})"

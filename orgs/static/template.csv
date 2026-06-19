@@ -1,2 +1,2 @@
-title,description,location_name,address,city,state,zip,activity_type,ongoing,start_date,end_date,date_description,time_description,activity_url,contact_email,has_cost,time_commitment,session_format,prerequisites,expire_date
+title,description,location_name,address,city,state,zip,activity_type,ongoing,start_date,end_date,date_description,activity_url,contact_email,has_cost,time_commitment,session_format,categories,prerequisites,expire_date
 

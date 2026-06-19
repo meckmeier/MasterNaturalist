@@ -4,7 +4,7 @@ from unittest import result
 
 from django.db import transaction
 from django.utils import timezone
-from orgs.models import (RawLoadData, Pending_Location, Pending_Activity, Pending_Session, Location, ZipToCounty)
+from orgs.models import (RawLoadData, Pending_Location, Pending_Activity, Pending_Session, Location, ZipToCounty, EventCategory)
 from orgs.services.helper_function import get_county_region_from_zip
 
 class PendingBuildResult:
@@ -73,6 +73,7 @@ def build_pending_row(raw_row, upload, result):
     
     pending_activity = build_pending_activity(raw_row, org, upload)
     if pending_activity:
+        build_pending_categories(pending_activity, raw_row)
         result.created_activities += 1
    
 
@@ -183,8 +184,14 @@ def build_pending_activity(raw, org, upload):
             #time_commitment=raw.time_commitment,  
             has_cost=raw.has_cost,     
             contact_email=raw.contact_email,
+            prerequisites=raw.prerequisites,
+            raw_category_text=raw.categories,
             created_at=timezone.now(),
         )
+        if raw.expire_date:
+            pending_activity.expire_date = raw.expire_date
+            pending_activity.save()
+
     except Exception as e:
         raise Exception(f"Error creating pending activity: {str(e)}")
     return pending_activity
@@ -210,3 +217,28 @@ def build_pending_session(raw, pending_activity, pending_location,  upload):
     except Exception as e:
         raise Exception(f"Error creating pending session: {str(e)}")
     return pending_session
+
+CATEGORY_SEPARATOR = ","
+
+def build_pending_categories(pending_activity, raw_row):
+    if not raw_row.categories:
+        return
+    category_text = (raw_row.categories or "").strip()
+    category_text = (
+            category_text
+            .replace("“", "")
+            .replace("”", "")
+            .replace('"', "")
+        )
+    category_names = [
+        c.strip()
+        for c in category_text.split(CATEGORY_SEPARATOR)
+        if c.strip()
+    ]
+    print("category_name", category_names)
+    categories = EventCategory.objects.filter(
+        cat_code__in=category_names
+    )
+    print("categories", categories)
+
+    pending_activity.categories.set(categories)

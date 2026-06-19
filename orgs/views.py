@@ -1471,7 +1471,7 @@ def location_search(request):
     q = request.GET.get("q", "").lower()
     org_id = request.GET.get("org_id")
     
-    locations = Location.objects.all()
+    locations =  Location.objects.filter(deleted=False)
    
     if q:
         locations = locations.filter(
