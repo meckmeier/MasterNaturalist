@@ -332,6 +332,10 @@ class EventFilterForm(forms.Form):
         required=False,
         label="Free events (no cost)"
     )
+    new = forms.BooleanField(
+        required=False,
+        label="Activity added in past 2 weeks"
+    )
     county = forms.ModelChoiceField(
         queryset = County.objects.all().order_by("county_name"),
         required=False,

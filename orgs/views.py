@@ -1192,6 +1192,11 @@ def activities(request):
             queryset = queryset.filter(activity__has_cost=False).distinct()
             active_filters.append("Free only")
 
+        if data.get("new"):
+            two_weeks_ago = timezone.now() - timedelta(days=15)
+            queryset = queryset.filter(activity__created_at__gte=two_weeks_ago)
+            active_filters.append(f"Newly created")
+
         if data.get("start_date"):
             queryset = queryset.filter(start__gte=data["start_date"])
             active_filters.append(f"Start on or after: {data['start_date']}")
