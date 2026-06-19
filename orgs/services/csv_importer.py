@@ -3,6 +3,8 @@ import re
 import pandas as pd
 from datetime import datetime, date
 from orgs.models import RawLoadData
+import traceback
+import io
 
 class CSVImporter:
     def __init__(self, upload, mapping=None):
@@ -14,6 +16,7 @@ class CSVImporter:
     
     # Step 1: read file
     def read(self):
+        
         try:
             file = self.upload.file
             file.open()
@@ -25,66 +28,51 @@ class CSVImporter:
                 self.df = pd.DataFrame()
                 return
 
-            encodings = ["utf-8", "cp1252", "latin-1"]
+            raw = file.read()
             last_error = None
 
-            for encoding in encodings:
+            for encoding in ["utf-8", "cp1252"]:
                 try:
-                    file.seek(0)
+                    
+                    text = raw.decode(encoding)
 
                     self.df = pd.read_csv(
-                        file,
-                        encoding=encoding,
+                        io.StringIO(text),
                         quotechar='"',
                         skipinitialspace=True,
                     )
-
-                    self.df = self.df.replace("\xa0", " ", regex=True)
-                    before = len(self.df)
-
-                    self.df = self.df.dropna(how="all")
-                    self.df = self.df[
-                        self.df.apply(
-                            lambda row: any(str(value).strip() and str(value).strip().lower() != "nan" for value in row),
-                            axis=1
-                        )
-                    ]
-
-                    removed = before - len(self.df)
-                    self.warnings.append(
-                        f"{removed} completely blank row(s) were skipped during import."
-                    )
-                    # look for replacement characters
-                    bad_cells = []
-
-                    for col in self.df.columns:
-                        matches = self.df[self.df[col].astype(str).str.contains("�", na=False)]
-
-                        for _, row in matches.iterrows():
-                            value = str(row[col])
-
-                            bad_cells.append(
-                                f"Column '{col}' contains invalid characters: {value}"
-                            )
-
-                    if bad_cells:
-                        self.errors.extend(bad_cells)
-                        self.errors.append(
-                                "Your CSV contains invalid text characters. "
-                                "Try re-saving the file as 'CSV UTF-8' from Excel or Google Sheets."
-                            )
-                        self.df = pd.DataFrame()
-                        return
+                    
+                    
                     self.encoding_used = encoding
-                    return
+                    break
 
                 except UnicodeDecodeError as e:
                     last_error = e
+            else:
 
-            # if we get here, none of the encodings worked
-            self.errors.append(f"Unable to decode CSV file: {last_error}")
-            self.df = pd.DataFrame()
+                # if we get here, none of the encodings worked
+                self.errors.append(f"Unable to decode CSV file: {last_error}")
+                self.df = pd.DataFrame()
+                return
+            self.df = self.df.replace("\u00A0", " ", regex=True)
+            before = len(self.df)
+            
+            self.df = self.df.dropna(how="all")
+            self.df = self.df[
+                self.df.apply(
+                    lambda row: any(
+                        str(value).strip()
+                        and str(value).strip().lower() != "nan"
+                        for value in row
+                    ),
+                    axis=1,
+                )
+            ]
 
+            removed = before - len(self.df)
+            self.warnings.append(
+                f"{removed} completely blank row(s) were skipped during import."
+            )
         except Exception as e:
             self.errors.append(f"Error reading file: {e}")
             self.df = pd.DataFrame()
@@ -108,20 +96,30 @@ class CSVImporter:
             return None
         return self.clean_value(row.at[col])
     
-    def parse_date(self, val, field_name, warnings):       
+    def parse_date(self, val, field_name, warnings):
         val = self.clean_value(val)
+
         if not val:
             return None
+
         if isinstance(val, datetime):
             return val.date()
+
         if isinstance(val, date):
-            return val       
+            return val
+
         if isinstance(val, str):
-            for fmt in ["%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y"]:
+            for fmt in [
+                "%Y-%m-%d",
+                "%m/%d/%Y",
+                "%m/%d/%y",
+                "%d-%b-%y",     # 27-Jun-26
+            ]:
                 try:
                     return datetime.strptime(val, fmt).date()
                 except ValueError:
                     pass
+
         warnings.append(f"{field_name}: invalid date '{val}'")
         return None
     

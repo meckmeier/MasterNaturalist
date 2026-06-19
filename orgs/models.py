@@ -354,7 +354,7 @@ class Location(models.Model):
     region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
-    org_loc_url = models.URLField(max_length=200, default="", blank=True)
+    org_loc_url = models.URLField(max_length=255, default="", blank=True)
     location_about = models.TextField(default="", blank=True )
     contact_email = models.EmailField(default="", blank=True)
     deleted = models.BooleanField(default=False)
@@ -481,20 +481,21 @@ class ActivityQuerySet(models.QuerySet):
     
 class Activity(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="activities")
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     activity_type = models.CharField(max_length=1,
                                   choices=[("v","Volunteer Opportunity"),("t","Training" )])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
+    time_commitment_txt = models.CharField(max_length=255, default="", blank=True, null=True)
     categories = models.ManyToManyField(EventCategory, blank=True, related_name="category_activities")
-    date_description = models.CharField(max_length=100, default='', blank=True, null=True)
-    time_description = models.CharField(max_length=100, default='', blank=True, null=True)
+    date_description = models.CharField(max_length=255, default='', blank=True, null=True)
+    time_description = models.CharField(max_length=255, default='', blank=True, null=True)
     expire_date = models.DateField(default=default_expire_date)
-    activity_url = models.URLField(max_length=200, default="", blank=True, null=True)
+    activity_url = models.URLField(max_length=255, default="", blank=True, null=True)
     
     has_cost = models.BooleanField(default=False)
     contact_email = models.EmailField(default="", blank=True, null=True)
-    prerequisites = models.CharField(max_length=200, blank=True, null=True)
+    prerequisites = models.CharField(max_length=255, blank=True, null=True)
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owned_acts', default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -554,7 +555,7 @@ class Session(models.Model):
     session_format = models.CharField(max_length=1 ,
                               choices=[("o","Online"),("i","InPerson" ),("b","Hybrid"), ("s","Self Selected Locations")])
     location = models.ForeignKey( Location, null=True, blank=True, on_delete=models.SET_NULL, related_name="sessions")
-    session_url = models.URLField(max_length=200, default="", blank=True)
+    session_url = models.URLField(max_length=255, default="", blank=True)
     ongoing = models.BooleanField(default=False)
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
@@ -637,19 +638,19 @@ class RawLoadData(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)  # ✅ FIXED (was CharField)
 
-    time_commitment = models.CharField(max_length=50, null=True, blank=True)
-    time_description = models.CharField(max_length=50, null=True, blank=True)
-    date_description = models.CharField(max_length=100, null=True, blank=True)
+    time_commitment = models.CharField(max_length=255, null=True, blank=True)
+    time_description = models.CharField(max_length=255, null=True, blank=True)
+    date_description = models.CharField(max_length=255, null=True, blank=True)
 
     expire_date = models.DateField(null=True, blank=True)
-    activity_url = models.CharField(max_length=200, null=True, blank=True)
+    activity_url = models.CharField(max_length=255, null=True, blank=True)
     
     has_cost = models.BooleanField(null=True)   # ✅ changed
     session_format = models.CharField(max_length=1, null=True, blank=True)    # ✅ changed
 
-    contact_email = models.CharField(max_length=200, null=True, blank=True)
-    prerequisites = models.CharField(max_length=200, blank=True, null=True)
-    categories = models.CharField(max_length=200, null=True, blank=True)
+    contact_email = models.CharField(max_length=255, null=True, blank=True)
+    prerequisites = models.CharField(max_length=255, blank=True, null=True)
+    categories = models.CharField(max_length=255, null=True, blank=True)
     # 🔹 VALIDATION OUTPUT
     validation_errors = models.JSONField(default=dict)
     validation_warnings = models.JSONField(default=dict)
@@ -675,7 +676,7 @@ class Pending_Location(models.Model):
     region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
-    org_loc_url = models.URLField(max_length=200, default="", blank=True)
+    org_loc_url = models.URLField(max_length=255, default="", blank=True)
     location_about = models.TextField(default="", blank=True )
     contact_email = models.EmailField(default="", blank=True)
     
@@ -684,7 +685,7 @@ class Pending_Location(models.Model):
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, related_name="updated_pending_locations"  )
     updated_at = models.DateTimeField(auto_now=True)
     source_upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
-    processing_status = models.CharField(max_length=20,
+    processing_status = models.CharField(max_length=50,
             choices=[
                 ("match", "Matched existing location"),
                 ("create", "Create new location"),
@@ -751,27 +752,27 @@ class Pending_Location(models.Model):
     
 class Pending_Activity(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="pending_activities")
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     activity_type = models.CharField(max_length=1,
                                   choices=[("v","Volunteer Opportunity"),("t","Training" )])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
-    time_description = models.CharField(max_length=100, default='', blank=True, null=True)
+    time_description = models.CharField(max_length=255, default='', blank=True, null=True)
     
-    date_description = models.CharField(max_length=100, default='', blank=True, null=True)
+    date_description = models.CharField(max_length=255, default='', blank=True, null=True)
     expire_date = models.DateField(default=default_expire_date)
-    activity_url = models.URLField(max_length=200, default="", blank=True, null=True)
+    activity_url = models.URLField(max_length=255, default="", blank=True, null=True)
     has_cost = models.BooleanField(default=False)
     contact_email = models.EmailField(default="", blank=True, null=True)
-    prerequisites = models.CharField(max_length=200, blank=True, null=True)
+    prerequisites = models.CharField(max_length=255, blank=True, null=True)
     created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_pending_activities")
     created_at =models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_pending_activities")
     updated_at = models.DateTimeField(auto_now=True)
     source_upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
-    processing_status = models.CharField(max_length=20, default="pending")  # pending, approved, rejected
+    processing_status = models.CharField(max_length=50, default="pending")  # pending, approved, rejected
     categories =  models.ManyToManyField(EventCategory, blank=True, related_name="category_pending_activities")
-    raw_category_text = models.CharField(max_length=200, null=True, blank=True)
+    raw_category_text = models.CharField(max_length=255, null=True, blank=True)
     
     def __str__(self):
         return f"{self.title} ({self.org})"
@@ -781,7 +782,7 @@ class Pending_Session(models.Model):
     session_format = models.CharField(max_length=1 ,
                               choices=[("o","Online"),("i","InPerson" ),("b","Hybrid")])
     location = models.ForeignKey( Pending_Location, null=True, blank=True, on_delete=models.SET_NULL, related_name="pending_sessions")
-    session_url = models.URLField(max_length=200, default="", blank=True, null=True)
+    session_url = models.URLField(max_length=255, default="", blank=True, null=True)
     ongoing = models.BooleanField(default=False)
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
@@ -791,7 +792,7 @@ class Pending_Session(models.Model):
     created_at =models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_pending_sessions"   )
     updated_at = models.DateTimeField(auto_now=True)
-    processing_status = models.CharField(max_length=20, default="pending")  # pending, approved, rejected
+    processing_status = models.CharField(max_length=50, default="pending")  # pending, approved, rejected
     source_upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
 
     def __str__(self):

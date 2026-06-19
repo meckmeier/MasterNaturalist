@@ -35,7 +35,7 @@
     {% if e.end and e.start != e.end %} - {{ e.end }}{% endif %}
     {% if e.activity.date_description %}<br><em>{{ e.activity.date_description }}</em>{% endif %}
     {% if e.activity.time_description %}| <em>{{ e.activity.time_description }}</em>{% endif %}
-
+    {% if e.activity.time_commitment_txt %} | <em>{{ e.activity.time_commitment_txt }}</em>{% endif %}
     
     {%if  e.activity.has_cost %}   
       | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>

@@ -76,6 +76,7 @@ def publish_pending_upload(upload_id, user):
             activity_type=pending_activity.activity_type,
             date_description=pending_activity.date_description,
             time_description=pending_activity.time_description,
+            time_commitment_txt =pending_activity.time_commitment,
             activity_url=pending_activity.activity_url,
             contact_email=pending_activity.contact_email,
             has_cost=pending_activity.has_cost,
