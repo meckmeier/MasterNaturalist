@@ -9,11 +9,11 @@
         {% endfor %}    
     </ul>
 {% endif %} 
-<h2>Upload Data</h2>
+<h2>Upload Process</h2>
 <div class="me-card">
     <div class="me-card-split">
         <div class="me-card-split-left">
-            <p>First time here? You can download a template to build your upload csv file.</p>
+            <p>First time here? You can download a template to build your upload csv file. Column definitions are found in the Instructions link.</p>
             <a href="{% static 'template.csv' %}"
             class="btn me-btn">
             <span><i class="bi bi-download me-btn-icon"></i></span>
@@ -40,12 +40,12 @@
         <div class="me-card-split-right">
             <h4>Upload Process</h4>
             <ol>
-                <li>Select your CSV file</li>
-                <li>Data will pass through an initial validation stage - you might see warnings when data is missing, but the activity can still load. Or errors when the data cannot be loaded as is.</li>
-                <li>You will a location confirmation - to make sure we selected the correct location for your activity - or maybe you need to create a new location.</li>
-                <li>You will then see a preview of your activities. You still have a chance to Remove it from the load</li>
-                <li>Once you confirm the load the activties will be available to users in WildPaths.</li>
-                <li>If you find an issue with the load, you will have an option to ROLL it BACK and remove them wholesale from the system.</li>
+                <li>Select your CSV file.</li>
+                <li>Data will pass through an initial validation stage - you might see warnings for rows that have issues but can still load. Errors will prevent a row from loading.</li>
+                <li>Next is a location confirmation - to make sure we selected the correct location for your activity.</li>
+                <li>Then a preview of your activities. You can still remove an individual activity from the load</li>
+                <li>Finally, PUBLISH the load to see the activity in WildPaths.</li>
+                <li>If you find an issue with a load, you can undo and remove them wholesale from the system.</li>
             </ul>
         </div>
     </div>
