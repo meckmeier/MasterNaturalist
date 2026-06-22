@@ -36,7 +36,9 @@
     </div>
 
     <div class="me-card-header-right">          
-      <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="height:75px;width:auto;" title="{{ loc.region_name }}">
+      <img src="<img src="{% static 'region_maps/' %}{{ loc.region.map_filename }}"
+     alt="{{ loc.region.name }}"
+     style="height:75px;width:auto;" title="{{ loc.region.name }}">
     </div>
   </div>
 
@@ -114,7 +116,7 @@
               </a>
             {% endif %}
 
-            <img src="{% static loc.region_image %}" alt="{{ loc.region_name }}" style="width:75px;">
+            <img src="{% static 'region_maps/' %}{{ loc.region.map_filename }}" alt="{{ loc.region.name }}" style="width:75px;">
           </div>
         </div>
 

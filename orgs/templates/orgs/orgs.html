@@ -150,7 +150,7 @@
                   <a class="me-icon-btn" href="{% url 'org_mgmt' %}?org={{org.id}}">
                       <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i></a>
                   {% endif %}
-                <img src="{% static org.region_image %}" alt="{{ org.region_name }}" style="width:75px;">
+                <img src="{% static 'region_maps/' %}{{ org.region.map_filename }}"" alt="{{ org.region.name }}" style="width:75px;">
             
             </div>
           </div>

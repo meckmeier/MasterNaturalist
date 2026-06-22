@@ -47,7 +47,7 @@
    <div class="me-card-header-right"> 
     <div class="me-icons">
       {% if e.location %}
-      <img src="{% static e.region_image %}" alt="{{e.location.region_name}}"  title="{{ e.location.region_name }}" 
+      <img src="{% static 'region_maps/' %}{{ e.location.region.map_filename }}" alt="{{e.location.region.name}}"  title="{{ e.location.region.name }}" 
       style="height:75px; width:auto;">
     {% endif %}
    
