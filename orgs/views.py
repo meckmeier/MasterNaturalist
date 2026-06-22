@@ -1584,7 +1584,14 @@ def map_view(request):
     print ("location json", locations_json)
     context = {"locations": json.dumps(locations_json, cls=DjangoJSONEncoder)}
     # Render template
-    return render(request, "orgs/map.html", context)
+    county_regions = {
+        c.county_name: c.region.code
+            for c in County.objects.select_related("region")
+            if c.region
+        }
+    context["county_regions"] = json.dumps(county_regions)
+    print("county_regions", county_regions)
+    return render(request, "orgs/_region_map.html", context)
 
 def test_email(request):
     print("starting email test")

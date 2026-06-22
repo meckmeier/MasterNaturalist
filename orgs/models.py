@@ -84,11 +84,14 @@ class Region(models.Model):
 
     def __str__(self):
         return self.name
+    @property
+    def map_image(self):
+        return f"region_maps/{self.code.lower()}.png"
     
 class County(models.Model):
     county_name=models.CharField(max_length=100)
     region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
-    region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name="regions", blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name="counties", blank=True, null=True)
     class Meta:
         ordering = ["county_name"]
             
@@ -105,6 +108,7 @@ class Profile(models.Model):
     bio=models.TextField(blank=True)
     staff = models.BooleanField(default=False)
     preferred_region = models.CharField(max_length =100, choices = region_list, default='', blank=True)
+    my_region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
      # Personalization Toggles
     include_online = models.BooleanField(default=True)
     terms_accepted_at = models.DateTimeField(null=True, blank=True)
@@ -133,6 +137,7 @@ class Organization(models.Model):
     host = models.BooleanField(default=False)
     about = models.TextField(default ="" , blank=True)
     region_name = models.CharField(max_length =100, choices = region_list, default='', blank=True)
+    region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
     training_url = models.URLField(max_length=200, default="", blank=True)
     volunteer_url = models.URLField(max_length=200, default="", blank=True)
     default_location = models.ForeignKey("Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="default_for_org")
@@ -187,6 +192,7 @@ class OrganizationEnrollmentRequest(models.Model):
     training_url = models.URLField(blank=True)
     about = models.TextField(blank=True)
     region_name = models.CharField(max_length=50, choices=region_list,blank=True)
+    region = models.ForeignKey(Region,null=True, blank=True, on_delete=models.SET_NULL)
     contact_name = models.CharField(max_length=255)
     contact_email = models.EmailField()
     contact_title = models.CharField(max_length=255, blank=True)
@@ -352,6 +358,7 @@ class Location(models.Model):
     city_name = models.CharField(max_length=255, blank=True,null=True )
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL, related_name="locations")
     region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
+    region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     org_loc_url = models.URLField(max_length=255, default="", blank=True)
