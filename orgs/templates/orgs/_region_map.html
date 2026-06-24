@@ -20,7 +20,7 @@ const map = L.map('map', {
 });
 
 
-const selectedRegion = "SW";   // test value
+const selectedRegion = "C";   // test value
 console.log("starting fetch");
 fetch("{% static 'orgs/geo/wi_regions.geojson' %}")
 .then(res => res.json())
@@ -32,8 +32,8 @@ fetch("{% static 'orgs/geo/wi_regions.geojson' %}")
         const region = feature.properties.region;
 
         return {
-            color: "#666",
-            weight: 1,
+            color: "#333",
+            weight: 2,
             fillColor:
                 region === selectedRegion
                     ? "#cc0000"

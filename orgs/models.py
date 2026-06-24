@@ -86,7 +86,7 @@ class Region(models.Model):
         return self.name
     @property
     def map_image(self):
-        return f"region_maps/{self.code.lower()}.png"
+        return f"orgs/region_maps/{self.code.lower()}.png"
     
 class County(models.Model):
     county_name=models.CharField(max_length=100)

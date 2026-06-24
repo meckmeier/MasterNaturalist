@@ -103,17 +103,8 @@ Version Two:
 * DNS is now on cloudflare.
 
 Upload process:
-* have data getting to pending tables.
-* need to deal with location matching issues.
-* get the happy path data into actual tables.
-* start testing ugly files to get all the other issues resolved.
-* build a good UI for the location matching and approval process.
-approval process
-Approval checks:
-- already linked to real_location? use it
-- exact fingerprint match? link it
-- possible fuzzy/name/city/org match? show choice
-- no match? create new Location
+* check that no end date will default to the start date (for a single day activity)
+* check other processes to make sure they really work
 
 
 Future wishlist - make a video that explains how to manage an org in this system.
