@@ -36,7 +36,7 @@
     </div>
 
     <div class="me-card-header-right">          
-      <img src="<img src="{% static 'orgs/region_maps/' %}{{ loc.region.map_filename }}"
+      <img src="{% static 'orgs/region_maps/' %}{{ loc.region.map_filename }}"
      alt="{{ loc.region.name }}"
      style="height:75px;width:auto;" title="{{ loc.region.name }}">
     </div>
@@ -115,8 +115,9 @@
                 <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon" title="Go to management view"></i>
               </a>
             {% endif %}
-
-            <img src="{% static 'orgs/region_maps/' %}{{ loc.region.map_filename }}" alt="{{ loc.region.name }}" style="width:75px;">
+             <img src="{% static 'orgs/region_maps/' %}{{ loc.region.map_filename }}" alt="{{loc.region.name}}"  title="{{ loc.region.name }}" 
+              style="height:75px; width:auto;">
+            
           </div>
         </div>
 
