@@ -285,7 +285,7 @@ def orgs(request):
             org_queryset=org_queryset.filter(locations__county_id=data["county"]).distinct()
 
         if data.get("region"):
-            org_queryset=org_queryset.filter(region_name=data["region"]).distinct()
+            org_queryset=org_queryset.filter(region=data["region"]).distinct()
 
         if data.get("q"):
             org_queryset =org_queryset.filter(Q(org_name__icontains=q) 
@@ -742,7 +742,7 @@ def locations(request):
             queryset=queryset.filter(county_id=data["county"]).distinct()
 
         if data.get("region"):
-            queryset=queryset.filter(region_name=data["region"]).distinct()
+            queryset=queryset.filter(region=data["region"]).distinct()
 
         if data.get("q"):
             queryset =queryset.filter(Q(org__org_name__icontains=q) 
@@ -1161,7 +1161,7 @@ def activities(request):
             active_filters.append(f"{data['county']} county ")
 
         if data.get("region"):
-            queryset=queryset.filter(location__region_name=data["region"]).distinct()
+            queryset=queryset.filter(location__region=data["region"]).distinct()
             active_filters.append(f"{data['region']} region ")
 
         if data.get("q"):

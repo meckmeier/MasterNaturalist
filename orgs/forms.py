@@ -343,23 +343,14 @@ class EventFilterForm(forms.Form):
         label="County" ,
         widget=forms.Select(attrs={"class":"form-select"})       
     )
-    REGION_CHOICES = [
-        ("", "Any"),
-        ("C", "Central"),
-        ("EC", "East Central"),
-        ("NE", "Northeast"),
-        ("NW", "Northwest"),
-        ("SC", "South Central"),
-        ("SE", "Southeast"),
-        ("SW", "Southwest"),
-        ("St", "Statewide"),
-    ]
-    region = forms.ChoiceField(
-        choices=REGION_CHOICES,
+    region = forms.ModelChoiceField(
+        queryset = Region.objects.all().order_by("name"),
         required=False,
+        empty_label="Any",
         label="Region",
         widget=forms.Select(attrs={"class":"form-select"})
     )
+    
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
@@ -417,23 +408,15 @@ class OrgFilterForm(forms.Form):
     ],
     widget=forms.RadioSelect,
     )
-    REGION_CHOICES = [
-        ("", "Any"),
-        ("C", "Central"),
-        ("EC", "East Central"),
-        ("NE", "Northeast"),
-        ("NW", "Northwest"),
-        ("SC", "South Central"),
-        ("SE", "Southeast"),
-        ("SW", "Southwest"),
-        ("St", "Statewide"),
-    ]
-    region = forms.ChoiceField(
-        choices=REGION_CHOICES,
+   
+    region = forms.ModelChoiceField(
+        queryset=Region.objects.all().order_by ("name"),
         required=False,
+        empty_label="Any",
         label="Region",
         widget=forms.Select(attrs={"class":"form-select"})
-    )
+    )  
+    
     q = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
@@ -480,20 +463,10 @@ class LocFilterForm(forms.Form):
         label="County" ,
         widget=forms.Select(attrs={"class":"form-select"})       
     )
-    REGION_CHOICES = [
-        ("", "Any"),
-        ("C", "Central"),
-        ("EC", "East Central"),
-        ("NE", "Northeast"),
-        ("NW", "Northwest"),
-        ("SC", "South Central"),
-        ("SE", "Southeast"),
-        ("SW", "Southwest"),
-        ("St", "Statewide"),
-    ]
-    region = forms.ChoiceField(
-        choices=REGION_CHOICES,
+    region = forms.ModelChoiceField(
+        queryset = Region.objects.all().order_by("name"),
         required=False,
+        empty_label="Any",
         label="Region",
         widget=forms.Select(attrs={"class":"form-select"})
     )
