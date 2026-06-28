@@ -108,6 +108,10 @@ class Profile(models.Model):
     
     def has_published_uploads(self):
         return self.published_uploads.exists()
+    
+    @property
+    def is_org_manager(self):
+        return self.managers.exists()
 
 class OrgQuerySet(models.QuerySet):
     def active(self):

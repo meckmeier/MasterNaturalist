@@ -4,87 +4,126 @@
 
 <div class="container py-4">
 
-    <h1>Manage User</h1>
+    <h1>Manage Users</h1>
 
-    <form method="get" class="mb-4">
-        <div class="mb-3">
-            {{ select_form.user_id.label_tag }}
-            {{ select_form.user_id }}
-        </div>
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Last Login</th>
+                <th>Date Joined</th>
+                <th class="text-end">Orgs add</th><th class="text-end">edits</th>
+                <th class="text-end">Locs add</th><th class="text-end">edits</th>
+                <th class="text-end">Acts add</th><th class="text-end">edits</th>
+                <th class="text-end">Updates</th>
+            </tr>
+        </thead>
 
-        <button type="submit" class="me-text-btn">
-            Load User
-        </button>
-    </form>
+        <tbody>
+
+        {% for u in users %}
+            <tr {% if target_user and target_user.id == u.id %}class="table-primary"{% endif %}>
+
+                <td>
+                    <a href="?user_id={{ u.id }}">
+                        {{ u.username }}
+                    </a>
+                </td>
+
+                <td>
+                    {% if u.last_login %}
+                        {{ u.last_login|date:"m/d/y g:i A" }}
+                    {% else %}
+                        Never
+                    {% endif %}
+                </td>
+
+                <td>{{ u.date_joined|date:"m/d/y" }}</td>
+
+                <td>{{ u.org_created }}</td>
+                <td>{{ u.org_updated }}</td>
+
+                <td>{{ u.loc_created }}</td>
+                <td>{{ u.loc_updated }}</td>
+
+                <td>{{ u.act_created }}</td>
+                <td>{{ u.act_updated }}</td>
+
+                <td>{{ u.total_updates }}</td>
+
+            </tr>
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
 
     {% if target_user %}
 
-        <hr>
+    <hr class="my-5">
 
-        <h2>{{ target_user.username }}</h2>
+    <h2>{{ target_user.username }}</h2>
 
-        <p><strong>Date joined:</strong> {{ target_user.date_joined|date:"M j, Y g:i A" }}</p>
+    <p>
+        <strong>Date joined:</strong>
+        {{ target_user.date_joined|date:"m/d/y g:i A" }}
+    </p>
 
-        <p>
-            <strong>Last login:</strong>
-            {% if target_user.last_login %}
-                {{ target_user.last_login|date:"M j, Y g:i A" }}
-            {% else %}
-                Never
-            {% endif %}
-        </p>
+    <p>
+        <strong>Last login:</strong>
 
-        <form method="post" novalidate>
-            {% csrf_token %}
+        {% if target_user.last_login %}
+            {{ target_user.last_login|date:"m/d/y g:i A" }}
+        {% else %}
+            Never
+        {% endif %}
+    </p>
 
-            <input type="hidden" name="user_id" value="{{ target_user.id }}">
+    <form method="post">
 
-            <h3>Account</h3>
+        {% csrf_token %}
 
-            {{ user_form.non_field_errors }}
+        <input type="hidden" name="user_id" value="{{ target_user.id }}">
+
+        <div class="form-check mb-2">
+            {{ user_form.is_active }}
+            {{ user_form.is_active.label_tag }}
+        </div>
+
+        <div class="form-check mb-4">
+            {{ user_form.is_staff }}
+            {{ user_form.is_staff.label_tag }}
+        </div>
+
+        <button class="me-text-btn">
+            Save User
+        </button>
+
+    </form>
 
 
-            <div class="form-check mb-3">
-                {{ user_form.is_active }}
-                {{ user_form.is_active.label_tag }}
-                {{ user_form.is_active.errors }}
-            </div>
-            <div class="form-check mb-3">
-                {{ user_form.is_staff }}
-                {{ user_form.is_staff.label_tag }}
-                {{ user_form.is_staff.errors }}
-            </div>
+    <hr>
 
-            {{ profile_form.non_field_errors }}
+    <h3>User Activity</h3>
 
- 
+    <h4>Organizations Created</h4>
+    {% include "orgs/_staff_object_list.html" with objects=created_orgs date_field="created_at" empty_message="No organizations created." %}
 
-            <button type="submit" class="me-text-btn">
-                Save User
-            </button>
-        </form>
+    <h4>Organizations Updated</h4>
+    {% include "orgs/_staff_object_list.html" with objects=updated_orgs date_field="updated_at" empty_message="No organizations updated." %}
 
-        <hr>
+    <h4>Locations Created</h4>
+    {% include "orgs/_staff_object_list.html" with objects=created_locations date_field="created_at" empty_message="No locations created." %}
 
-        <h3>User Activity</h3>
+    <h4>Locations Updated</h4>
+    {% include "orgs/_staff_object_list.html" with objects=updated_locations date_field="updated_at" empty_message="No locations updated." %}
 
-        <h4>Organizations Created</h4>
-        {% include "orgs/_staff_object_list.html" with objects=created_orgs date_field="created_at" empty_message="No organizations created." %}
+    <h4>Activities Created</h4>
+    {% include "orgs/_staff_object_list.html" with objects=created_activities date_field="created_at" empty_message="No activities created." %}
 
-        <h4>Organizations Updated</h4>
-        {% include "orgs/_staff_object_list.html" with objects=updated_orgs date_field="updated_at" empty_message="No organizations updated." %}
-
-        <h4>Locations Created</h4>
-        {% include "orgs/_staff_object_list.html" with objects=created_locations date_field="created_at" empty_message="No locations created." %}
-
-        <h4>Locations Updated</h4>
-        {% include "orgs/_staff_object_list.html" with objects=updated_locations date_field="updated_at" empty_message="No locations updated." %}
-
-        <h4>Activities Created</h4>
-        {% include "orgs/_staff_object_list.html" with objects=created_activities date_field="created_at" empty_message="No activities created." %}
-
-        <h4>Activities Updated</h4>
-        {% include "orgs/_staff_object_list.html" with objects=updated_activities date_field="updated_at" empty_message="No activities updated." %}
+    <h4>Activities Updated</h4>
+    {% include "orgs/_staff_object_list.html" with objects=updated_activities date_field="updated_at" empty_message="No activities updated." %}
 
     {% endif %}
 

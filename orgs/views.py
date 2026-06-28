@@ -377,10 +377,15 @@ def org_mgmt(request):
     managers_qs=OrgManager.objects.all().select_related("profile__user")
     activities_qs = (
         Activity.objects
-        .with_active_flag()   # ✅ your custom logic
+        .with_active_flag()
         .annotate(
-            next_session_start=Min(
-                "sessions__start",
+            next_session_start=Min("sessions__start")
+        )
+        .prefetch_related(
+            Prefetch(
+                "sessions",
+                queryset=Session.objects.only("id", "start").order_by("start"),
+                to_attr="pre_sessions"
             )
         )
         .order_by(
@@ -833,7 +838,7 @@ def staff_user_manage(request):
     target_user = None
     user_form = None
     profile_form = None
-
+    
     created_orgs = updated_orgs = None
     created_locations = updated_locations = None
     created_activities = updated_activities = None
@@ -874,8 +879,104 @@ def staff_user_manage(request):
     select_form = StaffUserSelectForm(
         initial={"user_id": target_user} if target_user else None
     )
+    # Get all users in last-login order
+    users = (
+        User.objects
+        .filter(last_login__isnull=False)
+        .select_related("profile")
+        .order_by("-last_login")
+    )
+
+    # Build count dictionaries (6 total queries regardless of number of users)
+
+    org_created = {
+        row["created_by"]: row["cnt"]
+        for row in (
+            Organization.objects
+            .values("created_by")
+            .annotate(cnt=Count("id"))
+        )
+    }
+
+    org_updated = {
+        row["updated_by"]: row["cnt"]
+        for row in (
+            Organization.objects
+            .values("updated_by")
+            .annotate(cnt=Count("id"))
+        )
+    }
+
+    loc_created = {
+        row["created_by"]: row["cnt"]
+        for row in (
+            Location.objects
+            .values("created_by")
+            .annotate(cnt=Count("id"))
+        )
+    }
+
+    loc_updated = {
+        row["updated_by"]: row["cnt"]
+        for row in (
+            Location.objects
+            .values("updated_by")
+            .annotate(cnt=Count("id"))
+        )
+    }
+
+    act_created = {
+        row["created_by"]: row["cnt"]
+        for row in (
+            Activity.objects
+            .values("created_by")
+            .annotate(cnt=Count("id"))
+        )
+    }
+
+    act_updated = {
+        row["updated_by"]: row["cnt"]
+        for row in (
+            Activity.objects
+            .values("updated_by")
+            .annotate(cnt=Count("id"))
+        )
+    }
+
+    # Attach counts to each user
+    for user in users:
+
+        profile = getattr(user, "profile", None)
+
+        if profile:
+            pid = profile.id
+
+            user.org_created = org_created.get(pid, 0)
+            user.org_updated = org_updated.get(pid, 0)
+
+            user.loc_created = loc_created.get(pid, 0)
+            user.loc_updated = loc_updated.get(pid, 0)
+
+            user.act_created = act_created.get(pid, 0)
+            user.act_updated = act_updated.get(pid, 0)
+
+            user.total_updates = (
+                user.org_updated +
+                user.loc_updated +
+                user.act_updated
+            )
+
+        else:
+            user.org_created = 0
+            user.org_updated = 0
+            user.loc_created = 0
+            user.loc_updated = 0
+            user.act_created = 0
+            user.act_updated = 0
+            user.total_updates = 0
 
     return render(request, "orgs/staff_user_manage.html", {
+        "users": users,
         "select_form": select_form,
         "target_user": target_user,
         "user_form": user_form,

@@ -8,10 +8,9 @@
      <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" width ="210" class="img-fluid">
 
 <br><br>
-<h4>A Compass to Conservation in Wisconsin</h4>
+<h4>Finding your Path to Conservation in Wisconsin</h4>
  
-Designed for <a href="https://www.wimasternaturalist.org" target="_blank">Wisconsin Master Naturalists <i class="bi bi-arrow-up-right-square "></i></a>, but open to all, the site will help 
-you discover your path to conservation efforts in Wisconsin.</p>
+
 
     <a class="me-btn" href="{% url 'activities' %}?activity_type=v" ; font-weight: bold;color:black;" title="See Volunteer activities by date">
      <span>
@@ -43,10 +42,13 @@ you discover your path to conservation efforts in Wisconsin.</p>
     <span class="me-btn-label">
         Organizations</span>
 </a>
-
 <hr>
-{% if user.is_authenticated%}
-    <div class="me-muted">If you are an organization and want to manage locations or activities:</div><br>
+<p class="text sm">Designed for Wisconsin Master Naturalists, but open to all, the site will help 
+you discover your path to conservation efforts in Wisconsin.</p>
+To learn more about Wisconsin Master Naturalists <a href="https://www.wimasternaturalist.org" target="_blank"><img src="{% static 'orgs/images/wisconsin-master-naturalist.svg'%}" width ="100" class="img-fluid"></a>
+<hr>
+{% if request.user.is_staff or request.user.profile.is_org_manager %}
+   
     <a class="me-btn" href="{% url 'org_mgmt' %}" title="Manage your organizations">
         <span>
             <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i>
@@ -54,16 +56,15 @@ you discover your path to conservation efforts in Wisconsin.</p>
      <span class="me-btn-label">
     Manage Organizations</span></a>
 
-{%else%}
+{% endif %}
 
-{% if false %}
-<a class="me-text-btn" href="{% url 'account_signup' %}" title="You need to sign up to save Favorites, or to manage organizations">
-    Signup</a>
-    {% endif %}
+{% if request.user.is_authenticated %}
+{% else %}
+
     Already have a login -> <a class="me-text-btn" href="{% url 'account_login' %}">Login</a>
      
 
-{%endif%}
+{% endif %}
 </div>
 </div>
 {% endblock %}
