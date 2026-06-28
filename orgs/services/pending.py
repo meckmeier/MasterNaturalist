@@ -5,7 +5,7 @@ from unittest import result
 from django.db import transaction
 from django.utils import timezone
 from orgs.models import (RawLoadData, Pending_Location, Pending_Activity, Pending_Session, Location, ZipToCounty, EventCategory)
-from orgs.services.helper_function import get_county_region_from_zip
+from orgs.services.helper_function import get_county_from_zip
 
 class PendingBuildResult:
     def __init__(self):
@@ -131,7 +131,7 @@ def get_or_create_pending_location(raw, org, upload, result=None):
             default_status = "create"
 
     try:
-        county, region = get_county_region_from_zip(zip_code)
+        county = get_county_from_zip(zip_code)
 
         pending_location = Pending_Location.objects.create(
             source_upload=upload,
@@ -144,7 +144,7 @@ def get_or_create_pending_location(raw, org, upload, result=None):
             state=state,
             zip_code=zip_code,
             county_id=county,
-            region_name=region,
+            region=county.region if county else None,
             fingerprint=fingerprint,
 
             real_location=matched_location,

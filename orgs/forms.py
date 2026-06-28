@@ -90,6 +90,7 @@ class OrgEnrollmentForm(forms.ModelForm):
             "volunteer_url",
             "training_url",
             "about",
+            "region",
             "contact_name",
             "contact_email",
             "contact_title",
@@ -147,7 +148,7 @@ class OrgForm(forms.ModelForm):
         model = Organization
         fields = [
             'id', 'org_name', 'org_url', 'volunteer_url', 'training_url',
-            'in_wisconsin', 'about', 'region_name', 'host', 'deleted', 'default_location'
+            'in_wisconsin', 'about', 'region', 'host', 'deleted', 'default_location'
         ]
         widgets = {
             "about": forms.Textarea(attrs={"rows": 5}),
@@ -184,7 +185,7 @@ class LocForm(forms.ModelForm):
     org_loc_url = forms.CharField(required=False)
     class Meta:
         model = Location
-        fields = [ "loc_name", "physical_location", "address", "city_name", "county_id", "region_name", "state", "zip_code", "org_loc_url", "location_about", "contact_email"]
+        fields = [ "loc_name", "physical_location", "address", "city_name", "county_id", "region", "state", "zip_code", "org_loc_url", "location_about", "contact_email"]
         widgets = {
             "location_about": forms.Textarea(attrs={
                 "rows": 3,
@@ -245,7 +246,7 @@ class BaseLocationFormSet(BaseInlineFormSet):
 LocationFormSet = inlineformset_factory(
     Organization,
     Location,
-    fields = ['id','loc_name', 'region_name','physical_location','org_loc_url', 'contact_email',  'location_about',  'address', 'city_name','county_id', 'state', 'zip_code'],
+    fields = ['id','loc_name', 'region','physical_location','org_loc_url', 'contact_email',  'location_about',  'address', 'city_name','county_id', 'state', 'zip_code'],
     extra=0,
     can_delete=True,
     formset=BaseLocationFormSet,
@@ -479,15 +480,16 @@ class LocFilterForm(forms.Form):
     )
 
 class ProfileForm(forms.ModelForm):
+
     class Meta:
         model = Profile
         model = Profile
-        fields = ["bio", "preferred_region", "include_online", "staff"]
+        fields = ["bio", "my_region", "include_online"]
         widgets = {
             "bio": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
-            "preferred_region": forms.Select(attrs={"class": "form-select"}),
+            "my_region": forms.Select(attrs={"class": "form-select"}),
             "include_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "staff": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            
         }
 
 class UserForm(forms.ModelForm):
@@ -530,7 +532,7 @@ class StaffUserUpdateForm(forms.ModelForm):
 class StaffProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ["preferred_region", "include_online", "staff"]
+        fields = ["my_region", "include_online", "is_master_naturalist"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

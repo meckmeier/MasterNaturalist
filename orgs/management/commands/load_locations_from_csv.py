@@ -88,7 +88,7 @@ class Command(BaseCommand):
                     "city_name":city,
                     "state":state,
                     "county_id": county,
-                    "region_name": county.region_name,
+                    "region": county.region,
                     "zip_code": zip_code,
                     "latitude": lat,
                     "longitude": lng,

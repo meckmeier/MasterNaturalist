@@ -31,7 +31,7 @@ import json
 import pandas as pd
 from .services.csv_importer import CSVImporter
 from orgs.services.activity_tracking import track_activity
-from orgs.services.helper_function import get_county_region_from_zip, normalize_address_key, similarity, normalize_location_name
+from orgs.services.helper_function import get_county_from_zip, normalize_address_key, similarity, normalize_location_name
 
 
 from collections import defaultdict
@@ -147,7 +147,7 @@ def org_approve(request, enrollment_id):
             org_url=enrollment.org_url,
             volunteer_url=enrollment.volunteer_url,
             training_url=enrollment.training_url,
-            region_name=enrollment.region_name,
+            region=enrollment.region,
             in_wisconsin=True,
             created_by=request.user.profile,
             updated_by=request.user.profile,
@@ -390,7 +390,7 @@ def org_mgmt(request):
     )
     locations_qs = Location.objects.active()
 
-    # staff gets to see all the organizations
+    # is_staff gets to see all the organizations
     if request.user.is_staff:
         orgs = (Organization.objects
         .active()
@@ -416,7 +416,7 @@ def org_mgmt(request):
             )
             )
         )
-    # if you are not staff, you have to be in the OrgManagers table to see the org on this page.
+    # if you are not is_staff, you have to be in the OrgManagers table to see the org on this page.
     else:
         orgs = (
             Organization.objects.active()
@@ -474,7 +474,7 @@ def org_enroll(request):
             enrollment.save()
             
             print("Enrollment saved:", enrollment.id)
-            # send email to staff
+            # send email to is_staff
             staff_emails = list(
                 User.objects.filter(is_staff=True)
                 .exclude(email="")
@@ -1066,11 +1066,19 @@ def location_action(request, location_id):
 
 
 def lookup_zip(request):
-    county, region = get_county_region_from_zip(request.GET.get("zip_code"))
+    county = get_county_from_zip(request.GET.get("zip_code"))
+
+    if county:
+        return JsonResponse({
+            "found": True,
+            "county_id": county.id,
+            "region_id": county.region_id,
+        })
 
     return JsonResponse({
-        "county_id": county.id if county else None,
-        "region": region,
+        "found": False,
+        "county_id": None,
+        "region_id": None,
     })
 
 @login_required

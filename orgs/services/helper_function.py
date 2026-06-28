@@ -101,24 +101,24 @@ def normalize_zip_code(value):
     return value
 
 
-def get_county_region_from_zip(zip_code):
+def get_county_from_zip(zip_code):
     from orgs.models import ZipToCounty
+
     zip_code = normalize_zip_code(zip_code)
 
     if not zip_code:
-        return None, None
+        return None
 
     try:
-        zip_row = ZipToCounty.objects.select_related("county").get(zip=zip_code)
+        zip_row = (
+            ZipToCounty.objects
+            .select_related("county__region")
+            .get(zip=zip_code)
+        )
     except ZipToCounty.DoesNotExist:
-        return None, None
+        return None
 
-    county = zip_row.county
-    region = county.region_name if county else None
-
-    return county, region
-
-
+    return zip_row.county
 
 
 def normalize_location_name(name):

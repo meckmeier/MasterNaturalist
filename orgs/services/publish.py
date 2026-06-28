@@ -44,7 +44,7 @@ def publish_pending_upload(upload_id, user):
             state=pending_loc.state,
             zip_code=pending_loc.zip_code,
             county_id=pending_loc.county_id,
-            region_name=pending_loc.region_name,
+            region=pending_loc.region,
             org_loc_url=pending_loc.org_loc_url,
             location_about=pending_loc.location_about,
             contact_email=pending_loc.contact_email,

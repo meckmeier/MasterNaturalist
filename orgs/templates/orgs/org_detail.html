@@ -43,9 +43,9 @@
             
         </div>
          <div class ="me-form-field">
-            {{ form.region_name.label_tag }}
-            {{ form.region_name}}
-            {{ form.region_name.errors }}
+            {{ form.region.label_tag }}
+            {{ form.region}}
+            {{ form.region.errors }}
         </div>
         
         <div class="me-form-field">
@@ -54,7 +54,7 @@
             {{ form.volunteer_url.errors }}
         </div>
         <div class="me-form-field">
-           {% if staff %} 
+           {% if user.is_staff %} 
            Master Naturalist Host
             {{ form.host}}
             {{ form.host.errors }} {% endif %}

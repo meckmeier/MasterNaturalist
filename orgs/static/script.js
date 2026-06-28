@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const zipField = document.getElementById("id_zip_code");
     const countyField = document.getElementById("id_county_id");
-    const regionField = document.getElementById("id_region_name");
+    const regionField = document.getElementById("id_region");
     console.log("starting zip code lookup wiring", { zipField, countyField, regionField });
     if (zipField && countyField && regionField) {
 
@@ -225,12 +225,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(response => response.json())
                 .then(data => {
                     console.log("zip lookup response", data);
-                    if (data.county_id) {
+                    if (data.found) {
                         countyField.value = data.county_id;
+                        regionField.value = data.region_id;
                     }
-                    if (data.region) {
-                        regionField.value = data.region;
-                    }
+                    
                 })
                 .catch(error => console.error("Zip lookup failed:", error));
         });

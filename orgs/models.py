@@ -15,26 +15,8 @@ from orgs.services.helper_function import build_location_fingerprint
 
 # fixed lists:
 #-------------------------------------------------------    
-region_list = [
-    ('C','Central')
-    ,('EC', 'East Central')
-    ,('NE', 'Northeast')
-    ,('NW','Northwest')
-    ,('SC','South Central')
-    ,('SE','Southeast')
-    ,('SW', 'Southwest')
-    ,('St','Statewide')]
 
-REGION_IMAGE_MAP = {
-        'SC': 'orgs/images/SC.jpg',
-        'NW': 'orgs/images/NW.jpg',
-        'C':  'orgs/images/C.jpg',
-        'NE': 'orgs/images/NE.jpg',
-        'SW': 'orgs/images/SW.jpg',
-        'SE': 'orgs/images/SE.jpg',
-        'EC': 'orgs/images/CE.jpg',
-        'St': 'orgs/images/St.jpg',
-    }
+
 
 ADDRESS_MAP = {
     "street": "st",
@@ -88,9 +70,11 @@ class Region(models.Model):
     def map_image(self):
         return f"orgs/region_maps/{self.code.lower()}.png"
     
+    class Meta:
+        ordering = ["name"]
+
 class County(models.Model):
     county_name=models.CharField(max_length=100)
-    region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name="counties", blank=True, null=True)
     class Meta:
         ordering = ["county_name"]
@@ -106,8 +90,7 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     bio=models.TextField(blank=True)
-    staff = models.BooleanField(default=False)
-    preferred_region = models.CharField(max_length =100, choices = region_list, default='', blank=True)
+    is_master_naturalist = models.BooleanField(default=False)
     my_region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
      # Personalization Toggles
     include_online = models.BooleanField(default=True)
@@ -136,7 +119,6 @@ class Organization(models.Model):
     in_wisconsin = models.BooleanField(default=True)
     host = models.BooleanField(default=False)
     about = models.TextField(default ="" , blank=True)
-    region_name = models.CharField(max_length =100, choices = region_list, default='', blank=True)
     region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
     training_url = models.URLField(max_length=200, default="", blank=True)
     volunteer_url = models.URLField(max_length=200, default="", blank=True)
@@ -178,12 +160,6 @@ class Organization(models.Model):
 
         super().save(*args, **kwargs)
 
-    @property
-    def region_image(self):
-        return REGION_IMAGE_MAP.get(
-            self.region_name,
-            'orgs/images/default.jpg'
-        )
 
 class OrganizationEnrollmentRequest(models.Model):
     org_name = models.CharField(max_length=255)
@@ -191,7 +167,6 @@ class OrganizationEnrollmentRequest(models.Model):
     volunteer_url = models.URLField(blank=True)
     training_url = models.URLField(blank=True)
     about = models.TextField(blank=True)
-    region_name = models.CharField(max_length=50, choices=region_list,blank=True)
     region = models.ForeignKey(Region,null=True, blank=True, on_delete=models.SET_NULL)
     contact_name = models.CharField(max_length=255)
     contact_email = models.EmailField()
@@ -357,7 +332,6 @@ class Location(models.Model):
     address = models.CharField(max_length=255, default ='', blank=True, null=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL, related_name="locations")
-    region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
     region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
@@ -425,12 +399,7 @@ class Location(models.Model):
             role__in=["owner", "admin", "editor"],
         ).exists()
     
-    @property
-    def region_image(self):
-        return REGION_IMAGE_MAP.get(
-            self.region_name,
-            'orgs/images/default.jpg'
-        )
+
     @property
     def organizations(self):
         orgs = {}
@@ -605,21 +574,6 @@ class Session(models.Model):
     def __str__(self):
         return f"{self.activity.title} – {self.start}"
   
-    @property
-    def region_image(self):
-        # 1️⃣ If event has orgloc, use that region
-        if self.location and self.location.region_name:
-            region = self.location.region_name
-        # 2️⃣ Otherwise fall back to org
-        elif self.activity.org and self.activity.org.region_name:
-            region = self.activity.org.region_name
-        else:
-            region = None
-
-        return REGION_IMAGE_MAP.get(
-            region,
-            'orgs/images/default.jpg'
-        )
 
 class RawLoadData(models.Model):
     upload = models.ForeignKey(ActivityUpload, on_delete=models.CASCADE)
@@ -680,7 +634,7 @@ class Pending_Location(models.Model):
     address = models.CharField(max_length=255, default ='', blank=True, null=True)
     city_name = models.CharField(max_length=255, blank=True,null=True )
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL)
-    region_name = models.CharField(max_length =100, choices = region_list, null=True, blank=True)
+    region=models.ForeignKey(Region, blank=True, null=True, on_delete=models.SET_NULL)
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     org_loc_url = models.URLField(max_length=255, default="", blank=True)
@@ -742,12 +696,6 @@ class Pending_Location(models.Model):
     def __str__(self):
         return f"{self.loc_name} ({self.org})"
     
-    @property
-    def region_image(self):
-        return REGION_IMAGE_MAP.get(
-            self.region_name,
-            'orgs/images/default.jpg'
-        )
     
     class Meta:
         constraints = [
