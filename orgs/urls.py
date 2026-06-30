@@ -79,7 +79,8 @@ urlpatterns = [
     path("about/",views.render_markdown, {"filename": "about"}, name="about"),
     path("feedback/", views.feedback_view, name="feedback"),
     path("logos/", TemplateView.as_view(template_name="orgs/logos.html"), name="logos"),
-    path("upload_faq/", views.render_markdown, {"filename":"upload_faq"},name="upload_faq")
+    path("upload_faq/", views.render_markdown, {"filename":"upload_faq"},name="upload_faq"),
+    path("tutorials/", views.tutorials, name="tutorials")
 ]
 
 if settings.DEBUG:

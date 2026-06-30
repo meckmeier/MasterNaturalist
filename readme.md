@@ -109,3 +109,7 @@ Upload process:
 
 Future wishlist - make a video that explains how to manage an org in this system.
 Talk to Sage about creating a way to 'register' for an activity in her system directly from here.
+
+https://www.youtube.com/watch?v=HbvGTnk7HR0 - Welcome to WildPathsWI.org
+https://www.youtube.com/watch?v=jLKQdMGDO7s - Add Your Organization
+https://www.youtube.com/watch?v=xfV6BcMvwxU - Manage Your Organization

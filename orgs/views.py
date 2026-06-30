@@ -2715,7 +2715,8 @@ def upload_results(request, upload_id):
 
     })
 
-
+def tutorials(request):
+    return render(request, "orgs/tutorials.html")
 
 def test_html(request):
     activity=Activity.objects.first()
