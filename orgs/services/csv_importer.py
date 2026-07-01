@@ -96,6 +96,22 @@ class CSVImporter:
             return None
         return self.clean_value(row.at[col])
     
+    def get_bool(self, row, key):
+        val = self.get_val(row, key)
+        print()
+        if val is None:
+            return False
+
+        if isinstance(val, bool):
+            return val
+
+        val = str(val).strip().lower()
+
+        if val in {"", "0", "false", "f", "no", "n"}:
+            return False
+
+        return True
+    
     def parse_date(self, val, field_name, warnings):
         val = self.clean_value(val)
 
@@ -138,26 +154,34 @@ class CSVImporter:
         errors.append(f"activity_type must start with V or T; got '{val}'")
         return None
 
-    def parse_session_format(self, val, location_name, url, errors):
-        # Always derive session_format.
-        # Do not consume or validate the uploaded session_format value.
+    def parse_session_format(self, val, location_name, url, warnings):
+        print(f"parse_session_format: val={val}, location_name={location_name}, url={url}")
 
         location_name = self.clean_value(location_name)
         url = self.clean_value(url)
-        if val and str(val).lower().startswith("o"):
-            return "o"
-        
+
+        if location_name and location_name.lower().startswith("self"):
+            return "s"
+
         has_location = bool(location_name)
         has_url = bool(url)
 
-        if has_location and has_url:
+        # Warning: online session but no URL
+        if val and not has_url:
+            warnings.append(
+                "Online is checked, but no meeting URL was provided."
+            )
+
+        if has_location and val:
             return "b"
+
         if has_location:
             return "i"
-        if has_url:
+
+        if val:
             return "o"
-        if not has_location and not has_url:
-            return "s"
+
+        return "s"
         
     
     def parse_zip(self, val, warnings):
@@ -227,14 +251,15 @@ class CSVImporter:
         cleaned = {
             "title": str(self.get_val(row, "title")).strip(),
             "description": self.get_val(row, "description"),
+            "online": self.get_bool(row, "online"),
             "city": self.get_val(row, "city"),
             "location_name": self.get_val(row, "location_name"),
             "address": self.get_val(row, "address"),
             "start_date": self.parse_date(self.get_val(row, "start_date"), "start_date", warnings),
             "end_date": self.parse_date(self.get_val(row, "end_date"),"end_date", warnings ),
             "zip": self.parse_zip( self.get_val(row, "zip"), warnings),
-            "has_cost": self.parse_bool_presence(self.get_val(row, "has_cost")),
-            "ongoing": self.parse_bool_presence(self.get_val(row, "ongoing")),
+            "has_cost": self.get_bool(row, "has_cost"),
+            "ongoing": self.get_bool(row, "ongoing"),
             "activity_url": self.parse_url(self.get_val(row, "activity_url"),warnings),
             "contact_email": self.parse_email(self.get_val(row, "contact_email"), warnings),
             "time_commitment": self.get_val(row, "time_commitment"),
@@ -258,10 +283,10 @@ class CSVImporter:
         )
 
         cleaned["session_format"] = self.parse_session_format(
-            self.get_val(row, "session_format"),
+            self.get_bool(row, "online"),
             cleaned["location_name"],
             cleaned["activity_url"],
-            errors
+            warnings
         )
 
         return cleaned, warnings, errors

@@ -1,7 +1,4 @@
 
-
-from unittest import result
-
 from django.db import transaction
 from django.utils import timezone
 from orgs.models import (RawLoadData, Pending_Location, Pending_Activity, Pending_Session, Location, ZipToCounty, EventCategory)
@@ -56,19 +53,23 @@ def build_pending_for_upload(upload):
 def build_pending_row(raw_row, upload, result):
     org = upload.organization
     
-    pending_location, status = get_or_create_pending_location(
-        raw=raw_row,
-        org=upload.organization,
-        upload=upload,
-        result=result,
-    )
-        
-    if status == "matched":
-        result.matched_locations += 1
-    elif status == "create":
-        result.created_locations += 1
-    elif status == "existing_pending":
-        pass
+    if raw_row.session_format in ("o", "s"):
+        pending_location= None
+    else:
+
+        pending_location, status = get_or_create_pending_location(
+            raw=raw_row,
+            org=upload.organization,
+            upload=upload,
+            result=result,
+        )
+            
+        if status == "matched":
+            result.matched_locations += 1
+        elif status == "create":
+            result.created_locations += 1
+        elif status == "existing_pending":
+            pass
     
     
     pending_activity = build_pending_activity(raw_row, org, upload)
@@ -120,8 +121,11 @@ def get_or_create_pending_location(raw, org, upload, result=None):
         return pending_location, "existing_pending"
 
     # Online sessions do not need a real physical location match
-    if raw.session_format == "o":
+    if raw.session_format in ("o", "s"):
         default_status = "skip"
+        matched_location = None
+        score = 0
+        reason = "Location not required"
     else:
         matched_location, score, reason = find_best_location_match(raw, org)
 

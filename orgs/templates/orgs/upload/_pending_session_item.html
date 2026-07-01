@@ -79,7 +79,7 @@
   <div class="me-card-sponsor">
     Sponsored by: {{ e.activity.org.org_name }}
 
-    <p>Location: 
+    <p>Location: {% if e.session_format == "s" %} Self-selected locations{% endif %}
       {% if e.location %}
       {{ e.location.loc_name }} ({{e.location.real_location.org.org_name}}) {% if e.location.processing_status == "create" %} 
         (will be added by load)

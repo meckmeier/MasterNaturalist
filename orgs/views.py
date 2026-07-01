@@ -1917,6 +1917,7 @@ def upload_map(request, upload_id):
     columns = list(df.columns)
 
     EXCLUDE_FIELDS = ["id", "upload", "row_number", "organization"]
+    IMPORT_ONLY_FIELDS = ["online",]
 
     field_names = [
         f.name for f in RawLoadData._meta.get_fields()
@@ -1925,6 +1926,8 @@ def upload_map(request, upload_id):
         and f.name not in EXCLUDE_FIELDS
     ]
 
+    field_names.extend(IMPORT_ONLY_FIELDS)
+    
     dropdown_options = build_dropdown_options(columns, field_names)
 
     # Try automatic/default mapping first
@@ -2677,38 +2680,7 @@ def upload_results(request, upload_id):
 
     if no_location.volunteer or no_location.training:
             locs.append(no_location)
-    print("UPLOAD:", upload.id)
 
-    print("activities:", Activity.objects.filter(source_upload=upload).count())
-
-    print("volunteer activities:", Activity.objects.filter(
-        source_upload=upload,
-        activity_type="v"
-    ).count())
-
-    print("training activities:", Activity.objects.filter(
-        source_upload=upload,
-        activity_type="t"
-    ).count())
-
-    print("sessions:", Session.objects.filter(
-        activity__source_upload=upload
-    ).count())
-
-    print("sessions with location:", Session.objects.filter(
-        activity__source_upload=upload,
-        location__isnull=False
-    ).count())
-
-    print("volunteer sessions:", volunteer.count())
-    print("training sessions:", training.count())
-
-    for loc in locs:
-        print(
-            loc.loc_name,
-            "vol:", len(loc.volunteer),
-            "train:", len(loc.training)
-        )
     return render(request, "orgs/upload/upload_results.html", {
         "upload": upload,
         "locs": locs,

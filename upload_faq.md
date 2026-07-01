@@ -54,6 +54,7 @@ Use the menu option under Organizer to view the Organization Management for your
 | ----------- | ----------- |
 |title | REQUIRED. This is the name of your activity (this line will appear at the top of the activity listing in bold).|
 |description| Use this for a longer description of your activity. |
+|online | If this is blank your event has only a physical location... but if you fill it in then it has an online component (you have to fill out the url column). If you have both a location_name and this field is not blank, then the event will be considered Hybrid (both online AND in person).
 |location_name| If you know the location exists in the system, use the name as it appears - to avoid creating new copies of the same location. The system will use this name plus the address to try and find existing locations - but if they cannot be found by the system it will automatically add it as a new location managed by your organization.|
 |address| Street address of the location.|
 city | City of the location.,
