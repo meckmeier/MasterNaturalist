@@ -29,6 +29,8 @@ def build_mapping(post_data, columns):
 
 
 def build_dropdown_options(columns, field_names):
+    IMPORT_ONLY_FIELDS = [ "online",]
+    
     normalized_field_map = {field_normalize(f): f for f in field_names}
 
     dropdown_options = {}

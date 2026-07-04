@@ -14,9 +14,8 @@
 
 <div class="me-page">
  <div class="me-card-header">
-    <div class="me-card-header-left">  
-      <h1>Locations</h1>
-    </div>
+
+    <div class="me-card-header-left"> <h1>Locations</h1> </div>
     <div class="me-card-header-right">
       {% if active_filters %}
           <div class="me-sponsor">
@@ -30,19 +29,15 @@
           </div>
       {% endif %}
     </div>
-  </div>
-    <div class="d-flex justify-content-between align-items-top mb-4">
+ </div>
+<div class="d-flex justify-content-between align-items-top mb-4">
 
-    <div class="mb-0">
- <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3" id="view-toggle-form">
-    <input type="hidden" name="county" value="{{ request.GET.county }}">
-    <input type="hidden" name="region" value="{{ request.GET.region }}">
-    <input type="hidden" name="q" value="{{ request.GET.q }}">
-    <input type="hidden" name="org" value="{{ request.GET.org }}">
+    <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3" id="view-toggle-form">
+      {% for key, value in query_params.items %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
     <input type="hidden" name="page" value="1">
-    <input type="hidden" name="loc" value="{{ request.GET.loc}}">
-    <input type="hidden" name="activity_status" value="{{request.GET.activity_status}}">
-     <div class="me-toggle" role="group"  style="margin: 15px;">
+    <div class="me-toggle" role="group"  style="margin: 15px;">
 
         <input type="radio" name="view" id="view-list" value="list"
                {% if request.GET.view == "list" %}checked{% endif %}>
@@ -53,15 +48,7 @@
         <label for="view-map">Map View</label>
 
     </div>
-    <div class="me-toggle" role="group"  style="margin: 15px;">
-      
-      <input type="radio" name="activity_status" id="quick-status-all" value=""
-            {% if not request.GET.activity_status %}checked{% endif %}>
-      <label for="quick-status-all">All</label>
-      <input type ="radio" name="activity_status" id="quick-status-has" value ="has"
-                {% if request.GET.activity_status == "has" %}checked{% endif %}>
-      <label for="quick-status-has">Has Activities</label>
-    </div>
+
  <button class="me-btn me-btn-small me-btn-compact-mobile"
             type="button"
             data-bs-toggle="offcanvas"
@@ -71,7 +58,7 @@
         <span class="me-btn-label">
         More Filters</span>
     </button>
-  </div>
+
     <a href="{% url 'locations'%}" class ="me-btn me-btn-compact-mobile me-btn-small">
         <span><i class="bi bi-funnel-fill me-btn-icon" title="clear all filters"></i></span>
         <span class="me-btn-label">Clear</span></a>    

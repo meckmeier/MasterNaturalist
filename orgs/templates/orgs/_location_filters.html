@@ -1,17 +1,11 @@
 <form method="get" action="{{ request.path }}" class="me-form">
     <input type="hidden" name="view" value="{{ request.GET.view }}">
-    <div class="mb-3">
-        Has: 
-        <div class="me-toggle" role="group">
-  
-    <input type="radio" name="activity_status" id="status-all" value=""
-            {% if not request.GET.activity_status %}checked{% endif %}>
-    <label for="status-all">All</label>
-    <input type ="radio" name="activity_status" id="status-has" value ="has"
-                {% if request.GET.activity_status == "has" %}checked{% endif %}>
-    <label for="status-has">Has Activities</label>
-
-</div></div>
+   <div class="mb-3">
+    Has:
+    {{filter_form.activity_status}}
+    {{filter_form.activity_status.errors}}
+    {{filter_form.activity_status.label_tag}}
+   </div>
    <div class="mb-3"> 
         Word Search:
         {{ filter_form.q }}

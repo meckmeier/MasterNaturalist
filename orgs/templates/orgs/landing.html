@@ -21,19 +21,19 @@
     </span>
 </a>
 
-<a class="me-btn" href="{% url 'activities' %}?activity_type=t" ;font-weight: bold;color:black;"  title="See Training activities by date">
+<a class="me-btn" href="{% url 'activities' %}?activity_type=t" ;font-weight: bold;color:black;"  title="See learning activities by date">
     <span>
             <i class="bi bi-mortarboard-fill me-btn-icon me-btn-learn-icon"></i>
     </span>
     <span class="me-btn-label">
-        Training</span> 
+        Learn</span> 
 </a>
 <a class="me-btn" href="{% url 'locations' %}" title="See a map of locations">
     <span>
             <i class="bi bi-geo-alt-fill me-btn-icon  me-btn-brown-icon"></i>
         </span>
     <span class="me-btn-label">
-        Locations</span>
+        Map</span>
 </a>
 <a class="me-btn" href="{% url 'orgs' %}" title="See a list of organizations">
     <span>
@@ -46,6 +46,9 @@
 <p class="text sm">Designed for Wisconsin Master Naturalists, but open to all, the site will help 
 you discover your path to conservation efforts in Wisconsin.</p>
 To learn more about Wisconsin Master Naturalists <a href="https://www.wimasternaturalist.org" target="_blank"><img src="{% static 'orgs/images/wisconsin-master-naturalist.svg'%}" width ="100" class="img-fluid"></a>
+<p> <a class="me-btn" href="{% url 'help'%}">
+    <span><i class="bi bi-question-circle me-btn-icon"></i></span>
+<span class="me-btn-label">Learn More About This Site</span></a></p>
 <hr>
 {% if request.user.is_staff or request.user.profile.is_org_manager %}
    

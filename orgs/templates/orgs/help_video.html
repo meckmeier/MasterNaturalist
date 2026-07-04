@@ -1,0 +1,20 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+{% load static %}
+<div class="me-page">
+<div class="ratio ratio-16x9">
+
+<iframe
+    src="https://www.youtube.com/embed/{{ video_id }}"
+    title="Video Tutorial"
+    style="width:100%;"
+    title="Welcome Video"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+</iframe>
+
+</div>
+<div></div>
+
+{% endblock %}

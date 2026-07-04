@@ -464,7 +464,7 @@ class Activity(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     activity_type = models.CharField(max_length=1,
-                                  choices=[("v","Volunteer Opportunity"),("t","Training" )])
+                                  choices=[("v","Volunteer"),("t","Learn" )])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
     time_commitment_txt = models.CharField(max_length=255, default="", blank=True, null=True)
     categories = models.ManyToManyField(EventCategory, blank=True, related_name="category_activities")

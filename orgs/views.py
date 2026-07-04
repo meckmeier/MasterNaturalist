@@ -91,6 +91,15 @@ def org_enrollment_list(request):
     enrollments = OrganizationEnrollmentRequest.objects.order_by("-created_at")
     return render(request, "orgs/org_enrollment_list.html", {"enrollments": enrollments})
 
+def help(request):
+    return render(request, "orgs/help.html")
+
+def help_video(request, video_id):
+    # This view renders a help video page based on the provided video_id.
+    # You can customize the template to display the video and any additional information.
+    return render(request, "orgs/help_video.html", {"video_id": video_id})
+
+
 @staff_member_required
 def org_deny(request, enrollment_id):
 
@@ -687,22 +696,46 @@ def locations(request):
     today = timezone.now().date()
     active_filters = []
 
+
+    current_session_filter = (
+        Q(sessions__deleted=False) &
+        Q(sessions__activity__deleted=False) &
+        Q(sessions__activity__org__deleted=False) &
+        (
+            Q(sessions__start__isnull=True) |
+            Q(sessions__start__gte=today) |
+            (
+                Q(sessions__start__lt=today) &
+                (Q(sessions__end__isnull=True) | Q(sessions__end__gte=today))
+            )
+        )
+    )
     volunteer = Session.objects.current().filter(
-        
-        activity__deleted=False,
-        activity__org__deleted=False,
         activity__activity_type="v",
     )
 
     training = Session.objects.current().filter(
-        activity__deleted=False,
-        activity__org__deleted=False,
         activity__activity_type="t",
     )
 
     queryset = (
         Location.objects
         .filter(deleted=False)
+        .annotate(
+            volunteer_count=Count(
+                "sessions",
+                filter=current_session_filter &
+                    Q(sessions__activity__activity_type="v"),
+                distinct=True,
+            ),
+
+            training_count=Count(
+                "sessions",
+                filter=current_session_filter &
+                    Q(sessions__activity__activity_type="t"),
+                distinct=True,
+            ),
+        )
         .order_by("loc_name")
         .select_related(
             "org",        # follow FK from Session -> Activity
@@ -723,15 +756,16 @@ def locations(request):
     
      
     get_data = request.GET.copy()
+    if "activity_status" not in get_data:
+        get_data["activity_status"] = "has"
 
-    if "org_id" in get_data and "org" not in get_data:
-        get_data["org"]=get_data["org_id"]
-
-    filter_form=LocFilterForm(get_data or None)
-    if filter_form.is_valid():
+    filter_form = LocFilterForm(get_data)
     
+    if filter_form.is_valid():
+        
         data = filter_form.cleaned_data
         today = timezone.now().date()
+        activity_filter = data.get("activity_status") or "has"
 
         if data.get("org"):
             queryset=queryset.filter(org__id=data["org"].id)
@@ -755,38 +789,37 @@ def locations(request):
                                       | Q(loc_name__icontains=q)
                                       | Q(location_about__icontains=q)
                                       ).distinct()
-        activity_status = data.get("activity_status")
             
-        if activity_status == "training":
+       
+            
+        if activity_filter == "has":
             queryset = queryset.filter(
-                sessions__in=training
-            ).distinct()
-
-        elif activity_status == "volunteer":
-            queryset = queryset.filter(
-                sessions__in=volunteer
-            ).distinct()
-
-        elif activity_status == "both":
-            queryset = queryset.filter(
-                sessions__in=training
-            ).filter(
-                sessions__in=volunteer
-            ).distinct()
-
-        elif activity_status == "none":
-            queryset = queryset.exclude(
-                Q(sessions__in=training) |
-                Q(sessions__in=volunteer)
+                Q(volunteer_count__gt=0) |
+                Q(training_count__gt=0)
             )
-        elif activity_status == "has":
+
+        elif activity_filter == "volunteer":
             queryset = queryset.filter(
-                Q(sessions__in=training) |
-                Q(sessions__in=volunteer)
-            ).distinct()
-        
-        
-    
+                volunteer_count__gt=0,
+                training_count=0,
+            )
+
+        elif activity_filter == "training":
+            queryset = queryset.filter(
+                training_count__gt=0,
+                volunteer_count=0,
+            )
+
+        elif activity_filter == "both":
+            queryset = queryset.filter(
+                volunteer_count__gt=0,
+                training_count__gt=0,
+            )
+
+        elif activity_filter == "all":
+            pass
+                
+            
    
     locs=Paginator(queryset, 5)
     page_number = request.GET.get('page')
@@ -797,6 +830,7 @@ def locations(request):
     all_locs =Location.objects.filter(deleted=False).order_by("loc_name")
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
+    clean_get.pop("view", None)
     import json
     #print("queryset is:", queryset)
     #print("type of queryset:", type(queryset))

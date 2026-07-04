@@ -446,16 +446,16 @@ class LocFilterForm(forms.Form):
         widget=forms.Select(attrs={"class":"form-select"})
     )
     activity_status = forms.ChoiceField(
-    required=False,
-    choices=[
-        ("", "All"),
-        ("training", "Training"),
-        ("volunteer", "Volunteer"),
-        ("none", "None"),
-        ("both", "Both"),
-        ("has","Has Activities"),
-    ],
-    widget=forms.RadioSelect,
+        required=False,
+        initial="has",
+        choices=[
+            ("has", "Has Activities"),
+            ("volunteer", "Volunteer Only"),
+            ("training", "Learn Only"),
+            ("both", "Has Both"),
+            ("all", "All Locations"),
+        ],
+        widget=forms.Select(attrs={"class": "form-select"}),
     )
     county = forms.ModelChoiceField(
         queryset = County.objects.all().order_by("county_name"),

@@ -9,9 +9,9 @@
     <div class="me-card-header-left">
       <div class="me-card-title-row"> 
         {% if e.activity_type == "t"%}
-          <i class="bi bi-mortarboard-fill me-learn-icon" data-bs-toggle="tooltip" title="Training"></i>
+          <i class="bi bi-mortarboard-fill me-learn-icon" data-bs-toggle="tooltip" title="Learn"></i>
         {%else%} 
-          <i class="bi bi-tree-fill me-tree-icon" data-bs-toggle="tooltip" title="Volunteer Opportunity"></i>
+          <i class="bi bi-tree-fill me-tree-icon" data-bs-toggle="tooltip" title="Volunteer"></i>
         {% endif %}             
         {% if q %}
             {{ e.title|highlight:q|safe  }}
@@ -45,7 +45,7 @@
           
         {% endfor %}
          {% if not e.has_cost %}   
-        <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+        <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Event has a cost for participants"></i>
           {% endif %}
     </div>
     </div>
