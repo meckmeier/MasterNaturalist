@@ -205,15 +205,15 @@
                             {{ hidden }}
                         {% endfor %}
                      <td>{{ session_formset.empty_form.session_format }}</td>
-                     <td>{{ session_formset.empty_form.session_url }}</td>
-                     <td>{{ session_formset.empty_form.location }}
+                     <td> <div class="url-group">{{ session_formset.empty_form.session_url }}</div></td>
+                     <td><div  class="loc-group">{{ session_formset.empty_form.location }}
                             <button type="button"
                                     class="me-btn  open-location-search"
                                     data-bs-toggle="modal"
                                     data-bs-target="#locationSearchModal">
                                <span><i class="bi bi-plus-fill me-btn-icon"></i></span> 
                                <span class="me-btn-label">Find or Add Location</span>
-                            </button>
+                            </button></div>
                      </td>
                      <td>{{ session_formset.empty_form.ongoing }}</td>
                      <td>{{ session_formset.empty_form.start }}</td>

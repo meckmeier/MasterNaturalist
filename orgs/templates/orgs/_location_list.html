@@ -172,28 +172,5 @@
 </div> <!-- end loc card -->
 {% endfor %}
 
-<!-- Pagination -->
-  <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-      {% if locs.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ locs.previous_page_number }}&{{ query_params.urlencode }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-      {% endif %}
-      {% for num in locs.paginator.page_range %}
-        <li class="page-item {% if locs.number == num %}active{% endif %}">
-          <a class="page-link" href="?page={{ num }}&{{ query_params.urlencode }}">{{ num }}</a>
-        </li>
-      {% endfor %}
-      {% if locs.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ locs.next_page_number }}&{{ query_params.urlencode }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      {% endif %}
-    </ul>
-  </nav>
+
 

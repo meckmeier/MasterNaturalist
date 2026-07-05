@@ -23,7 +23,7 @@ from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Count, Q
 
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 from pathlib import Path
 from .utils import update_new_fields
 import markdown
@@ -327,10 +327,7 @@ def orgs(request):
             )
 
         
-    
-    orgs=Paginator(org_queryset, 5)
-    page_number = request.GET.get('page')
-    page_obj = orgs.get_page(page_number)
+
 
     followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
     counties = County.objects.all()
@@ -347,7 +344,7 @@ def orgs(request):
         request,
         "orgs/orgs.html",
         {
-            "organizations": page_obj,
+            "organizations": org_queryset,
             "q": q,
             "followed_orgs": followed_orgs,
             "filter_form": OrgFilterForm(request.GET or None),
@@ -818,10 +815,7 @@ def locations(request):
             pass
                 
             
-   
-    locs=Paginator(queryset, 5)
-    page_number = request.GET.get('page')
-    page_obj = locs.get_page(page_number)
+
 
     followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
     counties = County.objects.all()
@@ -851,7 +845,7 @@ def locations(request):
         request,
         "orgs/locations.html",
         {
-            "locs": page_obj,
+            "locs": queryset,
             "q": q,
             "followed_orgs": followed_orgs,
             "filter_form": filter_form,
@@ -1321,6 +1315,10 @@ def activities(request):
             elif data["activity_type"] == "v":
                 active_filters.append("Volunteer")
             
+        if data.get("time") == "dated":
+            queryset = queryset.filter(ongoing=False)
+        elif data.get("time") == "ongoing":
+            queryset = queryset.filter(ongoing=True)
 
         if data.get("categories"):
             queryset = queryset.filter(activity__categories__id__in=data["categories"]).distinct()
@@ -1355,7 +1353,7 @@ def activities(request):
             queryset = queryset.filter(session_format__in=["o", "b"])
             active_filters.append("Online or Hybrid ")
     
-        
+
         activity_id = request.GET.get("activity_id")
 
         if activity_id:
@@ -1367,20 +1365,13 @@ def activities(request):
         clean_get.pop(p, None)
     
 
-    # Current: future start dates, sorted by start ascending
-    upcoming_sessions = queryset.upcoming().order_by('start')
-        
-    # Ongoing: start <= now <= end, sorted by start ascending
-    ongoing_sessions = queryset.ongoing().order_by('activity__title')
-    #print("ongoing sessions", ongoing_sessions)
     result_count = queryset.count()
     
 
     # For client-side tab segmentation, pass the whole filtered queryset
     return render(request, "orgs/activities.html",{
+                    "queryset": queryset,
                     "filter_form":filter_form,
-                    "upcoming" : upcoming_sessions,
-                    "ongoing": ongoing_sessions,
                     "query_params": clean_get,
                     "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
                     "cats": EventCategory.objects.all(),

@@ -282,16 +282,16 @@ class LocationMergeForm(forms.Form):
         return cleaned
     
 class EventFilterForm(forms.Form):
-    session_mode = forms.ChoiceField(
-    required=False,
-    choices=[
-        ("", "All formats"),
-        ("i", "In person"),
-        ("o", "Online"),
-        ("s", "Self-directed"),
-    ],
-    widget=forms.RadioSelect
-)
+    
+    time=forms.ChoiceField(
+        required=False,
+        choices=[
+            ("", "Any"),
+            ("dated", "Dated"),
+            ("ongoing", "Ongoing"),
+        ],
+        widget=forms.RadioSelect
+    )
     ongoing = forms.BooleanField(
         required=False,
         label="Ongoing (no dates)"
@@ -311,6 +311,12 @@ class EventFilterForm(forms.Form):
             "class": "form-control",
             "placeholder": "YYYY-MM-DD"
         })
+    )
+    session_format = forms.ChoiceField(
+        choices=[("", "Any"), ("o", "Online"), ("i", "In Person"), ("s", "Self Selected Locations")],
+        required=False,
+        label="Format",
+        widget=forms.Select(attrs={"class": "form-select"})
     )
     activity_type = forms.ChoiceField(
         choices=[("", "Any"), ("v", "Volunteer"), ("t", "Training")],

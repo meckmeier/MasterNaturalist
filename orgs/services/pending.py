@@ -73,19 +73,20 @@ def build_pending_row(raw_row, upload, result):
     
     
     pending_activity = build_pending_activity(raw_row, org, upload)
+
     if pending_activity:
         build_pending_categories(pending_activity, raw_row)
         result.created_activities += 1
-   
 
-    build_pending_session(
-        raw=raw_row,
-        upload=upload,
-        pending_activity=pending_activity,
-        pending_location=pending_location,
-        
-    )
-    result.created_sessions += 1
+        sessions_created = build_pending_session(
+            raw=raw_row,
+            upload=upload,
+            pending_activity=pending_activity,
+            pending_location=pending_location,
+        )
+
+        result.created_sessions += sessions_created
+
     
 
 from orgs.services.helper_function import build_location_fingerprint
@@ -202,25 +203,33 @@ def build_pending_activity(raw, org, upload):
 
 #Pending session
 def build_pending_session(raw, pending_activity, pending_location,  upload):
+    formats = (raw.session_format or "s").split(",")
+    pending_sessions = []
+    created = 0
 
     try:
-        pending_session = Pending_Session.objects.create(
-            source_upload=upload,
+        for fmt in formats:
+            pending_session = Pending_Session.objects.create(
+                source_upload=upload,
+                activity=pending_activity,
+                location=pending_location if fmt == "i" or fmt =="b" else None,
+                session_format=fmt,
+                session_url=raw.session_url if fmt == "o" or fmt == "b" else None,
+                ongoing=raw.ongoing,
+                start=raw.start_date,
+                end=raw.end_date,
+                processing_status="valid",
+                created_at=timezone.now(),
+            )
 
-            activity=pending_activity,
-            location=pending_location,
-            session_format=raw.session_format[:1] if raw.session_format else "",
-            
-            ongoing=raw.ongoing,
-            start=raw.start_date,
-            end=raw.end_date,
-            processing_status="valid",
+            pending_sessions.append(pending_session)
+            created += 1
 
-            created_at=timezone.now(),
-        )
+
+
     except Exception as e:
         raise Exception(f"Error creating pending session: {str(e)}")
-    return pending_session
+    return created
 
 CATEGORY_SEPARATOR = ","
 

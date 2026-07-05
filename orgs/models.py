@@ -533,7 +533,7 @@ class SessionQuerySet(models.QuerySet):
 class Session(models.Model):
     activity=models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="sessions")
     session_format = models.CharField(max_length=1 ,
-                              choices=[("o","Online"),("i","InPerson" ),("b","Hybrid"), ("s","Self Selected Locations")])
+                              choices=[("o","Online"),("i","InPerson" ),("b","Hybrid") , ("s","Self Selected Locations")])
     location = models.ForeignKey( Location, null=True, blank=True, on_delete=models.SET_NULL, related_name="sessions")
     session_url = models.URLField(max_length=255, default="", blank=True)
     ongoing = models.BooleanField(default=False)
@@ -558,11 +558,7 @@ class Session(models.Model):
         elif self.session_format =="o":
             if not self.session_url:
                 errors["session_url"]="online sessions require a session URL."
-        elif self.session_format == "b":
-            if not self.location:
-                errors["location"]="Hybrid sessions require a location."
-            if not self.session_url:
-                errors["session_url"] = "Hybrid sessions require a session URL."
+
         if errors:
             raise ValidationError(errors)
         
@@ -611,7 +607,8 @@ class RawLoadData(models.Model):
     activity_url = models.CharField(max_length=255, null=True, blank=True)
     
     has_cost = models.BooleanField(null=True)   # ✅ changed
-    session_format = models.CharField(max_length=1, null=True, blank=True)    # ✅ changed
+    session_format = models.CharField(max_length=10, null=True, blank=True)    # ✅ changed
+    session_url = models.CharField(max_length=255, null=True, blank=True)
 
     contact_email = models.CharField(max_length=255, null=True, blank=True)
     prerequisites = models.CharField(max_length=255, blank=True, null=True)

@@ -69,6 +69,8 @@ document.addEventListener("DOMContentLoaded", function () {
     //function for session visibility -- hiding and showing appropriate session columns
     console.log("session visibility code")
     function updateSessionRowVisibility(row) {
+        
+
     const formatField = row.querySelector("select[name$='-session_format']");
     const locationField = row.querySelector("select[name$='-location']");
     const urlGroup = row.querySelector(".url-group");
@@ -200,10 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
         tbody.appendChild(newRow);
         totalForms.value = formIndex + 1;
 
-        const newFormatField = newRow.querySelector("select[name$='session_format']");
-        if (newFormatField && !newFormatField.value) {
-            newFormatField.value = "i";
-        }
+
 
         wireSessionRow(newRow);
     });

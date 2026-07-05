@@ -154,8 +154,8 @@ class CSVImporter:
         errors.append(f"activity_type must start with V or T; got '{val}'")
         return None
 
-    def parse_session_format(self, val, location_name, url, warnings):
-        print(f"parse_session_format: val={val}, location_name={location_name}, url={url}")
+    def parse_session_formats(self, online_flag, location_name, url, warnings):
+        print(f"parse_session_formats: online_flag={online_flag}, location_name={location_name}, url={url}")
 
         location_name = self.clean_value(location_name)
         url = self.clean_value(url)
@@ -167,18 +167,18 @@ class CSVImporter:
         has_url = bool(url)
 
         # Warning: online session but no URL
-        if val and not has_url:
+        if online_flag and not has_url:
             warnings.append(
                 "Online is checked, but no meeting URL was provided."
             )
 
-        if has_location and val:
+        if has_location and online_flag:
             return "b"
 
         if has_location:
             return "i"
 
-        if val:
+        if online_flag:
             return "o"
 
         return "s"
@@ -252,6 +252,7 @@ class CSVImporter:
             "title": str(self.get_val(row, "title")).strip(),
             "description": self.get_val(row, "description"),
             "online": self.get_bool(row, "online"),
+            "session_url": self.parse_url(self.get_val(row,"session_url"),warnings),
             "city": self.get_val(row, "city"),
             "location_name": self.get_val(row, "location_name"),
             "address": self.get_val(row, "address"),
@@ -282,10 +283,10 @@ class CSVImporter:
             errors
         )
 
-        cleaned["session_format"] = self.parse_session_format(
+        cleaned["session_format"] = self.parse_session_formats(
             self.get_bool(row, "online"),
             cleaned["location_name"],
-            cleaned["activity_url"],
+            cleaned["session_url"],
             warnings
         )
 
@@ -356,6 +357,7 @@ class CSVImporter:
 
                     activity_type=cleaned["activity_type"],
                     session_format=cleaned["session_format"],
+                    session_url=cleaned["session_url"],
 
                     time_commitment=cleaned["time_commitment"],
                     time_description=cleaned["time_description"],
