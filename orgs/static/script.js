@@ -86,9 +86,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const showUrl = (format === "o" || format === "b");
     const showLocation = (format === "i" || format === "b");
     
-    dateGroups.forEach(group => {
-        group.style.display = ongoingField?.checked ? "none" : "";
-        });
+    const ongoingHelp = row.querySelector(".ongoing-help");
+
+    if (ongoingHelp) {
+        ongoingHelp.style.display = ongoingField?.checked ? "table-row" : "none";
+    }
 
     if (urlGroup) {
         urlGroup.style.display = showUrl ? "block" : "none";

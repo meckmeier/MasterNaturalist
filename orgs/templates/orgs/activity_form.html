@@ -170,8 +170,11 @@
                            
                             {{form.ongoing }}
                              {{form.ongoing.errors}}
-                             
+                             <div class="small text-muted ongoing-help" style="display:none;">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Dates are optional. Use them to set a range for this ongoing activity.
                         </td>
+                
                         <td class="date-group">
                             <div class="date-content">
                             {{ form.start }}
@@ -187,6 +190,7 @@
 
                         <td>{{form.DELETE}}</td>
                     </tr>
+           
                     
             {% empty %}
                     <tr class="empty-hint">

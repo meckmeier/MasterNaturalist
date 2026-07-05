@@ -1345,11 +1345,11 @@ def activities(request):
             queryset = queryset.filter(start__lte=data["end_date"])
             active_filters.append(f"Start on or before: {data['end_date']}")
 
-        if data.get("session_mode") == "i":
+        if data.get("session_format") == "i":
             queryset = queryset.filter(session_format__in=["i", "b","s"])
             active_filters.append("In-person or Hybrid ")
 
-        elif data.get("session_mode") == "o":
+        if data.get("session_format") == "o":
             queryset = queryset.filter(session_format__in=["o", "b"])
             active_filters.append("Online or Hybrid ")
     
