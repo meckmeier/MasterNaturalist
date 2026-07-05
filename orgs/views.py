@@ -1275,7 +1275,8 @@ def activities(request):
             "location"         # Session -> Location
         ).prefetch_related(
             "activity__categories"  # m2m from Activity -> categories
-        )
+        ).order_by("start", "activity__title").distinct()
+    
     get_data = request.GET.copy()
 
     if "org_id" in get_data and "org" not in get_data:
