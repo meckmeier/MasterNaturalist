@@ -299,7 +299,7 @@ def orgs(request):
         if data.get("q"):
             org_queryset =org_queryset.filter(Q(org_name__icontains=q) 
                                       | Q(about__icontains=q)
-                                      | Q(locations__loc_name__icontains=q)
+                                      
                                       ).distinct()
         
         activity_status = data.get("activity_status")
@@ -784,9 +784,7 @@ def locations(request):
             queryset=queryset.filter(region=data["region"]).distinct()
 
         if data.get("q"):
-            queryset =queryset.filter(Q(org__org_name__icontains=q) 
-                                      | Q(org__about__icontains=q)
-                                      | Q(loc_name__icontains=q)
+            queryset =queryset.filter(Q(loc_name__icontains=q)
                                       | Q(location_about__icontains=q)
                                       ).distinct()
             
@@ -1311,7 +1309,7 @@ def activities(request):
             queryset =queryset.filter(Q(activity__org__org_name__icontains=q) 
                                     | Q(activity__description__icontains=q)
                                     | Q(location__loc_name__icontains=q)
-                                        | Q(activity__title__icontains=q)
+                                    | Q(activity__title__icontains=q)
                                     ).distinct()
             active_filters.append(f"{data['q']} word search ")
 

@@ -113,3 +113,5 @@ Talk to Sage about creating a way to 'register' for an activity in her system di
 https://www.youtube.com/watch?v=HbvGTnk7HR0 - Welcome to WildPathsWI.org
 https://www.youtube.com/watch?v=jLKQdMGDO7s - Add Your Organization
 https://www.youtube.com/watch?v=xfV6BcMvwxU - Manage Your Organization
+
+re-record - use fades to switch topics. Land on the pages longer so user can absorb the information. 

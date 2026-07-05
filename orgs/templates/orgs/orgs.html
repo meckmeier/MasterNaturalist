@@ -85,8 +85,10 @@
     </div>
     {% if org.about %}
             <div class="me-description-block">
+        
+        
               <div class = "me-desc-short"> {{ org.about|truncatechars:250 }} </div>
-               <div class="me-desc-full"> {{ org.about }} </div> 
+               <div class="me-desc-full"> {% if q %}{{ org.about|highlight:q|safe }} {% else %}{{ org.about }} {% endif %} </div> 
               </div>
           {% endif %}
     <!-- tab buttons -->

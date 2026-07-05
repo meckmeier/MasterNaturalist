@@ -124,7 +124,7 @@
         {% if loc.location_about %}
           <div class="me-description-block">
             <div class="me-desc-short">{{ loc.location_about|truncatechars:250 }}</div> 
-            <div class="me-desc-full">{{ loc.location_about|highlight:q|safe }}</div>  
+            <div class="me-desc-full"> {% if q %}{{  loc.location_about|highlight:q|safe }} {% else %}{{ loc.location_about }} {% endif %} {{ loc.location_about|highlight:q|safe }}</div>  
           </div>
         {% endif %}
 

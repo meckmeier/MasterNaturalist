@@ -10,6 +10,7 @@ Keep your eye out for the **FILTER** button - that will let you target your view
 
 Currently the ability to browse our catalog of organizations and activities is open to the public. If you wish to create Favorite organizations you would need to REGISTER and create a login.
 
+
 <hr>
 ### If you are a provider
 **Add Organization** -use this menu item to submit a request to add your organization. Once that request is approved, you will receive an email that will let you create a login to manage this organization going forward. A new Organizer submenu will appear and you can use that to access the Organization Management page.

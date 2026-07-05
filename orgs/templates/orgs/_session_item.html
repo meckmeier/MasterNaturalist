@@ -80,9 +80,13 @@
         <div class="me-card-header-left">   
    
       <div class="me-card-sponsor">
-            Sponsored by: <a href="{% url 'orgs'%}?org={{e.activity.org.id}}">{{ e.activity.org.org_name }}</a>
+            Sponsored by: <a href="{% url 'orgs'%}?org={{e.activity.org.id}}">
+              {% if q %}{{ e.activity.org.org_name|highlight:q|safe }}{% else %}{{ e.activity.org.org_name }}{% endif %}
+            </a>
 
-           {% if e.location %} | Location: <a href="{% url 'locations'%}?&loc={{e.location.id}}&view=list">{{ e.location.loc_name }}</a>{% endif %}
+           {% if e.location %} | Location: <a href="{% url 'locations'%}?&loc={{e.location.id}}&view=list">
+            {% if q %}{{ e.location.loc_name|highlight:q|safe }}{% else %}{{ e.location.loc_name }}{% endif %}
+            </a>{% endif %}
             {% if e.session_format == "o"  %}| Location: <strong>Online</strong>{% endif %}
             {% if e.session_format == "s" %}| Location: <strong>Self selected locations </strong>{% endif %}
             {% if e.session_format == "b" %} and <strong>Online</strong> {% endif %}
