@@ -2,57 +2,66 @@
 {% block body %}
 {% load static %}
 <div class="me-page">
-<h1>Tutorials</h1>
+<h1>Info Center</h1>
+<p>Welcome to the Info Center! Here you can find helpful resources and documentation.</p>
+ <div class="me-card">
+        
+            <div class="help-grid">
+        <a href="{% url 'about'%}" class="help-card">About WildPathsWI.org</a>
+       <a class="help-card" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Click here to provide Feedback</a>
+        <div class="help-card"></div>
+ 
+       <a href="{% url 'terms' %}" class="help-card">Terms of Service</a>  
+       <a href="{% url 'privacy' %}" class="help-card">Privacy Policy</a>
+   </div>
+   </div>
+
 <div class="me-card">
-    
-    <a href="{% url 'help_video' '_pEHMJEaE3g' %}">
-        <div class="me-card-split">
-            <div class="me-card-split-left">
+<h4>Tutorials</h4>
+        
+    <div class="help-grid">
 
-            <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" class="img-fluid" style="max-width:120px;">
-            </div>
-            <div class="me-card-split-right">
-            <h4>Welcome to WildPathsWI.org</h4>
-
-                <p>Estimated time: 2 minutes</p>
-            </div>
+        <a href="{% url 'help_video' '_pEHMJEaE3g' %}" class="help-card help-card-video" >
+        <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" class="help-logo">
+        <div class="help-body">
+            <h3 class="help-header">Welcome</h3>
+            <div class="help-description">Learn how to navigate and use the WildPathsWI.org platform.</div>
+            <div class="help-time">Estimated time: 2 minutes</div>
         </div></a>
-</div>
 
+        <a href="{% url 'help_video' 'CO5Xr3qWKWc' %}" class="help-card help-card-video">
+            <img src="{% static 'orgs/images/wpwlogo13_9d.svg' %}" class="help-logo">
+            <div class="help-body">
+                <h3 class="help-header">Add Your Organization</h3>
+                <div class="help-description">
+                    Learn how to add your organization to the WildPathsWI.org platform. You will also learn how to create a login and see your organization management page.
+                </div>
+                <div class="help-time">
+                    Estimated time: 2 minutes
+                </div>
+            </div>
+        </a>
 
-<div class="me-card">
+            <a href="{% url 'help_video' '1P94zw9f604' %}" class="help-card help-card-video">
+             <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" class="help-logo">
+            <div class="help-body">
+                <h3 class="help-header">Manage Your Organization</h3>
+                <div class="help-description">
+                    Learn how to manage your organization's information, locations, and activities on the WildPathsWI.org platform.
+                </div>
+                <div class="help-time">Estimated time: 2 minutes</div>
+                </div>
+            </a>
+   
+    </div></div>
+    <div class="me-card">
+          <h4>Organizations</h4>
+            <div class="help-grid">
+                <a href="{% url 'for_orgs'%}" class="help-card">All About Organzation Management</a>
+        <a href="{% url 'upload_faq'%}" class="help-card">Upload Documentation</a>
+   </div>
+   </div>
+   <div class="me-card">
+  
 
-    <a href="{% url 'help_video' 'CO5Xr3qWKWc' %}">
-        <div class="me-card-split">
-        <div class="me-card-split-left">    
-        <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" class="img-fluid" style="max-width:120px;"></div>
-        <div class="me-card-split-right">
-        <h4>Add Your Organization</h4>
-
-     <p>Estimated time: 2 minutes</p>
-
-        <ul>Topics:
-        <li>Add an organization</li>
-        <li>Create a login</li>
-        <li>View the organization management pages</li>
-        </ul>
-        </div></div></div></a>
-<hr>
-<div class="me-card">
-     <a href="{% url 'help_video' '1P94zw9f604' %}">
-        <div class="me-card-split">
-            <div class="me-card-split-left">    
-            <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" class="img-fluid" style="max-width:120px;"></div>
-            <div class="me-card-split-right">
-        <h4>Manage Your Organization</h4>
-    
-
-        <p>Estimated time: 2 minutes</p>
-        <ul>Topics:
-        <li> the organization management pages</li>
-        <li> adding locations (addresses)</li>
-        <li> adding activities</li>
-        </ul>
-        </div></div></div></a>
-        </div>
 {% endblock %}
