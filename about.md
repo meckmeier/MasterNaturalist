@@ -1,21 +1,21 @@
 # Wild Path - Wisconsin
 
-Hi - I'm Mary and I am a <a href="https://wimasternaturalist.org/" target="_blank" rel="noopener noreferrer" title="External link to Master Naturalist site"> <i class="bi bi-arrow-up-right-square "></i> Wisconsin Master Naturalist</a>. I loved the training and I was so excited to get started with volunteering and continuing my path to conservation. But it was not so easy for me to find places to volunteer. So I thought "wouldn't it be nice to make a site where any nature lover could find organizations that want their help?" And WildPathsWI was born! It was nurtured with loving care by Becky Sapper at Wisconsin Master Naturalist - she was invaluable in making this site work! 
+Hi - I'm Mary and I am a Wisconsin Master Naturalist! If you don't already know what this program is - <a href="https://wimasternaturalist.org/" target="_blank" rel="noopener noreferrer" title="External link to Master Naturalist site">click here to find out more</a>. It's a great program that builds a network of well-informed volunteers dedicated to conservation service within their communities. I wanted to do all that, but I live in a pretty rural area of Wisconsin. There are things going on here, but it was not simple for me to connect to all the opportunities in my own community. So I thought "Wouldn't it be nice to make a site where **any** nature lover could find organizations that want their help?" And WildPathsWI was born! It was nurtured with loving care by Becky Sapper (Wisconsin Master Naturalist director). This site would not exist without her.
 
 
-> ## The Mission: make it easy for any nature lover to find nature-based organizations where they can learn or volunteer. 
+> ## The Mission: make it easy for any nature lover to find places to learn and volunteer. 
 
 
-You can learn more  <a href="{% url 'help_video' '_pEHMJEaE3g' %}" class="help-card help-card-video" > in this welcome video </a>
+<a href="{% url 'help_video' '_pEHMJEaE3g' %}" >This video will give you a brief overview of the site.</a>
 
 ## Activities
-Activities come in two flavors - Volunteer or learning opportunities. 
-They are sponsored by organizations and they take place in Locations (some key words you will find in our site). If the location has an address, it will show up on Map. Some activities are online - like webcast training - and there is always a way to get more information. It might be an information website, or it could be an email. Just click the button to continue your journey. 
+Activities come in two flavors - volunteer or learning opportunities. 
+They are sponsored by Organizations and they take place in Locations (some key words you will find in our site). If the location has an address, it will show up on a Map. All activities have a way to get more info: an information website, or an email. Some activities are online - like web-based training.
 
 Keep your eye out for the **FILTER** button - that will let you target your view. 
 
-**Organizations**  and **Map** to browse or search for either sponsors or places where activities are happening.
-
+**Map** to browse or search for places where activities are happening 
+**Organizations** to browse or search for nature-based organizations that are putting on activities.
 
 
 Currently the ability to browse our catalog of organizations and activities is open to the public. If you wish to create Favorite organizations you would need to REGISTER and create a login.

@@ -50,27 +50,27 @@ Use the menu option under Organizer to view the Organization Management for your
 ## Download Template (Field Key)</a>
 
 
-| Field | Description |
-| ----------- | ----------- |
-|title | REQUIRED. This is the name of your activity (this line will appear at the top of the activity listing in bold).|
-|description| Use this for a longer description of your activity. |
-|online | If this is blank your event has only a physical location... but if you fill it in then it has an online component (you have to fill out the url column). If you have both a location_name and this field is not blank, then the event will be considered Hybrid (both online AND in person).
-|location_name| If you know the location exists in the system, use the name as it appears - to avoid creating new copies of the same location. The system will use this name plus the address to try and find existing locations - but if they cannot be found by the system it will automatically add it as a new location managed by your organization.|
-|address| Street address of the location.|
-city | City of the location.,
-zip| 5-digit zip code of the location - if this is in Wisconsin we will use the zip to find the region and county. This field will also be important to create a Flag for the map.|
-activity_type| REQUIRED. activity type - v for volunteer opportunity and t for training session.|
-ongoing| Any non-blank value in this column will be used to set the value to Ongoing. Leave blank if your events has dates instead. |
-start_date| If ongoing is blank, you must put in a start date. The date should be in this format YYYY-MM-DD format.|
-end_date| If start_date is NOT blank and this field IS blank it will default to the start_date. If your event crosses multiple date, put the last date of the event here in this format YYYY-MM-DD format.|
-time_commitment| OPTIONAL. You may use this to indicate how long participants should expect to commit to this event. Free-form text.
-date_description| OPTIONAL. Indicate additional info (beyond start-end dates, or the ongoing flag) regarding dates here. Free-form text that will appear below the Activity title. |
-time_description| OPTIONAL. Indicate something about the time for your activity here. This is a free-form text that will appear below your activity.|
-activity_url| If your activity is online you must include this field. It will also be used at the activity level for the Connect link.|
-contact_email| You must provide either the activity url or a contact email. One of these is required.|
-has_cost| If your activity is free, leave this blank. If there is a value in this column it will be set with a $ on the form.|
-prerequisities| OPTIONAL. This field can be used to indicate any prerequisites for your activity.
-categories | You can list the categories for your activity here with a comma between each one. Here are the values you can use: aq=Aquatic Life, cs=Citizen Science, eco=Ecology, edu=Education, geo=Geology, hc=Human Connections, pla=Plants, ste=Stewardship, wat=Water, wea=Weather & Climate, and wil=Wildlife. You must use the 2-3 letter codes, inside double quotes separated by commas. For example, "cs, wil, edu".
+> | Field | Description |
+> |  ----------- | ----------- |
+> | title | REQUIRED. This is the name of your activity (this line will appear at the top of the activity listing in bold).|
+> | description| Use this for a longer description of your activity. |
+> | online | If this is blank your event has only a physical location... but if you fill it in then it has an online component (you should also fill out the url column). If you have both a location_name and this field is not blank, then the event will be considered Hybrid (both online AND in person).
+> | location_name| If you know the location exists in the system, use the name as it appears - to avoid creating new copies of the same location. The system will use this name plus the address to try and find existing locations - but if they cannot be found by the system it will automatically add it as a new location managed by your organization. You will have a chance to adjust this when you review the location data during the upload process. |
+> | address| Street address of the location.|
+> | city | City of the location. | 
+> | zip| 5-digit zip code of the location - if this is in Wisconsin, we will use the zip to find the region and county. Complete the full address to get a flag on the map for this location.|
+> | activity_type| REQUIRED. activity type - v for volunteer opportunity and t for learning session. |
+> | ongoing| Any non-blank value in this column will be used to set the value to Ongoing. If you want to specify the ongoing range, you can optionally include start and > | end dates as well, but they are not required for ongoing opportunities. These will retire after one year. |
+> | start_date| If ongoing is blank, you must put in a start date. The date should be in this format YYYY-MM-DD format.|
+> | end_date| If start_date is NOT blank and this field IS blank it will default to the start_date. If your event lasts for multiple days, put the last date of the event here in this format YYYY-MM-DD format. |
+> | time_commitment| OPTIONAL. You may use this to indicate how long participants should expect to commit to this event. Free-form text.
+> | date_description| OPTIONAL. Indicate additional info (beyond start-end dates, or the ongoing flag) regarding dates here. Free-form text that will appear below the activity title. |
+> | time_description| OPTIONAL. Indicate something about the time for your activity here. This is a free-form text that will appear below your activity title.|
+> | activity_url| Use this url for general information regarding the activity - this will link via a More Info button from the activity. Use the session_url field to define the actual online location of your session. |
+> | contact_email| You must provide either the activity url or a contact email. One of these is required. These two fields are used to link to more info regarding the event. |
+> | has_cost| If your activity is free, leave this blank. If there is a value in this column it will display a $ on the card.|
+> | prerequisities| OPTIONAL. This field can be used to indicate any prerequisites for your activity. |
+> | categories | You can list the categories for your activity here with a comma between each one. Here are the values you can use: aq=Aquatic Life, cs=Citizen Science, eco=Ecology, edu=Education, geo=Geology, hc=Human Connections, pla=Plants, ste=Stewardship, wat=Water, wea=Weather & Climate, and wil=Wildlife. You must use the 2-3 letter codes, inside double quotes separated by commas. For example, "cs, wil, edu".
 
 
 ### NOTE

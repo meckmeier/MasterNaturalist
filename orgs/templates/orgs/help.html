@@ -6,9 +6,9 @@
 <p>Welcome to the Info Center! Here you can find helpful resources and documentation.</p>
  <div class="me-card">
         
-            <div class="help-grid">
+            <div class="help-grid help-grid-docs">
         <a href="{% url 'about'%}" class="help-card">About WildPathsWI.org</a>
-       <a class="help-card" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Click here to provide Feedback</a>
+       <a class="help-card" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Give Feedback</a>
 
        <a href="{% url 'terms' %}" class="help-card">Terms of Service</a>  
        <a href="{% url 'privacy' %}" class="help-card">Privacy Policy</a>
@@ -18,7 +18,7 @@
 <div class="me-card">
 <h4>Tutorials</h4>
         
-    <div class="help-grid">
+    <div class="help-grid help-grid-video">
 
         <a href="{% url 'help_video' '_pEHMJEaE3g' %}" class="help-card help-card-video" >
         <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" class="help-logo">
@@ -55,9 +55,9 @@
     </div></div>
     <div class="me-card">
           <h4>Organizations</h4>
-            <div class="help-grid">
-                <a href="{% url 'for_orgs'%}" class="help-card">All About Organzation Management</a>
-        <a href="{% url 'upload_faq'%}" class="help-card">Upload Documentation</a>
+            <div class="help-grid help-grid-docs">
+                <a href="{% url 'for_orgs'%}" class="help-card">Organzation Management</a>
+        <a href="{% url 'upload_faq'%}" class="help-card">Upload Activities</a>
    </div>
    </div>
    <div class="me-card">

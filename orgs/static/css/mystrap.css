@@ -824,9 +824,13 @@ li.inactive {
 .help-grid{
     display:grid;
     gap:1rem;
-    grid-template-columns:repeat(auto-fill,minmax(360px,1fr));
 }
-
+.help-grid-video{
+    grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));
+}
+.help-grid-docs{
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+}
 
 .help-card{
     display:flex;
