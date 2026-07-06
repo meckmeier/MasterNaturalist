@@ -19,7 +19,7 @@
     
     <div class = "me-form-grid {% if view_only %}view-mode{% endif %}">
         <div class ="me-form-field-full">
-            Location Name:
+            Name:
             {{ form.loc_name}}
             {{ form.loc_name.errors }}
             {% if form.loc_name.help_text %}
@@ -34,7 +34,7 @@
             {{ form.address.errors }} 
         </div>
         <div class ="me-form-field">
-            {{ form.city_name.label_tag }}
+            City:
             {{ form.city_name}}
             {{ form.city_name.errors }}
         </div>
@@ -49,7 +49,7 @@
             {{ form.zip_code.errors }}
         </div>
         <div class="me-form-field-full">
-            {{ form.location_about.label_tag}}
+            About this location:
             {{ form.location_about}}
             {{ form.location_about.errors}}
         </div>
@@ -58,7 +58,7 @@
             Location website:
             {{ form.org_loc_url}}
             {{ form.org_loc_url.errors }}
-            {{ form.contact_email.label_tag }}
+            Location Email:
             {{ form.contact_email}}
             {{ form.contact_email.errors }}
         </div>

@@ -6,14 +6,16 @@ First you need to get your organization added.
 
 1. Use the menu in the top right corner to Add Your Organization.
 2. Complete the Form.
-    Organization Name - this name will appear as a "sponsor" for activities - and users can search based on your name. 
-    About - this should be relatively brief but descriptive so volunteers will be able to tell what you do. We will use this description to help us approve your request.
-    Main URL - we will provide a link to this site - make sure it is in a url format (www.mysite.com for example).
-    Region - if your organization is based in a specific region in Wisconsin, you can pick it here. This is just informational for volunteers looking at your organization.
-    Contact Email - this field is really important because we will use this email to communicate with you about the request. You will want to use this email when you register to the site to manage the organization in the future. You will be able to add more people to manage this organization in the future.
-    Contact Name - this field is required.
-    Contact Title - optional, but helpful
-    Authorized to represent the organization - we are asking you to confirm your role. Once this organization is created you will be responsible for maintaining the organization going forward. We expect only authorized folks to be submit requests. 
+| Field | Description |
+| ----------- | ----------- |
+| Organization Name | This name will appear as a "sponsor" for activities - and users can search based on your name. |
+| About | This should be relatively brief but descriptive so volunteers will be able to tell what you do. We will use this description to help us approve your request. |
+| Main URL | We will provide a link to this site - make sure it is in a url format (www.mysite.com for example). |
+| Region | If your organization is based in a specific region in Wisconsin, you can pick it here. This is just informational for volunteers looking at your organization. |
+| Contact Email | This field is really important because we will use this email to communicate with you about the request. You will want to use this email when you register to the site to manage the organization in the future. You will be able to add more people to manage this organization in the future. |
+| Contact Name | REQUIRED. |
+| Contact Title | OPTIONAL, but helpful |
+| Authorized to represent the organization | We are asking you to confirm your role. Once this organization is created you will be responsible for maintaining the organization going forward. We expect only authorized folks to be submit requests. |
 
 3. Click Submit Request.
 
@@ -102,14 +104,14 @@ If you created a location while adding in your activity above, you will see that
 
 | Field | Description |
 | ----------- | ----------- |
-| Location Name | Use this field to describe the location using a short name. |
+| Name | Use this field to describe the location using a short name. |
 | Address | Street Address |
-| City Name | City |
+| City | City |
 | State | This field defaults to WI |
 | Zip Code | The zip code field will be used to populate the County and Region. There are zip codes that cross counties though, so if we picked the wrong one for you - you are able to change them. |
-| Location about | Use this field for a longer description of the location. |
+| About | Use this field for a longer description of the location. |
 | Location website | OPTIONAL. If your location has it's own web page, you can include it here. |
-| Contact email | OPTIONAL. If your location has a specific contact you can include that here. |
+| Location email | OPTIONAL. If your location has a specific contact email you can include that here. |
 | Region | The region pick here will drive the map icon on your location and activities. |
 | County | The county tells us which region to pick. It is also a search option for the end user. |
 
