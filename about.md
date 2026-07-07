@@ -6,7 +6,7 @@ Hi - I'm Mary and I am a Wisconsin Master Naturalist! If you don't already know 
 > ## The Mission: make it easy for any nature lover to find places to learn and volunteer. 
 
 
-<a href="{% url 'help_video' '_pEHMJEaE3g' %}" >This video will give you a brief overview of the site.</a>
+ <a href="/help/video/_pEHMJEaE3g/" >This video will give you a brief overview of the site.</a>
 
 ## Activities
 Activities come in two flavors - volunteer or learning opportunities. 
@@ -22,11 +22,11 @@ Currently the ability to browse our catalog of organizations and activities is o
 
 
 ### If you are a provider
-**Add Organization** -use this menu item to submit a request to add your organization. Once that request is approved, you will receive an email that will let you create a login to manage this organization going forward. A new Organizer submenu will appear and you can use that to access the Organization Management page.  <a href="{% url 'help_video' 'CO5Xr3qWKWc' %}">Check out this how-to video for details.</a>
+**Add Organization** -use this menu item to submit a request to add your organization. Once that request is approved, you will receive an email that will let you create a login to manage this organization going forward. A new Organizer submenu will appear and you can use that to access the Organization Management page.  <a href="/help/video/CO5Xr3qWKWc/">Check out this how-to video for details.</a>
 
 From that page you can add locations, and activities as well as add other users to help you manage the organization going forward.
 
-If you have suggestions or ideas - or find issues or bugs - use the <a href="{% url 'feedback'%}">**Feedback** </a>form. It's a great way to report things while it's fresh in your mind. 
+If you have suggestions or ideas - or find issues or bugs - use the <a href="/feedback/?page=/help/">**Feedback** </a>form. It's a great way to report things while it's fresh in your mind. 
 
 Thanks for joining us!
 Mary
