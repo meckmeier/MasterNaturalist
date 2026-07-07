@@ -982,3 +982,11 @@ li.inactive {
    
   }
 }
+@media (max-width: 576px){
+
+    .help-grid-video,
+    .help-grid-docs{
+        grid-template-columns:1fr;
+    }
+
+}
