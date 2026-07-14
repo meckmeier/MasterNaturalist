@@ -2,7 +2,8 @@
 If you are a nature based organization and would like to share volunteer or learning opportunities in WildPathsWI.org - Welcome! We are excited to have you. Organizations really are the backbone of this site. Without your participation, there wouldn't be much for volunteers to find. But with you, we can build a wonderful community.
 
 ## Getting Started
-You can <a href="{% url 'help_video' 'CO5Xr3qWKWc' %}" class="help-card help-card-video">view this How-to Video</a> if you prefer to see the steps in action.
+You can 
+ <a href="/help/video/CO5Xr3qWKWc/" >view this How-to Video.</a>
 
 First you need to get your organization added. 
 
@@ -57,7 +58,8 @@ NOTE: if something goes wrong and you are not able to see this page, please subm
 NOTE: if you wish to have someone else also manage your organization, have that person create a login. Use the Login button on the main page, and click the link to REGISTER. Once they have created a new login, you will be able to use their email address to add them to the Managers section of your organization.
 
 ## Activities
-You can <a href="{% url 'help_video' '1P94zw9f604' %}" class="help-card help-card-video">view this how-to-video</a> to see managing your organization in action.
+
+You can <a href="/help/video/1P94zw9f604">view this how-to-video</a> to see managing your organization in action.
 
 Activities are the primary object in our application.
 To add a new activity, click the PLUS sign in the Activities section header.

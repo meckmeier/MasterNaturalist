@@ -83,7 +83,7 @@ urlpatterns = [
     path("help/video/<str:video_id>/",views.help_video, name="help_video"),
     path("logos/", TemplateView.as_view(template_name="orgs/logos.html"), name="logos"),
     path("upload_faq/", views.render_markdown, {"filename":"upload_faq"},name="upload_faq"),
-    path("tutorials/", views.tutorials, name="tutorials")
+
 ]
 
 if settings.DEBUG:
