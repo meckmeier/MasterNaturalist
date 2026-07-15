@@ -35,6 +35,7 @@ from orgs.services.helper_function import get_county_from_zip, normalize_address
 
 
 from collections import defaultdict
+from collections import OrderedDict
 from io import StringIO
 from orgs.models import *
 from .forms import *
@@ -2759,3 +2760,35 @@ def feedback_view(request):
         form = FeedbackForm(initial={"page_url": initial_url})
 
     return render(request, "orgs/feedback.html", {"form": form})
+
+def calendar(request):
+
+
+    queryset = Session.objects.current().filter(ongoing=False).exclude(start__isnull=True).select_related(
+                "activity",        # follow FK from Session -> Activity
+                "activity__org",   # Activity -> Organization
+                "location"         # Session -> Location
+            ).prefetch_related(
+                "activity__categories"  # m2m from Activity -> categories
+            ).order_by("start", "activity__title").distinct()
+    
+    calendar = OrderedDict()
+
+    for session in queryset:
+
+        month_key = session.start.strftime("%B %Y")      # July 2026
+        
+        day_key = session.start                  # 2026-07-19
+        
+        if month_key not in calendar:
+            calendar[month_key] = OrderedDict()
+
+        if day_key not in calendar[month_key]:
+            calendar[month_key][day_key] = []
+
+        calendar[month_key][day_key].append(session)
+        
+    return render(request, "orgs/calendar.html", {
+        
+        "calendar": calendar,
+    })

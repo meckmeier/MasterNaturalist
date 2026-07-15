@@ -12,7 +12,7 @@
  
 
 
-    <a class="me-btn" href="{% url 'activities' %}?activity_type=v" ; font-weight: bold;color:black;" title="See Volunteer activities by date">
+    <a class="me-btn" href="{% url 'activities' %}?activity_type=v" ; font-weight: bold;color:black;" title="Browse Volunteer activities">
      <span>
             <i class="bi bi-tree-fill me-btn-icon me-btn-vol-icon"></i>
     </span>
@@ -21,12 +21,19 @@
     </span>
 </a>
 
-<a class="me-btn" href="{% url 'activities' %}?activity_type=t" ;font-weight: bold;color:black;"  title="See learning activities by date">
+<a class="me-btn" href="{% url 'activities' %}?activity_type=t" ;font-weight: bold;color:black;"  title="Browse Learning activities">
     <span>
             <i class="bi bi-mortarboard-fill me-btn-icon me-btn-learn-icon"></i>
     </span>
     <span class="me-btn-label">
         Learn</span> 
+</a>
+<a class="me-btn" href="{% url 'calendar' %}" title="See a calendar of activities">
+    <span>
+            <i class="bi bi-calendar-event me-btn-icon me-btn-blue-icon"></i>
+    </span>
+    <span class="me-btn-label">
+        Calendar</span>
 </a>
 <a class="me-btn" href="{% url 'locations' %}" title="See a map of locations">
     <span>

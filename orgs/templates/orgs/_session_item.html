@@ -118,7 +118,8 @@
             <a class="me-btn me-btn-compact-mobile" href="{{ e.activity.activity_url }}" target="_blank" rel="noopener noreferrer" title="External link to activity site">
               <span><i class="bi bi-arrow-up-right-square me-btn-icon"></i></span>
             <span class="me-btn-label">More Info</span></a>
-      {% elif e.activity.contact_email%}
+      {% endif %}
+      {% if e.activity.contact_email%}
               {% with body_text="Hello, I found this opportunity on WildPaths Wisconsin and I'm interested in "|add:e.activity.title|add:" at "|add:e.activity.org.org_name|add:". Thank you." %}
            <a class="me-btn me-btn-compact-mobile" href="mailto:{{ e.activity.contact_email }}?subject={{ e.activity.title|urlencode }}&body={{ body_text|urlencode }}" title="Send email to contact">
             <span> 

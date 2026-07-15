@@ -305,6 +305,26 @@ a:active {
   font-size: 0.95rem;
   color: var(--dark-green);
 }
+.me-card-link,
+.me-card-link:visited,
+.me-card-link:hover,
+.me-card-link:active,
+.me-card-link:focus {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    font: inherit;
+}
+
+
+.me-card-link .me-card {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.me-card-link:hover .me-card {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,.12);
+}
 
 /* Badges */
 .me-badge {
@@ -820,7 +840,50 @@ li.inactive {
     vertical-align: middle;
     margin-right: 6px;
 }
+.me-calendar-month{
+    margin-bottom:3rem;
+}
 
+.me-calendar-month-title{
+    font-size:2rem;
+    font-weight:600;
+    margin-bottom:1rem;
+    border-bottom:2px solid #ddd;
+    padding-bottom:.4rem;
+}
+.me-calendar-day{
+    display:grid;
+    grid-template-columns:70px 1fr;
+    column-gap:1.5rem;
+    margin-bottom:1.75rem;
+    align-items:start;
+}
+.me-calendar-day-header{
+    text-align:center;
+}
+
+.me-calendar-day-number{
+    font-size:2rem;
+    font-weight:700;
+    line-height:1;
+}
+
+.me-calendar-day-name{
+    font-size:.9rem;
+    color:#666;
+    text-transform:uppercase;
+}
+.me-calendar-day-sessions {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+}
+.me-session-summary{
+    display:grid;
+    grid-template-columns:1fr 50px;
+    gap:1rem;
+    align-items:start;
+}
 .help-grid{
     display:grid;
     gap:1rem;
@@ -987,6 +1050,20 @@ li.inactive {
     .help-grid-video,
     .help-grid-docs{
         grid-template-columns:1fr;
+    }
+
+}
+@media (max-width:768px){
+    .calendar-day{
+        grid-template-columns:1fr;
+    }
+
+    .calendar-day-header{
+        display:flex;
+        align-items:baseline;
+        gap:.5rem;
+        text-align:left;
+        margin-bottom:.5rem;
     }
 
 }

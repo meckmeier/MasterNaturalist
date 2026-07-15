@@ -10,7 +10,7 @@ from . import views
 urlpatterns = [
     path("",  views.landing, name="landing"),
 
-    
+    path("calendar/", views.calendar, name="calendar"),
     path("activities/", views.activities, name="activities"),
     path("orgs/", views.orgs, name="orgs"),
     path("org/enroll/", views.org_enroll, name="org_enroll"),

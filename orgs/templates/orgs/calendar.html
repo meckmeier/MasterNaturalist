@@ -1,0 +1,43 @@
+{% extends "orgs/layout.html" %}
+
+
+{% block filters %}
+{% include "orgs/_activity_filters.html" %}
+{% endblock %}
+
+
+{% block body %}
+{% load static %}
+{% load highlight %}
+<div class="me-page">
+
+    
+    {% for month_key, days in calendar.items %}
+    
+    <div class="me-calendar-month">
+        <div class="me-calendar-month-title">{{ month_key}}</div>
+        
+       {% for day, sessions in days.items %}
+       <div class="me-calendar-day">
+        <div class="me-calendar-day-header">
+            <div class="me-calendar-day-name">{{ day|date:"D" }}</div>
+            <div class="me-calendar-day-number">{{ day|date:"j" }}</div>
+        </div> <!--me-calendar-day-header-->
+
+        <div class="me-calendar-day-sessions"> 
+ 
+         {% for e in sessions %}
+            {% include "orgs/includes/_session_summary.html" %}
+        {% endfor %}
+         </div><!--me-calendar-day-sessions-->
+
+        </div><!--me-calendar-day -->
+        {% endfor %}
+        
+    </div> <!--me-calendar-month -->
+    {% endfor %}
+    
+
+</div> <!--me-page -->
+{% endblock %}
+

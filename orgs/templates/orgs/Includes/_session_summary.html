@@ -1,0 +1,55 @@
+{% load static %}
+{% load highlight %}
+{% load can_edit_filters %}
+<a class="me-card-link" href="{% url 'activities' %}?activity_id={{ e.activity.id }}">
+<div class="me-card">
+<div class="me-card-header">
+<div class="me-card-header-left">
+ <div class="me-card-title-row">
+        {% if e.activity.activity_type == "t" %}
+            <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
+        {% else %}
+            <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
+        {% endif %}  
+    
+        {% if q %}
+          {{ e.activity.title|highlight:q|safe }}
+        {% else %}
+          {{ e.activity.title }}
+        {% endif %}
+
+    </div>
+
+    <div class="me-card-sponsor">
+        {% if e.activity.date_description %}{{ e.activity.date_description }}{% endif %}
+        {% if e.activity.time_description %} | {{ e.activity.time_description }}{% endif %}
+        {% if e.activity.time_commitment_txt %} | {{ e.activity.time_commitment_txt }}{% endif %}
+        <br>{% if e.location %} 
+            {% if q %}{{ e.location.loc_name|highlight:q|safe }}{% else %}{{ e.location.loc_name }}{% endif %}
+            {% endif %}
+            {% if e.session_format == "s" %} <strong>Self selected locations </strong>{% endif %}
+        {%if  e.activity.has_cost %}   
+        | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+        {% endif %}
+        
+            {% if q %} ({{ e.activity.org.org_name|highlight:q|safe }}){% else %} ({{ e.activity.org.org_name }}){% endif %}
+      
+    </div>
+    </div>
+    <div class="me-card-header-right"> 
+    <div class="me-icons">
+     
+      {% if e.location %}
+      <img src="{% static 'orgs/region_maps/' %}{{ e.location.region.map_filename }}" alt="{{e.location.region.name}}"  title="{{ e.location.region.name }}" 
+      style="height:45px; width:auto;">
+    {% endif %}
+        </div>
+    </div>
+    </div>
+
+
+
+       
+
+
+    </div></a>
