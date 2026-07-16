@@ -1,0 +1,517 @@
+COMMIT|2026-07-15|ad23e2ab|moving session include file
+ 2 files changed, 1 insertion(+), 6 deletions(-)
+
+COMMIT|2026-07-15|4ec29eda|adding in a calendar view
+ 8 files changed, 222 insertions(+), 6 deletions(-)
+
+COMMIT|2026-07-14|a4234b11|adding the upload activities video
+ 4 files changed, 17 insertions(+), 6 deletions(-)
+
+COMMIT|2026-07-07|74f6a9fc|fixing links on about page
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+COMMIT|2026-07-07|4ca6c4cd|fix mobile view ofhelp page
+ 1 file changed, 8 insertions(+)
+
+COMMIT|2026-07-06|7c8c1da7|more updates to help files
+ 6 files changed, 94 insertions(+), 84 deletions(-)
+
+COMMIT|2026-07-06|0fbe04c1|adjusting the labels and language on location form
+ 3 files changed, 19 insertions(+), 18 deletions(-)
+
+COMMIT|2026-07-06|76330679|adding more help documents
+ 6 files changed, 311 insertions(+), 61 deletions(-)
+
+COMMIT|2026-07-05|e873d8ee|updates to the training videos
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+COMMIT|2026-07-05|b137db79|refining card layout for ongoing
+ 5 files changed, 21 insertions(+), 15 deletions(-)
+
+COMMIT|2026-07-05|271b6428|minor updates, rolling back to using hybrid sessions
+ 16 files changed, 182 insertions(+), 161 deletions(-)
+
+COMMIT|2026-07-05|d8f8ca8b|adding sort on activities to move ongoing to the end
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+COMMIT|2026-07-05|74de7077|adding in highlight for all word search pages
+ 7 files changed, 17 insertions(+), 14 deletions(-)
+
+COMMIT|2026-07-04|37f41605|changing training to learn
+ 20 files changed, 197 insertions(+), 172 deletions(-)
+
+COMMIT|2026-07-01|224bbc83|adding in self selected locations to upload
+ 9 files changed, 104 insertions(+), 65 deletions(-)
+
+COMMIT|2026-06-30|25e1df1a|new version of video links
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+COMMIT|2026-06-30|946bf7b5|adding in tutorial pages
+ 5 files changed, 75 insertions(+), 2 deletions(-)
+
+COMMIT|2026-06-28|3e8d7ead|updating some language
+ 8 files changed, 246 insertions(+), 97 deletions(-)
+
+COMMIT|2026-06-28|1a6db714|removing old region_name fields
+ 22 files changed, 188 insertions(+), 118 deletions(-)
+
+COMMIT|2026-06-27|df71dcac|updating filters to work with new region field
+ 2 files changed, 16 insertions(+), 43 deletions(-)
+
+COMMIT|2026-06-24|c89283bd|fixing the code for showing the elements
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+COMMIT|2026-06-24|1814e8a8|adding new image files for regions
+ 21 files changed, 13 insertions(+), 22 deletions(-)
+
+COMMIT|2026-06-22|d74ec0cc|new region applied to the views
+ 7 files changed, 26 insertions(+), 7 deletions(-)
+
+COMMIT|2026-06-22|af35c27c|updating region to model
+ 13 files changed, 271 insertions(+), 2 deletions(-)
+
+COMMIT|2026-06-19|323ce945|adding a new filter to activities
+ 4 files changed, 14 insertions(+), 1 deletion(-)
+
+COMMIT|2026-06-19|198e6c83|language on upload page
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+COMMIT|2026-06-19|27eeeaf5|adding description to template file
+ 4 files changed, 14 insertions(+), 7 deletions(-)
+
+COMMIT|2026-06-19|2b625178|fixing error from first test
+ 8 files changed, 267 insertions(+), 75 deletions(-)
+
+COMMIT|2026-06-19|f457e382|adding categories to the upload process
+ 12 files changed, 135 insertions(+), 62 deletions(-)
+
+COMMIT|2026-06-18|c4776e74|adding copyright notice
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+COMMIT|2026-06-18|69c1a06c|updating faq and adding a clear filter to all main pages
+ 25 files changed, 1430 insertions(+), 44 deletions(-)
+
+COMMIT|2026-06-18|805755c7|adding filter to organizations list
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+COMMIT|2026-06-18|e4389cab|Adding legend to the map
+ 6 files changed, 61 insertions(+), 28 deletions(-)
+
+COMMIT|2026-06-17|6745396c|more button edits
+ 24 files changed, 213 insertions(+), 92 deletions(-)
+
+COMMIT|2026-06-17|e110c5bc|button consistency
+ 12 files changed, 129 insertions(+), 109 deletions(-)
+
+COMMIT|2026-06-16|a5993a89|final logo change
+ 5 files changed, 3498 insertions(+), 2 deletions(-)
+
+COMMIT|2026-06-16|c634d5e6|another logo change
+ 4 files changed, 6 insertions(+), 3 deletions(-)
+
+COMMIT|2026-06-16|8f1ac523|more logo changes
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+COMMIT|2026-06-16|0175db1b|changing green to dark green:
+ 3 files changed, 13 insertions(+), 9 deletions(-)
+
+COMMIT|2026-06-16|52610200|adding new logo file
+ 3 files changed, 256 insertions(+), 2 deletions(-)
+
+COMMIT|2026-06-16|a818d789|updating buttons for upload
+ 16 files changed, 94 insertions(+), 180 deletions(-)
+
+COMMIT|2026-06-13|876edeaf|adding confirm rollback and minor text changes
+ 14 files changed, 218 insertions(+), 23 deletions(-)
+
+COMMIT|2026-06-11|bf415d4c|minor page adjustments
+ 2 files changed, 6 insertions(+), 9 deletions(-)
+
+COMMIT|2026-06-10|570d8774|adding updates to the load process
+ 32 files changed, 1582 insertions(+), 924 deletions(-)
+
+COMMIT|2026-06-09|0f245b51|adding cancel and logging on rollback
+ 14 files changed, 199 insertions(+), 57 deletions(-)
+
+COMMIT|2026-06-09|52502d94|adding error tracking for server 500 error
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+COMMIT|2026-06-08|b45510f9|fixing server 500 error
+ 3 files changed, 24 insertions(+), 13 deletions(-)
+
+COMMIT|2026-06-08|e803b79a|version two: includes upload process
+ 72 files changed, 2551 insertions(+), 667 deletions(-)
+
+COMMIT|2026-06-02|150c5704|full migration to allauth for user accounts
+ 11 files changed, 140 insertions(+), 130 deletions(-)
+
+COMMIT|2026-05-22|494a358b|changing setting to get SERVER_EMAIL configured
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+COMMIT|2026-05-22|8027b0d6|testing email from feebackform
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+COMMIT|2026-05-22|d7a7daf3|adding turnstile to the OrgEnrollment form
+ 3 files changed, 8 insertions(+), 1 deletion(-)
+
+COMMIT|2026-05-22|0a542363|new login process, started on the upload process. Am trying to test new email functionality.
+ 19 files changed, 853 insertions(+), 55 deletions(-)
+
+COMMIT|2026-05-19|4deb5a11|adding turnstile to feedback form
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+COMMIT|2026-05-19|83c33022|disabling registration link to prevent new bots from adding to my userlist
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+COMMIT|2026-05-19|ed78a8d8|setup for 2FA not implemented. also filter hide favorite references if not logged in
+ 10 files changed, 91 insertions(+), 12 deletions(-)
+
+COMMIT|2026-05-18|ebbc202b|Finishing the Add Organization flow. Need email reset on 5/22 to test
+ 22 files changed, 643 insertions(+), 58 deletions(-)
+
+COMMIT|2026-05-17|cd32016f|adjustment to filters and showing results found on three main pages
+ 10 files changed, 154 insertions(+), 40 deletions(-)
+
+COMMIT|2026-05-17|66b804c9|adding hide/show on the ongoing button
+ 8 files changed, 107 insertions(+), 50 deletions(-)
+
+COMMIT|2026-05-17|3b5184ea|adding public access
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+COMMIT|2026-05-17|caa7b8b3|moving public access to include volunteer stuff
+ 2 files changed, 13 insertions(+), 6 deletions(-)
+
+COMMIT|2026-05-17|92b68802|adding captcha to the signup form
+ 12 files changed, 357 insertions(+), 33 deletions(-)
+
+COMMIT|2026-05-13|5828c33e|version two - allauth login routine, menu changes and addition of staff menu
+ 46 files changed, 1193 insertions(+), 116 deletions(-)
+
+COMMIT|2026-05-07|cad1b50d|fixing broken div structure on location
+ 1 file changed, 137 insertions(+), 116 deletions(-)
+
+COMMIT|2026-05-07|0cb669a3|disabling import routine
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+COMMIT|2026-05-07|9c8cc2e4|fixing location view back to tabs like in orgs
+ 1 file changed, 104 insertions(+), 40 deletions(-)
+
+COMMIT|2026-05-06|7fdc59d8|updating correct template file
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+COMMIT|2026-05-06|3cdd1eae|adding template file
+ 4 files changed, 3 insertions(+), 6 deletions(-)
+
+COMMIT|2026-05-06|7823aef0|file issue replaced.
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-05-06|6fe6a876|adding link to org from location list
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-05-06|9073313d|another little fix on online location
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+COMMIT|2026-05-06|3852e364|moving online flag in session build
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+COMMIT|2026-05-06|fd08be1b|more tiny fixes
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+COMMIT|2026-05-06|551cb90e|adding in Has Actvities filter
+ 4 files changed, 11 insertions(+), 6 deletions(-)
+
+COMMIT|2026-05-06|ad584afc|adding ongoing filters to activities
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+
+COMMIT|2026-05-06|7afb0a6e|fixing org save button for non staff
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-05-06|cdd01016|fixing the location add-must save org first
+ 2 files changed, 10 insertions(+), 7 deletions(-)
+
+COMMIT|2026-05-06|222a5621|organized menu
+ 2 files changed, 32 insertions(+), 25 deletions(-)
+
+COMMIT|2026-05-06|c77d6a46|adding tiered menu and email subject lines
+ 3 files changed, 30 insertions(+), 16 deletions(-)
+
+COMMIT|2026-05-05|a96e2ee9|adjusting the datasets for the sorts in activities
+ 2 files changed, 13 insertions(+), 16 deletions(-)
+
+COMMIT|2026-05-05|3ca107ed|adding media query for smaller font on small iphone
+ 2 files changed, 26 insertions(+), 13 deletions(-)
+
+COMMIT|2026-05-05|b54484fd|changing dates on activity_item to wrap
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+COMMIT|2026-05-04|78b3e572|fixing location search button on new sessions
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-05-04|da3416cf|updating text to be a be less wordy
+ 3 files changed, 11 insertions(+), 13 deletions(-)
+
+COMMIT|2026-05-04|6b76dc8d|fixing the location picker
+ 7 files changed, 170 insertions(+), 170 deletions(-)
+
+COMMIT|2026-05-04|3ca9f169|redirect on edit to view posted element
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+COMMIT|2026-05-04|a16b897b|another pass on the buttons
+ 8 files changed, 78 insertions(+), 46 deletions(-)
+
+COMMIT|2026-05-03|bddd012d|removed sticky top and fixed location view button
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+COMMIT|2026-05-03|46393988|consistent new button format
+ 20 files changed, 411 insertions(+), 176 deletions(-)
+
+COMMIT|2026-05-02|d39e2113|trying new color combinations
+ 10 files changed, 296 insertions(+), 191 deletions(-)
+
+COMMIT|2026-05-01|6ea04407|fixing broken links
+ 4 files changed, 34 insertions(+), 23 deletions(-)
+
+COMMIT|2026-05-01|fc11aab9|fixing location list layout
+ 6 files changed, 115 insertions(+), 93 deletions(-)
+
+COMMIT|2026-04-30|3398b44c|fixing the filter button on activities and adding in some additional formatting.
+ 18 files changed, 444 insertions(+), 162 deletions(-)
+
+COMMIT|2026-04-27|9bd66184|adding faq to upload process
+ 11 files changed, 44 insertions(+), 284 deletions(-)
+
+COMMIT|2026-04-27|2b376922|adding new about page
+ 2 files changed, 25 insertions(+), 1 deletion(-)
+
+COMMIT|2026-04-26|7a55cad5|coloring map icons
+ 15 files changed, 384 insertions(+), 365 deletions(-)
+
+COMMIT|2026-04-25|eb2f3f23|fixing color on hamburger menu
+ 3 files changed, 20 insertions(+), 8 deletions(-)
+
+COMMIT|2026-04-25|17b30bdf|edits per Tim Meeting
+ 6 files changed, 86 insertions(+), 72 deletions(-)
+
+COMMIT|2026-04-24|b926f479|adding in charge icon
+ 4 files changed, 14 insertions(+), 2 deletions(-)
+
+COMMIT|2026-04-24|b54c3b6a|adding logo images
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+COMMIT|2026-04-24|6d9479ad|adding adjustment to the buttons for mobile
+ 3 files changed, 12 insertions(+), 12 deletions(-)
+
+COMMIT|2026-04-24|71f230d3|Fixing category break
+ 2 files changed, 38 insertions(+), 29 deletions(-)
+
+COMMIT|2026-04-24|6d3682df|updating no cost field
+ 9 files changed, 64 insertions(+), 9 deletions(-)
+
+COMMIT|2026-04-24|ddc1cbfe|adjusting filters to be more userfriendly
+ 13 files changed, 234 insertions(+), 109 deletions(-)
+
+COMMIT|2026-04-23|2b66fee1|minor updates. added self directed format
+ 16 files changed, 222 insertions(+), 151 deletions(-)
+
+COMMIT|2026-04-22|ede0c2a2|adding back the old logo
+ 6 files changed, 49 insertions(+), 24 deletions(-)
+
+COMMIT|2026-04-22|43446796|adding colors and changing logo
+ 15 files changed, 222 insertions(+), 95 deletions(-)
+
+COMMIT|2026-04-21|b03bc46b|final form changes
+ 1 file changed, 25 insertions(+)
+
+COMMIT|2026-04-21|a3e6a6d3|finalizing form changes
+ 14 files changed, 670 insertions(+), 278 deletions(-)
+
+COMMIT|2026-04-19|e1dbdc66|finalizing form maintenance
+ 18 files changed, 414 insertions(+), 176 deletions(-)
+
+COMMIT|2026-04-19|81699481|tighten forms to include more validation.
+ 32 files changed, 975 insertions(+), 263 deletions(-)
+
+COMMIT|2026-04-16|b6e4d741|adding form css to feedback.
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-04-16|ee12dba8|adding feedback and some minor appearance tweeks
+ 12 files changed, 202 insertions(+), 71 deletions(-)
+
+COMMIT|2026-04-15|e0f258b3|fix to update latlng
+ 3 files changed, 73 insertions(+), 12 deletions(-)
+
+COMMIT|2026-04-15|549c2977|adding in filter to show all activities in dashboard but highlight deleted ones
+ 6 files changed, 63 insertions(+), 33 deletions(-)
+
+COMMIT|2026-04-14|d492ab0e|added disclaimer, privacy policy and terms of service
+ 14 files changed, 227 insertions(+), 20 deletions(-)
+
+COMMIT|2026-04-14|5835d456|adding locations with map
+ 5 files changed, 237 insertions(+), 133 deletions(-)
+
+COMMIT|2026-04-14|9a58448b|adding updatelatlng as management command
+ 1 file changed, 99 insertions(+)
+
+COMMIT|2026-04-13|2f1c8279|Incorporating the add new location modal
+ 8 files changed, 118 insertions(+), 22 deletions(-)
+
+COMMIT|2026-04-13|cff1c2cd|location selection on activity form
+ 12 files changed, 579 insertions(+), 92 deletions(-)
+
+COMMIT|2026-04-12|38263ea9|adding updated requirements.txt
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+COMMIT|2026-04-12|e7aa61ac|removing print commands
+ 3 files changed, 6 insertions(+), 17 deletions(-)
+
+COMMIT|2026-04-12|263fb2ea|fixing issue with the location of the dataset and gitignore
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-04-12|7de5797f|adding csv files for location load
+ 49 files changed, 902 insertions(+)
+
+COMMIT|2026-04-12|e74835d1|Finalizing Location setup
+ 11 files changed, 338 insertions(+), 39 deletions(-)
+
+COMMIT|2026-04-11|367c1b37|Default locations implementation
+ 11 files changed, 225 insertions(+), 50 deletions(-)
+
+COMMIT|2026-04-11|28cd0a63|Reset orgs migrations to clean baseline
+ 203 files changed, 8 insertions(+), 355 deletions(-)
+
+COMMIT|2026-04-08|1e1782f3|resolved merge conflict
+COMMIT|2026-04-08|49925565|schema complete
+ 9 files changed, 366 insertions(+)
+
+COMMIT|2026-04-08|c20cb87a|schema ready
+ 79 files changed, 1 insertion(+), 2375 deletions(-)
+
+COMMIT|2026-04-08|f441fe28|bringing current dev back into main
+COMMIT|2026-04-08|f7bd198d|adding constraint to location
+ 6 files changed, 23 insertions(+), 1 deletion(-)
+
+COMMIT|2026-04-08|84910bee|schema changes
+ 12 files changed, 368 insertions(+), 23 deletions(-)
+
+COMMIT|2026-04-08|e1c36b36|current dev work on load processing
+ 51 files changed, 1245 insertions(+), 387 deletions(-)
+
+COMMIT|2026-04-04|0a8c27d2|fixing logo filename
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+COMMIT|2026-04-04|76ebed44|fixing logo
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-04-04|994321b5|changing the name to wildpaths
+ 6 files changed, 4 insertions(+), 53 deletions(-)
+
+COMMIT|2026-04-04|177703de|changing reset password timeout
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-04-04|311e0b35|adding test email form
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-04-04|8713da6a|test email form
+ 3 files changed, 64 insertions(+), 33 deletions(-)
+
+COMMIT|2026-04-03|4028152d|testing out of domain email routine
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-04-03|0e1d4af6|remove venv and staticfile from git tracking
+ 158 files changed, 6 insertions(+), 45644 deletions(-)
+
+COMMIT|2026-04-03|02a3d070|remove venv from git tracking again
+ 13325 files changed, 1930948 deletions(-)
+
+COMMIT|2026-04-03|86fa74c1|still fixing css files
+ 13370 files changed, 1938218 insertions(+), 685 deletions(-)
+
+COMMIT|2026-04-03|424d4133|stop tracking virtual environment:
+ 13325 files changed, 1930948 deletions(-)
+
+COMMIT|2026-04-03|9d86bedf|moving styles.css to css folder
+ 13328 files changed, 1930951 insertions(+), 1 deletion(-)
+
+COMMIT|2026-04-03|28df93aa|css test
+ 4 files changed, 54 insertions(+), 9 deletions(-)
+
+COMMIT|2026-04-03|b99cb80b|downgrading python to 3.11.4
+ 99 files changed, 17 insertions(+), 4 deletions(-)
+
+COMMIT|2026-04-03|d2e8cd48|adding file upload feature
+ 83 files changed, 2060 insertions(+), 654 deletions(-)
+
+COMMIT|2026-03-29|e92c0df4|org management enhancements
+ 20 files changed, 283 insertions(+), 349 deletions(-)
+
+COMMIT|2026-03-27|7b0ee6cf|fix dups
+ 6 files changed, 37 insertions(+), 1 deletion(-)
+
+COMMIT|2026-03-27|5ed6a7e8|unrolling duplicate issue for location
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-03-27|0371e613|org managerment feature
+ 21 files changed, 183 insertions(+), 25 deletions(-)
+
+COMMIT|2026-03-26|82ebea7e|management view for orgs
+ 10 files changed, 165 insertions(+), 108 deletions(-)
+
+COMMIT|2026-03-26|ab61d8aa|adjusting new flow
+ 16 files changed, 367 insertions(+), 51 deletions(-)
+
+COMMIT|2026-03-25|2634c0f5|modifying workflow to be a tool not a diretory
+ 16 files changed, 392 insertions(+), 224 deletions(-)
+
+COMMIT|2026-03-22|69bbcc59|test email using postmark
+ 5 files changed, 29 insertions(+), 10 deletions(-)
+
+COMMIT|2026-03-22|48190ede|adding postmark to requirements file
+ 1 file changed, 1 insertion(+)
+
+COMMIT|2026-03-22|ba6b7612|changing to postmark email
+ 2 files changed, 16 insertions(+), 19 deletions(-)
+
+COMMIT|2026-03-22|9ca9af1f|adding test email endpoint
+ 4 files changed, 18 insertions(+), 3 deletions(-)
+
+COMMIT|2026-03-22|a67281f1|adding backend email settings
+ 5 files changed, 41 insertions(+), 10 deletions(-)
+
+COMMIT|2026-03-18|bbf6f661|adding better navigation, about page and starting on map functionality
+ 25 files changed, 13291 insertions(+), 140 deletions(-)
+
+COMMIT|2026-03-15|aefed874|adding local env variables
+ 4 files changed, 10 insertions(+), 4 deletions(-)
+
+COMMIT|2026-03-15|cd6e1f93|adding setting for debug
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+COMMIT|2026-03-15|25c509a4|adding can-edit logic for icon visibility
+ 12 files changed, 79 insertions(+), 14 deletions(-)
+
+COMMIT|2026-03-15|f4ecd61c|adding json with data for preloading app
+ 2 files changed, 2293 insertions(+)
+
+COMMIT|2026-03-15|f7035613|rendering deploying via ui
+ 147 files changed, 32615 insertions(+), 1 deletion(-)
+
+COMMIT|2026-03-15|dd95efad|prepare for render deploy
+ 7 files changed, 21 insertions(+), 30 deletions(-)
+
+COMMIT|2026-03-14|4f211205|adding a readme file
+ 1 file changed, 4 insertions(+)
+
+COMMIT|2026-03-14|135ca6d0|finalizing the new activities model in the app.
+ 21 files changed, 365 insertions(+), 438 deletions(-)
+
+COMMIT|2026-03-13|18789e33|updating with new single activity data model
+ 59 files changed, 1442 insertions(+), 1082 deletions(-)
+
+COMMIT|2026-03-06|7bb685d5|updates with interface changes to show/hide volunteer and training tabs on org cards based on whether the org has any volunteer or training events. Also added a link to the org location if it exists.
+ 26 files changed, 495 insertions(+), 275 deletions(-)
+
+COMMIT|2026-02-28|af19e6b8|updating events and roles for a more dense viewing experience.
+ 34 files changed, 1277 insertions(+), 154 deletions(-)
+
+COMMIT|2026-02-26|3eaf6c8c|first commit
+ 179 files changed, 3934 insertions(+)
