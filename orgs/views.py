@@ -2763,7 +2763,7 @@ def feedback_view(request):
 
 def calendar(request):
 
-
+    
     queryset = Session.objects.current().filter(ongoing=False).exclude(start__isnull=True).select_related(
                 "activity",        # follow FK from Session -> Activity
                 "activity__org",   # Activity -> Organization
@@ -2772,23 +2772,124 @@ def calendar(request):
                 "activity__categories"  # m2m from Activity -> categories
             ).order_by("start", "activity__title").distinct()
     
+    
+    q = request.GET.get("q", "")
+    get_data = request.GET.copy()    
+    active_filters = []
+    get_data = request.GET if request.GET else None
+
+    filter_form=EventFilterForm(get_data or None)
+    if filter_form.is_valid():
+    
+        data = filter_form.cleaned_data
+        if data.get("upload"):
+            queryset = queryset.filter()
+        if data.get("org"):
+            queryset=queryset.filter(activity__org__id=data["org"].id)
+            active_filters.append(f"{data['org'].org_name} ")
+            
+        if data.get("my_orgs"):
+            followed_orgs = request.user.profile.following_orgs.filter(deleted=False)
+            queryset = queryset.filter(activity__org__id__in=followed_orgs)
+            
+            
+        if data.get("county") :
+            queryset=queryset.filter(location__county_id=data["county"]).distinct()
+            active_filters.append(f"{data['county']} county ")
+
+        if data.get("region"):
+            queryset=queryset.filter(location__region=data["region"]).distinct()
+            active_filters.append(f"{data['region']} region ")
+
+        if data.get("q"):
+            queryset =queryset.filter(Q(activity__org__org_name__icontains=q) 
+                                    | Q(activity__title__icontains=q)
+                                    | Q(location__loc_name__icontains=q)
+                                    ).distinct()
+            active_filters.append(f"{data['q']} word search ")
+
+        if data.get("activity_type"):
+            queryset=queryset.filter(activity__activity_type=data["activity_type"]).distinct()
+            if data["activity_type"] == "t":
+                active_filters.append("Training")
+            elif data["activity_type"] == "v":
+                active_filters.append("Volunteer")
+            
+        if data.get("time") == "dated":
+            queryset = queryset.filter(ongoing=False)
+        elif data.get("time") == "ongoing":
+            queryset = queryset.filter(ongoing=True)
+
+        if data.get("categories"):
+            queryset = queryset.filter(activity__categories__id__in=data["categories"]).distinct()
+            active_filters.append(f"Categories: {', '.join([str(c) for c in data['categories']])}")
+
+        if data.get("ongoing"):
+            queryset = queryset.filter(ongoing=True)
+            active_filters.append("Ongoing")
+
+        if data.get("has_cost"):
+            queryset = queryset.filter(activity__has_cost=False).distinct()
+            active_filters.append("Free only")
+
+        if data.get("new"):
+            two_weeks_ago = timezone.now() - timedelta(days=15)
+            queryset = queryset.filter(activity__created_at__gte=two_weeks_ago)
+            active_filters.append(f"Newly created")
+
+        if data.get("start_date"):
+            queryset = queryset.filter(start__gte=data["start_date"])
+            active_filters.append(f"Start on or after: {data['start_date']}")
+
+        if data.get("end_date"):
+            queryset = queryset.filter(start__lte=data["end_date"])
+            active_filters.append(f"Start on or before: {data['end_date']}")
+
+        if data.get("session_format") == "i":
+            queryset = queryset.filter(session_format__in=["i", "b","s"])
+            active_filters.append("In-person or Hybrid ")
+
+        if data.get("session_format") == "o":
+            queryset = queryset.filter(session_format__in=["o", "b"])
+            active_filters.append("Online or Hybrid ")
+    
+
+        activity_id = request.GET.get("activity_id")
+
+        if activity_id:
+            queryset = queryset.filter(activity_id=activity_id)
+            active_filters.append(f" {queryset.first().activity.title if queryset.exists() else 'N/A'}")
+
+    clean_get = request.GET.copy()
+    for p in ["page", "curr_page", "onl_page","ong_page"]:
+        clean_get.pop(p, None)
+
     calendar = OrderedDict()
 
     for session in queryset:
-
-        month_key = session.start.strftime("%B %Y")      # July 2026
-        
-        day_key = session.start                  # 2026-07-19
-        
+        month_key = session.start.strftime("%B %Y")      # July 2026        
+        day_key = session.start                  # 2026-07-19        
         if month_key not in calendar:
             calendar[month_key] = OrderedDict()
-
         if day_key not in calendar[month_key]:
             calendar[month_key][day_key] = []
-
         calendar[month_key][day_key].append(session)
-        
+
     return render(request, "orgs/calendar.html", {
-        
+        "filter_form":filter_form,
+        "query_params": clean_get,
+        "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
+        "cats": EventCategory.objects.all(),
+        "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html,
         "calendar": calendar,
     })
+
+
+def activity_panel(request, pk):
+    activity = get_object_or_404(Activity, pk=pk)
+
+    return render(
+        request,
+        "orgs/_activity_item.html",
+        {"e": activity},
+    )

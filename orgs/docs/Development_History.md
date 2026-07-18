@@ -1,160 +1,136 @@
-# WildPaths Wisconsin
+# WildPaths Development History
 
-# Development History
+**Version 0.4 (Working Draft)**
 
-**Version:** 0.4 (Draft)  
-**Status:** In Progress  
-**Last Updated:** July 16, 2026
+# Introduction
 
----
+WildPaths did not begin as a software project.
 
-# Why This Document Exists
+It began with a practical problem. Organizations were collecting
+valuable information about volunteer opportunities, training, and
+events, but there was no simple way for people to discover it. The
+information already existed, but it was scattered across many sources,
+difficult to search, and challenging to keep current.
 
-One of the questions that eventually came up was, "How long did WildPaths take to build?" At first, that seemed like it should have a simple answer. The more we talked about it, however, the more obvious it became that the answer depends on when the project actually began.
+The original goal was **not** to build an application. In fact, every
+effort was made to avoid building one. If the problem could be solved
+using tools that organizations already knew---such as Google Sheets or
+Google Sites---there would be no reason to ask volunteers to learn new
+technology or maintain a custom system.
 
-Looking back, WildPaths did not begin as a software project. It began as an attempt to solve a problem. Wisconsin has hundreds of organizations offering volunteer opportunities, citizen science projects, educational programs, and training, but the information is spread across many different websites.
+Each prototype answered an important question while exposing a new
+limitation. As the understanding of the problem deepened, the solutions
+became progressively more sophisticated. Eventually it became clear that
+the problem had outgrown the available tools. Building a custom
+application was no longer an ambition; it had become the simplest way to
+solve the problem.
 
-The first goal was simply to bring that information together in a way that made it easier to search and maintain. As the project evolved, each attempt answered one set of questions while revealing another. Looking back now, it is clear that the early experiments were not false starts. They were the process of discovering what WildPaths actually needed to become.
+WildPaths exists because every simpler solution was explored first.
 
-This document records that journey. It explains how the project developed, why important decisions were made, and what was learned along the way.
+------------------------------------------------------------------------
 
----
+# Part I -- Exploration
 
-# Timeline
+## Streamlit -- Can the idea work?
 
-- Phase 0 – Looking for the Right Solution
-- Phase 1 – Learning the Skills
-- Phase 2 – Building the First Application
-- Phase 3 – Discovering the Data Model
-- Phase 4 – Building the User Experience
-- Phase 5 – Building the Import Architecture
-- Phase 6 – Preparing for Production
-- Phase 7 – Preparing for Organizations
-- Phase 8 – Launch Preparation
+The first interactive prototype was built with Streamlit. The objective
+was to determine whether a modern, searchable interface would make the
+information significantly more useful.
 
----
+It did.
 
-# Phase 0 — Looking for the Right Solution
+Searching, filtering, maps, and card-based layouts demonstrated the
+value of an interactive experience. However, keeping the underlying
+information current proved difficult. The interface was promising, but
+maintaining the data was not sustainable.
 
-The earliest work focused on organizing information rather than writing software. We started with the tools we already knew: Google Sheets, website builders, static HTML/JavaScript, and GitHub Pages.
+That shifted the project toward solving the data-management problem.
 
-Each experiment taught us something. Displaying the information was never the hardest part. Maintaining it was.
+## Google Sheets -- Meet people where they already are
 
-As the project grew, relationships between organizations, locations, activities, schedules, counties, and regions became more important than the pages displaying them. That realization led to the conclusion that WildPaths needed to become a database application.
+Google Sheets was not selected because spreadsheets make good databases.
+It was selected because it was already the tool organizations used to
+maintain their information.
 
----
+The goal was to leverage an existing workflow instead of introducing new
+technology. If organizations could continue maintaining their
+information in a familiar environment, adoption would be much easier.
 
-# Phase 1 — Learning the Skills
+As the project evolved, the limitations of using a spreadsheet as the
+primary data store became increasingly apparent. Relationships,
+validation, and consistency all became more difficult as the data model
+grew.
 
-Once we realized a database application was the right direction, the next challenge was learning how to build one.
+The spreadsheet was never the problem. It simply reached the limits of
+what it was designed to do.
 
-Harvard's CS50 course provided the foundation in Python, Git, programming, and web development. The goal was never simply to learn a new language. The goal was to build WildPaths well enough that it could continue to grow.
+## Google Sites
 
-A background in SQL, data warehousing, reporting, and data quality heavily influenced the way the application was designed. The emphasis remained on modeling information correctly before worrying about appearance.
+Google Sites was evaluated as a way to publish the information without
+writing a custom application. Although it was quick to assemble, it did
+not provide enough flexibility for the desired user experience.
 
----
+## Google Apps Script (24 Aug 2025)
 
-# Phase 2 — Building the First Application
+Apps Script connected Google Sheets to a dynamic web application,
+allowing information to be published directly from the spreadsheet while
+preserving a familiar editing experience.
 
-The first Django application was largely about learning.
+## HTML / JavaScript / JSON (12 Sep 2025)
 
-Models, views, templates, forms, URLs, Bootstrap, authentication, and deployment all represented new concepts. The early versions were simple, but they proved that the project could move beyond prototypes and become a real web application.
+A client-side application built with HTML, JavaScript, and JSON provided
+complete control over the interface while keeping deployment
+lightweight.
 
-This phase established the technical foundation that every later feature would build upon.
+This phase introduced an important architectural insight: data published
+for an application should be shaped around the needs of the user
+interface rather than simply mirroring the underlying storage.
 
----
+## Looking Back
 
-# Phase 3 — Discovering the Data Model
+Every prototype was an attempt to avoid unnecessary complexity. The
+project did not move to a new technology because it was fashionable; it
+moved because the current solution could no longer solve the problem
+well enough.
 
-As development continued, the data model became the center of the project.
+------------------------------------------------------------------------
 
-Organizations, Locations, Activities, Sessions, Categories, Counties, and Regions gradually emerged as separate concepts with their own relationships and responsibilities.
+# Part II -- Learning
 
-Several redesigns took place during this period. Those redesigns were not setbacks; they reflected a better understanding of the real-world information WildPaths was intended to manage.
+## CS50 (Sep 2025 -- Jan 2026)
 
-Looking back, this phase probably influenced the quality of the application more than any individual feature.
+Only after exhausting simpler approaches did it become clear that a
+custom application was necessary. Learning Python, Django, Git, and
+modern web development became a means to solve the problem---not the
+goal itself.
 
----
+For that reason, the educational journey is part of the project's
+history but is treated separately from the engineering effort invested
+in WildPaths.
 
-# Phase 4 — Building the User Experience
+------------------------------------------------------------------------
 
-With the core data model becoming more stable, attention shifted toward making the application useful.
+# Part III -- Building WildPaths
 
-Search, filters, organization cards, maps, responsive layouts, county and region filtering, and general usability became major areas of development.
+## 21 February 2026
 
-The goal was to help users discover opportunities without needing to understand how the underlying data was organized.
+The Django project folder was created on **21 February 2026**. This
+marks the beginning of software development for WildPaths itself.
 
----
+Subsequent revisions of this document will trace the application's
+architectural evolution using Git history, recovered prototypes, and
+historical screenshots.
 
-# Phase 5 — Building the Import Architecture
+------------------------------------------------------------------------
 
-The import system eventually became one of the largest projects within WildPaths.
+# Historical Artifacts
 
-Rather than importing CSV files directly into production tables, a complete review workflow evolved.
+Current archive includes screenshots and source from:
 
-Major pieces included:
+-   Streamlit prototype
+-   Google Sites prototype
+-   Google Apps Script web application
+-   HTML / JavaScript / JSON prototype
+-   Early Django application
 
-- CSV uploads
-- field mapping
-- validation
-- staging tables
-- pending records
-- location matching
-- fingerprinting
-- review screens
-- publishing
-- rollback considerations
-
-This work reflected the belief that organizations should be able to maintain their own information while protecting the integrity of the production database.
-
----
-
-# Phase 6 — Preparing for Production
-
-As WildPaths matured, attention shifted from building features to operating a production application.
-
-This included PostgreSQL, Render deployments, email, password resets, authentication, backups, bot protection, logging, and general reliability.
-
-Many of these changes are almost invisible to users, but they are essential for running a dependable application.
-
----
-
-# Phase 7 — Preparing for Organizations
-
-Eventually the focus moved beyond software.
-
-Questions became less about what the application could do and more about whether organizations could comfortably use it.
-
-This phase includes organization management, invitations, documentation, tutorial videos, branding, and workflows that allow organizations to maintain their own information with confidence.
-
----
-
-# Phase 8 — Launch Preparation
-
-The current phase is about preparing WildPaths for wider use.
-
-The emphasis is on refinement rather than new features:
-
-- improving usability
-- completing documentation
-- polishing workflows
-- validating data quality
-- preparing organizations for onboarding
-
-Like the earliest phases, this work is driven by the original goal: making it easier for people to discover opportunities to learn, volunteer, and connect with Wisconsin's natural resources.
-
----
-
-# Looking Ahead
-
-This document is intentionally incomplete.
-
-Future drafts will include:
-
-- calendar timeline
-- Git milestones
-- major architectural decisions
-- screenshots of important stages
-- estimated development effort by phase
-- lessons learned
-- reflections after public launch
+Artifacts are stored under `docs/images/`.

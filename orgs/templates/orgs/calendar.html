@@ -2,16 +2,28 @@
 
 
 {% block filters %}
-{% include "orgs/_activity_filters.html" %}
+{% include "orgs/_calendar_filters.html" %}
 {% endblock %}
 
 
 {% block body %}
 {% load static %}
+{% load can_edit_filters %}
 {% load highlight %}
 <div class="me-page">
+<button class="me-btn me-btn-compact-mobile me-btn-small"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#filterPanel"
+            aria-controls="filterPanel">
+        <span><i class="bi bi-funnel me-btn-icon"></i></span>
+        <span class="me-btn-label">
+        More Filters</span>
+    </button>
+<a href="{% url 'calendar'%}" class ="me-btn me-btn-compact-mobile me-btn-small">
+            <span><i class="bi bi-funnel-fill me-btn-icon" title="clear all filters"></i></span>
+            <span class="me-btn-label">Clear</span></a>   
 
-    
     {% for month_key, days in calendar.items %}
     
     <div class="me-calendar-month">
@@ -39,5 +51,41 @@
     
 
 </div> <!--me-page -->
-{% endblock %}
 
+<div class="modal fade" id="activityPanel" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" id="activityContent">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block extrajs %}
+<script>
+console.log("Activity JS loaded");
+document.addEventListener("click", async function (e) {
+    const link = e.target.closest(".me-activity-link");
+    if (!link) return;
+
+    e.preventDefault();
+
+    const activityId = link.dataset.activity;
+    console.log("Clicked activity:", activityId);
+
+    const response = await fetch(`/activities/${activityId}/panel/`);
+    const html = await response.text();
+
+    document.getElementById("activityContent").innerHTML = html;
+});
+</script>
+{% endblock %}

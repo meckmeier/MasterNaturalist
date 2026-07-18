@@ -20,34 +20,19 @@
           {% endif %}
           {% if e|can_edit:request.user %} <a href="{% url 'activity_edit' e.id%}"><i class="bi bi-pencil-fill" data-bs-toggle="tooltip" title="Edit activity" style="font-size: .75rem;"></i></a>{% endif %} 
       </div>
-     <div class="me-card-sponsor">
-      {% for session in e.sessions.all %}
-          
-            {% if session.ongoing %} <strong>Ongoing</strong> 
-            {% elif session.start %}  {{ session.start|date:"m/d" }} 
-            {% endif %}
-            {% if session.end and session.start != session.end %}  to {{ session.end|date:"m/d" }}
-            {% endif %}
-            {% if session.date_description %}  | <em>{{ a.session.date_description }}</em> 
-            {% endif %}
-            {% if session.session_format == "s" %} | <em>Self selected locations </em> 
-            {% endif %}
-            {% if session.session_format == "i" or session.session_format == "b" %} 
-              {% if session.location != e.org.default_location %} 
-              ( <a href="{% url 'locations'%}?loc={{session.location.id}}&view=list">{{ session.location}} </a>)
-              {% endif %}
-            {% endif %}
-            {% if session.session_format == "o" or session.session_format == "b" and session.session_url %} | 
-               <strong>Online</strong> <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
-               <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i></a>
-            {% endif %}
-              
-          
-        {% endfor %}
-         {% if not e.has_cost %}   
-        <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Event has a cost for participants"></i>
+       <div class="me-card-subtitle">
+    {% if e.date_description %}<br><em>{{ e.date_description }}</em>{% endif %}
+   
+
+  </div>
+     
+          <div class="me-stacked">{% for cat in e.categories.all %}
+              <span class="me-badge">{{cat.name}}</span>
+          {% endfor %}
+          {% if not e.has_cost %}   
+         | <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Event has a cost for participants"></i> 
           {% endif %}
-    </div>
+      </div>
     </div>
     <div class="me-card-header-right">
       <div class="me-icons">
@@ -63,7 +48,9 @@
            <a class="me-icon-btn" href="mailto:{{ e.contact_email }}?subject={{ e.title|urlencode }}&body={{ body_text|urlencode }}">
             <i class="bi bi-envelope me-btn-icon" title="send email to contact person"></i></a>
            {% endwith %}
-            {% elif e.activity_url %}
+           {% endif %}
+
+            {% if e.activity_url %}
            <a class="me-icon-btn" href="{{ e.activity_url }}" target="_blank" rel="noopener noreferrer">
             <i class="bi bi-arrow-up-right-square me-btn-icon" title="External link to activity details."></i></a>
             {% endif %}
@@ -81,15 +68,38 @@
     {% endif %}
   </div>
   <div class="me-card-sponsor">
+      {% for session in e.sessions.all %}
+          
+            {% if session.ongoing %} <strong>Ongoing</strong> 
+            {% elif session.start %}  {{ session.start|date:"m/d" }} 
+            {% endif %}
+            {% if session.end and session.start != session.end %}  to {{ session.end|date:"m/d" }}
+            {% endif %}
+           
+            {% if session.session_format == "s" %} | <em>Self selected locations </em> 
+
+            {% endif %}
+            {% if session.session_format == "i" or session.session_format == "b" %} 
+              {% if session.location != e.org.default_location %} 
+              |  <a href="{% url 'locations'%}?loc={{session.location.id}}&view=list">{{ session.location}} </a>
+              {% endif %}
+            {% endif %}
+            {% if session.session_format == "o" or session.session_format == "b" and session.session_url %} | 
+               <strong>Online</strong> <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
+               <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i></a>
+            {% endif %}
+              <br>
+          
+        {% endfor %}
+         
+    </div>
+  <div class="me-card-sponsor">
     Prerequisites: {{e.prerequisites }}
   </div>
   <!-- Date row -->
    <div>
  
-      <div class="me-stacked">{% for cat in e.categories.all %}
-              <span class="me-badge">{{cat.name}}</span>
-          {% endfor %}
-      </div>
+    
 
 
   </div>

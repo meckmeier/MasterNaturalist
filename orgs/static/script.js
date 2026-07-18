@@ -9,15 +9,18 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("adding back to top button")
     const button = document.getElementById("back-to-top");
 
-    if (!button) return;
-
-    button.addEventListener("click", function () {
-        window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+    if (button) {
+        button.addEventListener("click", function () {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
         });
-    console.log("finished back to top button")
-    });
+
+        console.log("finished back to top button");
+    }
+
+
 
     //--- toggle tab buttons
     const tabButtons = document.querySelectorAll('#eventTabs button[data-bs-toggle="tab"]');
@@ -215,12 +218,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const countyField = document.getElementById("id_county_id");
     const regionField = document.getElementById("id_region");
     console.log("starting zip code lookup wiring", { zipField, countyField, regionField });
+    
     if (zipField && countyField && regionField) {
-
+        
         zipField.addEventListener("change", function () {
-           
+            
             const zip = zipField.value.trim().substring(0, 5);          
-            console.log("looking up zip code", zip);
+            
             
             fetch(`/lookup-zip/?zip_code=${zip}`)
                 .then(response => response.json())
@@ -234,6 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .catch(error => console.error("Zip lookup failed:", error));
         });
+        
     }
-    
+    console.log("last line of script reached")
 });
