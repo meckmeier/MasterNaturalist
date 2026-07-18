@@ -559,13 +559,11 @@ class ActivityForm(forms.ModelForm):
 
     class Meta:        
         model = Activity
-        fields = ["org", "title", "description", "activity_type", "time_commitment", "categories", "date_description", "activity_url", "has_cost", "contact_email", "time_description", "prerequisites", "expire_date",  "deleted"] 
+        fields = ["org", "title", "description", "activity_type", "categories", "activity_url", "has_cost", "contact_email", "time_commitment", "prerequisites", "expire_date",  "deleted"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "prerequisites": forms.TextInput(attrs={"placeholder": "e.g. Previous training, experience, or materials needed"}),
             "expire_date": forms.DateInput(attrs={"type": "date"}),
-            "date_description": forms.TextInput(attrs={"placeholder": "e.g., Ongoing or Wednesdays in June"}),
-            "time_description": forms.TextInput(attrs={"placeholder": "e.g., 2 hours per week, or 9-11:30am"}),
             "deleted": forms.CheckboxInput(attrs={"style": "display:none;"}),
             "activity_url": forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/eventpage"}),
             "contact_email": forms.EmailInput(attrs={"placeholder": "contact@yourorg.org"})
@@ -639,12 +637,12 @@ class SessionForm(forms.ModelForm):
         input_formats=["%Y-%m-%d"],
         widget=forms.DateInput(attrs={"placeholder": "YYYY-MM-DD"})
     )
-    
+   
     class Meta:
         model = Session
         fields = "__all__"
         widgets = {
-            
+            "session_comment":  forms.TextInput(attrs={"placeholder": "Provide additional info on session schedule here."}),
             "format": forms.Select(),
             "location": forms.Select(attrs={"class": "form-select form-select-sm real-location-field"}),
         }

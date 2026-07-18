@@ -59,12 +59,21 @@
 <fieldset>
        <div class="error-text"> {{ activity_form.non_field_errors }}</div>
     <div class = "me-form-grid {% if view_only %}view-mode{% endif %}">
-        <div class="me-form-field">
+        <div class="me-form-field-full">
             {{ activity_form.title.label_tag }}<br>
             {{ activity_form.title }}
             <span class="error-text">{{ activity_form.title.errors }}</span>
         </div>
-
+<div class="me-form-field-full">
+    {{activity_form.description.label_tag}}
+    {{activity_form.description}}
+    {{activity_form.description.errors}}
+</div>
+<div class="me-form-field">
+            {{ activity_form.prerequisites.label_tag }}<br>
+            {{ activity_form.prerequisites }}
+            <span class="error-text">{{ activity_form.prerequisites.errors }}</span>
+            </div>
          <div class="me-form-field">
             Type:<br>
             {{ activity_form.activity_type }}
@@ -92,16 +101,36 @@
             {{ activity_form.contact_email }}
             <span class="error-text">{{ activity_form.contact_email.errors }}</span>
         </div>
-                <div class ="me-form-field-full">
-            {{ activity_form.description.label_tag }}<br>
-            {{ activity_form.description }}
-            {{ activity_form.description.errors }}
+         
+        
+           
+
+<div class="me-form-field-full">
+     <legend>Keywords (to help with volunteer searches)</legend>
+
+    {% for group, choices in activity_form.category_groups %}
+        <div class="category-group">
+            <div class="category-group-title">
+                <strong>{{ group|title }}</strong>
+            </div>
+
+            <div class="category-options">
+                {% for value, label in choices %}
+                    <label class="category-checkbox">
+                        <input type="checkbox"
+                               name="{{ activity_form.categories.html_name }}"
+                               value="{{ value }}"
+                               id="filter_cat_{{ value }}"
+                               {% if value|stringformat:"s" in activity_form.selected_category_ids %}checked{% endif %}>
+                        {{ label }}
+                    </label>
+                {% endfor %}
+            </div>
         </div>
-        <div class="me-form-field-full">
-            {{ activity_form.prerequisites.label_tag }}<br>
-            {{ activity_form.prerequisites }}
-            <span class="error-text">{{ activity_form.prerequisites.errors }}</span>
-        </div>
+    {% endfor %}
+
+    {{ activity_form.categories.errors }}
+</div>
         <div class="me-form-field-full">
     
     <div class="formset" data-prefix="locations">
@@ -122,7 +151,7 @@
             </thead>
             <tbody>
                 {% for form in session_formset %}
-                    <tr class ="formset-row">
+                    <tr class ="formset-row"> 
                         {% for hidden in form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
@@ -190,7 +219,17 @@
 
                         <td>{{form.DELETE}}</td>
                     </tr>
-           
+                    <tr class="schedule-row">
+                    <td colspan="7">
+                        <label class="small fw-semibold">
+                            Schedule Details
+                        </label>
+
+                        {{ form.session_comment }}
+                        {{ form.session_comment.errors }}
+                    </td>        
+                </tr>
+  
                     
             {% empty %}
                     <tr class="empty-hint">
@@ -208,22 +247,33 @@
                         {% for hidden in session_formset.empty_form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
-                     <td>{{ session_formset.empty_form.session_format }}</td>
-                     <td> <div class="url-group">{{ session_formset.empty_form.session_url }}</div></td>
-                     <td><div  class="loc-group">{{ session_formset.empty_form.location }}
-                            <button type="button"
-                                    class="me-btn  open-location-search"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#locationSearchModal">
-                               <span><i class="bi bi-plus-fill me-btn-icon"></i></span> 
-                               <span class="me-btn-label">Find or Add Location</span>
-                            </button></div>
-                     </td>
-                     <td>{{ session_formset.empty_form.ongoing }}</td>
-                     <td>{{ session_formset.empty_form.start }}</td>
-                     <td>{{ session_formset.empty_form.end }}</td>
-                    <td>{{session_formset.empty_form.DELETE}}</td>
-                    </tr>
+                        <td>{{ session_formset.empty_form.session_format }}</td>
+                        <td> <div class="url-group">{{ session_formset.empty_form.session_url }}</div></td>
+                        <td><div  class="loc-group">{{ session_formset.empty_form.location }}
+                                <button type="button"
+                                        class="me-btn  open-location-search"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#locationSearchModal">
+                                <span><i class="bi bi-plus-fill me-btn-icon"></i></span> 
+                                <span class="me-btn-label">Find or Add Location</span>
+                                </button></div>
+                        </td>
+                        <td>{{ session_formset.empty_form.ongoing }}</td>
+                        <td>{{ session_formset.empty_form.start }}</td>
+                        <td>{{ session_formset.empty_form.end }}</td>
+                        <td>{{session_formset.empty_form.DELETE}}</td>
+                        </tr>
+                        <tr class="schedule-row form-template" style="display:none;">
+                        <td colspan="7">
+                            <label class="small fw-semibold">
+                                Schedule Details
+                            </label>
+
+                            {{ form.session_comment }}
+                            {{ form.session_comment.errors }}
+                        </td>
+                        </tr>
+
             </tbody>
         </table>
     </div>
@@ -236,55 +286,13 @@
     {% endif %}
  {% endif %}    
     </div>
-    <div class ="me-form-field-full">
-             <legend>Details</legend>
-           <span class="me-muted">These fields are optional but you can use them to display additional information regarding dates and times.</span>
-        </div>
-        <div class="me-form-field">
-            {{ activity_form.date_description.label_tag }}<br>
-            {{ activity_form.date_description }}
-            {{ activity_form.date_description.errors }}
-        </div>
-        <div class="me-form-field">
-            Time: <br>
-            {{ activity_form.time_commitment }}
-            {{ activity_form.time_commitment.errors }}
-        </div> 
-        <div class="me-form-field">
-            {{ activity_form.time_description.label_tag }}<br>
-            {{ activity_form.time_description }}
-            {{ activity_form.time_description.errors }}
-        </div>
 
 
-       
 
-<div class="me-form-field-full">
-     <legend>Keywords (to help with volunteer searches)</legend>
 
-    {% for group, choices in activity_form.category_groups %}
-        <div class="category-group">
-            <div class="category-group-title">
-                <strong>{{ group|title }}</strong>
-            </div>
 
-            <div class="category-options">
-                {% for value, label in choices %}
-                    <label class="category-checkbox">
-                        <input type="checkbox"
-                               name="{{ activity_form.categories.html_name }}"
-                               value="{{ value }}"
-                               id="filter_cat_{{ value }}"
-                               {% if value|stringformat:"s" in activity_form.selected_category_ids %}checked{% endif %}>
-                        {{ label }}
-                    </label>
-                {% endfor %}
-            </div>
-        </div>
-    {% endfor %}
 
-    {{ activity_form.categories.errors }}
-</div>
+    
 
 </div>
 

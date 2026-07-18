@@ -32,7 +32,7 @@ import pandas as pd
 from .services.csv_importer import CSVImporter
 from orgs.services.activity_tracking import track_activity
 from orgs.services.helper_function import get_county_from_zip, normalize_address_key, similarity, normalize_location_name
-
+from itertools import groupby
 
 from collections import defaultdict
 from collections import OrderedDict
@@ -2886,10 +2886,23 @@ def calendar(request):
 
 
 def activity_panel(request, pk):
-    activity = get_object_or_404(Activity, pk=pk)
+    activity = get_object_or_404(
+        Activity.objects.prefetch_related(
+            Prefetch(
+                "sessions",
+                queryset=Session.objects.current().order_by("start")
+            )
+        ),
+        pk=pk,
+    )
+
+
 
     return render(
         request,
         "orgs/_activity_item.html",
-        {"e": activity},
+        {
+            "e": activity,
+
+        },
     )

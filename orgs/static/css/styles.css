@@ -136,6 +136,15 @@
 .formset-table.view-mode textarea {
     display: none;
 }
+.formset-table .schedule-row td {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: .75rem;
+}
+
+.formset-table .schedule-row + tr td {
+    padding-top: .75rem;
+}
+
 .btn view-mode {
     display: none;
 }

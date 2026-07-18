@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from datetime import date, timedelta
 from django.conf import settings
 from orgs.services.helper_function import build_location_fingerprint
-
+from itertools import groupby
 # fixed lists:
 #-------------------------------------------------------    
 
@@ -505,6 +505,41 @@ class Activity(models.Model):
     @property
     def is_newly_added(self):
         return self.created_at >= timezone.now() - timedelta(days=15)
+    @property
+    def location_groups(self):
+        """
+        Groups sessions by physical location for display.
+
+        Returns:
+            [
+                {
+                    "location": <Location> | None,
+                    "sessions": [Session, Session, ...],
+                    "rowspan": int,
+                },
+                ...
+            ]
+        """
+
+        sessions = sorted(
+            self.sessions.all(),
+            key=lambda s: (
+                s.location.loc_name if s.location else "",
+                s.start or timezone.datetime.max.replace(tzinfo=timezone.get_current_timezone()),
+            ),
+        )
+
+        groups = []
+
+        for location, rows in groupby(sessions, key=lambda s: s.location):
+            rows = list(rows)
+            groups.append({
+                "location": location,
+                "sessions": rows,
+                "rowspan": len(rows),
+            })
+
+        return groups
 
 class SessionQuerySet(models.QuerySet):
     def active(self):
@@ -539,6 +574,7 @@ class Session(models.Model):
     ongoing = models.BooleanField(default=False)
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
+    session_comment = models.CharField(max_length=100, blank=True, null=True)
     deleted=models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
     created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_sessions")

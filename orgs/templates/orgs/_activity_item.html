@@ -20,11 +20,9 @@
           {% endif %}
           {% if e|can_edit:request.user %} <a href="{% url 'activity_edit' e.id%}"><i class="bi bi-pencil-fill" data-bs-toggle="tooltip" title="Edit activity" style="font-size: .75rem;"></i></a>{% endif %} 
       </div>
-       <div class="me-card-subtitle">
-    {% if e.date_description %}<br><em>{{ e.date_description }}</em>{% endif %}
+       {% if e.time_commitment %}<div class="me-card-subtitle">{{e.time_commitment}}</div>{% endif %}
    
 
-  </div>
      
           <div class="me-stacked">{% for cat in e.categories.all %}
               <span class="me-badge">{{cat.name}}</span>
@@ -56,53 +54,68 @@
             {% endif %}
      
     </div>  
-  </div>
+    </div>
   </div>
     <!-- Description -->
   <div class="me-description-block {% if q %}expanded{% endif %}">
-    <div class="me-desc-short">{{ e.description|truncatechars:200 }}</div>
+    {{ e.description }}
     {%if q %}
-    <div class="me-desc-full">{{ e.description|highlight:q|safe }}</div>
-    {% else %}
-    <div class="me-desc-full">{{ e.description }}</div>
+    {{ e.description|highlight:q|safe }}
+    
     {% endif %}
   </div>
-  <div class="me-card-sponsor">
-      {% for session in e.sessions.all %}
-          
-            {% if session.ongoing %} <strong>Ongoing</strong> 
-            {% elif session.start %}  {{ session.start|date:"m/d" }} 
-            {% endif %}
-            {% if session.end and session.start != session.end %}  to {{ session.end|date:"m/d" }}
-            {% endif %}
-           
-            {% if session.session_format == "s" %} | <em>Self selected locations </em> 
 
-            {% endif %}
-            {% if session.session_format == "i" or session.session_format == "b" %} 
-              {% if session.location != e.org.default_location %} 
-              |  <a href="{% url 'locations'%}?loc={{session.location.id}}&view=list">{{ session.location}} </a>
+  <table class="table">
+
+{% for group in e.location_groups %}
+    {% for s in group.sessions %}
+        <tr>
+
+        {% if forloop.first %}
+            <td rowspan="{{ group.rowspan }}" class="align-middle">
+                {% if group.location %}
+                
+
+              <a href="{% url 'locations' %}?loc={{group.location.id}}&view=list">{{ group.location.loc_name }}</a><br>
+                  {%if group.location.city_name %}{{ group.location.city_name }}{% endif %}
               {% endif %}
-            {% endif %}
-            {% if session.session_format == "o" or session.session_format == "b" and session.session_url %} | 
-               <strong>Online</strong> <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
-               <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i></a>
-            {% endif %}
-              <br>
-          
-        {% endfor %}
+                {% if s.session_format == "s" %} | <em>Self selected locations </em> {% endif %}
+                {% if s.session_format == "o" %} | <em>Online</em> {% endif %}
+                {% if s.session_url %}<a href="{{s.session_url}}" target="_blank" rel="noopener noreferrer">
+               <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i>Online Session</a>{% endif %}
+             
+
+              
+            </td>
+             <td rowspan="{{ group.rowspan}}" class = "align-middle">
+                <img src="{% static 'orgs/region_maps/' %}{{ group.location.region.map_filename }}" alt="{{group.location.region.name}}"  title="{{ group.location.region.name }}" 
+        style="height:75px; width:auto;">
+        {% endif %}
+
+        <td> {% if s.ongoing %} <strong>Ongoing</strong> 
+            {% elif s.start %}  {{ s.start|date:"m/d" }} 
          
-    </div>
-  <div class="me-card-sponsor">
-    Prerequisites: {{e.prerequisites }}
-  </div>
-  <!-- Date row -->
-   <div>
+          {% if s.end and s.start != s.end %}  to {{ s.end|date:"m/d" }}
+            {% endif %}
+               {% endif %}
+
+            {% if s.session_comment %} |
+          {{s.session_comment}}{% endif %}
+          </td>
+        </tr>
+
+    {% endfor %}
+{% endfor %}
+
+</table>
  
-    
+  <div class="me-card-subtitle">
+    Prerequisites: {{e.prerequisites }}</div>
+    <div class="me-card-sponsor">
+    Sponsored by: {{e.org.org_name}}</div>
 
+  <!-- Date row -->
 
-  </div>
  
   <div class="me-card-date">
 Activity added: {{ e.created_at|date:"M j, Y" }}
