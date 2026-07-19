@@ -715,6 +715,7 @@ def locations(request):
     training = Session.objects.current().filter(
         activity__activity_type="t",
     )
+    current_sessions = Session.objects.current()
 
     queryset = (
         Location.objects
@@ -749,7 +750,12 @@ def locations(request):
                 "sessions",
                 queryset=training,
                 to_attr="training"
-            )
+            ),
+            Prefetch(
+                "sessions",
+                queryset=current_sessions.order_by("start"),
+                to_attr="all_sessions"
+            ),
         ))
     
      
@@ -1250,7 +1256,7 @@ def profile_view(request):
         "user_form": user_form,})
 
 
-def opportunity_list(request):
+def opps(request):
 
     q = request.GET.get("q", "")
 
@@ -1387,14 +1393,21 @@ def opportunity_list(request):
     # 4. Sort cards if desired
     #
 
+
+    for card in cards:
+        earliest = min((s.start or date.max) for s in card["sessions"])
+        print(
+            earliest,
+            card["activity"].title,
+            [s.start for s in card["sessions"]]
+        )
+
     cards.sort(
-    key=lambda c: (
-            c["location"].region.code
-                if c["location"] and c["location"].region
-                else "ZZ",
-            c["location"].loc_name
-                if c["location"]
-                else "",
+        key=lambda c: (
+            min(
+                s.start or date.max
+                for s in c["sessions"]
+            ),
             c["activity"].title,
         )
     )
@@ -1621,6 +1634,10 @@ def _activity_form_workflow(request, org, activity, is_new=False):
 
             for s in session_formset.deleted_objects:
                 s.delete()
+            next_url = request.GET.get("next") or request.POST.get("next")
+
+            if next_url:
+                return redirect(next_url)
 
             return redirect(f"{reverse('activities')}?activity_id={activity.id}")
 

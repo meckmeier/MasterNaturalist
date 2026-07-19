@@ -2,7 +2,7 @@
 {% load highlight %}
 {% load can_edit_filters %}
 
- <div class="me-card">
+ <div class="me-card" id="activity-{{ card.activity.id }}">
 
  <!-- Right block: simple inline icons -->
 
@@ -23,22 +23,26 @@
           {{ card.activity.title }}
         {% endif %}
        {% if card.activity|can_edit:request.user %}
-          <a href="{% url 'activity_edit' card.activity_id %}">
+          <a href="{% url 'activity_edit' card.activity.id %}?next={{ request.get_full_path|urlencode }}#activity-{{ card.activity.id }}">
             <i class="bi bi-pencil" style="font-size: .75rem;"></i>
           </a>
         {% endif %}
       </div>
+       {% if card.location %} <a href="{% url 'locations'%}?&loc={{card.location.id}}&view=list">
+            {% if q %}{{ card.location.loc_name|highlight:q|safe }}{% else %}{{ card.location.loc_name }}{% endif %}
+            </a>{% endif %}
+
         <div class="me-card-date">
+
             {% if card.activity.time_commitment_txt %} | <em>{{ card.activity.time_commitment_txt }}</em>{% endif %}
             {% for session in card.sessions %}
-                | {% if session.ongoing %}<strong>Ongoing</strong>{% endif%}
+                | {% if session.ongoing %}Ongoing{% endif%}
                 {% if session.start %}{{ session.start }}{% endif %}
 
                 {% if session.end and session.start != session.end %} - {{ session.end }}{% endif %}
+                {% if session.session_comment %}<em>{{ session.session_comment }}</em>{% endif %} 
                 {% if session.session_url %} <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
-                        <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i>Online Session</a>{% endif %}
-                {% if session.session_comment %}<br><em>{{ session.session_comment }}</em>{% endif %} 
-                
+                        <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i> Join online</a>{% endif %}
                 
     
             {% endfor %}
@@ -89,9 +93,7 @@
               {% if q %}{{ card.activity.org.org_name|highlight:q|safe }}{% else %}{{ card.activity.org.org_name }}{% endif %}
             </a>
 
-           {% if card.location %} | Location: <a href="{% url 'locations'%}?&loc={{card.location.id}}&view=list">
-            {% if q %}{{ card.location.loc_name|highlight:q|safe }}{% else %}{{ card.location.loc_name }}{% endif %}
-            </a>{% endif %}
+          
            
             
   <br>Activity added: {{ card.created_at|date:"M j, Y" }}

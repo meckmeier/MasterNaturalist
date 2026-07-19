@@ -26,7 +26,9 @@
  
     <div class="me-card-subtitle"">
         {% if e.activity.date_description %}{{ e.activity.date_description }}{% endif %}
-        {% if e.activity.time_description %} | {{ e.activity.time_description }}{% endif %}
+        {% if e.start %} {{ e.start|date:"m/d" }} {% endif %}
+        {% if e.end and e.start != e.end %} to {{ e.end|date:"m/d" }}  {% endif %}
+         {% if e.session_comment %} | {{ e.session_comment }}{% endif %}
         {% if e.activity.time_commitment_txt %} | {{ e.activity.time_commitment_txt }}{% endif %}
         <br>{% if e.location %} 
             {% if q %}{{ e.location.loc_name|highlight:q|safe }}{% else %}{{ e.location.loc_name }}{% endif %}
