@@ -1,0 +1,135 @@
+{% load static %}
+{% load highlight %}
+{% load can_edit_filters %}
+
+ <div class="me-card">
+
+ <!-- Right block: simple inline icons -->
+
+  <!-- Header row -->
+  <div class="me-card-header">
+    <!-- Left block -->
+    <div class="me-card-header-left">        
+      <div class="me-card-title-row">
+        {% if card.activity.activity_type == "t" %}
+      <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
+    {% else %}
+      <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
+    {% endif %}  
+    
+        {% if q %}
+          {{ card.activity.title|highlight:q|safe }}
+        {% else %}
+          {{ card.activity.title }}
+        {% endif %}
+       {% if card.activity|can_edit:request.user %}
+          <a href="{% url 'activity_edit' card.activity_id %}">
+            <i class="bi bi-pencil" style="font-size: .75rem;"></i>
+          </a>
+        {% endif %}
+      </div>
+        <div class="me-card-date">
+            {% if card.activity.time_commitment_txt %} | <em>{{ card.activity.time_commitment_txt }}</em>{% endif %}
+            {% for session in card.sessions %}
+                | {% if session.ongoing %}<strong>Ongoing</strong>{% endif%}
+                {% if session.start %}{{ session.start }}{% endif %}
+
+                {% if session.end and session.start != session.end %} - {{ session.end }}{% endif %}
+                {% if session.session_url %} <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
+                        <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i>Online Session</a>{% endif %}
+                {% if session.session_comment %}<br><em>{{ session.session_comment }}</em>{% endif %} 
+                
+                
+    
+            {% endfor %}
+
+  </div>
+
+    </div>
+   <div class="me-card-header-right"> 
+    <div class="me-icons">
+      {% if card.location %}
+      <img src="{% static 'orgs/region_maps/' %}{{ card.location.region.map_filename }}" alt="{{card.location.region.name}}"  title="{{ card.location.region.name }}" 
+      style="height:75px; width:auto;">
+    {% endif %}
+   
+
+    </div></div>
+  </div> <!-- header -->
+  <!-- Date line -->
+
+  <!-- Description -->
+  <div class="me-description-block {% if q %}expanded{% endif %}">
+    <div class="me-desc-short">{{ card.activity.description|truncatechars:200 }}</div>
+    {%if q %}
+    <div class="me-desc-full">{{ card.activity.description|highlight:q|safe }}</div>
+    {% else %}
+    <div class="me-desc-full">{{ card.activity.description }}</div>
+    {% endif %}
+  </div>
+    <div class="me-card-sponsor">
+     Prerequisites: {{card.activity.prerequisites }}
+  </div>
+
+  <!-- Badges -->
+  <div class="me-stack">
+    {% for cat in card.activity.categories.all %}
+      <span class="me-badge">{{ cat.name }}</span>
+    {% endfor %}
+    {%if  card.activity.has_cost %}   
+      | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+    {% endif %}
+  </div>
+  
+   <div class="me-card-header">
+        <div class="me-card-header-left">   
+   
+      <div class="me-card-sponsor">
+            Sponsored by: <a href="{% url 'orgs'%}?org={{card.activity.org.id}}">
+              {% if q %}{{ card.activity.org.org_name|highlight:q|safe }}{% else %}{{ card.activity.org.org_name }}{% endif %}
+            </a>
+
+           {% if card.location %} | Location: <a href="{% url 'locations'%}?&loc={{card.location.id}}&view=list">
+            {% if q %}{{ card.location.loc_name|highlight:q|safe }}{% else %}{{ card.location.loc_name }}{% endif %}
+            </a>{% endif %}
+           
+            
+  <br>Activity added: {{ card.created_at|date:"M j, Y" }}
+    {% if card.activity.is_newly_added %}
+       <span class="me-badge">* New *</span>
+    {% endif %}
+    {% if card.activity.source_upload %}
+        <span class="me-badge">* Upload ID : {{card.activity.source_upload.id }} </span>
+    {% endif %}
+    {% if card.activity.updated_at > card.activity.created_at or card.activity.updated_at > card.activity.created_at %} | Last update: 
+    {% if card.activity.updated_at > card.activity.updated_at %} {{ card.activity.updated_at|date:"M j, Y" }}
+    {% else %}{{ card.activity.updated_at|date:"M j, Y" }}{% endif %}
+    {% endif %}
+    </div>  </div>
+     <div class="me-card-header-right"> 
+    <div class="me-icons">
+        {% if card.activity.org and card.activity.org|can_edit:request.user %}
+          <a class="me-icon-btn" href="{% url 'org_mgmt' %}?org={{ current_activity.org.id }}" title="Go to Organization Dashboard">
+            <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i>
+          </a>
+        {% endif %}
+
+     
+      {% if card.activity.activity_url %}
+            <a class="me-btn me-btn-compact-mobile" href="{{ card.activity.activity_url }}" target="_blank" rel="noopener noreferrer" title="External link to activity site">
+              <span><i class="bi bi-arrow-up-right-square me-btn-icon"></i></span>
+            <span class="me-btn-label">Learn More</span></a>
+      {% endif %}
+      {% if card.activity.contact_email%}
+              {% with body_text="Hello, I found this opportunity on WildPaths Wisconsin and I'm interested in "|add:card.activity.title|add:" at "|add:card.activity.org.org_name|add:". Thank you." %}
+           <a class="me-btn me-btn-compact-mobile" href="mailto:{{ card.activity.contact_email }}?subject={{ card.activity.title|urlencode }}&body={{ body_text|urlencode }}" title="Send email to contact">
+            <span> 
+          <i class="bi bi-envelope me-btn-icon" title="send email to contact person"></i></span>
+         <span class="me-btn-label">Contact</span></a>{% endwith %}
+          
+        {% endif %}
+
+    </div></div>   
+    
+  </div>
+</div>

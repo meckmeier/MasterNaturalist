@@ -23,11 +23,7 @@
 
     </div>
      <!-- Badges -->
-  <div class="me-stack">
-    {% for cat in e.activity.categories.all %}
-      <span class="me-badge">{{ cat.name }}</span>
-    {% endfor %}
-  </div>
+ 
     <div class="me-card-subtitle"">
         {% if e.activity.date_description %}{{ e.activity.date_description }}{% endif %}
         {% if e.activity.time_description %} | {{ e.activity.time_description }}{% endif %}
@@ -43,6 +39,11 @@
             {% if q %} ({{ e.activity.org.org_name|highlight:q|safe }}){% else %} ({{ e.activity.org.org_name }}){% endif %}
       
     </div>
+     <div class="me-stack">
+    {% for cat in e.activity.categories.all %}
+      <span class="me-badge">{{ cat.name }}</span>
+    {% endfor %}
+  </div>
     </div>
     <div class="me-card-header-right"> 
     <div class="me-icons">

@@ -1,0 +1,114 @@
+{% extends "orgs/layout.html" %}
+{% block filter_button %}
+{% endblock %}
+
+{% block filters %}
+{% include "orgs/_activity_filters.html" %}
+{% endblock %}
+
+
+{% block body %}
+{% load static %}
+{% load highlight %}
+
+<div class="me-page">
+ <div class="me-card-header">
+    <div class="me-card-header-left">  
+      <h2>Activities</h2>
+    </div>
+    <div class="me-card-header-right">
+      {% if active_filters %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+              for:
+              {{ active_filters|join:", " }}
+          </div>
+      {% else %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+          </div>
+      {% endif %}
+    </div>
+  </div>
+  {% if current_activity %}
+    <div class="active-filter-banner">
+        Showing only one activity
+
+        <a href="{% url 'opportunity_list' %}" class="me-button-link">
+            Remove Filter
+        </a>
+    </div>
+  {% else %}
+  <div class="d-flex justify-content-between align-items-top mb-4">
+    <div class="mb-0">
+  <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3">
+ 
+<!-- When -->
+<div class="me-toggle" role="group" aria-label="When">
+
+  <input type="radio" name="time" id="main-time-all" value=""
+         {% if not request.GET.time %}checked{% endif %}>
+  <label for="main-time-all">All</label>
+
+  <input type="radio" name="time" id="main-time-dated" value="dated"
+         {% if request.GET.time == "dated" %}checked{% endif %}>
+  <label for="main-time-dated">Upcoming</label>
+
+  <input type="radio" name="time" id="main-time-ongoing" value="ongoing"
+         {% if request.GET.time == "ongoing" %}checked{% endif %}>
+  <label for="main-time-ongoing">Ongoing</label>
+
+</div>
+
+  <!-- Activity Type -->
+  <div class="me-toggle" role="group" aria-label="Activity Type">
+    <input type="radio" name="activity_type" id="main-type-all" value=""
+           {% if not request.GET.activity_type %}checked{% endif %}>
+    <label for="main-type-all">All</label>
+
+    <input type="radio" name="activity_type" id="main-type-volunteer" value="v"
+           {% if request.GET.activity_type == "v" %}checked{% endif %}>
+    <label for="main-type-volunteer">Volunteer</label>
+
+    <input type="radio" name="activity_type" id="main-type-training" value="t"
+           {% if request.GET.activity_type == "t" %}checked{% endif %}>
+    <label for="main-type-training">Learn</label>
+  </div>
+<button class="me-btn me-btn-compact-mobile me-btn-small"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#filterPanel"
+            aria-controls="filterPanel">
+        <span><i class="bi bi-funnel me-btn-icon"></i></span>
+        <span class="me-btn-label">
+        More Filters</span>
+    </button>
+</div>
+    <a href="{% url 'activities'%}" class ="me-btn me-btn-compact-mobile me-btn-small">
+            <span><i class="bi bi-funnel-fill me-btn-icon" title="clear all filters"></i></span>
+            <span class="me-btn-label">Clear</span></a>    
+</div>            
+</form>
+{% endif %}
+
+    {% for card in cards %}
+    
+      {% include "orgs/_act_by_location.html" with card=card q=q  %} 
+
+    {% endfor %}
+
+<hr>
+
+    
+
+
+{% endblock %}
+{% block extrajs %}
+<script>
+document.querySelectorAll(".quick-filters input").forEach(el => {
+  el.addEventListener("change", () => {
+    el.closest("form").submit();
+  });
+});
+</script>
+{% endblock %}
