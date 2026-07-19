@@ -715,7 +715,7 @@ def locations(request):
     training = Session.objects.current().filter(
         activity__activity_type="t",
     )
-    current_sessions = Session.objects.current()
+    all_sessions = Session.objects.current()
 
     queryset = (
         Location.objects
@@ -753,7 +753,7 @@ def locations(request):
             ),
             Prefetch(
                 "sessions",
-                queryset=current_sessions.order_by("start"),
+                queryset=all_sessions.order_by("start"),
                 to_attr="all_sessions"
             ),
         ))
@@ -848,6 +848,25 @@ def locations(request):
     ])
     result_count = queryset.count()
 
+    for location in queryset:
+
+        cards = {}
+
+        for session in location.all_sessions:
+
+            key = session.activity_id
+
+            if key not in cards:
+                cards[key] = {
+                    "activity": session.activity,
+                    "location": location,
+                    "sessions": [],
+                }
+
+            cards[key]["sessions"].append(session)
+
+        location.activity_cards = list(cards.values())
+        
     return render(
         request,
         "orgs/locations.html",

@@ -38,7 +38,7 @@
           </a>
         {% endif %}
 
-        <br>
+        
         {{ loc.address }}, {{ loc.city_name }} | {{ loc.county_id.county_name }}  {% if loc.latitude %}<a
         href="https://www.google.com/maps/dir/?api=1&destination={{ loc.latitude}},{{ loc.longitude }}"
         target="_blank"
@@ -87,9 +87,13 @@
         </div>
 
 
-      {% for each in loc.all_sessions %}
-        {% include "orgs/_session_summary.html" with e=each q=q source='loc' %}
+     
+        {% for card in loc.activity_cards %}
+   
+          {% include "orgs/_act_by_location.html" with card=card q=q  %} 
+
       {% endfor %}
+    
    
      
 </div>
