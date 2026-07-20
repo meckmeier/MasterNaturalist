@@ -111,11 +111,20 @@ in WildPaths.
 ------------------------------------------------------------------------
 
 # Part III -- Building WildPaths
-
-## 21 February 2026
+## 21 December 2025 - 21 February 2026 : Benchmark 01
+After completing the CS50 class, I wanted to recreate the basic Streamlit interface so that
+using Django. It seemed relatively straightforward (a csv file that showed each row as a card with some filtering options), 
+but to implment required the following:
+    * a data model (and building that model in Postgre SQL - I started with that, not really bothering
+with the SQLLite version). With only organizations and locations at this point. 
+    * registration/login/logout and showing different elements based on authentication.
+    * pagination (which I was sensitive to expecting that the data load might be significant, but it turns out i have left that completely behind now).
+    * django forms to build the filter page 
+    * bootstrap menu - hamburger on mobile and across the top for desktop. with a canvas fade
+    
 
 The Django project folder was created on **21 February 2026**. This
-marks the beginning of software development for WildPaths itself.
+marks the first commit of a django implmentation for WildPaths itself.
 
 Subsequent revisions of this document will trace the application's
 architectural evolution using Git history, recovered prototypes, and
@@ -131,6 +140,6 @@ Current archive includes screenshots and source from:
 -   Google Sites prototype
 -   Google Apps Script web application
 -   HTML / JavaScript / JSON prototype
--   Early Django application
+-   History/benchmark01
 
 Artifacts are stored under `docs/images/`.
