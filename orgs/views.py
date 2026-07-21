@@ -251,7 +251,6 @@ def orgs(request):
         )
     )
 
-    
     org_queryset = (
         Organization.objects.active()
         .order_by("org_name")
@@ -274,14 +273,14 @@ def orgs(request):
     
     if "org_id" in get_data and "org" not in get_data:
         get_data["org"]=get_data["org_id"]
-
+    
     filter_form=OrgFilterForm(get_data or None)
     if filter_form.is_valid():
-    
+        
         data = filter_form.cleaned_data
         has_volunteer = data.get("has_volunteer")
         has_training = data.get("has_training")
-
+        
         if data.get("org"):
             org_queryset=org_queryset.filter(id=data["org"].id)
 
@@ -321,7 +320,7 @@ def orgs(request):
             )
 
         for org in org_queryset:
-                
+                print("building cards")
                 sessions = Session.objects.current().filter(
                     activity__org=org
                 )
@@ -331,6 +330,18 @@ def orgs(request):
 
                 elif has_training and not has_volunteer:
                     sessions = sessions.filter(activity__activity_type="t")
+
+                # both checked -> no additional filter
+                # neither checked -> no additional filter
+
+                org.activity_cards = build_activity_cards(sessions)
+    else:
+         for org in org_queryset:
+                print("building cards")
+                sessions = Session.objects.current().filter(
+                    activity__org=org
+                )
+
 
                 # both checked -> no additional filter
                 # neither checked -> no additional filter

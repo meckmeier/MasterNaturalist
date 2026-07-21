@@ -25,9 +25,9 @@
      
       
       </div>
-       {% if page_type != "location" %} <a href="{% url 'locations'%}?&loc={{card.location.id}}&view=list">
+       {% if page_type != "location" %} 
             {{ card.location.loc_name }}
-            </a>{% endif %}
+            {% endif %}
         {% if page_type != "org" %}
             {{card.organization.org_name}}
           {% endif %}
@@ -40,10 +40,7 @@
 
                 {% if session.end and session.start != session.end %} - {{ session.end }}{% endif %}
                 {% if session.session_comment %}<em>{{ session.session_comment }}</em>{% endif %} 
-                {% if session.session_url %} <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
-                        <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i> Join online</a>{% endif %}
-                
-    
+                 
             {% endfor %}
 
   </div>

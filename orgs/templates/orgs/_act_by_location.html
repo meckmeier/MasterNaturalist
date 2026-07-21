@@ -64,8 +64,8 @@
   <!-- Date line -->
 
   <!-- Description -->
-  <div class="me-description-block {% if q %}expanded{% endif %}">
-    <div class="me-desc-short">{{ card.activity.description|truncatechars:200 }}</div>
+  <div class="me-description-block expanded">
+   
     {%if q %}
     <div class="me-desc-full">{{ card.activity.description|highlight:q|safe }}</div>
     {% else %}
