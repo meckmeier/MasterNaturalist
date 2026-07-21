@@ -39,6 +39,7 @@ from collections import OrderedDict
 from io import StringIO
 from orgs.models import *
 from .forms import *
+from .utils import build_activity_cards
 
 def sort_key(x):
     # Use date or expire_date; fallback to far-future
@@ -240,43 +241,37 @@ def orgs(request):
     active_filters = []
 
 
-    volunteer_qs = (
-    Activity.objects.volunteer().prefetch_related(
-            Prefetch(
-             "sessions",
-             queryset=Session.objects.current().order_by("start")
-         )
-        ))
-    
-    training_qs = (
-        Activity.objects.training().prefetch_related(
+    activities_qs = (
+        Activity.objects.active()
+        .prefetch_related(
             Prefetch(
                 "sessions",
-                queryset=Session.objects.current().order_by("start")
+                queryset=Session.objects.current().order_by("start"),
             )
-        ))
+        )
+    )
+
     
     org_queryset = (
         Organization.objects.active()
         .order_by("org_name")
-        .prefetch_related(   
-            Prefetch(
-                "activities",  # must match the related_name on model
-                queryset=volunteer_qs,
-                to_attr="pre_volunteer"  # this creates the attribute you reference later
-            ),
+        .prefetch_related(
             Prefetch(
                 "activities",
-                queryset=training_qs,
-                to_attr="pre_training"
+                queryset=activities_qs,
+                to_attr="pre_activities",
             ),
-            Prefetch("locations", queryset=locations_qs, to_attr="pre_locs"),
-            
+            Prefetch(
+                "locations",
+                queryset=locations_qs,
+                to_attr="pre_locs",
+            ),
         )
     )
-        
+ 
     get_data = request.GET.copy()
-
+    
+    
     if "org_id" in get_data and "org" not in get_data:
         get_data["org"]=get_data["org_id"]
 
@@ -284,6 +279,9 @@ def orgs(request):
     if filter_form.is_valid():
     
         data = filter_form.cleaned_data
+        has_volunteer = data.get("has_volunteer")
+        has_training = data.get("has_training")
+
         if data.get("org"):
             org_queryset=org_queryset.filter(id=data["org"].id)
 
@@ -303,32 +301,41 @@ def orgs(request):
                                       
                                       ).distinct()
         
-        activity_status = data.get("activity_status")
-            
-        if activity_status == "training":
+        volunteer_orgs = Activity.objects.volunteer().values("org_id")
+        training_orgs = Activity.objects.training().values("org_id")
+        
+        if data.get("has_volunteer") and data.get("has_training"):
             org_queryset = org_queryset.filter(
-                activities__in=training_qs
-            ).distinct()
+                    Q(id__in=volunteer_orgs) |
+                    Q(id__in=training_orgs)
+                )
 
-        elif activity_status == "volunteer":
+        elif data.get("has_volunteer"):
             org_queryset = org_queryset.filter(
-                activities__in=volunteer_qs
-            ).distinct()
-
-        elif activity_status == "both":
-            org_queryset = org_queryset.filter(
-                activities__in=training_qs
-            ).filter(
-                activities__in=volunteer_qs
-            ).distinct()
-
-        elif activity_status == "none":
-            org_queryset = org_queryset.filter(
-                activities__isnull=True
+                id__in=volunteer_orgs
             )
 
-        
+        elif data.get("has_training"):
+            org_queryset = org_queryset.filter(
+                id__in=training_orgs
+            )
 
+        for org in org_queryset:
+                
+                sessions = Session.objects.current().filter(
+                    activity__org=org
+                )
+
+                if has_volunteer and not has_training:
+                    sessions = sessions.filter(activity__activity_type="v")
+
+                elif has_training and not has_volunteer:
+                    sessions = sessions.filter(activity__activity_type="t")
+
+                # both checked -> no additional filter
+                # neither checked -> no additional filter
+
+                org.activity_cards = build_activity_cards(sessions)
 
     followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
     counties = County.objects.all()
@@ -340,6 +347,10 @@ def orgs(request):
     # for org in org_queryset[:5]:  # just first few
     #    print(org.org_name, getattr(org, 'pre_volunteer', []))
     result_count = org_queryset.count()
+    
+    
+
+    
     
     return render(
         request,
@@ -354,6 +365,7 @@ def orgs(request):
             "orgs": all_orgs,
             "active_filters": active_filters,
             "result_count": result_count,
+            
         }
     )
 
@@ -850,22 +862,10 @@ def locations(request):
 
     for location in queryset:
 
-        cards = {}
-
-        for session in location.all_sessions:
-
-            key = session.activity_id
-
-            if key not in cards:
-                cards[key] = {
-                    "activity": session.activity,
-                    "location": location,
-                    "sessions": [],
-                }
-
-            cards[key]["sessions"].append(session)
-
-        location.activity_cards = list(cards.values())
+        location.activity_cards = build_activity_cards(
+            location.all_sessions,
+            location=location,
+        )
         
     return render(
         request,
@@ -1548,6 +1548,9 @@ def activities(request):
         if data.get("session_format") == "o":
             queryset = queryset.filter(session_format__in=["o", "b"])
             active_filters.append("Online or Hybrid ")
+        if data.get("session_format") == "s":
+            queryset = queryset.filter(session_format__in=["s"])
+            active_filters.append("Self-directed")        
     
 
         activity_id = request.GET.get("activity_id")
@@ -1562,11 +1565,13 @@ def activities(request):
     
 
     result_count = queryset.count()
-    
+    cards = build_activity_cards(queryset)
+        
 
     # For client-side tab segmentation, pass the whole filtered queryset
     return render(request, "orgs/activities.html",{
                     "queryset": queryset,
+                    "cards": cards,
                     "filter_form":filter_form,
                     "query_params": clean_get,
                     "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
@@ -3106,3 +3111,31 @@ def activity_panel(request, pk):
         },
     )
 
+def act_loc_panel(request, location_id, activity_id):
+   
+    sessions = Session.objects.current().filter(
+        location_id=location_id,
+        activity_id=activity_id,
+    )
+    first_session = sessions.first()
+
+    activity = get_object_or_404(Activity, pk=activity_id)
+    location = get_object_or_404(Location, pk=location_id)
+    
+    can_edit = activity.can_edit(request.user)
+
+    cards = build_activity_cards(
+        sessions,
+        location=location,
+    )
+    card=cards[0]
+
+    return render(
+        request,
+        "orgs/_act_by_location.html",
+        {
+            "card": card,
+            "page_type": "location",
+            "can_edit": can_edit
+        },
+    )

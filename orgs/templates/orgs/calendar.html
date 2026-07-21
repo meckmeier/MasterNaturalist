@@ -80,9 +80,10 @@ document.addEventListener("click", async function (e) {
     e.preventDefault();
 
     const activityId = link.dataset.activity;
+    const locationId = link.dataset.location;
     console.log("Clicked activity:", activityId);
 
-    const response = await fetch(`/activities/${activityId}/panel/`);
+    const response =  await fetch(`/act-loc-panel/${locationId}/${activityId}/`);
     const html = await response.text();
 
     document.getElementById("activityContent").innerHTML = html;

@@ -3,6 +3,7 @@
 {% load can_edit_filters %}
 <a class="me-activity-link" href="#"
    data-activity="{{ e.activity.id }}"
+   data-location= "{{ e.location.id }}"
    data-bs-toggle="modal"
    data-bs-target="#activityPanel">
 <div class="me-card">
@@ -22,6 +23,7 @@
         {% endif %}
 
     </div>
+    {{e.activity.org.name}}{{e.loc.loc_name}}
      <!-- Badges -->
  
     <div class="me-card-subtitle"">
@@ -38,13 +40,15 @@
         | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
         {% endif %}
         
+          {% if e.activity.org.org_name != e.location.loc_name %} 
             {% if q %} ({{ e.activity.org.org_name|highlight:q|safe }}){% else %} ({{ e.activity.org.org_name }}){% endif %}
-      
+        {% endif %}
     </div>
      <div class="me-stack">
     {% for cat in e.activity.categories.all %}
       <span class="me-badge">{{ cat.name }}</span>
     {% endfor %}
+    
   </div>
     </div>
     <div class="me-card-header-right"> 

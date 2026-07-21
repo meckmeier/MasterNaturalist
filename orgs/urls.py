@@ -12,6 +12,7 @@ urlpatterns = [
 
     path("calendar/", views.calendar, name="calendar"),
     path( "activities/<int:pk>/panel/", views.activity_panel, name="activity_panel",),
+    path("act-loc-panel/<int:location_id>/<int:activity_id>/",views.act_loc_panel,name="act_loc_panel"),
     path("activities/", views.activities, name="activities"),
     path("opps/", views.opps, name="opps"),
     path("orgs/", views.orgs, name="orgs"),

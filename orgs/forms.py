@@ -404,16 +404,16 @@ class OrgFilterForm(forms.Form):
         required=False,
         label="Show Followed Organizations"
     )
-    activity_status = forms.ChoiceField(
-    required=False,
-    choices=[
-        ("", "All"),
-        ("training", "Training"),
-        ("volunteer", "Volunteer"),
-        ("none", "None"),
-        ("both", "Both"),
-    ],
-    widget=forms.RadioSelect,
+    has_volunteer = forms.BooleanField(
+        required=False,
+        label="Volunteer",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+
+    has_training = forms.BooleanField(
+        required=False,
+        label="Learn",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
    
     region = forms.ModelChoiceField(

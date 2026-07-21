@@ -1,29 +1,6 @@
 
 <form method="get" action="{{ request.path }}" class="me-form">
-        <div class="mb-3">
-        Has: 
-    <div class="me-toggle" role="group">
   
-  <input type="radio" name="activity_status" id="status-all" value=""
-         {% if not request.GET.activity_status %}checked{% endif %}>
-  <label for="status-all">All</label>
-
-  <input type="radio"  name="activity_status" id="status-volunteer" value="volunteer"
-         {% if request.GET.activity_status == "volunteer" %}checked{% endif %}>
-  <label for="status-volunteer">Volunteer</label>
-
-  <input type="radio" name="activity_status" id="status-training" value="training"
-         {% if request.GET.activity_status == "training" %}checked{% endif %}>
-  <label for="status-training">Learn</label>
-
-  <input type="radio" name="activity_status" id="status-both" value="both"
-         {% if request.GET.activity_status == "both" %}checked{% endif %}>
-  <label for="status-both">Both</label>
-
-  <input type="radio" name="activity_status" id="status-none" value="none"
-         {% if request.GET.activity_status == "none" %}checked{% endif %}>
-
-</div></div>
     <div class="mb-3"> 
         Word Search:
         {{ filter_form.q }}
@@ -42,8 +19,16 @@
        {{ filter_form.my_orgs.errors }}
     </div>
     {% endif %}
-
-
+    <div class="mb-3">
+        {{ filter_form.has_volunteer }}
+        Has Volunteer Activities
+        {{ filter_form.errors }}
+    </div>
+    <div class="mb-3">
+        {{ filter_form.has_training }}
+        Has Training Activities
+        {{ filter_form.errors}}
+    </div>
     
     <div class="mb-3">
         {{ filter_form.region.label_tag}}

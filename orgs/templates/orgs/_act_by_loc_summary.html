@@ -1,0 +1,82 @@
+{% load static %}
+{% load highlight %}
+{% load can_edit_filters %}
+<a class="me-activity-link" href="#"
+   data-activity="{{ card.activity.id }}"
+   data-location="{{ card.location.id }}""
+   data-bs-toggle="modal"
+   data-bs-target="#activityPanel">
+ <div class="me-card" id="activity-{{ card.activity.id }}">
+
+
+  <!-- Header row -->
+  <div class="me-card-header">
+    <!-- Left block -->
+    <div class="me-card-header-left">        
+      <div class="me-card-title-row">
+        {% if card.activity.activity_type == "t" %}
+      <i class="bi bi-mortarboard-fill me-learn-icon" title="Training"></i>
+    {% else %}
+      <i class="bi bi-tree-fill me-tree-icon" title="Volunteer Opportunity"></i>
+    {% endif %}  
+    
+        
+          {{ card.activity.title }}
+     
+      
+      </div>
+       {% if page_type != "location" %} <a href="{% url 'locations'%}?&loc={{card.location.id}}&view=list">
+            {{ card.location.loc_name }}
+            </a>{% endif %}
+        {% if page_type != "org" %}
+            {{card.organization.org_name}}
+          {% endif %}
+        <div class="me-card-date">
+
+            {% if card.activity.time_commitment_txt %} | <em>{{ card.activity.time_commitment_txt }}</em>{% endif %}
+            {% for session in card.sessions %}
+                | {% if session.ongoing %}Ongoing{% endif%}
+                {% if session.start %}{{ session.start }}{% endif %}
+
+                {% if session.end and session.start != session.end %} - {{ session.end }}{% endif %}
+                {% if session.session_comment %}<em>{{ session.session_comment }}</em>{% endif %} 
+                {% if session.session_url %} <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
+                        <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i> Join online</a>{% endif %}
+                
+    
+            {% endfor %}
+
+  </div>
+
+    </div>
+   <div class="me-card-header-right"> 
+    <div class="me-icons">
+      {% if page_type.org %}
+      <img src="{% static 'orgs/region_maps/' %}{{ card.location.region.map_filename }}" alt="{{card.location.region.name}}"  title="{{ card.location.region.name }}" 
+      style="height:75px; width:auto;">
+    {% endif %}
+   </div>
+
+    </div>
+  </div>
+
+
+
+  <!-- Badges -->
+  <div class="me-stack">
+    {% for cat in card.activity.categories.all %}
+      <span class="me-badge">{{ cat.name }}</span>
+    {% endfor %}
+    {%if  card.activity.has_cost %}   
+      | <i class="bi bi-currency-dollar" data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
+    {% endif %}
+    {% if card.activity.is_newly_added %}
+      | <span class="me-badge">* New *</span>
+    {% endif %}
+  </div>
+  
+
+   
+    
+  </div>
+</a>

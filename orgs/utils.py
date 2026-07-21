@@ -7,6 +7,65 @@ from datetime import datetime
 geolocator = Nominatim(user_agent="volunteer_map_app")
 geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
 
+def build_activity_cards(sessions, location=None):
+    """
+    Build activity cards from a queryset or list of Session objects.
+
+    Returns a list of dictionaries:
+
+        {
+            "activity": Activity,
+            "location": Location,
+            "sessions": [Session, ...],
+        }
+
+    If a location is supplied, sessions are grouped only by activity.
+    Otherwise they are grouped by (activity, location).
+    """
+
+    cards = {}
+
+    for session in sessions:
+
+        if location is None:
+            key = (session.activity_id, session.location_id)
+            card_location = session.location
+        else:
+            key = session.activity_id
+            card_location = location
+
+        if key not in cards:
+            cards[key] = {
+                "activity": session.activity,
+                "location": card_location,
+                "sessions": [],
+            }
+
+        cards[key]["sessions"].append(session)
+
+    # Sort sessions within each card
+    for card in cards.values():
+        card["sessions"].sort(
+            key=lambda s: (
+                s.start is None,
+                s.start,
+            )
+        )
+
+    # Convert to list
+    cards = list(cards.values())
+
+    # Sort cards by earliest session
+    cards.sort(
+        key=lambda c: (
+            c["sessions"][0].start is None,
+            c["sessions"][0].start,
+            c["activity"].title.lower(),
+        )
+    )
+
+    return cards
+
 def get_lat_lng(city, county=None, state="WI"):
     parts = [city]
     if county:

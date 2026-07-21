@@ -92,15 +92,72 @@
               </div>
           {% endif %}
     <!-- tab buttons -->
-     <div class="me-card-header">
+    <ul class="me-tabs" id="orgTabs{{ org.id }}" role="tablist" aria-orientation="vertical">
+      <li role="presentation">
+        <button class="me-tab-button active" 
+          id="v-pills-info-tab{{ org.id }}" 
+          data-bs-toggle="pill" 
+          data-bs-target="#v-pills-info{{ org.id }}" 
+          aria-controls="v-pills-info{{ org.id }}"
+          aria-selected="true"
+          type="button" 
+          role="tab">Info</button>
+      </li>
+      {% if org.pre_volunteer %}
+        <li  role="presentation">
+          <button class="me-tab-button me-tree-tab" 
+            id="v-pills-events-tab{{ org.id }}" 
+            data-bs-toggle="pill" 
+            data-bs-target="#v-pills-events{{ org.id }}" 
+            aria-controls="v-pills-events{{ org.id }}"
+            aria-selected="true"
+            type="button" 
+            role="tab">Volunteer<i class="bi bi-tree-fill"></i></button>
+        </li>
+      {% endif %}
+      {% if org.pre_training  %}
+      <li  role="presentation">
+        <button class="me-tab-button me-learn-tab" 
+        id="v-pills-trainings-tab{{ org.id }}" 
+        data-bs-toggle="pill" 
+        data-bs-target="#v-pills-trainings{{ org.id }}" 
+        aria-controls="v-pills-trainings{{ org.id }}"
+        aria-selected="true"
+        type="button" 
+        role="tab">Learn<i class="bi bi-mortarboard-fill"></i></button>
+      </li>
+        {% endif %}
+    </ul>
+       
+    <!-- Tab Content -->
+    <div class="me-tab-content tab-content" id="v-pills-tabContent{{ org.id }}">
+      
+        <!-- Info Tab -->
+        <div class="tab-pane fade show active" id="v-pills-info{{ org.id }}" aria-labelledby="v-pills-info-tab{{ org.id }}" role="tabpanel">
+          <div class="me-card">
+            <div class="me-card-header">
+              
               <div class="me-card-header-left">
-  
+                
                 {% if org.default_location %}
                 Main Location:
-                <strong>{{org.default_location.loc_name}}</strong>
+                <strong>{{org.default_location.loc_name}}</strong><br>
                           {{org.default_location.address}}, {{org.default_location.city_name}} {{org.default_location.county_id.county_name}}
                 {% endif %}
-                    {% if org.locations.exists %}
+                {% if org.volunteer_url%}<a href="{{org.volunteer_url}}" target="_blank" rel="noopener noreferrer" title="External link to volunteer page at organization site.">Volunteer site.</a>{% endif %}
+                {% if org.training_url%}<a href="{{org.training_url}}" target="_blank" rel="noopener noreferrer" title="External link to training page at organization site.">Training site.</a>{% endif %}
+              </div>
+              <div class="me-card-header-right">
+                {% if org|can_edit:request.user %}
+                  <a class="me-icon-btn" href="{% url 'org_mgmt' %}?org={{org.id}}">
+                      <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i></a>
+                  {% endif %}
+                <img src="{% static 'orgs/region_maps/' %}{{ org.region.map_filename }}"" alt="{{ org.region.name }}" style="width:75px;">
+            
+            </div>
+          </div>
+            
+              {% if org.locations.exists %}
               <div class="me-card-sponsor">
                 Additional locations: 
                 {% for loc in org.pre_locs %}
@@ -111,28 +168,29 @@
               {% else %}
                 This organization does not maintain locations.
               {% endif %}
-              </div>
-              <div class="me-card-header-right">
-                {% if org|can_edit:request.user %}
-                  <a class="me-icon-btn" href="{% url 'org_mgmt' %}?org={{org.id}}">
-                      <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i></a>
-                  {% endif %}
-                <img src="{% static 'orgs/region_maps/' %}{{ org.region.map_filename }}"" alt="{{ org.region.name }}" style="width:50px;">
-
+              
             </div>
-    
+            
+           <div>
+               </div>        
         </div>
 
-          {% for card in org.activity_cards %}
-   
-          {% include "orgs/_act_by_loc_summary.html" with card=card q=q page_type="org" %} 
-
-      {% endfor %}
+        <!-- Events Tab -->
+        <div class="tab-pane fade" id="v-pills-events{{ org.id }}" aria-labelledby="v-pills-events-tab{{ org.id }}" role="tabpanel">
+          {% for each in org.pre_volunteer %}
+              {% include "orgs/_activity_item.html" with e=each q=q source='org'%}
+          {% endfor %}
         </div>
             
 
-
-
+        <!-- Trainings Tab -->
+        <div class="tab-pane fade" id="v-pills-trainings{{ org.id }}" aria-labelledby="v-pills-trainings-tab{{ org.id }}" role="tabpanel">          
+          {% for each in org.pre_training %}           
+               {% include "orgs/_activity_item.html" with e=each q=q source='org'%}
+          {% endfor %}
+        </div>
+  </div> <!-- tabcontent-->
+</div> <!--cardbody-->
 <!-- orgcard-->
 {% endfor %}
 

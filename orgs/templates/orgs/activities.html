@@ -14,7 +14,7 @@
 <div class="me-page">
  <div class="me-card-header">
     <div class="me-card-header-left">  
-      <h2>Activities By Date</h2>
+      <h2>Activities</h2>
     </div>
     <div class="me-card-header-right">
       {% if active_filters %}
@@ -91,9 +91,9 @@
 </form>
 {% endif %}
 
-    {% for a in queryset %}
+    {% for card in cards %}
     
-      {% include "orgs/_session_item.html" with e=a q=q  %} 
+      {% include "orgs/_act_by_location.html" with card=card q=q  %} 
 
     {% endfor %}
 

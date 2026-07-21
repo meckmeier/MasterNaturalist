@@ -31,17 +31,18 @@
        {% if card.location %} <a href="{% url 'locations'%}?&loc={{card.location.id}}&view=list">
             {% if q %}{{ card.location.loc_name|highlight:q|safe }}{% else %}{{ card.location.loc_name }}{% endif %}
             </a>{% endif %}
-
+     
         <div class="me-card-date">
 
             {% if card.activity.time_commitment_txt %} | <em>{{ card.activity.time_commitment_txt }}</em>{% endif %}
-            {% for session in card.sessions %}
-                | {% if session.ongoing %}Ongoing{% endif%}
-                {% if session.start %}{{ session.start }}{% endif %}
+            {% for s in card.sessions %}
+               {% if s.session_format == "s" %}Self directed locations{% endif %}
+                | {% if s.ongoing %}Ongoing{% endif%}
+                {% if s.start %}{{ s.start }}{% endif %}
 
-                {% if session.end and session.start != session.end %} - {{ session.end }}{% endif %}
-                {% if session.session_comment %}<em>{{ session.session_comment }}</em>{% endif %} 
-                {% if session.session_url %} <a href="{{session.session_url}}" target="_blank" rel="noopener noreferrer">
+                {% if s.end and s.start != s.end %} - {{ s.end }}{% endif %}
+                {% if s.session_comment %}<em>{{ s.session_comment }}</em>{% endif %} 
+                {% if s.session_url %} <a href="{{s.session_url}}" target="_blank" rel="noopener noreferrer">
                         <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i> Join online</a>{% endif %}
                 
     
@@ -110,7 +111,7 @@
     </div>  </div>
      <div class="me-card-header-right"> 
     <div class="me-icons">
-        {% if card.activity.org and card.activity.org|can_edit:request.user %}
+        {% if card.activity|can_edit:request.user %}
           <a class="me-icon-btn" href="{% url 'org_mgmt' %}?org={{ current_activity.org.id }}" title="Go to Organization Dashboard">
             <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i>
           </a>

@@ -147,9 +147,12 @@ document.addEventListener("click", async function (e) {
     e.preventDefault();
 
     const activityId = link.dataset.activity;
-    console.log("Clicked activity:", activityId);
+    const locationId = link.dataset.location;
 
-    const response = await fetch(`/activities/${activityId}/panel/`);
+    console.log("Clicked activity:", activityId);
+    console.log("clicked locatoin",locationId )
+
+    const response = await fetch(`/act-loc-panel/${locationId}/${activityId}/`);
     const html = await response.text();
 
     document.getElementById("activityContent").innerHTML = html;

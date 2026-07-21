@@ -90,7 +90,7 @@
      
         {% for card in loc.activity_cards %}
    
-          {% include "orgs/_act_by_location.html" with card=card q=q  %} 
+          {% include "orgs/_act_by_loc_summary.html" with card=card q=q page_type="location" %} 
 
       {% endfor %}
     
