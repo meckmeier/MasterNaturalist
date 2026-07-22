@@ -184,12 +184,10 @@
             </li>
           {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
+              <a class="nav-link" href="{% url 'account_login' %}">Organization Log In</a>
             </li>
 
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'account_signup' %}">Register</a>
-            </li>
+
 
           {% endif %}
 
@@ -235,7 +233,7 @@
   External organization links are marked with <i class="bi bi-arrow-up-right-square "></i>.
 </p>
     © 2026 WildPaths Wisconsin. All rights reserved. <a href="{% url 'terms' %}">Terms of Service</a> | <a href="{% url 'privacy' %}">Privacy Policy</a>
-    
+    <br><a href="{% url 'about' %}">About WildPathsWI.org</a> | <a href="{% url 'feedback'%}">Feedback</a>
   </div>
   
 </footer>

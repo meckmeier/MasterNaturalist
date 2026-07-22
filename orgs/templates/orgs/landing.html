@@ -53,9 +53,7 @@
 <p class="text sm">Designed for Wisconsin Master Naturalists, but open to all, the site will help 
 you discover your path to conservation efforts in Wisconsin.</p>
 To learn more about Wisconsin Master Naturalists <a href="https://wimasternaturalist.org/" target="_blank"><img src="{% static 'orgs/images/wisconsin-master-naturalist.svg'%}" width ="100" class="img-fluid"></a>
-<p> <a class="me-btn" href="{% url 'help'%}">
-    <span><i class="bi bi-question-circle me-btn-icon"></i></span>
-<span class="me-btn-label">Learn More About This Site</span></a></p>
+<p> <a  href="{% url 'help'%}">Tutorials and other Documentation</span></a></p>
 <hr>
 {% if request.user.is_staff or request.user.profile.is_org_manager %}
    

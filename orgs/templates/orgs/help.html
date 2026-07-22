@@ -4,16 +4,7 @@
 <div class="me-page">
 <h1>Info Center</h1>
 <p>Welcome to the Info Center! Here you can find helpful resources and documentation.</p>
- <div class="me-card">
-        
-            <div class="help-grid help-grid-docs">
-        <a href="{% url 'about'%}" class="help-card">About WildPathsWI.org</a>
-       <a class="help-card" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Give Feedback</a>
 
-       <a href="{% url 'terms' %}" class="help-card">Terms of Service</a>  
-       <a href="{% url 'privacy' %}" class="help-card">Privacy Policy</a>
-   </div>
-   </div>
 
 <div class="me-card">
 <h4>Tutorials</h4>
@@ -27,6 +18,8 @@
             <div class="help-description">Learn how to navigate and use the WildPathsWI.org platform.</div>
             <div class="help-time">Estimated time: 2 minutes</div>
         </div></a>
+        </div>
+        <div class="help-grid help-grid-video">
 
         <a href="{% url 'help_video' 'CO5Xr3qWKWc' %}" class="help-card help-card-video">
             <img src="{% static 'orgs/images/wpwlogo13_9d.svg' %}" class="help-logo">
@@ -55,23 +48,33 @@
              <a href="{% url 'help_video' 'KtO_XyJ13tc' %}" class="help-card help-card-video">
              <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" class="help-logo">
             <div class="help-body">
-                <h3 class="help-header">Upload Activities</h3>
+                <h3 class="help-header">Upload Multiple Activities</h3>
                 <div class="help-description">
                     Learn how to add lots of activities for your organization on the WildPathsWI.org platform using an upload file.
                 </div>
                 <div class="help-time">Estimated time: 7 minutes</div>
                 </div>
             </a>
-   
-    </div></div>
-    <div class="me-card">
-          <h4>Organizations</h4>
+            </div>
+            <div class="me-card">
+        
             <div class="help-grid help-grid-docs">
-                <a href="{% url 'for_orgs'%}" class="help-card">Organization Management</a>
-        <a href="{% url 'upload_faq'%}" class="help-card">Upload Activities</a>
-   </div>
-   </div>
+            
+  <a href="{% url 'for_orgs'%}" class="help-card">Organization Management</a>
+    <a href="{% url 'upload_faq'%}" class="help-card">Upload Activities</a>
+   </div></div></div>
+    
+
+
    <div class="me-card">
-  
+        
+            <div class="help-grid help-grid-docs">
+        <a href="{% url 'about'%}" class="help-card">About WildPathsWI.org</a>
+       <a class="help-card" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Give Feedback</a>
+
+       <a href="{% url 'terms' %}" class="help-card">Terms of Service</a>  
+       <a href="{% url 'privacy' %}" class="help-card">Privacy Policy</a>
+   </div>
+   </div>
 
 {% endblock %}
