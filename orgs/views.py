@@ -158,6 +158,8 @@ def org_approve(request, enrollment_id):
             org_url=enrollment.org_url,
             volunteer_url=enrollment.volunteer_url,
             training_url=enrollment.training_url,
+            news_source=enrollment.news_source,
+            news_url=enrollment.news_url,
             region=enrollment.region,
             in_wisconsin=True,
             created_by=request.user.profile,
@@ -3148,5 +3150,41 @@ def act_loc_panel(request, location_id, activity_id):
             "card": card,
             "page_type": "location",
             "can_edit": can_edit
+        },
+    )
+
+import feedparser
+import datetime
+def news(request):
+    articles = []
+    feed_list = Organization.objects.filter(news_source="rss")
+    for each in feed_list:
+        feed = feedparser.parse(each.news_url)
+
+        for entry in feed.entries[:10]:
+
+            published = None
+            if entry.get("published_parsed"):
+                published = datetime.datetime(*entry.published_parsed[:6])
+
+            articles.append({
+                "title": entry.title,
+                "link": entry.link,
+                "published": entry.get("published"),
+                "published_sort": published,
+                "summary": entry.get("summary", ""),
+                "organization": each.org_name,
+            })
+
+    articles.sort(
+        key=lambda a: a["published_sort"] or datetime.datetime.min,
+        reverse=True
+    )
+
+    return render(
+        request,
+        "orgs/news.html",
+        {
+            "articles": articles,
         },
     )

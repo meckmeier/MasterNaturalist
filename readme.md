@@ -107,11 +107,51 @@ Upload process:
 * check other processes to make sure they really work
 
 
-Future wishlist - make a video that explains how to manage an org in this system.
-Talk to Sage about creating a way to 'register' for an activity in her system directly from here.
+Videos:
 
 https://www.youtube.com/watch?v=HbvGTnk7HR0 - Welcome to WildPathsWI.org
 https://www.youtube.com/watch?v=jLKQdMGDO7s - Add Your Organization
 https://www.youtube.com/watch?v=xfV6BcMvwxU - Manage Your Organization
 
 re-record - use fades to switch topics. Land on the pages longer so user can absorb the information. 
+
+# News Aggregation for Canopy
+Provide a Wisconsin Nature News page that aggregates news from organizations already participating in Canopy.
+
+## Source Configuration
+
+Each organization may optionally provide (values are stored in Org Model)
+
+> * RSS feed URL (preferred)
+> * News page URL (if no RSS feed exists)
+> * Nothing (no news available)
+
+## Import Process
+
+A scheduled task periodically checks each configured news source.
+
+> * RSS → read the feed
+> * News page → scrape the page (future)
+> * API → retrieve articles (future)
+
+## NewsArticles model design / have a purge routine to clear this out after some time frame
+
+Organization
+Title
+Summary (if available)
+Published Date
+Article URL
+Image URL (optional)
+Retrieved Date
+
+No need to store the full article.
+
+### Display Views
+
+> * Latest News
+> * News by Organization
+> * News by Category (Birds, Water, Prairie, etc.)
+> * Search
+
+Each item links to the original article on the organization's website.
+

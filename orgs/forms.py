@@ -81,6 +81,10 @@ class OrgEnrollmentForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/training"})
     )
+    news_url = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/feed or/news or /subscribe"})
+    )
 
     class Meta:
         model = OrganizationEnrollmentRequest
@@ -89,6 +93,8 @@ class OrgEnrollmentForm(forms.ModelForm):
             "org_url",
             "volunteer_url",
             "training_url",
+            "news_source",
+            "news_url",
             "about",
             "region",
             "contact_name",
@@ -104,7 +110,7 @@ class OrgEnrollmentForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        for field in ["org_url", "volunteer_url", "training_url"]:
+        for field in ["org_url", "volunteer_url", "training_url", ]:
             url = cleaned_data.get(field)
             if url:
                 url = url.strip()
@@ -143,11 +149,11 @@ class OrgForm(forms.ModelForm):
     org_url = forms.CharField(required=False)
     volunteer_url = forms.CharField(required=False)
     training_url = forms.CharField(required=False)
-
+    news_url=forms.CharField(required=False)
     class Meta:
         model = Organization
         fields = [
-            'id', 'org_name', 'org_url', 'volunteer_url', 'training_url',
+            'id', 'org_name', 'org_url', 'volunteer_url', 'training_url', 'news_url', 'news_source',
             'in_wisconsin', 'about', 'region', 'host', 'deleted', 'default_location'
         ]
         widgets = {
@@ -161,12 +167,15 @@ class OrgForm(forms.ModelForm):
             "training_url": forms.TextInput(attrs={
                 "placeholder": "https://www.yourorg.org/training"
             }),
+            "news_url": forms.TextInput(attrs={
+                "placeholder": "https://www.yourorg.org/rss_feed or /news or /subscribe"
+            }),
         }
 
     def clean(self):
         cleaned_data = super().clean()
 
-        for field in ["org_url", "volunteer_url", "training_url"]:
+        for field in ["org_url", "volunteer_url", "training_url", "news_url"]:
             url = cleaned_data.get(field)
             if url:
                 url = url.strip()

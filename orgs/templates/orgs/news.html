@@ -1,0 +1,19 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+{% load static %}
+<div class="me-page">
+
+{% for article in articles %}
+    <h4>
+
+        <a href="{{ article.link }}">
+          From {{article.organization}}: <br>  {{ article.title }}
+        </a>
+    </h4>
+
+    <small>{{ article.published }}</small>
+
+    <p>{{ article.summary|safe }}</p>
+{% endfor %}
+</div>
+{% endblock %}

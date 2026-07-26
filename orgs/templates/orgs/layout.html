@@ -86,17 +86,23 @@
             </a>
             <ul class="dropdown-menu">
               <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'activities' %}">Activities</a>
+                <a class="nav-link" href="{% url 'activities' %}?activity_type=v">Volunteer</a>
               </li>
-
+              <li class="dropdown-item">
+                <a class="nav-link" href="{% url 'activities' %}?activity_type=t">Learn</a>
+              </li>              
+              <li class="dropdown-item">
+                <a class="nav-link" href ={% url 'calendar' %}">Calendar</a>
+              </li>
+              <li  class="dropdown-item">
+                <a class="nav-link" href="{% url 'locations' %}">Map</a>
+              </li>              
               <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'orgs' %}">Organizations</a>
               </li>
 
-              <li  class="dropdown-item">
-                <a class="nav-link" href="{% url 'locations' %}">Locations</a><hr>
-              </li>
               {% if user.is_authenticated %}
+              <hr>
               <li class="dropdown-item">
                 <a class="nav-link" href="{% url 'profile' %}">Your Profile</a>
               </li>
@@ -168,7 +174,7 @@
            </li>
   
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'help' %}">Site Info</a>
+              <a class="nav-link" href="{% url 'help' %}">Video Tutorials</a>
             </li>
          
 

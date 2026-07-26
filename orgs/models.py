@@ -126,6 +126,15 @@ class Organization(models.Model):
     region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
     training_url = models.URLField(max_length=200, default="", blank=True)
     volunteer_url = models.URLField(max_length=200, default="", blank=True)
+    news_source = models.CharField(max_length=20, choices=[
+                ("none", "None"),
+                ("rss", "RSS Feed"),
+                ("newspage", "News Page"),
+                ("email_newsletter","Email Newsletter"),
+        ],
+        default="none",
+    )
+    news_url=models.URLField(max_length=500, default="", blank=True)
     default_location = models.ForeignKey("Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="default_for_org")
     deleted=models.BooleanField(default=False)
     deleted_at = models.DateTimeField( null=True, blank=True)
@@ -170,6 +179,15 @@ class OrganizationEnrollmentRequest(models.Model):
     org_url = models.URLField(blank=True)
     volunteer_url = models.URLField(blank=True)
     training_url = models.URLField(blank=True)
+    news_source = models.CharField(max_length=20, choices=[
+                ("none", "None"),
+                ("rss", "RSS Feed"),
+                ("newspage", "News Page"),
+                ("email_newsletter","Email Newsletter"),
+            ],
+            default="none",
+        )
+    news_url = models.URLField(max_length=500, default="", blank=True)
     about = models.TextField(blank=True)
     region = models.ForeignKey(Region,null=True, blank=True, on_delete=models.SET_NULL)
     contact_name = models.CharField(max_length=255)

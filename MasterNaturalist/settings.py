@@ -34,9 +34,15 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 
 if DEBUG:
+    # In development, send admin error emails to the console.
+    ADMINS = [
+        ("Mary", "mary@eckmeier.com"),
+    ]
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     DEFAULT_FROM_EMAIL = "noreply@example.com"
 else:
+    # In production, no admin emails are sent. to protect postmark
+    ADMINS = []
     EMAIL_BACKEND = "anymail.backends.postmark.EmailBackend"
     DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
@@ -51,9 +57,6 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-ADMINS = [
-    ("Mary", "mary@eckmeier.com"),
-]
 EMAIL_TIMEOUT = 10  # seconds
 
 PASSWORD_RESET_TIMEOUT = 60*60*24

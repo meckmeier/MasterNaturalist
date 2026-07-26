@@ -39,8 +39,11 @@
             Main URL:
             {{ form.org_url}}
             {{ form.org_url.errors }}
+            
+           
         </div>
-        <div class ="me-form-field">
+        
+        <div class="me-form-field">
 
         </div>
          <div class ="me-form-field">
@@ -73,6 +76,27 @@
             {{ form.authorized.errors }}
         </div>
         <div>Indicate if you are authorized to represent this organization. </div>
+        <div class ="me-form-field-full">
+            Additional URLS (optional)
+            </div>
+            <div class="me-form=field">
+                 {{form.volunteer_url.label_tag}}
+                {{form.volunteer_url}}
+                {{form.volunteer_url.errors}}
+                Learning URL:
+                {{form.training_url}}
+                {{form.training_url.errors}}
+            </div>
+            <div class="me-form-field">
+            News Source: {{ form.news_source}} 
+            {{form.news_source.errors}}
+       </div>
+       <div class="me-form-field">
+            {{form.news_url.label_tag}}
+            {{form.news_url}}
+            {{form.news_url.errors}}
+      
+        </div>
         <div class="me-form-field-full">
             Please add any additional comments or questions here:
             {{ form.message }}
