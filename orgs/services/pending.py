@@ -248,10 +248,10 @@ def build_pending_categories(pending_activity, raw_row):
         for c in category_text.split(CATEGORY_SEPARATOR)
         if c.strip()
     ]
-    print("category_name", category_names)
+
     categories = EventCategory.objects.filter(
         cat_code__in=category_names
     )
-    print("categories", categories)
+
 
     pending_activity.categories.set(categories)

@@ -54,6 +54,10 @@ DEFAULT_FROM_EMAIL = os.environ.get(
     "DEFAULT_FROM_EMAIL",
     "mary@eckmeier.com"
 )
+EMAIL_ENABLED = os.getenv("EMAIL_ENABLED", "True") == "True"
+EMAIL_HOURLY_LIMIT = int(os.getenv("EMAIL_HOURLY_LIMIT", "50"))
+EMAIL_MONTHLY_LIMIT = int(os.getenv("EMAIL_MONTHLY_LIMIT", "9000"))
+POSTMARK_BILLING_DAY = int(os.getenv("POSTMARK_BILLING_DAY", "22"))
 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 

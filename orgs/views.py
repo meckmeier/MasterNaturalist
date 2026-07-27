@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail
+
 from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
@@ -25,7 +25,7 @@ from django.db.models import Count, Q
 
 from datetime import date, time, timedelta
 from pathlib import Path
-from .utils import update_new_fields
+from .utils import update_new_fields, safe_send_mail
 import markdown
 import json
 import pandas as pd
@@ -117,7 +117,8 @@ def org_deny(request, enrollment_id):
         
         enrollment.save()
         email = enrollment.contact_email.lower().strip()
-        send_mail(subject="Your request to add an organization on WildPaths Wisconsin has been DENIED",
+        
+        safe_send_mail(subject="Your request to add an organization on WildPaths Wisconsin has been DENIED",
                    message=f"""
                         Hello,
 
@@ -128,6 +129,7 @@ def org_deny(request, enrollment_id):
 
                         Thank you!
                         """,
+                         category="org_enrollment",
                                 from_email=settings.DEFAULT_FROM_EMAIL,
                                 recipient_list=[email],
                                 fail_silently=False,
@@ -150,7 +152,7 @@ def org_approve(request, enrollment_id):
         messages.info(request, "This enrollment has already been denied.")
         return redirect("org_enrollment_list")
     
-    print("Creating org for enrollment:", enrollment.org_name)
+    
     # Create the organization (it will be logged as created by the staff member approving it.)
     org = Organization.objects.create(
             org_name=enrollment.org_name,
@@ -167,14 +169,14 @@ def org_approve(request, enrollment_id):
         )
     path = reverse("org_mgmt")
     org_url = f"{settings.SITE_URL}{path}?org={org.id}"
-    print("Created org id:", org.id)
+    
     # Optionally, you could also create an OrgManager entry for the contact person here if you want them to have immediate access.
     email = enrollment.contact_email.lower().strip()
     user=User.objects.filter(email__iexact=email).first()
     if user and hasattr(user, "profile"):
         OrgManager.objects.get_or_create(profile=user.profile, org=org, role="owner")
         
-        send_mail(subject="Organization Approved on WildPaths Wisconsin",
+        safe_send_mail(subject="Organization Approved on WildPaths Wisconsin",
                    message=f"""
                         Hello,
 
@@ -186,6 +188,7 @@ def org_approve(request, enrollment_id):
 
                         Thank you!
                         """,
+                        category="org_enrollment",
                                 from_email=settings.DEFAULT_FROM_EMAIL,
                                 recipient_list=[email],
                                 fail_silently=False,
@@ -199,7 +202,7 @@ def org_approve(request, enrollment_id):
         )
 
         invite_url = request.build_absolute_uri(reverse("accept_org_invite", args=[invite.token]))
-        send_mail(subject="Organization Approved on WildPaths Wisconsin",
+        safe_send_mail(subject="Organization Approved on WildPaths Wisconsin",
                    message=f"""
                         Hello,
 
@@ -214,6 +217,7 @@ def org_approve(request, enrollment_id):
                         newly created organization management page: {org_url}
                         Thank you!
                         """,
+                        category="org enrollment",
                                 from_email=settings.DEFAULT_FROM_EMAIL,
                                 recipient_list=[email],
                                 fail_silently=False,
@@ -322,7 +326,7 @@ def orgs(request):
             )
 
         for org in org_queryset:
-                print("building cards")
+                
                 sessions = Session.objects.current().filter(
                     activity__org=org
                 )
@@ -339,7 +343,7 @@ def orgs(request):
                 org.activity_cards = build_activity_cards(sessions)
     else:
          for org in org_queryset:
-                print("building cards")
+                
                 sessions = Session.objects.current().filter(
                     activity__org=org
                 )
@@ -496,13 +500,13 @@ def org_mgmt(request):
             })
 
 def org_enroll(request):
-    print("org_enroll called with method", request.method)
+    
     if request.method == "POST":
         track_activity(request, "org_enroll", org=None)
         form = OrgEnrollmentForm(request.POST)
-        print("org_enroll form errors", form.errors)
+        
         if form.is_valid():
-            print("org_enroll form is valid")
+            
             enrollment = form.save(commit=False)
 
             if request.user.is_authenticated:
@@ -510,15 +514,15 @@ def org_enroll(request):
                                                                         
             enrollment.save()
             
-            print("Enrollment saved:", enrollment.id)
+           
             # send email to is_staff
             staff_emails = list(
                 User.objects.filter(is_staff=True)
                 .exclude(email="")
                 .values_list("email", flat=True)
             )
-            print("staff emails", staff_emails)
-            send_mail(
+            
+            safe_send_mail(
                 subject="New Organization Enrollment Request",
                 message=(
                     f"A new organization enrollment request has been submitted.\n\n"
@@ -529,6 +533,7 @@ def org_enroll(request):
                     f"About: {enrollment.about}\n"
                     f"Review it in on your staff page."
                 ),
+                category="staff",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=staff_emails,
                 fail_silently=False,
@@ -549,7 +554,7 @@ def org_enroll_thanks(request):
 
 def accept_org_invite(request, token):
     invite = get_object_or_404(OrgInvite, token=token, accepted=False)
-    print("INVITE EMAIL STORED:", invite.email)
+    
     request.session["pending_org_invite_token"]=str(invite.token)
     request.session["pending_org_invite_email"]=invite.email
     
@@ -1955,11 +1960,12 @@ def test_email(request):
         sendto = request.POST.get("sendto")
         
         try:
-            send_mail(
+            safe_send_mail(
                 subject="Test Email from Postmark",
                 message="This is a test email via Postmark + Anymail.",
                 from_email=None,  # uses DEFAULT_FROM_EMAIL
                 recipient_list=[sendto],
+                category="test",
                 fail_silently=False,
             )
             context["success"] = True
@@ -2929,16 +2935,25 @@ def upload_results(request, upload_id):
 
     })
 
-
+from django.db import DatabaseError
+@staff_member_required
 def test_html(request):
-    activity=Activity.objects.first()
-    activity_form = ActivityForm(instance=activity)
-    default_location_id =""
+    if request.method == "POST":
+        action = request.POST.get("test_action")
 
+        if action == "exception":
+            raise Exception("Intentional test exception")
+
+        elif action == "zerodivision":
+            x = 1 / 0
+
+        elif action == "database":
+            raise DatabaseError("Intentional database error")
+
+
+   
     return render(request, "orgs/test_html.html", {
-        "activity": activity,
-        "activity_form": activity_form,
-        "default_location_id": default_location_id,
+
         })
 
 
@@ -2979,7 +2994,7 @@ def feedback_view(request):
     return render(request, "orgs/feedback.html", {"form": form})
 
 def calendar(request):
-
+    active_filters = []
     
     queryset = Session.objects.current().filter(ongoing=False).exclude(start__isnull=True).select_related(
                 "activity",        # follow FK from Session -> Activity
@@ -3001,6 +3016,11 @@ def calendar(request):
         data = filter_form.cleaned_data
         if data.get("upload"):
             queryset = queryset.filter()
+            
+        if data.get("month"):
+            year, month_num = map(int, data.get("month").split("-"))
+            queryset = queryset.filter( start__year=year,start__month=month_num)
+
         if data.get("org"):
             queryset=queryset.filter(activity__org__id=data["org"].id)
             active_filters.append(f"{data['org'].org_name} ")
@@ -3008,7 +3028,7 @@ def calendar(request):
         if data.get("my_orgs"):
             followed_orgs = request.user.profile.following_orgs.filter(deleted=False)
             queryset = queryset.filter(activity__org__id__in=followed_orgs)
-            
+            active_filters.append(f"Followed orgs ")
             
         if data.get("county") :
             queryset=queryset.filter(location__county_id=data["county"]).distinct()
@@ -3099,6 +3119,7 @@ def calendar(request):
         "cats": EventCategory.objects.all(),
         "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html,
         "calendar": calendar,
+        "active_filters": active_filters,
     })
 
 

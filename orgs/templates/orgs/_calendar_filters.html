@@ -19,6 +19,11 @@
     <label for="type-training">Learn</label>
   </div>
   </div>
+    <div class="mb-3">
+        {{filter_form.month.label_tag}}
+        {{filter_form.month}}
+        {{filter_form.month.errors}}
+    </div>
       <div class="mb-3"> 
         Word Search: 
         {{ filter_form.q }}
@@ -47,19 +52,7 @@
         {{filter_form.new.label_tag}}
     </div>
     <hr>
-   <div class="me-filter-2colrow">
-    <div class="me-filter-col">
-        {{ filter_form.start_date.label_tag }}
-        {{ filter_form.start_date }}
-        {{ filter_form.start_date.errors }}
-    </div>
    
-    <div class="me-filter-col">
-        {{ filter_form.end_date.label_tag }}
-        {{ filter_form.end_date }}
-        {{ filter_form.end_date.errors }}
-    </div>
-</div>
    
     <hr>
     <div class="me-filter-2colrow">

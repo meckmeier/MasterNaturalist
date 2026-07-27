@@ -25,7 +25,7 @@ def publish_pending_upload(upload_id, user):
     ).exclude(
         processing_status__in=["skip", "merged"]
     )
-    print("pending count", pending_locations.count())
+  
 
     for pending_loc in pending_locations:
         if pending_loc.real_location:

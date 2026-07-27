@@ -64,14 +64,27 @@
   <!-- Date line -->
 
   <!-- Description -->
-  <div class="me-description-block expanded">
-   
-    {%if q %}
-    <div class="me-desc-full">{{ card.activity.description|highlight:q|safe }}</div>
-    {% else %}
-    <div class="me-desc-full">{{ card.activity.description }}</div>
-    {% endif %}
-  </div>
+{% if card.activity.description %}
+<div class="me-description-block{% if q %} expanded{% endif %}">
+
+    <div class="me-desc-short">
+        {% if q %}
+            {{ card.activity.description|truncatechars:250|highlight:q|safe }}
+        {% else %}
+            {{ card.activity.description|truncatechars:250 }}
+        {% endif %}
+    </div>
+
+    <div class="me-desc-full">
+        {% if q %}
+            {{ card.activity.description|highlight:q|safe }}
+        {% else %}
+            {{ card.activity.description }}
+        {% endif %}
+    </div>
+
+</div>
+{% endif %}
     <div class="me-card-sponsor">
      Prerequisites: {{card.activity.prerequisites }}
   </div>

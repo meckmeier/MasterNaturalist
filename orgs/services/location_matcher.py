@@ -32,8 +32,7 @@ def find_best_location_match(raw_row, org):
         score = 0
         reason = []
 
-        print(repr(raw_row.location_name))
-        print(repr(loc.loc_name))
+
 
         # Strongest: address match
         if raw_address and norm(loc.address) == raw_address:

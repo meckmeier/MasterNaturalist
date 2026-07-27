@@ -26,6 +26,7 @@ admin.site.register(ActivityLog)
 admin.site.register(UploadLog)
 admin.site.register(Region)
 
+
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = ["created_at", "name", "email", "page_url"]
@@ -57,3 +58,25 @@ class OrgInviteAdmin(admin.ModelAdmin):
     ordering = (
         "-created_at",
     )
+@admin.register(EmailLog)
+class EmailLogAdmin(admin.ModelAdmin):
+    list_display = (
+        "sent_at",
+        "category",
+        "recipient",
+        "subject",
+        "status",
+    )
+
+    list_filter = (
+        "status",
+        "category",
+        "sent_at",
+    )
+
+    search_fields = (
+        "recipient",
+        "subject",
+    )
+
+    ordering = ("-sent_at",)

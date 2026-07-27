@@ -98,7 +98,7 @@ class CSVImporter:
     
     def get_bool(self, row, key):
         val = self.get_val(row, key)
-        print()
+   
         if val is None:
             return False
 
@@ -155,7 +155,6 @@ class CSVImporter:
         return None
 
     def parse_session_formats(self, online_flag, location_name, url, warnings):
-        print(f"parse_session_formats: online_flag={online_flag}, location_name={location_name}, url={url}")
 
         location_name = self.clean_value(location_name)
         url = self.clean_value(url)

@@ -825,7 +825,12 @@ li.inactive {
   background: #2e7d32;
   color: white;
 }
-
+.me-month-select {
+    font-size: 0.80rem;
+    line-height: 1;
+    padding-top: 0;
+    padding-bottom: 0;
+}
 .map-legend {
     background: white;
     padding: 10px;

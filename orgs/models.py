@@ -7,12 +7,14 @@ from django.db.models import Q, SET_NULL, Exists, OuterRef
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import timedelta
-from django.core.mail import mail_admins
+
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
 from django.conf import settings
 from orgs.services.helper_function import build_location_fingerprint
 from itertools import groupby
+from .utils import safe_send_mail
+
 # fixed lists:
 #-------------------------------------------------------    
 
@@ -821,14 +823,11 @@ class Feedback(models.Model):
     
     def save(self, *args, **kwargs):
         is_new = self.pk is None
-        print("Feedback save called. is_new =", is_new)
 
         super().save(*args, **kwargs)
 
         if is_new:
-            print("Sending feedback email via mail_admins")
-
-            mail_admins(
+            safe_send_mail(
                 subject="New feedback received",
                 message=(
                     f"New feedback was submitted.\n\n"
@@ -837,10 +836,12 @@ class Feedback(models.Model):
                     f"Page: {self.page_url or 'Not provided'}\n\n"
                     f"Message:\n{self.note}"
                 ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=["mary@eckmeier.com"],
+                category="admin",
                 fail_silently=False,
             )
 
-            print("Feedback email sent")
 
 
 
@@ -879,3 +880,20 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.action} - {self.created_at:%Y-%m-%d %H:%M}"
+
+class EmailLog(models.Model):
+    sent_at = models.DateTimeField(auto_now_add=True)
+    category = models.CharField(max_length=50)
+    recipient = models.EmailField()
+    subject = models.CharField(max_length=255)
+    status = models.CharField(
+    max_length=30,
+    choices=[
+        ("SENT", "Sent"),
+        ("BLOCKED_HOURLY", "Blocked Hourly"),
+        ("BLOCKED_MONTHLY", "Blocked Monthly"),
+        ("DISABLED", "Email Disabled"),
+        ("FAILED", "Send Failed"),
+    ],
+    default="SENT",
+)

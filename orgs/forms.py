@@ -380,7 +380,13 @@ class EventFilterForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         label="Categories"
     )
+    month = forms.ChoiceField(
+            required=False,
+            label="Month",
+            widget=forms.Select(attrs={"class": "form-select"})
+        )
 
+            
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         category_qs = EventCategory.objects.all().order_by("category_class", "name")
@@ -400,7 +406,22 @@ class EventFilterForm(forms.Form):
             selected = self.initial.get("categories", [])
 
         self.selected_category_ids = [str(x) for x in selected]
+        today = date.today()
 
+        choices = [("", "All Months")]
+
+        # Current month through next 11 months
+        for i in range(12):
+            month = (today.month - 1 + i) % 12 + 1
+            year = today.year + ((today.month - 1 + i) // 12)
+
+            value = f"{year}-{month:02d}"
+            label = date(year, month, 1).strftime("%B %Y")
+
+            choices.append((value, label))
+
+        self.fields["month"].choices = choices
+        
 class OrgFilterForm(forms.Form):
     org= forms.ModelChoiceField(
         queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),

@@ -11,7 +11,44 @@
 {% load can_edit_filters %}
 {% load highlight %}
 <div class="me-page">
-<button class="me-btn me-btn-compact-mobile me-btn-small"
+  <div class="me-card-header">
+    <div class="me-card-header-left">  
+   
+    </div>
+    <div class="me-card-header-right">
+      {% if active_filters %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+              for:
+              {{ active_filters|join:", " }}
+          </div>
+      {% else %}
+          <div class="me-sponsor">
+              <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} found
+          </div>
+      {% endif %}
+    </div>
+  </div>
+ 
+   <form method="get" class="quick-filters d-flex flex-wrap gap-2 mb-3">
+    {% for key, value in query_params.items %}
+          <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
+
+    <div class="me-toggle">
+    <select name="month"
+            id="{{ filter_form.month.id_for_label }}"
+            class="form-select me-month-select">
+        {% for value, label in filter_form.month.field.choices %}
+            <option value="{{ value }}"
+                {% if filter_form.month.value == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+    </div>
+
+    <button class="me-btn me-btn-compact-mobile me-btn-small"
             type="button"
             data-bs-toggle="offcanvas"
             data-bs-target="#filterPanel"
@@ -20,9 +57,13 @@
         <span class="me-btn-label">
         More Filters</span>
     </button>
-<a href="{% url 'calendar'%}" class ="me-btn me-btn-compact-mobile me-btn-small">
+
+<div class="me-card-header-right">
+    <a href="{% url 'calendar'%}" class ="me-btn me-btn-compact-mobile me-btn-small">
             <span><i class="bi bi-funnel-fill me-btn-icon" title="clear all filters"></i></span>
-            <span class="me-btn-label">Clear</span></a>   
+            <span class="me-btn-label">Clear</span></a>  
+        </div> 
+</form>
 
     {% for month_key, days in calendar.items %}
     
@@ -72,6 +113,13 @@
 {% endblock %}
 {% block extrajs %}
 <script>
+
+document.querySelectorAll(".quick-filters select").forEach(el => {
+  el.addEventListener("change", () => {
+    el.closest("form").submit();
+  });
+});
+
 console.log("Activity JS loaded");
 document.addEventListener("click", async function (e) {
     const link = e.target.closest(".me-activity-link");
