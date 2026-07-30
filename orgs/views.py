@@ -89,8 +89,16 @@ def run_update_latlng(request):
 
 @staff_member_required
 def org_enrollment_list(request):
+    from django.db.models import Case, When, Value, IntegerField
 
-    enrollments = OrganizationEnrollmentRequest.objects.order_by("-created_at")
+    enrollments = OrganizationEnrollmentRequest.objects.annotate(
+        pending_first=Case(
+            When(status="p", then=Value(0)),
+            default=Value(1),
+            output_field=IntegerField(),
+        )
+    ).order_by("pending_first", "-created_at")
+
     return render(request, "orgs/org_enrollment_list.html", {"enrollments": enrollments})
 
 def help(request):
@@ -3208,4 +3216,19 @@ def news(request):
         {
             "articles": articles,
         },
+    )
+from orgs.services.dashboard_services import build_dashboard
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def dashboard(request):
+    """
+    Administrative dashboard summarizing the health of WildPaths.
+    """
+
+    context = build_dashboard()
+
+    return render(
+        request,
+        "orgs/staff/dashboard.html",
+        context,
     )

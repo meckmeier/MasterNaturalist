@@ -816,7 +816,8 @@ class Feedback(models.Model):
     note = models.TextField()
     page_url = models.CharField(max_length=500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    handled = models.BooleanField(default=False)
+    
     def __str__(self):
         who = self.name or self.email or "Anonymous"
         return f"{who} - {self.created_at:%Y-%m-%d %H:%M}"

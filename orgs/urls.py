@@ -86,6 +86,7 @@ urlpatterns = [
     path("logos/", TemplateView.as_view(template_name="orgs/logos.html"), name="logos"),
     path("upload_faq/", views.render_markdown, {"filename":"upload_faq"},name="upload_faq"),
     path("news/",views.news, name="news"),
+    path("dashboard/",views.dashboard,name="dashboard",),
 ]
 
 if settings.DEBUG:

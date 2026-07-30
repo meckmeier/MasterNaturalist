@@ -50,9 +50,8 @@
         Organizations</span>
 </a>
 <hr>
-<p class="text sm">Designed for Wisconsin Master Naturalists, but open to all, the site will help 
-you discover your path to conservation efforts in Wisconsin.</p>
-To learn more about Wisconsin Master Naturalists <a href="https://wimasternaturalist.org/" target="_blank"><img src="{% static 'orgs/images/wisconsin-master-naturalist.svg'%}" width ="100" class="img-fluid"></a>
+<p class="text sm">Designed for Wisconsin Master Naturalists. Open to all.</p>
+
 <p> <a  href="{% url 'help'%}">Tutorials and other Documentation</span></a></p>
 <hr>
 {% if request.user.is_staff or request.user.profile.is_org_manager %}
@@ -69,7 +68,9 @@ To learn more about Wisconsin Master Naturalists <a href="https://wimasternatura
 {% if request.user.is_authenticated %}
 {% else %}
 
-    Already have a login -> <a class="me-text-btn" href="{% url 'account_login' %}">Login</a>
+   <a class="me-text-btn" href="{% url 'account_login' %}">Login</a>
+    or <a href="{% url 'account_signup' %}" class="me-btn-text">
+       Register here</a>
      
 
 {% endif %}
