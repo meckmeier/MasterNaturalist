@@ -60,7 +60,7 @@
         {% if q %}
           {{ org.org_name|highlight:q|safe }}
         {% else %}
-          {{ org.org_name }}
+         {% if org.example_org %}<img src="{% static 'orgs/images/demo.jpg' %}" alt="This is a demo organization" style="width:100px;">{% endif %} {{ org.org_name }}
         {% endif %}
         
       </h4>
@@ -70,6 +70,7 @@
       </div>
       <div class="me-card-header-right">
         <div class="me-icons">
+          
           {% if user.is_authenticated %}
              <a href="{% url 'follow_org' org.id %}?next={{ request.get_full_path }}" class="btn btn-link p-0 btn-lg">
               {% if org.id in followed_orgs %}
@@ -80,7 +81,7 @@
             </a>
           {% endif %} 
                          {% if org.activity_cards %}
-               {% else %} <img src="{% static 'orgs/region_maps/' %}{{ org.region.map_filename }}"" alt="{{ org.region.name }}" style="width:50px;">
+               {% else %} <img src="{% static 'orgs/region_maps/' %}{{ org.region.map_filename }}" alt="{{ org.region.name }}" style="width:50px;">
                     {% endif %}
     
           
@@ -88,7 +89,7 @@
     </div>
     {% if org.about %}
             <div class="me-description-block">
-        
+              
         
               <div class = "me-desc-short"> {{ org.about|truncatechars:250 }} </div>
                <div class="me-desc-full"> {% if q %}{{ org.about|highlight:q|safe }} {% else %}{{ org.about }} {% endif %} </div> 

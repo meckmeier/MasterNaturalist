@@ -138,6 +138,7 @@ class Organization(models.Model):
     )
     news_url=models.URLField(max_length=500, default="", blank=True)
     default_location = models.ForeignKey("Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="default_for_org")
+    example_org = models.BooleanField(default=False)
     deleted=models.BooleanField(default=False)
     deleted_at = models.DateTimeField( null=True, blank=True)
     created_by =models.ForeignKey(Profile, on_delete=models.SET_NULL, blank=True, null=True, related_name="created_orgs")

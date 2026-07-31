@@ -154,7 +154,7 @@ class OrgForm(forms.ModelForm):
         model = Organization
         fields = [
             'id', 'org_name', 'org_url', 'volunteer_url', 'training_url', 'news_url', 'news_source',
-            'in_wisconsin', 'about', 'region', 'host', 'deleted', 'default_location'
+            'in_wisconsin', 'about', 'region', 'host', 'deleted', 'default_location','example_org'
         ]
         widgets = {
             "about": forms.Textarea(attrs={"rows": 5}),
@@ -324,7 +324,7 @@ class EventFilterForm(forms.Form):
     session_format = forms.MultipleChoiceField(
         choices=[ ("o", "Online"), ("i", "In Person"), ("s", "Self Selected Locations")],
         required=False,
-        initial=["i", "o", "s"] ,    
+        initial=["i", "o", "s"],    
         label="Format",
         widget=forms.CheckboxSelectMultiple,
     )

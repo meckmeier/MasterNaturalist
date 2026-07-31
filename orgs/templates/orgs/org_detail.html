@@ -70,6 +70,10 @@
            Master Naturalist Host
             {{ form.host}}
             {{ form.host.errors }} {% endif %}
+         {% if user.is_staff %} 
+           Example Org:
+            {{ form.example_org}}
+            {{ form.host.example_org }} {% endif %}
       
         </div>
 
