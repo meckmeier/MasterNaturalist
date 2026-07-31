@@ -20,8 +20,9 @@
         {% if q %}
           {{ card.activity.title|highlight:q|safe }}
         {% else %}
-          {{ card.activity.title }}
+          {{ card.activity.title }}  {% if card.activity.org.example_org %}<img src="{% static 'orgs/images/demo.jpg' %}" alt="This is a demo organization" style="width:100px;">{% endif %} 
         {% endif %}
+        
        {% if card.activity|can_edit:request.user %}
           <a href="{% url 'activity_edit' card.activity.id %}?next={{ request.get_full_path|urlencode }}#activity-{{ card.activity.id }}">
             <i class="bi bi-pencil" style="font-size: .75rem;"></i>
@@ -104,6 +105,7 @@
    
       <div class="me-card-sponsor">
             Sponsored by: <a href="{% url 'orgs'%}?org={{card.activity.org.id}}">
+              
               {% if q %}{{ card.activity.org.org_name|highlight:q|safe }}{% else %}{{ card.activity.org.org_name }}{% endif %}
             </a>
 

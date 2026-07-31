@@ -22,7 +22,7 @@
     
         
           {{ card.activity.title }}
-     
+     {% if card.organization.example_org %}<img src="{% static 'orgs/images/demo.jpg' %}" alt="This is a demo organization" style="width:100px;">{% endif %} 
       
       </div>
        {% if page_type != "location" %} 

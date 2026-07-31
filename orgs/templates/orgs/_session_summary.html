@@ -19,7 +19,7 @@
         {% if q %}
           {{ e.activity.title|highlight:q|safe }}
         {% else %}
-          {{ e.activity.title }}
+          {{ e.activity.title }} {% if  e.activity.org.example_org %}<img src="{% static 'orgs/images/demo.jpg' %}" alt="This is a demo organization" style="width:100px;">{% endif %} 
         {% endif %}
 
     </div>

@@ -81,6 +81,7 @@
    
       <div class="me-card-sponsor">
             Sponsored by: <a href="{% url 'orgs'%}?org={{e.activity.org.id}}">
+               {% if e.activity.org.example_org %}<img src="{% static 'orgs/images/demo.jpg' %}" alt="This is a demo organization" style="width:100px;">{% endif %} 
               {% if q %}{{ e.activity.org.org_name|highlight:q|safe }}{% else %}{{ e.activity.org.org_name }}{% endif %}
             </a>
 

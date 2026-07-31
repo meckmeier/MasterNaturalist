@@ -12,8 +12,8 @@
 <div class="me-page">
 <form method="post" class="me-form" autocomplete="off">
     {% csrf_token %}
-    <h2>Request to Add Your Organization</h2>
-    <p> Wild Paths Wisconsin is a platform for nature-based organizations that 
+    <h2>Request to Add Your Organization or Program</h2>
+    <p> Wild Paths Wisconsin is a platform for nature-based organizations or programs that 
     provide training or volunteer opportunities to Master Naturalists and other adult nature-oriented volunteers and learners. 
     Volunteer roles may serve a youth audience, but non nature-based activities and youth-only programming should not be listed here.</p>
     
@@ -25,7 +25,7 @@
 {% endif %}
      <div class = "me-form-grid">
         <div class ="me-form-field-full">
-            Organization Name:
+            Organization/Program Name:
             {{ form.org_name}}
             {{ form.org_name.errors }}
         </div>

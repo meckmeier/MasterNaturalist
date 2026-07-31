@@ -26,6 +26,7 @@
       {% if loc.org %} 
               Managed by: <a href="{% url 'orgs' %}?org_id={{ loc.org.id }}">
                 <strong>{{ loc.org.org_name }}</strong></a>
+                {% if loc.org.example_org %}<img src="{% static 'orgs/images/demo.jpg' %}" alt="This is a demo organization" style="width:100px;">{% endif %}
 
         {% if loc == loc.org.default_location %}
                 <span class="me-badge">Default</span>
