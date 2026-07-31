@@ -1,10 +1,10 @@
-# WildPaths Development History
+# Wild Paths Wisconsin Development History
 
 **Version 0.4 (Working Draft)**
 
 # Introduction
 
-The WildPaths story in not really one about a software project.
+The Wild Paths Wisconsin story in not really one about a software project.
 
 It really began with a practical problem. Master Naturalist folk were collecting
  volunteer opportunities, and advanced training -- storing it in a PDF and
@@ -123,7 +123,7 @@ took as much time as building the initial prototype. Welcome to web development.
 site management, etc. all that stuff takes a long time to learn. By March 15, I was sending the site to render for deployment.
     
 * Mar 26: Canopy app; model has evolved to use Activities/Sessions and Location is decoupled from Organization.
-* Apr 4: renamed to WildPathsWI
+* Apr 4: renamed to Wild Paths Wisconsin
 * Apr 14: added site policy and privacy settings - it's now built to be a professional site.
 * Apr 15: Meeting with Becky to be ready to show the site to the test organization managers.
 * Apr 22: incorporating more of a look based on Lyle's feedback. Getting a new logo. Readying the app for the testers.

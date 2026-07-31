@@ -109,7 +109,7 @@ Upload process:
 
 Videos:
 
-https://www.youtube.com/watch?v=HbvGTnk7HR0 - Welcome to WildPathsWI.org
+https://www.youtube.com/watch?v=HbvGTnk7HR0 - Welcome to Wild Paths Wisconsin.org
 https://www.youtube.com/watch?v=jLKQdMGDO7s - Add Your Organization
 https://www.youtube.com/watch?v=xfV6BcMvwxU - Manage Your Organization
 

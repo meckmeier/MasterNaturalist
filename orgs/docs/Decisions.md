@@ -1,4 +1,4 @@
-# WildPaths Wisconsin
+# Wild Paths Wisconsin
 
 # Architectural Decisions
 
@@ -22,7 +22,7 @@ Each decision should explain:
 
 # Major Decisions
 
-## WildPaths is database-driven.
+## Wild Paths Wisconsin is database-driven.
 
 Not a spreadsheet.
 

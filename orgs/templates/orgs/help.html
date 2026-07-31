@@ -14,13 +14,15 @@
         <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" class="help-logo">
         <div class="help-body">
             <h3 class="help-header">Welcome</h3>
-            <div class="help-description">Learn how to navigate and use the WildPathsWI.org platform.</div>
+            <div class="help-description">Learn how to navigate and use the Wild Paths Wisconsin.org platform.</div>
             <div class="help-time">Estimated time: 3 minutes</div>
         </div></a>
-        <a href="https://wimasternaturalist.org/" target="_blank"><img src="{% static 'orgs/images/wisconsin-master-naturalist.svg'%}" width ="100" class="img-fluid">Learn More about Wisconsin Master Naturalists </a>
+         <a class="help-card" href="https://wimasternaturalist.org/" target="_blank"><img src="{% static 'orgs/images/mstr_nat_and_ext.png'%}" width ="100" class="img-fluid">
+            Learn More about Wisconsin Master Naturalists</a>
 
         </div>
-
+</div>
+<div class="me-card">
         <h4>Organizations</h4>
         <div class="help-grid help-grid-video">
 
@@ -30,7 +32,7 @@
             <div class="help-body">
                 <h3 class="help-header">Add Your Organization</h3>
                 <div class="help-description">
-                    Learn how to add your organization to the WildPathsWI.org platform. You will also learn how to create a login and see your organization management page.
+                    Learn how to add your organization to the Wild Paths Wisconsin.org platform. You will also learn how to create a login and see your organization management page.
                 </div>
                 <div class="help-time">
                     Estimated time: 2 minutes
@@ -43,7 +45,7 @@
             <div class="help-body">
                 <h3 class="help-header">Manage Your Organization</h3>
                 <div class="help-description">
-                    Learn how to manage your organization's information, locations, and activities on the WildPathsWI.org platform.
+                    Learn how to manage your organization's information, locations, and activities on the Wild Paths Wisconsin.org platform.
                 </div>
                 <div class="help-time">Estimated time: 2 minutes</div>
                 </div>
@@ -54,19 +56,17 @@
             <div class="help-body">
                 <h3 class="help-header">Upload Multiple Activities</h3>
                 <div class="help-description">
-                    Learn how to add lots of activities for your organization on the WildPathsWI.org platform using an upload file.
+                    Learn how to add lots of activities for your organization on the Wild Paths Wisconsin.org platform using an upload file.
                 </div>
                 <div class="help-time">Estimated time: 7 minutes</div>
                 </div>
             </a>
-            </div>
-            <div class="me-card">
-        
-            <div class="help-grid help-grid-docs">
+         
+
             
-  <a href="{% url 'for_orgs'%}" class="help-card">Organization Management</a>
-    <a href="{% url 'upload_faq'%}" class="help-card">Upload Activities</a>
-   </div></div></div>
+  <a href="{% url 'for_orgs'%}" class="help-card"><i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i>Organization Management</a>
+    <a href="{% url 'upload_faq'%}" class="help-card"><i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i>Upload Activities</a>
+   </div>
     
 
 

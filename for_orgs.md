@@ -1,5 +1,5 @@
 # For Organizations
-If you are a nature based organization and would like to share volunteer or learning opportunities in WildPathsWI.org - Welcome! We are excited to have you. Organizations really are the backbone of this site. Without your participation, there wouldn't be much for volunteers to find. But with you, we can build a wonderful community.
+If you are a nature based organization and would like to share volunteer or learning opportunities in Wild Paths Wisconsin - Welcome! We are excited to have you. Organizations really are the backbone of this site. Without your participation, there wouldn't be much for volunteers to find. But with you, we can build a wonderful community.
 
 ## Getting Started
 You can 
@@ -24,7 +24,7 @@ First you need to get your organization added.
 
 
 
-After your request is approved, you will receive an email from WildPathsWI.org (it comes from mary@eckmeier.com right now). In the email, you will find a link to asking you to register for the site. 
+After your request is approved, you will receive an email from Wild Paths Wisconsin (it comes from mary@eckmeier.com right now). In the email, you will find a link to asking you to register for the site. 
 
 ### Creating a login
 
@@ -39,7 +39,7 @@ After your request is approved, you will receive an email from WildPathsWI.org (
 5. Click the link in that email - and click CONFIRM EMAIL. This will complete your registration.
 
 ### Login
-The confirm email button should take you to a login screen - but if not click the WildPathsWI Icon in the top right corner and look for the LOGIN button near the bottom of the page.
+The confirm email button should take you to a login screen - but if not click the Wild Paths Wisconsin Icon in the top right corner and look for the LOGIN button near the bottom of the page.
 1. Type your username (or you can use your email - both will work).
 2. Type your password.
 

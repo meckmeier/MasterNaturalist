@@ -10,13 +10,13 @@ By using the App, you agree to the following terms.
 
 The App provides information about volunteer opportunities, locations, and organizations. This information is submitted by organizations or collected from publicly available sources.
 
-We do not guarantee that information is accurate, complete, or up to date. Details may change without notice.
+We do not guarantee that information is accurate, complete, or up to date. Details may change without notice. Please confirm all activities with the sponsoring organization. 
 
 ###No Endorsement or Affiliation
 
 Listings on the App do not constitute endorsement, recommendation, or certification of any organization, activity, or event.
 
-The App is not responsible for the actions, policies, or practices of any third-party organization.
+The App is not responsible for the actions, policies, or practices of any third-party organization. 
 
 ###Participation at Your Own Risk
 
@@ -34,6 +34,7 @@ Always confirm details directly with the hosting organization before attending.
 If you submit or edit information in the App:
 - you agree that the information is accurate to the best of your knowledge
 - you grant the App permission to display and use that information
+- you agree that you are a person with appropriate authority to act on behalf of the organization.
 
 We reserve the right to edit or remove content at any time.
 

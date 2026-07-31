@@ -13,7 +13,7 @@ Many of these decisions evolved over time as the project itself evolved.
 
 # AD-001 -- Build around existing organizational workflows
 
-WildPaths began with the goal of helping organizations that already
+Wild Paths Wisconsin began with the goal of helping organizations that already
 maintained information in Google Sheets. The objective was to improve
 access to information, not force organizations into a new system.
 

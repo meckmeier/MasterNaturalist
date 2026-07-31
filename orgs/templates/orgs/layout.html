@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <title>{% block title %}WildPaths Wisconsin{% endblock %}</title>
+    <title>{% block title %}Wild Paths Wisconsin{% endblock %}</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -97,14 +97,9 @@
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'orgs' %}">Organizations</a>
               </li>
-
              
               <hr>
-              <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'profile' %}">Your Profile</a>
-              </li>
-             
-              
+           
           
             
 
@@ -123,9 +118,6 @@
                 <a class="nav-link" href="{% url 'upload_dashboard' %}">Upload Dashboard</a>
                 </li>
              
-            <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'feedback' %}?page={{ request.path|urlencode }}">Feedback</a>
-              </li>
             </ul></li>
          {% if user.is_staff %}
              <li class="nav-item dropdown">
@@ -176,9 +168,11 @@
            </li>
   
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'help' %}">Video Tutorials</a>
+              <a class="nav-link" href="{% url 'help' %}">Tutorials and Documentation</a>
             </li>
-         
+                       <li class="dropdown-item">
+              <a class="nav-link"  href="{% url 'feedback'%}">Contact Me</a>
+             </li>
 
           <hr>
 
@@ -192,7 +186,7 @@
             </li>
           {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'account_login' %}">Organization Log In</a>
+              <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
             </li>
 
 
@@ -238,10 +232,9 @@
 <footer class="site-footer">
   <div class="container text-center small text-muted py-3">
     Information is provided by organizations and may change. Please confirm details with the hosting organization. 
-  External organization links are marked with <i class="bi bi-arrow-up-right-square "></i>.
 </p>
-    © 2026 WildPaths Wisconsin. All rights reserved. <a href="{% url 'terms' %}">Terms of Service</a> | <a href="{% url 'privacy' %}">Privacy Policy</a>
-    <br><a href="{% url 'about' %}">About WildPathsWI.org</a> | <a href="{% url 'feedback'%}">Contact</a>
+    © 2026 Wild Paths Wisconsin. All rights reserved. <a href="{% url 'terms' %}">Terms of Service</a> | <a href="{% url 'privacy' %}">Privacy Policy</a>
+    <br><a href="{% url 'about' %}">About Wild Paths Wisconsin.org</a> | <a href="{% url 'feedback'%}">Contact</a>
   </div>
   
 </footer>

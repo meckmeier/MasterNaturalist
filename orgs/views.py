@@ -126,11 +126,11 @@ def org_deny(request, enrollment_id):
         enrollment.save()
         email = enrollment.contact_email.lower().strip()
         
-        safe_send_mail(subject="Your request to add an organization on WildPaths Wisconsin has been DENIED",
+        safe_send_mail(subject="Your request to add an organization on Wild Paths Wisconsin has been DENIED",
                    message=f"""
                         Hello,
 
-                        Your organization, {enrollment.org_name}, has been denied for WildPaths Wisconsin.
+                        Your organization, {enrollment.org_name}, has been denied for Wild Paths Wisconsin.
 
                         If you believe this request was denied unjustly, you may respond to this email with an explanation.
 
@@ -184,11 +184,11 @@ def org_approve(request, enrollment_id):
     if user and hasattr(user, "profile"):
         OrgManager.objects.get_or_create(profile=user.profile, org=org, role="owner")
         
-        safe_send_mail(subject="Organization Approved on WildPaths Wisconsin",
+        safe_send_mail(subject="Organization Approved on Wild Paths Wisconsin",
                    message=f"""
                         Hello,
 
-                        Your organization, {org.org_name}, has been approved for WildPaths Wisconsin.
+                        Your organization, {org.org_name}, has been approved for Wild Paths Wisconsin.
 
                         Please use this link to see the new organization:
 
@@ -210,11 +210,11 @@ def org_approve(request, enrollment_id):
         )
 
         invite_url = request.build_absolute_uri(reverse("accept_org_invite", args=[invite.token]))
-        safe_send_mail(subject="Organization Approved on WildPaths Wisconsin",
+        safe_send_mail(subject="Organization Approved on Wild Paths Wisconsin",
                    message=f"""
                         Hello,
 
-                        Your organization, {org.org_name}, has been approved for WildPaths Wisconsin.
+                        Your organization, {org.org_name}, has been approved for Wild Paths Wisconsin.
 
                         Please use this link to create your login and manage the organization:
 

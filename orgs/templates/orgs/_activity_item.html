@@ -41,7 +41,7 @@
               {% endif %}
            
           {% if e.contact_email%}
-           {% with body_text="Hello, I found this opportunity on WildPaths Wisconsin and I'm interested in "|add:e.title|add:" at "|add:e.org.org_name|add:". Thank you." %}
+           {% with body_text="Hello, I found this opportunity on Wild Paths Wisconsin and I'm interested in "|add:e.title|add:" at "|add:e.org.org_name|add:". Thank you." %}
       
            <a class="me-icon-btn" href="mailto:{{ e.contact_email }}?subject={{ e.title|urlencode }}&body={{ body_text|urlencode }}">
             <i class="bi bi-envelope me-btn-icon" title="send email to contact person"></i></a>

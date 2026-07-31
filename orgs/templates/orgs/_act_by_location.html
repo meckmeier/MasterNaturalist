@@ -137,7 +137,7 @@
             <span class="me-btn-label">Learn More</span></a>
       {% endif %}
       {% if card.activity.contact_email%}
-              {% with body_text="Hello, I found this opportunity on WildPaths Wisconsin and I'm interested in "|add:card.activity.title|add:" at "|add:card.activity.org.org_name|add:". Thank you." %}
+              {% with body_text="Hello, I found this opportunity on Wild Paths Wisconsin and I'm interested in "|add:card.activity.title|add:" at "|add:card.activity.org.org_name|add:". Thank you." %}
            <a class="me-btn me-btn-compact-mobile" href="mailto:{{ card.activity.contact_email }}?subject={{ card.activity.title|urlencode }}&body={{ body_text|urlencode }}" title="Send email to contact">
             <span> 
           <i class="bi bi-envelope me-btn-icon" title="send email to contact person"></i></span>

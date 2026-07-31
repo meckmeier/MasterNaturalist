@@ -1,4 +1,4 @@
-# WildPaths Wisconsin
+# Wild Paths Wisconsin
 
 # Design Principles
 
@@ -49,7 +49,7 @@ Technology should solve problems rather than create them.
 
 ## Build for Nonprofits
 
-WildPaths is designed for conservation organizations with limited technical resources.
+Wild Paths Wisconsin is designed for conservation organizations with limited technical resources.
 
 ---
 

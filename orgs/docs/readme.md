@@ -1,4 +1,4 @@
-# WildPaths Historical Images
+# Wild Paths Wisconsin Historical Images
 
 | File | Date | Description |
 |------|------|-------------|

@@ -1,4 +1,4 @@
-# WildPaths Wisconsin
+# Wild Paths Wisconsin
 
 # Architecture
 
@@ -9,7 +9,7 @@
 
 ## Purpose
 
-This document explains how WildPaths is constructed.
+This document explains how Wild Paths Wisconsin is constructed.
 
 It focuses on architecture rather than implementation.
 
