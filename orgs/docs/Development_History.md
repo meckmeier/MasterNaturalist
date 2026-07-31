@@ -6,12 +6,7 @@
 
 The Wild Paths Wisconsin story in not really one about a software project.
 
-It really began with a practical problem. Master Naturalist folk were collecting
- volunteer opportunities, and advanced training -- storing it in a PDF and
- publishing it on their portal site. Keeping it current was a job. As the list grew long 
- it was harder for users to actually find the opportunities. So it started with
- wanting to make the job of maintaining the list easier and more consistent. Plus the
- added benefit of help users actually find the opportunities that excited them.
+It really began with a practical problem. Master Naturalist folk were collecting volunteer opportunities, and advanced training -- storing it in a PDF and publishing it on their portal site. Keeping it current was a job. As the list grew long it was harder for users to actually find the opportunities. So it started with wanting to make the job of maintaining the list easier and more consistent. Plus the added benefit of help users actually find the opportunities that excited them.
 
 The original goal was **not** to build an application. In fact, every
 effort was made to avoid building one. If we could solve it by 
@@ -20,9 +15,7 @@ Google Sites---that's what we wanted to do. Plus as a non-profit it was importan
 to keep the solution inexpensive and self-maintaining.
 
 We started testing out ideas. Each idea told me something new and valuable about what was needed. Coupled
-with the fact that I was just interested in this idea -- how can you take data and present it on the web -- had
- pestered me in my previous career. It wasn't something I had to solve in my job but I thought
- it would be fun to see what it really takes. 
+with the fact that I was just interested in this idea -- how can you take data and present it on the web -- had pestered me in my previous career. It wasn't something I had to solve in my job but I thought it would be fun to see what it really takes. 
 
 ------------------------------------------------------------------------
 
@@ -44,62 +37,39 @@ It did.
 
 Searching, filtering, and card-based layouts showed the
 value of an interactive experience. Building this site was so fast - and it was right there on the web for all to use.
-However, keeping the underlying
- csv file current proved had issues. Ultimately I decided that getting the updated data involved too much technical work 
- for the staff so I went searching for other solutions. I will say this layout and interface became the gold standard for 
- a presentation. 
+However, keeping the underlying csv file current proved had issues. Ultimately I decided that getting the updated data involved too much technical work  for the staff so I went searching for other solutions. I will say this layout and interface became the gold standard for  a presentation. 
 
 That shifted the project toward solving the data-management problem.
 
 ## HTML/CSV -- No fancy tools (August 2025)
 
 I put the data aside for the moment. Staff was currently getting opportunity data from a Google form and it was stored in a GoogleSheet.
-Staff would then take that sheet and build out a PDF file. What if all I did was simplify that... put a Googlesheet into CSV and send it 
-into a HTML reader that would layout the data. While I wouldn't solve every problem, at least we would solve some of the work that the 
-staff needed to do. I knew I could host GitHub pages for free off GitHub and that might just be a fine way to do this...
+Staff would then take that sheet and build out a PDF file. What if all I did was simplify that... put a Googlesheet into CSV and send it into a HTML reader that would layout the data. While I wouldn't solve every problem, at least we would solve some of the work that the staff needed to do. I knew I could host GitHub pages for free off GitHub and that might just be a fine way to do this...
 
   ![GitHub](images/2025-08-12_NatureBased_GithubPages.png)
 
-This solution has so much promise. It was cheap (or free!). It didn't change anything about how they maintained their data. It introduced 
-no fancy tools. Straight up HTML and Javascript to load the data. But to make it work, I had to adjust the data model of the google sheet to 
-the point that maintaining the data in a Google Sheet just got overwhelming. Plus I still didn't have a great interface. It was workable. And 
-certainly better. But the data management issue because the sticking point.
+This solution has so much promise. It was cheap (or free!). It didn't change anything about how they maintained their data. It introduced no fancy tools. Straight up HTML and Javascript to load the data. But to make it work, I had to adjust the data model of the google sheet to the point that maintaining the data in a Google Sheet just got overwhelming. Plus I still didn't have a great interface. It was workable. And certainly better. But the data management issue because the sticking point.
 
-We spent a certain amount of time trying to see if this idea - of hosting a relatively simple web interface inside the University system 
-might work. But this also resulted in some dead ends. And technical conversations no one wanted to have. 
+We spent a certain amount of time trying to see if this idea - of hosting a relatively simple web interface inside the University system might work. But this also resulted in some dead ends. And technical conversations no one wanted to have. 
 
 ## Google Apps Script (Sept 2025)
 
 So now the data is in Google Sheets. So I explored the Google universe to see if there was a good 
 way to use the sheet as data and just present it via Google world. 
 
-The goal was to "leverage an existing workflow" instead of introducing new
-technology. If staff could continue maintaining the
-date in a familiar environment, adoption would be much easier. The other issue that presented here was the need to find 
-a hosting environment. Master Naturalist is a part of the University of Wisconsin Extension and I wanted them to own the final solution. 
-That meant finding tools or platforms that could be hosted inside their current tech stack. Our first cut was Google.
+The goal was to "leverage an existing workflow" instead of introducing new technology. If staff could continue maintaining the date in a familiar environment, adoption would be much easier. The other issue that presented here was the need to find a hosting environment. Master Naturalist is a part of the University of Wisconsin Extension and I wanted them to own the final solution. That meant finding tools or platforms that could be hosted inside their current tech stack. Our first cut was Google.
 
-Here there were two problems. One was that a single google sheet flattened to accomodate all the data while great for presentation was a 
-little tricky for maintenance. I started to build out organization sheets, plus activity sheets that linked back. Not perfect but it could work. However, the
-second problem was that the Google Site tool just didn't give me enough control over the layout. As soon as I wanted to do something a little bit 
-different than "out of the box" presentation I ran into costs. Not surprising.
+Here there were two problems. One was that a single google sheet flattened to accomodate all the data while great for presentation was a little tricky for maintenance. I started to build out organization sheets, plus activity sheets that linked back. Not perfect but it could work. However, the second problem was that the Google Site tool just didn't give me enough control over the layout. As soon as I wanted to do something a little bit different than "out of the box" presentation I ran into costs. Not surprising.
 
  ![GoogleApp](images/2025-08_25_GoogleApp.png)
 
 
 ## CS50 (Sep 2025 -- Jan 2026)
 
-Every prototype was an attempt to avoid unnecessary complexity. All the tries above... they told me that to do what I wanted 
-really involved a framework. I needed a backend database to store the data and to capture the data, and a frontend to present it. 
-Since there didn't seem to be a way to solve the problem without that structure, I decided to take the CS50 Web Development Class. 
-It was a free class offered by Harvard. That class used Django so that is the framework I went with. I had a lot of conversations 
-with ChatGPT to try and see if a better framework existed, but since I know had some familiarity with it, and there were inexpensive 
-hosting options. Not free, but not too expensive. Given all that I found it became clear that this tool was not going to live at the Master 
-Naturalists, but rather I would have to own it. And while I wasn't sure that was the most sustainable solution for them, I was so 
-intrigued by finding out if I really could build out this thing, I decided to take it on. 
+Every prototype was an attempt to avoid unnecessary complexity. All the tries above... they told me that to do what I wanted really involved a framework. I needed a backend database to store the data and to capture the data, and a frontend to present it. Since there didn't seem to be a way to solve the problem without that structure, I decided to take the CS50 Web Development Class. It was a free class offered by Harvard. That class used Django so that is the framework I went with. I had a lot of conversations 
+with ChatGPT to try and see if a better framework existed, but since I know had some familiarity with it, and there were inexpensive hosting options. Not free, but not too expensive. Given all that I found it became clear that this tool was not going to live at the Master Naturalists, but rather I would have to own it. And while I wasn't sure that was the most sustainable solution for them, I was so intrigued by finding out if I really could build out this thing, I decided to take it on. 
 
-After completing the CS50 class, I wanted to recreate the basic Streamlit interface so that
-using Django. It seemed relatively straightforward (a csv file that showed each row as a card with some filtering options), 
+After completing the CS50 class, I wanted to recreate the basic Streamlit interface so that using Django. It seemed relatively straightforward (a csv file that showed each row as a card with some filtering options), 
 but to implement required the following:
 
     * datamodel - done in sqllite : Organization, OrgLocation, Event.

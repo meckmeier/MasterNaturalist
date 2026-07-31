@@ -321,11 +321,12 @@ class EventFilterForm(forms.Form):
             "placeholder": "YYYY-MM-DD"
         })
     )
-    session_format = forms.ChoiceField(
-        choices=[("", "Any"), ("o", "Online"), ("i", "In Person"), ("s", "Self Selected Locations")],
+    session_format = forms.MultipleChoiceField(
+        choices=[ ("o", "Online"), ("i", "In Person"), ("s", "Self Selected Locations")],
         required=False,
+        initial=["i", "o", "s"] ,    
         label="Format",
-        widget=forms.Select(attrs={"class": "form-select"})
+        widget=forms.CheckboxSelectMultiple,
     )
     activity_type = forms.ChoiceField(
         choices=[("", "Any"), ("v", "Volunteer"), ("t", "Training")],

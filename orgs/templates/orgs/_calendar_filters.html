@@ -52,9 +52,17 @@
         {{filter_form.new.label_tag}}
     </div>
     <hr>
-   
-   
-    <hr>
+      <div class="me-check-group">
+
+    {% for value, label in filter_form.session_format.field.choices %}
+        <label class="me-checkbox">
+            <input type="checkbox"
+                   name="session_format"
+                   value="{{ value }}"
+                   {% if value in filter_form.session_format.value %}checked{% endif %}>
+            {{ label }}
+        </label>
+    {% endfor %}
     <div class="me-filter-2colrow">
     <div class="me-filter-col">
         {{ filter_form.region.label_tag}}

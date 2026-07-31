@@ -611,6 +611,11 @@ errorlist {
 .me-filter-col input {
   width: 100%;
 }
+.me-check-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+}
 .me-tabs {
   display: inline-flex;
   border-bottom: 1px solid #ddd;

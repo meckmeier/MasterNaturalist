@@ -43,7 +43,7 @@
         {{ filter_form.org }}
         {{ filter_form.org.errors }}
     </div>
-    {% if user.is_authenticated %}
+     {% if user.is_authenticated %}
      <input type="hidden" name="tab" id="tabInput" value="{{ request.GET.tab|default:'upcoming' }}">
     <div >
         {{ filter_form.my_orgs }}
@@ -51,24 +51,42 @@
         {{ filter_form.my_orgs.errors }}
     </div>
     {% endif %}
+    <div class="me-check-group">
+
+    {% for value, label in filter_form.session_format.field.choices %}
+        <label class="me-checkbox">
+            <input type="checkbox"
+                   name="session_format"
+                   value="{{ value }}"
+                   {% if value in filter_form.session_format.value %}checked{% endif %}>
+            {{ label }}
+        </label>
+    {% endfor %}
+
+</div>
+    <div class="me-filter-2colrow">
+    <div class="me-filter-col">
+        {{ filter_form.region.label_tag}}
+        {{ filter_form.region }}
+    </div>
+    <div class="me-filter-col">
+        {{ filter_form.county.label_tag}}
+        {{ filter_form.county }}
+    </div>
+
+    </div>
+
+    <hr>
     <div>{{filter_form.has_cost}}
         {{ filter_form.has_cost.label_tag}} 
         {{ filter_form.has_cost.errors }} </div>
 
-    <div>
-        {{filter_form.session_format.label_tag}}
-        {{filter_form.session_format}}
-        {{filter_form.session_format.errors}}
-      
 
-
-    </div>
     <div>
         {{filter_form.new}}
         {{filter_form.new.errors}}
         {{filter_form.new.label_tag}}
-    </div>
-    <hr>
+
    <div class="me-filter-2colrow">
     <div class="me-filter-col">
         {{ filter_form.start_date.label_tag }}
@@ -84,17 +102,7 @@
 </div>
    
     <hr>
-    <div class="me-filter-2colrow">
-    <div class="me-filter-col">
-        {{ filter_form.region.label_tag}}
-        {{ filter_form.region }}
-    </div>
-    <div class="me-filter-col">
-        {{ filter_form.county.label_tag}}
-        {{ filter_form.county }}
-    </div>
 
-    </div>
     <div class="mb-3">
         
         

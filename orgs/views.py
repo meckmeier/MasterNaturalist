@@ -1497,8 +1497,11 @@ def activities(request):
 
     if "org_id" in get_data and "org" not in get_data:
         get_data["org"]=get_data["org_id"]
-        
+
+    if "session_format" not in get_data:
+        get_data.setlist("session_format", ["i", "o", "s"])
     
+
     filter_form=EventFilterForm(get_data or None)
     if filter_form.is_valid():
     
@@ -1567,16 +1570,27 @@ def activities(request):
             queryset = queryset.filter(start__lte=data["end_date"])
             active_filters.append(f"Start on or before: {data['end_date']}")
 
-        if data.get("session_format") == "i":
-            queryset = queryset.filter(session_format__in=["i", "b","s"])
-            active_filters.append("In-person or Hybrid ")
+        formats = data.get("session_format", [])
+        
+        # Only filter if the user has unchecked something
+        if len(formats) < 3:
+            
+            include = []
 
-        if data.get("session_format") == "o":
-            queryset = queryset.filter(session_format__in=["o", "b"])
-            active_filters.append("Online or Hybrid ")
-        if data.get("session_format") == "s":
-            queryset = queryset.filter(session_format__in=["s"])
-            active_filters.append("Self-directed")        
+            if "i" in formats:
+                include.extend(["i", "b"])      # In-person + Hybrid
+
+            if "o" in formats:
+                include.extend(["o", "b"])      # Online + Hybrid
+
+            if "s" in formats:
+                include.append("s")             # Self-selected
+
+            queryset = queryset.filter(
+                session_format__in=include
+            ).distinct()
+
+        
     
 
         activity_id = request.GET.get("activity_id")
@@ -3014,9 +3028,13 @@ def calendar(request):
     
     
     q = request.GET.get("q", "")
+    
     get_data = request.GET.copy()    
+    if "session_format" not in get_data:
+            get_data.setlist("session_format", ["i", "o", "s"])
     active_filters = []
     get_data = request.GET if request.GET else None
+
 
     filter_form=EventFilterForm(get_data or None)
     if filter_form.is_valid():
@@ -3090,13 +3108,30 @@ def calendar(request):
             queryset = queryset.filter(start__lte=data["end_date"])
             active_filters.append(f"Start on or before: {data['end_date']}")
 
-        if data.get("session_format") == "i":
-            queryset = queryset.filter(session_format__in=["i", "b","s"])
-            active_filters.append("In-person or Hybrid ")
+        formats = data.get("session_format", [])
+        
+        # Only filter if the user has unchecked something
+        if len(formats) < 3:
+            
+            include = []
 
-        if data.get("session_format") == "o":
-            queryset = queryset.filter(session_format__in=["o", "b"])
-            active_filters.append("Online or Hybrid ")
+            if "i" in formats:
+                include.extend(["i", "b"])      # In-person + Hybrid
+                active_filters.append(f"In-person")
+
+            if "o" in formats:
+                include.extend(["o", "b"])      # Online + Hybrid
+                active_filters.append(f"Online")
+
+            if "s" in formats:
+                include.append("s")             # Self-selected
+                active_filters.append(f"Self selected locations")
+
+            queryset = queryset.filter(
+                session_format__in=include
+            ).distinct()
+            
+            
     
 
         activity_id = request.GET.get("activity_id")
@@ -3120,6 +3155,7 @@ def calendar(request):
             calendar[month_key][day_key] = []
         calendar[month_key][day_key].append(session)
 
+    result_count = queryset.count()
     return render(request, "orgs/calendar.html", {
         "filter_form":filter_form,
         "query_params": clean_get,
@@ -3128,6 +3164,7 @@ def calendar(request):
         "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html,
         "calendar": calendar,
         "active_filters": active_filters,
+        "result_count": result_count,
     })
 
 
