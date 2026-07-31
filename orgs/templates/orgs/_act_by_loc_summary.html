@@ -48,7 +48,7 @@
     </div>
    <div class="me-card-header-right"> 
     <div class="me-icons">
-      {% if page_type.org %}
+      {% if page_type == "org" %}
       <img src="{% static 'orgs/region_maps/' %}{{ card.location.region.map_filename }}" alt="{{card.location.region.name}}"  title="{{ card.location.region.name }}" 
       style="height:75px; width:auto;">
     {% endif %}
