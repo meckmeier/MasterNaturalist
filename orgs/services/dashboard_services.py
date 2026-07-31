@@ -45,6 +45,7 @@ def get_data_quality_summary():
                 ("organizations_without_activities", Organization.objects.filter( activities__isnull=True).distinct().count()),
                 ("activities_without_sessions", Activity.objects.filter(sessions__isnull=True).distinct().count()),
                 ("locations_without_sessions",Location.objects.filter(sessions__isnull=True).distinct().count()),
+                ("locations_without_orgs", Location.objects.filter(org__isnull=True).distinct().count()),
                 ("uploaded_activities", Activity.objects.filter( source_upload__isnull=False ).count()),
             ]
 
