@@ -195,10 +195,10 @@ document.addEventListener("DOMContentLoaded", function () {
             button.type = "button";
             button.className = "list-group-item list-group-item-action location-result";
             button.dataset.id = loc.id;
-            button.dataset.label = `${loc.label} - ${loc.city}`;
+            button.dataset.label = `${loc.label} - ${loc.city_name}`;
             button.innerHTML = `
                 <div><strong>${loc.label}</strong></div>
-                <div class="small text-muted">${loc.city} | ${loc.org_name || ""}</div>
+                <div class="small text-muted">${loc.city_name} | ${loc.org_name || ""}</div>
             `;
             container.appendChild(button);
         });
