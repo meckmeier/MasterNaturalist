@@ -899,3 +899,15 @@ class EmailLog(models.Model):
     ],
     default="SENT",
 )
+class Video(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    audience = models.CharField(max_length=255, default="", blank=True, null=True)
+    video_url = models.URLField(max_length=255, default="", blank=True, null=True)
+    video_id = models.CharField(max_length=255, default="", blank=True, null=True)
+    estimated_time = models.CharField(max_length=255, default="", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title

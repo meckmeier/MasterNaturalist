@@ -29,7 +29,11 @@
  {% csrf_token %}
  <input type="hidden" name="org" value="{{ request.GET.org }}">
  <input type="hidden" name="location" value="{{ request.GET.location }}">
- <input type="hidden" name="next" value="{{ request.GET.next|default:request.get_full_path }}">
+{% if next %}
+    <input type="hidden"
+           name="next"
+           value="{{ request.POST.next|default:request.GET.next|default:request.get_full_path }}">
+{% endif %}
  {% if duplicate_warning %}
   <div style="background: #fff3cd; padding: 10px; margin-bottom: 10px;">
     ⚠️ An activity with this name already exists for this organization.
@@ -57,24 +61,24 @@
 {% endif %}   
 
 <fieldset>
-       <div class="error-text"> {{ activity_form.non_field_errors }}</div>
+    <div class="error-text"> {{ activity_form.non_field_errors }}</div>
     <div class = "me-form-grid {% if view_only %}view-mode{% endif %}">
         <div class="me-form-field-full">
             {{ activity_form.title.label_tag }}<br>
             {{ activity_form.title }}
             <span class="error-text">{{ activity_form.title.errors }}</span>
         </div>
-<div class="me-form-field-full">
-    {{activity_form.description.label_tag}}
-    {{activity_form.description}}
-    {{activity_form.description.errors}}
-</div>
-<div class="me-form-field">
-            {{ activity_form.prerequisites.label_tag }}<br>
-            {{ activity_form.prerequisites }}
-            <span class="error-text">{{ activity_form.prerequisites.errors }}</span>
-            </div>
-         <div class="me-form-field">
+        <div class="me-form-field-full">
+            {{activity_form.description.label_tag}}
+            {{activity_form.description}}
+            {{activity_form.description.errors}}
+        </div>
+        <div class="me-form-field">
+                {{ activity_form.prerequisites.label_tag }}<br>
+                {{ activity_form.prerequisites }}
+                <span class="error-text">{{ activity_form.prerequisites.errors }}</span>
+        </div>
+        <div class="me-form-field">
             Type:<br>
             {{ activity_form.activity_type }}
             {{ activity_form.activity_type.errors }}
@@ -91,8 +95,7 @@
         </div>
         <div class="me-form-field">
             <i class="bi bi-currency-dollar " data-bs-toggle="tooltip" title="Training has a cost for participants"></i>
-            {{ activity_form.has_cost }}
-            
+            {{ activity_form.has_cost }}            
              <span class="error-text
             <span class="error-text">{{ activity_form.has_cost.errors }}</span>
         </div>
@@ -102,68 +105,57 @@
             <span class="error-text">{{ activity_form.contact_email.errors }}</span>
         </div>
          
-        
-           
-
-<div class="me-form-field-full">
-     <legend>Keywords (to help with volunteer searches)</legend>
-
-    {% for group, choices in activity_form.category_groups %}
-        <div class="category-group">
-            <div class="category-group-title">
-                <strong>{{ group|title }}</strong>
-            </div>
-
-            <div class="category-options">
-                {% for value, label in choices %}
-                    <label class="category-checkbox">
-                        <input type="checkbox"
-                               name="{{ activity_form.categories.html_name }}"
-                               value="{{ value }}"
-                               id="filter_cat_{{ value }}"
-                               {% if value|stringformat:"s" in activity_form.selected_category_ids %}checked{% endif %}>
-                        {{ label }}
-                    </label>
-                {% endfor %}
-            </div>
-        </div>
-    {% endfor %}
-
-    {{ activity_form.categories.errors }}
-</div>
         <div class="me-form-field-full">
-    
-    <div class="formset" data-prefix="locations">
-    
-       
-        {{ session_formset.management_form }}
-        <table class="formset-table {% if view_only %}view-mode{% endif %}">
-            <thead>
-                <tr> 
-                    <th>Format</th>
-                    <th>URL (if online option)</th>
-                    <th>Location (if inperson)</th>
-                    <th><i class="bi bi-info-circle" data-bs-toggle="tooltip" title="If checked, this session will be listed as ongoing and start/end dates will be hidden. Clear the check to show the start/end dates."> Ongoing</i></th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>DELETE</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for form in session_formset %}
-                    <tr class ="formset-row"> 
-                        {% for hidden in form.hidden_fields %}
-                            {{ hidden }}
-                        {% endfor %}
-                        
-                                                
-                        <td>
+            <legend>Keywords (to help with volunteer searches)</legend>
 
+            {% for group, choices in activity_form.category_groups %}
+                <div class="category-group">
+                    <div class="category-group-title">
+                        <strong>{{ group|title }}</strong>
+                    </div>
+
+                    <div class="category-options">
+                        {% for value, label in choices %}
+                            <label class="category-checkbox">
+                                <input type="checkbox"
+                                    name="{{ activity_form.categories.html_name }}"
+                                    value="{{ value }}"
+                                    id="filter_cat_{{ value }}"
+                                    {% if value|stringformat:"s" in activity_form.selected_category_ids %}checked{% endif %}>
+                                {{ label }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+        {{ activity_form.categories.errors }}
+        </div>
+        <div class="me-form-field-full">
+            <div class="formset" data-prefix="locations">
+                 {{ session_formset.management_form }}
+                <table class="formset-table {% if view_only %}view-mode{% endif %}">
+                <thead>
+                    <tr> 
+                        <th>Format</th>
+                        <th>URL (if online option)</th>
+                        <th>Location (if inperson)</th>
+                        <th><i class="bi bi-info-circle" data-bs-toggle="tooltip" title="If checked, this session will be listed as ongoing and start/end dates will be hidden. Clear the check to show the start/end dates."> Ongoing</i></th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Time (optional) </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for form in session_formset %}
+                        <tr class ="formset-row"> 
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}                                             
+                        <td>
                             {{ form.session_format }}
                             {{ form.session_format.errors }}
-
                         </td>
-                        
                         <td>
                             <div class="url-group">
                             {{ form.session_url }}
@@ -191,12 +183,11 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#locationSearchModal">
                                  <span><i class="bi bi-search me-btn-icon"></i></span> 
-                               <span class="me-btn-label">Find Location</span>
+                               <span class="me-btn-label">Find/Add Location</span>
                             </button>
                         </div>
                         </td>       
-                        <td> 
-                           
+                        <td>                            
                             {{form.ongoing }}
                              {{form.ongoing.errors}}
                              <div class="small text-muted ongoing-help" style="display:none;">
@@ -216,19 +207,12 @@
                             {{ form.end.errors }}
                             </div>
                         </td>    
-
-                        <td>{{form.DELETE}}</td>
+                        <td>
+                            {{form.session_comment}}
+                            {{form.session_comment.errors}}
+                        </td>
                     </tr>
-                    <tr class="schedule-row">
-                    <td colspan="7">
-                        <label class="small fw-semibold">
-                            Schedule Details
-                        </label>
-
-                        {{ form.session_comment }}
-                        {{ form.session_comment.errors }}
-                    </td>        
-                </tr>
+                   
   
                     
             {% empty %}
@@ -255,23 +239,15 @@
                                         data-bs-toggle="modal"
                                         data-bs-target="#locationSearchModal">
                                 <span><i class="bi bi-plus-fill me-btn-icon"></i></span> 
-                                <span class="me-btn-label">Find or Add Location</span>
+                                <span class="me-btn-label">Find/Add Location</span>
                                 </button></div>
                         </td>
                         <td>{{ session_formset.empty_form.ongoing }}</td>
                         <td>{{ session_formset.empty_form.start }}</td>
                         <td>{{ session_formset.empty_form.end }}</td>
-                        <td>{{session_formset.empty_form.DELETE}}</td>
+                        <td>{{ session_formset.empty_form.session_comment}}</td>
                         </tr>
-                        <tr class="schedule-row form-template" style="display:none;">
-                        <td colspan="7">
-                            <label class="small fw-semibold">
-                                Schedule Details
-                            </label>
-
-                            {{ form.session_comment }}
-                            {{ form.session_comment.errors }}
-                        </td>
+                        
                         </tr>
 
             </tbody>
@@ -286,11 +262,6 @@
     {% endif %}
  {% endif %}    
     </div>
-
-
-
-
-
 
     
 

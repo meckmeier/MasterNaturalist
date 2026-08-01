@@ -6,7 +6,6 @@ from .models import *
 # Register your models here.
 admin.site.register(User)
 admin.site.register(Organization)
-admin.site.register(Location)
 admin.site.register(County)
 admin.site.register(Commitment)
 admin.site.register(Profile)
@@ -25,6 +24,8 @@ admin.site.register(OrganizationEnrollmentRequest)
 admin.site.register(ActivityLog)
 admin.site.register(UploadLog)
 admin.site.register(Region)
+admin.site.register(Video)
+
 
 
 @admin.register(Feedback)
@@ -32,7 +33,11 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_display = ["created_at", "name", "email", "page_url"]
     search_fields = ["name", "email", "note", "page_url"]
     ordering = ["-created_at"]
-
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ["loc_name", "org", "created_at"]
+    search_fields = ["name", "org"]
+    ordering = ["-created_at"]
 @admin.register(OrgInvite)
 class OrgInviteAdmin(admin.ModelAdmin):
     list_display = (

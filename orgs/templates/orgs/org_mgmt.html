@@ -124,9 +124,10 @@
                                     {% if session.start %} | {{ session.start|date:"m/d/y" }} {% endif %} {% if session.end and session.end != session.start %} - {{session.end|date:"m/d/y"}} {% endif %}
                                     {% endif %}
                                 {% endfor %}
-                            <a href="{% url 'activity_edit' act.id %}" title="edit activity"><i class="bi bi-pencil"></i></a>
+                                
+                            <a href="{% url 'activity_edit' act.id %}?next=org_mgmt">
+                                    <i class="bi bi-pencil"></i></a>
                             <a href="{% url 'activity_delete' act.id %}" title="Delete"><i class="bi bi-trash"></i></a>
-
                           
                         </li>
                     {% empty %}

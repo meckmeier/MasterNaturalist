@@ -412,6 +412,7 @@ def follow_org(request, org_id):
     else:
         return redirect("landing")  # fallback
 
+@login_required
 def org_mgmt(request):
     # managing YOUR organizations - this is where you can edit them, add activities, etc.
     today = timezone.localdate()
@@ -501,10 +502,11 @@ def org_mgmt(request):
         if data.get("org"):
             orgs=orgs.filter(id=data["org"].id)
 
-    
+
     return render(request, "orgs/org_mgmt.html", {
         "organizations": orgs,
         "filter_form": OrgFilterForm(request.GET or None),
+        "next_url": request.get_full_path(),
             })
 
 def org_enroll(request):
@@ -1700,9 +1702,11 @@ def _activity_form_workflow(request, org, activity, is_new=False):
                 s.delete()
             next_url = request.GET.get("next") or request.POST.get("next")
 
-            if next_url:
-                return redirect(next_url)
+            # Org management workflow
+            if request.GET.get("next") == "org_mgmt" or request.POST.get("next") == "org_mgmt":
+                return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
 
+            # Default for everything else
             return redirect(f"{reverse('activities')}?activity_id={activity.id}")
 
     print("Session formset errors:", session_formset.errors)
@@ -1724,6 +1728,7 @@ def activity_create(request):
     org = get_object_or_404(Organization, id=org_id)
     activity = Activity(org=org)
     #print("launching activity create for new org", org.org_name)
+
     return _activity_form_workflow(
         request=request,
         org=org,

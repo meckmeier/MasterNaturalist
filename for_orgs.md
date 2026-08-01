@@ -1,11 +1,24 @@
 # For Organizations
-If you are a nature based organization and would like to share volunteer or learning opportunities in Wild Paths Wisconsin - Welcome! We are excited to have you. Organizations really are the backbone of this site. Without your participation, there wouldn't be much for volunteers to find. But with you, we can build a wonderful community.
+If you are an organization or program that wants dedicated nature-loving volunteers - Welcome! We are excited to have you. Organizations really are the backbone of this site. Without your participation, there wouldn't be much for volunteers to find. But with you, we can build a wonderful community.
+
+## Learning Guidelines
+The site was designed for Master Naturalists so knowing what they are expecting can help you target the activities you include here. Learning opportunities should focus on Wisconsin's natural, environmental or cultural history. If you have workshops that focus on specialized skills for volunteers they would also be great here. These activities should be formal training or workshops and be targeted to adult learners. 
+
+## Volunteer Guidelines
+For Master Naturalists, volunteer activities should be unpaid, under the direction or guidance of your organization/program and located in Wisconsin or neighboring states. The program focuses on work that falls into Citizen Science, Education and Stewardship. Volunteer work that supports an organization whose mission is focused on natural resources topics also counts. These are the guidelines for Master Naturalists. But remember we are open to all people interested in conservation efforts in Wisconsin. So any volunteer activity that supports that mission is welcome here. 
+
+## What is an Organization
+For the purposes of this site - an organization is an 'organizing' entity for activities. Usually an organization will be just that - a nature center, a friends group, visitor centers or watershed associations, for example. But an "organization" might also be programs inside a larger entity - like programs at the DNR. It's all built to help people find opportunities that interest them. Use your judgement about how to enter the data.
+
+## What is a Location
+A location is a physical address. It will allow us to map the event. There are shared locations, like state parks that are already in the system. Sometimes you might have an activity that uses a nature center (which is its own organization). The system will allow you to use existing locations. If your location is not already in the system, then you can add it. Don't worry if the location isn't 'yours' to manage, if you need to add it just add it. It's more important to make sure that people can find your activity's location. On the backend, we will monitor duplicate locations and may contact you to consolidate these locations later.
+
+If this sounds like your organization, then let's get started!
 
 ## Getting Started
 You can 
  <a href="/help/video/CO5Xr3qWKWc/" >view this How-to Video.</a>
 
-First you need to get your organization added. 
 
 1. Use the menu in the top right corner to Add Your Organization.
 2. Complete the Form.
@@ -14,8 +27,8 @@ First you need to get your organization added.
 > | Field | Description |
 > | ----------- | ----------- |
 > | Organization Name | This name will appear as a "sponsor" for activities - and users can search based on your name. |
-> | About | This should be relatively brief but descriptive so volunteers will be able to tell what you do. We will use this description to help us approve your request. |
-> | Main URL | We will provide a link to this site - make sure it is in a url format (www.mysite.com for example). |
+> | About | This should be relatively brief but descriptive so volunteers will be able to tell what you do. We will use this description to help us approve your request. The first 250 characters will appear in a scan view, so put the most important information at the top. Users can click in to see the rest of the description. |
+> | Main URL | Use the url that you want users to see when the first go to your site. |
 > | Region | If your organization is based in a specific region in Wisconsin, you can pick it here. This is just informational for volunteers looking at your organization. |
 > | Contact Email | This field is really important because we will use this email to communicate with you about the request. You will want to use this email when you register to the site to manage the organization in the future. You will be able to add more people to manage this organization in the future. |
 > | Contact Name | REQUIRED. |
@@ -39,7 +52,7 @@ After your request is approved, you will receive an email from Wild Paths Wiscon
 5. Click the link in that email - and click CONFIRM EMAIL. This will complete your registration.
 
 ### Login
-The confirm email button should take you to a login screen - but if not click the Wild Paths Wisconsin Icon in the top right corner and look for the LOGIN button near the bottom of the page.
+The confirm email button should take you to a login screen - but if not go to WildPathsWi.org and look for the LOGIN button near the bottom of the page.
 1. Type your username (or you can use your email - both will work).
 2. Type your password.
 
@@ -55,7 +68,7 @@ Once you are successfully logged in, the system will automatically make you a ma
 
 NOTE: if something goes wrong and you are not able to see this page, please submit a feedback request and indicate that you are having login problems. Provide your username and Organization name. Someone will get back to you with a resolution.
 
-NOTE: if you wish to have someone else also manage your organization, have that person create a login. Use the Login button on the main page, and click the link to REGISTER. Once they have created a new login, you will be able to use their email address to add them to the Managers section of your organization.
+NOTE: if you wish to have someone else also manage your organization, have that person REGISTER. There is a button at the bottom of the main page of WildPathsWi.org. Once they have created a new login, you will be able to use their email address to add them to the Managers section of your organization.
 
 ## Activities
 

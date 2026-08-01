@@ -23,7 +23,7 @@
           {{ e.activity.title }}
         {% endif %}
        {% if e.activity|can_edit:request.user %}
-          <a href="{% url 'activity_edit' e.activity_id %}">
+          <a href="{% url 'activity_edit' e.activity_id %}?next={{ request.get_full_path|urlencode }}#activity-{{ e.activity_id }}">
             <i class="bi bi-pencil" style="font-size: .75rem;"></i>
           </a>
         {% endif %}

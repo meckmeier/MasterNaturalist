@@ -673,7 +673,7 @@ class SessionForm(forms.ModelForm):
         model = Session
         fields = "__all__"
         widgets = {
-            "session_comment":  forms.TextInput(attrs={"placeholder": "Provide additional info on session schedule here."}),
+            "session_comment":  forms.TextInput(attrs={"placeholder": "Session times (optional)"}),
             "format": forms.Select(),
             "location": forms.Select(attrs={"class": "form-select form-select-sm real-location-field"}),
         }
