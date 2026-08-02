@@ -15,7 +15,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Q, Min, Prefetch, F
-from django.http import  Http404, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import  Http404, HttpResponseNotFound, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.urls import reverse
@@ -3204,31 +3204,36 @@ def activity_panel(request, pk):
     )
 
 def act_loc_panel(request, location_id, activity_id):
-   
-    sessions = Session.objects.current().filter(
-        location_id=location_id,
-        activity_id=activity_id,
-    )
-    first_session = sessions.first()
 
     activity = get_object_or_404(Activity, pk=activity_id)
-    location = get_object_or_404(Location, pk=location_id)
-    
+
+    if location_id == 0:
+        location = None
+        sessions = Session.objects.current().filter(
+            activity_id=activity_id,
+            location__isnull=True,
+        )
+    else:
+        location = get_object_or_404(Location, pk=location_id)
+        sessions = Session.objects.current().filter(
+            activity_id=activity_id,
+            location_id=location_id,
+        )
+
     can_edit = activity.can_edit(request.user)
 
-    cards = build_activity_cards(
-        sessions,
-        location=location,
-    )
-    card=cards[0]
+    cards = build_activity_cards(sessions, location=location)
+
+    if not cards:
+        return HttpResponseNotFound("No activity details found.")
 
     return render(
         request,
         "orgs/_act_by_location.html",
         {
-            "card": card,
+            "card": cards[0],
             "page_type": "location",
-            "can_edit": can_edit
+            "can_edit": can_edit,
         },
     )
 
