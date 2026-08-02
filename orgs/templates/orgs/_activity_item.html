@@ -109,10 +109,11 @@
 
 </table>
  
-  <div class="me-card-subtitle">
+ {% if e.prerequisites %} <div class="me-card-subtitle">
     Prerequisites: {{e.prerequisites }}</div>
     <div class="me-card-sponsor">
     Sponsored by: {{e.org.org_name}}</div>
+ {% endif %}
 
   <!-- Date row -->
 

@@ -86,9 +86,11 @@
 
 </div>
 {% endif %}
-    <div class="me-card-sponsor">
-     Prerequisites: {{card.activity.prerequisites }}
-  </div>
+    {% if card.activity.prerequisites %}
+      <div class="me-card-sponsor">
+        Prerequisites: {{card.activity.prerequisites }}
+      </div>
+    {% endif %}
 
   <!-- Badges -->
   <div class="me-stack">

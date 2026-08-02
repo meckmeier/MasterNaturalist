@@ -2022,7 +2022,10 @@ def org_manager_add(request, org_id):
 
     if not (
         request.user.is_staff
-        or org.managed.filter(id=request.user.profile.id).exists()
+        or OrgManager.objects.filter(
+                org=org,
+                profile=request.user.profile
+            ).exists()
     ):
         return HttpResponseForbidden("You do not have permission to add managers.")
 
@@ -2073,11 +2076,16 @@ def org_manager_delete(request, pk):
     org_manager = OrgManager.objects.filter(pk=pk).select_related("org").first()
     if not org_manager:
         return redirect("org_mgmt")
-
+    if org_manager.role == "owner":
+        return HttpResponseForbidden("You cannot remove the owner of an organization.")
+    
     if not (
-        request.user.is_staff
-        or org_manager.org.managed.filter(id=request.user.profile.id).exists()
-    ):
+           request.user.is_staff
+           or OrgManager.objects.filter(
+                   org=org_manager.org,
+                   profile=request.user.profile
+               ).exists()
+       ):
         return HttpResponseForbidden("You do not have permission to delete this manager.") 
 
     if org_manager.profile_id == request.user.profile.id:
