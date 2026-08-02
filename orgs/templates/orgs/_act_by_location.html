@@ -66,7 +66,7 @@
 
   <!-- Description -->
 {% if card.activity.description %}
-<div class="me-description-block{% if q %} expanded{% endif %}">
+<div class="me-description-block{% if q or description_expanded %} expanded{% endif %}">
 
     <div class="me-desc-short">
         {% if q %}

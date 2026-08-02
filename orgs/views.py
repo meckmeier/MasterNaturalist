@@ -3234,6 +3234,7 @@ def act_loc_panel(request, location_id, activity_id):
             "card": cards[0],
             "page_type": "location",
             "can_edit": can_edit,
+            "description_expanded": True,
         },
     )
 
