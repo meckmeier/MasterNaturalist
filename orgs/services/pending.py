@@ -25,7 +25,7 @@ def build_pending_for_upload(upload):
     
     result = PendingBuildResult()
     raw_rows = RawLoadData.objects.filter(upload=upload).exclude(status__in=["error", "skipped"]).order_by("row_number")
-    print(f"Found {raw_rows.count()} raw rows for upload {upload.id}")
+    # print(f"Found {raw_rows.count()} raw rows for upload {upload.id}")
 
     if not raw_rows.exists():
         result.errors.append("No data rows found for this upload.")
@@ -33,7 +33,7 @@ def build_pending_for_upload(upload):
     
     with transaction.atomic():
         for raw in raw_rows:
-            print(f"Processing row {raw.row_number}...")
+            # print(f"Processing row {raw.row_number}...")
             try:
                 build_pending_row(raw, upload, result)
             except Exception as e:

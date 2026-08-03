@@ -2199,7 +2199,7 @@ def upload_map(request, upload_id):
     df = importer.df
     columns = list(df.columns)
 
-    EXCLUDE_FIELDS = ["id", "upload", "row_number", "organization"]
+    EXCLUDE_FIELDS = ["id", "upload", "row_number", "organization", "raw_data","time_commitment", "date_description","expire_date", "validation_errors", "validate_warnings","status"]
     IMPORT_ONLY_FIELDS = ["online",]
 
     field_names = [
@@ -2216,8 +2216,10 @@ def upload_map(request, upload_id):
     # Try automatic/default mapping first
     default_mapping = build_default_mapping(columns, field_names)
     default_errors = validate_mapping(default_mapping)
-
-    if request.method == "GET" and not default_errors:
+    
+    mapping_complete = set(default_mapping.keys()) == set(field_names)
+    
+    if request.method == "GET" and not default_errors and mapping_complete:
         request.session[f"mapping_{upload_id}"] = default_mapping
 
         upload.status = "csv_mapped"
@@ -2225,10 +2227,11 @@ def upload_map(request, upload_id):
 
         return redirect("upload_stage", upload_id=upload.id)
 
+
     if request.method == "POST":
         mapping = build_mapping(request.POST, columns)
         errors = validate_mapping(mapping)
-
+        
         if errors:
             upload.status = "error"
             upload.save(update_fields=["status"])
@@ -2239,6 +2242,7 @@ def upload_map(request, upload_id):
                 "field_names": field_names,
                 "upload": upload,
                 "dropdown_options": dropdown_options,
+                "default_mapping": default_mapping,
             })
 
         request.session[f"mapping_{upload_id}"] = mapping

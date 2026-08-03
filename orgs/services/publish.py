@@ -75,7 +75,7 @@ def publish_pending_upload(upload_id, user):
             description=pending_activity.description,
             activity_type=pending_activity.activity_type,
             date_description=pending_activity.date_description,
-            time_description=pending_activity.time_description,
+            
             time_commitment_txt =pending_activity.time_commitment,
             activity_url=pending_activity.activity_url,
             contact_email=pending_activity.contact_email,
@@ -123,6 +123,7 @@ def publish_pending_upload(upload_id, user):
             session_format=pending_session.session_format,
             start=pending_session.start,
             end=pending_session.end,
+            session_comment=pending_session.activity.time_description,
             ongoing=pending_session.ongoing,
             created_by=user,
             updated_by=user,

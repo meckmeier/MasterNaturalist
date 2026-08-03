@@ -1,6 +1,32 @@
 import re
 import pandas as pd
 
+FIELD_ALIASES = {
+    "location_name": [
+        "location",
+        "site",
+        "venue",
+        "location_name",
+    ],
+    "start_date": [
+        "date",
+        "start",
+        "start_date",
+    ],
+    "contact_email": [
+        "email",
+        "contact email",
+        "contact_email",
+    ],
+    "activity_url": [
+        "information_url",
+    ],
+    "time_description": [
+        "times",
+        "time"]
+}
+
+
 def field_normalize(value):
     if value is None:
         return ""
@@ -18,6 +44,11 @@ def field_normalize(value):
 
     return value.strip("_")
 
+ALIAS_LOOKUP = {}
+
+for model_field, aliases in FIELD_ALIASES.items():
+    for alias in aliases:
+        ALIAS_LOOKUP[field_normalize(alias)] = model_field
 
 def build_mapping(post_data, columns):
     mapping = {}
@@ -37,7 +68,13 @@ def build_dropdown_options(columns, field_names):
 
     for col in columns:
         normalized_col = field_normalize(col)
+
+        # First try an exact match
         preselected = normalized_field_map.get(normalized_col)
+
+        # If not found, try aliases
+        if preselected is None:
+            preselected = ALIAS_LOOKUP.get(normalized_col)
 
         choices = field_names.copy()
         if preselected is None:
@@ -68,21 +105,26 @@ def build_default_mapping(columns, field_names):
     mapping = {}
 
     normalized_fields = {
-        field.lower().strip(): field
+        field_normalize(field): field
         for field in field_names
     }
 
     for col in columns:
         col = str(col).strip()
 
-        # ignore blank / unnamed spreadsheet columns
         if not col or col.lower().startswith("unnamed:"):
             continue
 
-        normalized_col = col.lower().strip()
+        normalized_col = field_normalize(col)
 
-        if normalized_col in normalized_fields:
-            field_name = normalized_fields[normalized_col]
+        # Exact match first
+        field_name = normalized_fields.get(normalized_col)
+
+        # Then alias match
+        if field_name is None:
+            field_name = ALIAS_LOOKUP.get(normalized_col)
+
+        if field_name:
             mapping[field_name] = col
 
     return mapping
