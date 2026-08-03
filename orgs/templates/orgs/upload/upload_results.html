@@ -18,59 +18,8 @@
         
     </div>
 
-  <!-- tab buttons -->
-  <ul class="me-tabs" id="locTabs{{ loc.id }}" role="tablist" aria-orientation="vertical">
-    <li role="presentation">
-      <button class="me-tab-button active" 
-        id="v-pills-info-tab{{ loc.id }}" 
-        data-bs-toggle="pill" 
-        data-bs-target="#v-pills-info{{ loc.id }}" 
-        aria-controls="v-pills-info{{ loc.id }}"
-        aria-selected="true"
-        type="button" 
-        role="tab">Info</button>
-    </li>
-
-    {% if loc.volunteer %}
-      <li role="presentation">
-        <button class="me-tab-button me-tree-tab" 
-          id="v-pills-events-tab{{ loc.id }}" 
-          data-bs-toggle="pill" 
-          data-bs-target="#v-pills-events{{ loc.id }}" 
-          aria-controls="v-pills-events{{ loc.id }}"
-          aria-selected="false"
-          type="button" 
-          role="tab">Volunteer <i class="bi bi-tree-fill"></i></button>
-      </li>
-    {% endif %}
-
-    {% if loc.training %}
-      <li role="presentation">
-        <button class="me-tab-button me-learn-tab" 
-          id="v-pills-trainings-tab{{ loc.id }}" 
-          data-bs-toggle="pill" 
-          data-bs-target="#v-pills-trainings{{ loc.id }}" 
-          aria-controls="v-pills-trainings{{ loc.id }}"
-          aria-selected="false"
-          type="button" 
-          role="tab">Trainings <i class="bi bi-mortarboard-fill"></i></button>
-      </li>
-    {% endif %}
-  </ul>
-
-  <!-- Tab Content -->
-  <div class="me-tab-content tab-content" id="v-pills-tabContent{{ loc.id }}">
-    <!-- Info Tab -->
-    <div class="tab-pane fade show active"
-         id="v-pills-info{{ loc.id }}"
-         aria-labelledby="v-pills-info-tab{{ loc.id }}"
-         role="tabpanel">
-
-      <div class="me-card">
-        <div class="me-card-header">
-          <div class="me-card-header-left">
             {% if loc.loc_name == "No Location" %}
-                <h2>No Location</h2>
+                
                 (most likely online activities)
             
             
@@ -81,40 +30,29 @@
                 Managed by:
                 {{ loc.org.org_name }} |   {{ loc.org_loc_url }}
             {% endif %}
-            </div>
-            <div class="me-card-header-right">
-                <img src="{% static 'orgs/region_maps/' %}{{ loc.region.map_filename }}" alt="{{ loc.region.name }}" title="{{ loc.region.name }}" style="width:75px;">
-            </div>
-            </div>
+
+
             {% if loc.loc_name != "No Location" %}
 
             {{ loc.address }}, {{ loc.city_name }} | {{ loc.county_id.county_name }}
             <br> {{loc.region}}, {{loc.state}}
             {% endif %}
-    </div>
-    </div>
 
-    <!-- Events Tab -->
-    <div class="tab-pane fade"
-         id="v-pills-events{{ loc.id }}"
-         aria-labelledby="v-pills-events-tab{{ loc.id }}"
-         role="tabpanel">
+
+
+
       {% for each in loc.volunteer %}
         {% include "orgs/_session_item.html" with e=each source='loc' %}
       {% endfor %}
-    </div>
 
-    <!-- Trainings Tab -->
-    <div class="tab-pane fade"
-         id="v-pills-trainings{{ loc.id }}"
-         aria-labelledby="v-pills-trainings-tab{{ loc.id }}"
-         role="tabpanel">          
+
+        
       {% for each in loc.training %}           
         {% include "orgs/_session_item.html" with e=each source='loc' %}
       {% endfor %}
-    </div>
 
-  </div> <!-- end tab content -->
+
+
 
 </div> <!-- end loc card -->
 {% endfor %}
