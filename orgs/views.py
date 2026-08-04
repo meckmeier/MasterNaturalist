@@ -25,7 +25,7 @@ from django.db.models import Count, Q
 
 from datetime import date, time, timedelta
 from pathlib import Path
-from .utils import update_new_fields, safe_send_mail
+from .utils import  safe_send_mail
 import markdown
 import json
 import pandas as pd
@@ -41,12 +41,7 @@ from orgs.models import *
 from .forms import *
 from .utils import build_activity_cards
 
-def sort_key(x):
-    # Use date or expire_date; fallback to far-future
-    d = getattr(x, "date", None) or getattr(x, "expire_date", None)
-    if d is None:
-        return date.max
-    return d
+
 
 @staff_member_required
 def run_cleanup_old_imports(request):
@@ -1184,6 +1179,7 @@ def location_action(request, location_id):
 
     action = request.POST.get("action")
 
+
     if action == "update_org":
         org_id = request.POST.get("org_id")
 
@@ -2011,10 +2007,7 @@ def test_email(request):
 def superuser_required(user):
     return user.is_superuser
 
-@user_passes_test(superuser_required)
-def run_backfill(request):
-    update_new_fields()
-    return HttpResponse("Backfill complete")
+
 
 @login_required
 def org_manager_add(request, org_id):

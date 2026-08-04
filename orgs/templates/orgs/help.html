@@ -17,10 +17,9 @@
             <div class="help-description">Learn how to navigate and use the Wild Paths Wisconsin.org platform.</div>
             <div class="help-time">Estimated time: 3 minutes</div>
         </div></a>
-         <a class="help-card" href="https://wimasternaturalist.org/" target="_blank"><img src="{% static 'orgs/images/mstr_nat_and_ext.png'%}" width ="100" class="img-fluid">
-            Learn More about Wisconsin Master Naturalists</a>
+          <a href="{% url 'about'%}" class="help-card"><i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i>About Wild Paths Wisconsin</a>
 
-        </div>
+</div>
 </div>
 <div class="me-card">
         <h4>Organizations</h4>
@@ -68,8 +67,15 @@
   <a href="{% url 'for_orgs'%}" class="help-card"><i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i>Organization Management</a>
     <a href="{% url 'upload_faq'%}" class="help-card"><i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i>Upload Activities</a>
    </div>
-    
+   </div>
 
+    <div class="me-card">
+          <h4>Collaborating Organizations</h4>
+            <a class="help-card" href="https://wimasternaturalist.org/" target="_blank"><img src="{% static 'orgs/images/mstr_nat_and_ext.png'%}" width ="100" class="img-fluid">
+            Learn More about Wisconsin Master Naturalists</a>
+
+        </div>
+</div>
 
 
 {% endblock %}

@@ -74,7 +74,7 @@ urlpatterns = [
     path("staff/cleanup-imports/", views.run_cleanup_old_imports, name="run_cleanup_old_imports"),
     path("test_email",views.test_email, name="test_email"),
     path("test_html", views.test_html, name="test_html"),
-    path("admin/run-backfill/", views.run_backfill),
+
     path("debug/sessions/", views.debug_sessions, name="debug_sessions"),
     path("terms/", views.render_markdown, {"filename": "terms"}, name="terms"),
     path("privacy/", views.render_markdown, {"filename": "privacy"}, name="privacy"),

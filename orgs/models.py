@@ -896,6 +896,7 @@ class EmailLog(models.Model):
         ("BLOCKED_MONTHLY", "Blocked Monthly"),
         ("DISABLED", "Email Disabled"),
         ("FAILED", "Send Failed"),
+        ("PENDING", "Pending"),
     ],
     default="SENT",
 )

@@ -50,6 +50,8 @@ Primary production database.
 - Pending review
 - Publishing
 - Authentication
+- Email logging
+- Activity logging
 
 ---
 
