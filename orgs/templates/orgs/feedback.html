@@ -2,9 +2,9 @@
 
 {% block body %}
 <div class="me-page">
-    <h2>Send Feedback</h2>
+    <h2>Contact Me</h2>
     <p class="text-muted">
-        We would love to hear from you - let us know what you think about the site. 
+        I would love to hear from you - let me know what you think about the site. Use this form if you have questions or issues as well.
     </p>
 
     <form method="post" class="me-form">
@@ -21,7 +21,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="{{ form.note.id_for_label }}" class="form-label">Feedback</label>
+            <label for="{{ form.note.id_for_label }}" class="form-label">Message</label>
             {{ form.note }}
         </div>
         <div class="mb-3">
@@ -32,7 +32,7 @@
         
         <button type="submit" class="me-btn">
             <span><i class="bi bi-send me-btn-icon"></i></span>
-            <span class="me-btn-label">Submit Feedback</span></button>
+            <span class="me-btn-label">Submit</span></button>
     </form>
 </div>
 {% endblock %}
