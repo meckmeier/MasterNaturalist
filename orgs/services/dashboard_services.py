@@ -43,7 +43,6 @@ def get_data_quality_summary():
             "icon": "data_quality",
             "rows": [
                 ("organizations_without_activities", Organization.objects.filter( activities__isnull=True).distinct().count()),
-                ("activities_without_sessions", Activity.objects.filter(sessions__isnull=True).distinct().count()),
                 ("locations_without_sessions",Location.objects.filter(sessions__isnull=True).distinct().count()),
                 ("locations_without_orgs", Location.objects.filter(org__isnull=True).distinct().count()),
                 ("uploaded_activities", Activity.objects.filter( source_upload__isnull=False ).count()),
@@ -73,9 +72,7 @@ def get_security_summary():
                "rows": [
 
                     ("users", Profile.objects.count()),
-                    ("active", User.objects.filter(is_active=True).count()),
                     ("staff", User.objects.filter(is_staff=True).count()),
-                    ("superusers",User.objects.filter(is_superuser=True).count()),
                     ("inactive", User.objects.filter(is_active=False).count()),
             ]
        

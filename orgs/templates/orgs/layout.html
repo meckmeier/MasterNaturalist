@@ -129,30 +129,8 @@
               <li class="dropdown-item">
                 <a class="nav-link" href="/admin/">Admin</a>
                 </li>
-                
-              <li class="dropdown-item">
-                <a class="nav-link" href="/dashboard/">Dashboard</a>
-              </li>
-              <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'org_enrollment_list' %}">
-                  Approve New Orgs</a>
-              </li>
-              <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'staff_user_manage' %}">User Stats</a>
-              </li>
-              <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'run_update_latlng' %}">Lat/Lng Updates</a>
-              </li>
-              <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'run_cleanup_old_imports' %}">Clean up old imports </a>
-              </li>
-              <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'location_manage' %}">Manage Locations</a>
-              </li>
+              <li class="dropdown-item"><a class="nav-link" href="{% url 'staff_landing' %}">Staff Dashboard</a></li>
               
-              <li class="dropdown-item">
-                <a class="nav-link" href="{% url 'upload_dashboard' %}">Upload Dashboard</a>
-                </li>
             </ul>
            
           {% endif %}

@@ -3285,3 +3285,8 @@ def dashboard(request):
         "orgs/staff/dashboard.html",
         context,
     )
+
+
+@staff_member_required
+def staff_landing(request):
+    return render(request, "orgs/staff/staff_landing.html")

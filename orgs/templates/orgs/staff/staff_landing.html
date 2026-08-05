@@ -1,0 +1,94 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+
+
+<div class="container py-4">
+
+    <h1 class="mb-4">Staff Dashboard</h1>
+
+    <!-- Primary Tasks -->
+    <h3 class="mb-3">Maintenance Tasks</h3>
+
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+
+                    <h4 class="card-title">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        Update Location Coordinates
+                    </h4>
+
+                    <p class="text-muted">
+                        Find locations missing latitude and longitude and geocode them.
+                    </p>
+
+                    <a href="{% url 'run_update_latlng' %}" class="me-btn">
+                        <i class="bi bi-play-fill me-btn-icon"></i>
+                        <span class="me-btn-label">Run Coordinate Update</span>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+
+                    <h4 class="card-title">
+                        <i class="bi bi-trash me-2"></i>
+                        Cleanup Old Imports
+                    </h4>
+
+                    <p class="text-muted">
+                        Remove upload records that are more than 90 days old.
+                    </p>
+
+                    <a href="{% url 'run_cleanup_old_imports' %}" class="me-btn">
+                        <i class="bi bi-play-fill me-btn-icon"></i>
+                        <span class="me-btn-label">Run Cleanup</span>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Administration -->
+    <h3 class="mb-3">Administration</h3>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+
+        <a href="/dashboard/" class="btn btn-outline-primary">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+
+        <a href="{% url 'upload_dashboard' %}" class="btn btn-outline-primary">
+            <i class="bi bi-upload"></i> Upload Dashboard
+        </a>
+
+        <a href="{% url 'location_manage' %}" class="btn btn-outline-primary">
+            <i class="bi bi-geo"></i> Manage Locations
+        </a>
+
+        <a href="{% url 'org_enrollment_list' %}" class="btn btn-outline-primary">
+            <i class="bi bi-building-add"></i> Approve Organizations
+        </a>
+
+        <a href="{% url 'staff_user_manage' %}" class="btn btn-outline-primary">
+            <i class="bi bi-people"></i> User Statistics
+        </a>
+
+        <a href="/admin/" class="btn btn-outline-secondary">
+            <i class="bi bi-tools"></i> Django Admin
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

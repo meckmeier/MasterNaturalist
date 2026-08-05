@@ -21,6 +21,7 @@ urlpatterns = [
     path("staff/org-enrollments/", views.org_enrollment_list, name="org_enrollment_list"),
     path("staff/org-enrollments/<int:enrollment_id>/approve/", views.org_approve, name="org_approve"),
     path("staff/org-enrollments/<int:enrollment_id>/deny/", views.org_deny, name="org_deny"),  
+    path("staff/operations/", views.staff_landing, name="staff_landing"),
     path("locations/manage/", views.location_manage, name="location_manage"),
     path("locations/<int:location_id>/action/", views.location_action, name="location_action"),
     path("org-invite/<uuid:token>/", views.accept_org_invite, name="accept_org_invite",),
