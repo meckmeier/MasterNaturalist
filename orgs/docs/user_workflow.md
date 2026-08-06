@@ -216,3 +216,10 @@ Wildpaths users Cloudflare.Turnstyle to handle CAPTCHA configuration (used to ma
  Email configuration
 
  Outbound authentication emails are sent through Anymail/Postmark in production and the console backend during development.
+
+ ## User Workflow
+ Users can create a new user name directly by using the Register link from the main landing page.
+
+ Also can receive an invite in email, if they use the Add Organization menu option before they have created a username. This flow examines the email address from the Add form, and if it already exists will add the username to the OrgManagers table. But if that email does not exist, then it will generate an email with a link for the user to create the username. Once they create it, the link will add the username created to the OrgManager table. 
+
+ 

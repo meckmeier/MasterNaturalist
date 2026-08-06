@@ -113,6 +113,14 @@ to pay for email yet. It just pretty much locked down new registrations until I 
 
 Now in July there are many fewer changes to the site. Time has been spent on this documentation piece. It feels like it is really ready for pilot. Met Jen who is writing an article for the Newsletter about the app. And Becky has me with a slot on the Wisconsin Nature Volunteers organization meeting in October. It sure would be nice to have some users now, but things are delayed from the Master Naturalist side right now.
 
+# Part IV - Launch of app
+## August 2026
+(added WildPathsWisconsin.org and ended up maxing out email. Bought Postmark for a month to get thru launch.)
+
+Aug 3rd - invite email to partner orgs went out.
+Aug 4th - first org added: Kishwauketoe Nature Conservancy
+Aug 6th - zoom meeting office hours
+
 ------------------------------------------------------------------------
 
 # Historical Artifacts

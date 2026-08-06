@@ -24,7 +24,7 @@
         {% endif %}
         
        {% if card.activity|can_edit:request.user %}
-          <a href="{% url 'activity_edit' card.activity.id %}?next={{ request.get_full_path|urlencode }}#activity-{{ card.activity.id }}">
+          <a href="{% url 'activity_edit' card.activity.id %}">
             <i class="bi bi-pencil" style="font-size: .75rem;"></i>
           </a>
         {% endif %}

@@ -185,9 +185,11 @@ def org_approve(request, enrollment_id):
 
                         Your organization, {org.org_name}, has been approved for Wild Paths Wisconsin.
 
-                        Please use this link to see the new organization:
+                        To manage this organization, you will need to login. From there you should see the new Manage Organization button.
 
-                        {org_url}
+                        For more details on how to manage your organization, you can view this tutorial: https://wildpathswi.org/help/video/9Vdfv2czSvE/
+
+                        If you are currently logged in, you can use this link to see the new organization. {org_url}
 
                         Thank you!
                         """,
@@ -686,14 +688,24 @@ def loc_detail(request, loc_id=None):
                 loc.updated_by = request.user.profile
                 loc.save()
                 messages.success(request, f"Location '{loc.loc_name}' saved successfully!")
-                return redirect(f"{reverse('locations')}?view=list&loc={loc.id}")
+               
             else:
                 loc = form.save(commit=False)
                 loc.updated_by = request.user.profile
                 loc.save()
                 messages.success(request, f"Location '{loc.loc_name}' updated successfully!")
+
+            next_url = request.GET.get("next") or request.POST.get("next")
+            print ("next_url is:", next_url)
+            anchor = request.GET.get("anchor") or request.POST.get("anchor")
+
+            if next_url == "org_mgmt":
+                url = reverse("org_mgmt")
+                if anchor:
+                    url += f"#{anchor}"
+                return redirect(url)
+            else:
                 return redirect(f"{reverse('locations')}?view=list&loc={loc.id}")
-            
         else:
             #print("loc form errors",form.errors)
             messages.error(request, "there are errors in the form.")
@@ -3290,3 +3302,4 @@ def dashboard(request):
 @staff_member_required
 def staff_landing(request):
     return render(request, "orgs/staff/staff_landing.html")
+    
