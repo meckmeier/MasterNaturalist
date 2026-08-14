@@ -2947,7 +2947,7 @@ def calendar(request):
     if "session_format" not in get_data:
             get_data.setlist("session_format", ["i", "o", "s"])
     active_filters = []
-    get_data = request.GET if request.GET else None
+    
 
 
     filter_form=EventFilterForm(get_data or None)

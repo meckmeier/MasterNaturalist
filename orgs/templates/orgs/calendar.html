@@ -113,14 +113,6 @@
 {% endblock %}
 {% block extrajs %}
 <script>
-
-document.querySelectorAll(".quick-filters select").forEach(el => {
-  el.addEventListener("change", () => {
-    el.closest("form").submit();
-  });
-});
-
-console.log("Activity JS loaded");
 document.addEventListener("click", async function (e) {
     const link = e.target.closest(".me-activity-link");
     if (!link) return;
@@ -129,9 +121,16 @@ document.addEventListener("click", async function (e) {
 
     const activityId = link.dataset.activity;
     const locationId = link.dataset.location;
-    console.log("Clicked activity:", activityId);
 
-    const response =  await fetch(`/act-loc-panel/${locationId}/${activityId}/`);
+    console.log("Clicked activity:", activityId);
+    console.log("Clicked location:", locationId);
+
+    const url = `/act-loc-panel/${locationId}/${activityId}/`;
+    console.log("FETCH URL:", url);
+
+    const response = await fetch(url);
+    console.log("STATUS:", response.status);
+
     const html = await response.text();
 
     document.getElementById("activityContent").innerHTML = html;

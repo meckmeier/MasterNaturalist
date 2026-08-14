@@ -3,7 +3,7 @@
 {% load can_edit_filters %}
 <a class="me-activity-link" href="#"
    data-activity="{{ e.activity.id }}"
-   data-location= "{{ e.location.id }}"
+   data-location="{{ e.location.id|default:'0' }}"{% if e.location %}data-location="{{ e.location.id }}"{% endif %}
    data-bs-toggle="modal"
    data-bs-target="#activityPanel">
 <div class="me-card">
