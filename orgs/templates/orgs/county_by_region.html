@@ -1,0 +1,74 @@
+{% extends "orgs/layout.html" %}
+
+
+{% block body %}
+
+
+<div class="me-page">
+ <div class="me-card-header">
+    <div class="me-card-header-left">  
+      <h1>Counties in Each Region</h1>
+
+    <div class="mb-4">
+        <label for="countyFilter" class="form-label">Find my county</label>
+        <input
+            type="text"
+            id="countyFilter"
+            class="form-control"
+            placeholder="Start typing a county name..."
+        >
+    </div>
+    </div>
+  </div>
+  
+<div class="row" id="countyList">
+
+    {% for region in regions %}
+        <div class="col-12 col-md-6 col-lg-4 region-block mb-4">
+
+            <h2>{{ region.name }}</h2>
+
+            <ol>
+                {% for county in region.counties.all %}
+                    <li class="county-item">
+                        {{ county.county_name }}
+                    </li>
+                {% endfor %}
+            </ol>
+
+        </div>
+    {% endfor %}
+
+</div>
+</div>
+
+{% endblock %}
+{% block extrajs %}
+<script>
+    document.getElementById("countyFilter").addEventListener("input", function() {
+        const filter = this.value.toLowerCase();
+        const countyItems = document.querySelectorAll(".county-item");
+        const regionBlocks = document.querySelectorAll(".region-block");
+
+        let visibleRegions = 0;
+
+        regionBlocks.forEach(region => {
+            let visibleCounties = 0;
+            countyItems.forEach(county => {
+                if (county.textContent.toLowerCase().includes(filter)) {
+                    county.style.display = "list-item";
+                    visibleCounties++;
+                } else {
+                    county.style.display = "none";
+                }
+            });
+            if (visibleCounties > 0) {
+                region.style.display = "block";
+                visibleRegions++;
+            } else {
+                region.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %}

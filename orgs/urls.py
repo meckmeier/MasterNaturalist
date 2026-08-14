@@ -11,7 +11,7 @@ urlpatterns = [
     path("",  views.landing, name="landing"),
 
     path("calendar/", views.calendar, name="calendar"),
-    path( "activities/<int:pk>/panel/", views.activity_panel, name="activity_panel",),
+    #path("activities/<int:pk>/panel/", views.activity_panel, name="activity_panel",),
     path("act-loc-panel/<int:location_id>/<int:activity_id>/",views.act_loc_panel,name="act_loc_panel"),
     path("activities/", views.activities, name="activities"),
     path("opps/", views.opps, name="opps"),
@@ -31,7 +31,7 @@ urlpatterns = [
         path("orgs/manager-search/", views.org_manager_search, name="manager_search"),
        
         path("org_detail/<int:org_id>/edit/", views.org_edit, name="org_edit"),
-        path("org_detail/new/", views.org_create, name="org_create"),
+        #path("org_detail/new/", views.org_create, name="org_create"),
         path("activity/new/", views.activity_create, name="activity_create"),
         
         path("activity/<int:activity_id>/edit/", views.activity_edit, name="activity_edit"),
@@ -84,7 +84,7 @@ urlpatterns = [
     path("for_org/", views.render_markdown, {"filename": "for_orgs"}, name="for_orgs"),
     path("help/",views.help, name="help"),
     path("help/video/<str:video_id>/",views.help_video, name="help_video"),
-   
+    path("countylist/", views.county_list, name="county_list"),
     path("upload_faq/", views.render_markdown, {"filename":"upload_faq"},name="upload_faq"),
     path("news/",views.news, name="news"),
     path("dashboard/",views.dashboard,name="dashboard",),

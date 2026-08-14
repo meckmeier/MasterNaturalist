@@ -41,15 +41,11 @@
 
 
 
-      {% for each in loc.volunteer %}
-        {% include "orgs/_session_item.html" with e=each source='loc' %}
-      {% endfor %}
+    {% for card in cards %}
+    
+      {% include "orgs/_act_by_location.html" with card=card q=q  %} 
 
-
-        
-      {% for each in loc.training %}           
-        {% include "orgs/_session_item.html" with e=each source='loc' %}
-      {% endfor %}
+    {% endfor %}
 
 
 

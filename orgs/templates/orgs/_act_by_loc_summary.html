@@ -23,6 +23,7 @@
         
           {{ card.activity.title }}
      {% if card.organization.example_org %}<img src="{% static 'orgs/images/demo.jpg' %}" alt="This is a demo organization" style="width:100px;">{% endif %} 
+    
       
       </div>
        {% if page_type != "location" %} 
@@ -48,6 +49,7 @@
     </div>
    <div class="me-card-header-right"> 
     <div class="me-icons">
+       {% if card.has_online %}<img src="{% static 'orgs/images/online.png' %}" alt="online" style="width:50px; height:auto;">{% endif %}
       {% if page_type == "org" %}
       <img src="{% static 'orgs/region_maps/' %}{{ card.location.region.map_filename }}" alt="{{card.location.region.name}}"  title="{{ card.location.region.name }}" 
       style="height:75px; width:auto;">

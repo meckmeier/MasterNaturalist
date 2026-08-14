@@ -59,7 +59,7 @@ def run_cleanup_old_imports(request):
 
         output = out.getvalue()
 
-    return render(request, "orgs/upload/staff_run_cleanup_imports.html", {
+    return render(request, "orgs/staff/run_cleanup_imports.html", {
         "output": output,
     })
 
@@ -78,7 +78,7 @@ def run_update_latlng(request):
 
         output = out.getvalue()
 
-    return render(request, "orgs/staff_run_update_latlng.html", {
+    return render(request, "orgs/staff/run_update_latlng.html", {
         "output": output,
     })
 
@@ -94,7 +94,7 @@ def org_enrollment_list(request):
         )
     ).order_by("pending_first", "-created_at")
 
-    return render(request, "orgs/org_enrollment_list.html", {"enrollments": enrollments})
+    return render(request, "orgs/staff/org_enrollment_list.html", {"enrollments": enrollments})
 
 def help(request):
     return render(request, "orgs/help.html")
@@ -405,7 +405,7 @@ def follow_org(request, org_id):
         follow_relation.delete()
 
     if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts=None):
-        return redirect(next_url)
+        return redirect(f"{next_url}#org-{org_id}")
     else:
         return redirect("landing")  # fallback
 
@@ -1062,7 +1062,7 @@ def staff_user_manage(request):
             user.act_updated = 0
             user.total_updates = 0
 
-    return render(request, "orgs/staff_user_manage.html", {
+    return render(request, "orgs/staff/user_manage.html", {
         "users": users,
         "select_form": select_form,
         "target_user": target_user,
@@ -1286,9 +1286,6 @@ def org_set_default_location(request, org_id, loc_id):
     url = reverse("org_mgmt")
     return redirect(f"{url}#org-{org.id}")
 
-
-    logout(request)
-    return HttpResponseRedirect(reverse("landing"))
 
     
 @login_required
@@ -1755,113 +1752,20 @@ def activity_edit(request, activity_id):
         is_new=False,
     )   
 
-def activity_detail(request, activity_id=None):
-    is_new = activity_id is None
-    confirm = request.POST.get("confirm_duplicate")
-
-    categories = EventCategory.objects.all().order_by("name")
-    grouped_categories = defaultdict(list)
-    grouped_ids = {}
-
-    for cat in categories:
-        group = cat.category_class or "Other"
-        grouped_categories[group].append(cat)
-
-    for group, cats in grouped_categories.items():
-        grouped_ids[group] = [str(cat.id) for cat in cats]
-
-    # always in org context
-    if is_new:
-        org_id = request.GET.get("org") or request.POST.get("org")
-        org = get_object_or_404(Organization, id=org_id)
-        activity = Activity(org=org)
-    else:
-        activity = get_object_or_404(Activity, id=activity_id)
-        org = activity.org
-
-    can_edit = False
-    if request.user.is_authenticated:
-        if request.user.is_staff or  org.can_edit(request.user):
-            can_edit = True
-
-    if not can_edit:
-        return redirect("org_mgmt")
-
-    default_location_id = ""
-    if org and org.default_location_id:
-        default_location_id = str(org.default_location_id)
-
-    location_id = request.GET.get("location")
-    initial = [{"location": location_id}] if request.method == "GET" and location_id else None
-
-    activity_form = ActivityForm(
-        request.POST or None,
-        instance=activity,
-    )
-
-    session_formset = SessionFormSet(
-        request.POST or None,
-        instance=activity,
-        org=activity.org,
-        initial=initial,
-        prefix="sessions",
-        form_kwargs={"org": org},
-    )
+def activity_delete(request,activity_id=None):
+    activity = get_object_or_404(Activity, id=activity_id)
 
     if request.method == "POST":
-        if activity_form.is_valid() and session_formset.is_valid():
-            activity = activity_form.save(commit=False)
+        org_id = activity.org.id
+        activity.deleted=True
+        activity.deleted_at=timezone.now()
+        activity.save()
+        return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
 
-            if is_new:
-                activity.owner = request.user.profile
-
-                if activity_form.possible_duplicate() and not confirm:
-                    return render(request, "orgs/activity_form.html", {
-                        "activity": activity,
-                        "activity_form": activity_form,
-                        "session_formset": session_formset,
-                        "can_edit": can_edit,
-                        "duplicate_warning": True,
-                        "default_location_id": default_location_id,
-                        "grouped_categories": grouped_categories,
-                        "grouped_ids": grouped_ids,
-                    })
-
-            if not activity.owner:
-                activity.owner = request.user.profile
-            if not activity.created_by:
-                activity.created_by = request.user.profile
-            activity.updated_by = request.user.profile
-            activity.org = org
-            activity.save()
-
-            sessions = session_formset.save(commit=False)
-            for s in sessions:
-                if not s.created_by:
-                    s.created_by = request.user.profile
-                s.updated_by = request.user.profile
-                s.activity = activity
-                s.save()
-
-            for s in session_formset.deleted_objects:
-                s.delete()
-
-            return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
-
-        #print("Session formset errors:", session_formset.errors)
-        #print("Management errors:", session_formset.management_form.errors)
-        #print("Main form errors:", activity_form.errors)
-
-    return render(request, "orgs/activity_form.html", {
-        "activity": activity,
-        "activity_form": activity_form,
-        "session_formset": session_formset,
-        "can_edit": can_edit,
-        "duplicate_warning": False,
-        "default_location_id": default_location_id,
-        "grouped_categories": grouped_categories,
-        "grouped_ids": grouped_ids,
+    return render(request, "orgs/_activity_confirm_delete.html", {
+        "activity": activity
     })
+
 
 def location_search(request):
     q = request.GET.get("q", "").lower()
@@ -1929,19 +1833,6 @@ def quick_location_create(request):
         "org": org,
     })
 
-def activity_delete(request,activity_id=None):
-    activity = get_object_or_404(Activity, id=activity_id)
-
-    if request.method == "POST":
-        org_id = activity.org.id
-        activity.deleted=True
-        activity.deleted_at=timezone.now()
-        activity.save()
-        return redirect(f"{reverse('org_mgmt')}#org-{org_id}")
-
-    return render(request, "orgs/_activity_confirm_delete.html", {
-        "activity": activity
-    })
 
 def map_view(request):
     training_qs = Activity.objects.training().filter(
@@ -2972,11 +2863,12 @@ def upload_results(request, upload_id):
 
     if no_location.volunteer or no_location.training:
             locs.append(no_location)
-
+    cards = build_activity_cards(base_sessions)
+    
     return render(request, "orgs/upload/upload_results.html", {
         "upload": upload,
         "locs": locs,
-
+        "cards": cards,
     })
 
 from django.db import DatabaseError
@@ -3165,17 +3057,29 @@ def calendar(request):
     clean_get = request.GET.copy()
     for p in ["page", "curr_page", "onl_page","ong_page"]:
         clean_get.pop(p, None)
-
+    from datetime import timedelta
     calendar = OrderedDict()
 
     for session in queryset:
-        month_key = session.start.strftime("%B %Y")      # July 2026        
-        day_key = session.start                  # 2026-07-19        
-        if month_key not in calendar:
-            calendar[month_key] = OrderedDict()
-        if day_key not in calendar[month_key]:
-            calendar[month_key][day_key] = []
-        calendar[month_key][day_key].append(session)
+        start_date = session.start
+        end_date = session.end if session.end else start_date
+
+        current_date = start_date
+
+        while current_date <= end_date:
+            month_key = current_date.strftime("%B %Y")
+            day_key = current_date
+
+            if month_key not in calendar:
+                calendar[month_key] = OrderedDict()
+
+            if day_key not in calendar[month_key]:
+                calendar[month_key][day_key] = []
+
+            calendar[month_key][day_key].append(session)
+
+            current_date += timedelta(days=1)
+
 
     result_count = queryset.count()
     return render(request, "orgs/calendar.html", {
@@ -3190,27 +3094,7 @@ def calendar(request):
     })
 
 
-def activity_panel(request, pk):
-    activity = get_object_or_404(
-        Activity.objects.prefetch_related(
-            Prefetch(
-                "sessions",
-                queryset=Session.objects.current().order_by("start")
-            )
-        ),
-        pk=pk,
-    )
 
-
-
-    return render(
-        request,
-        "orgs/_activity_item.html",
-        {
-            "e": activity,
-
-        },
-    )
 
 def act_loc_panel(request, location_id, activity_id):
 
@@ -3303,3 +3187,15 @@ def dashboard(request):
 def staff_landing(request):
     return render(request, "orgs/staff/staff_landing.html")
     
+
+def county_list(request):
+    regions = (
+        Region.objects
+        .prefetch_related("counties")
+        .exclude(counties__isnull=True)
+        .order_by("name")
+    )
+
+    return render(request, "orgs/county_by_region.html", {
+        "regions": regions,
+    })

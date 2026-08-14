@@ -150,7 +150,10 @@ def build_activity_cards(sessions, location=None):
                 s.start,
             )
         )
-
+        card["has_online"] = any(
+            s.session_format in ["o", "b"]
+            for s in card["sessions"]
+        )
     # Convert to list
     cards = list(cards.values())
 
