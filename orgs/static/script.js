@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const container = document.querySelector(".formset");
         const totalForms = document.querySelector("[id$='-TOTAL_FORMS']");
         const template = document.querySelector(".form-template");
-        const tbody = document.querySelector(".formset-table tbody");
+        const tbody = document.querySelector(".me-formset-table tbody");
 
         console.log("Add button clicked", { container, totalForms, template, tbody });
 

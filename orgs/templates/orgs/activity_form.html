@@ -192,7 +192,7 @@
                             {{form.ongoing }}
                              {{form.ongoing.errors}}
                
-                
+                            </td>
                         <td class="date-group" data-label="Activity Date">
                             <div class="date-content">
                             <div class="ongoing-help me-small" >Show from </div>
@@ -210,10 +210,7 @@
                             {{form.session_comment.errors}}
                         </td>
                     </tr>
-                    <tr class="session-divider">
-                        <td colspan="7"><hr></td>
-                    </tr>
-                   
+                    <tr><hr></tr>
   
                     
             {% empty %}
@@ -228,13 +225,13 @@
                             </td>
                         </tr>
                         {% endif %}
-                        <tr class="formset-row form-template" style="display:none;">
+                        <tr class="me-formset-row form-template" style="display:none;">
                         {% for hidden in session_formset.empty_form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
                         <td>{{ session_formset.empty_form.session_format }}</td>
                         <td> <div class="url-group">{{ session_formset.empty_form.session_url }}</div></td>
-                        <td><div  class="loc-group">{{ session_formset.empty_form.location }}
+                        <td><div class="loc-group">{{ session_formset.empty_form.location }}
                                 <button type="button"
                                         class="me-btn  open-location-search"
                                         data-bs-toggle="modal"
@@ -243,13 +240,19 @@
                                 <span class="me-btn-label">Find/Add Location</span>
                                 </button></div>
                         </td>
-                        <td>{{ session_formset.empty_form.ongoing }}</td>
-                        <td>{{ session_formset.empty_form.start }}</td>
-                        <td>{{ session_formset.empty_form.end }}</td>
-                        <td>{{ session_formset.empty_form.session_comment}}</td>
+                        <td  data-label="Ongoing">{{ session_formset.empty_form.ongoing }}</td>
+                        <td class="date-group" data-label="Activity Date">
+                            <div class="date-content">
+                            <div class="ongoing-help me-small" >Show from </div>
+                            {{ session_formset.empty_form.start }}
+                            <div class="ongoing-help me-small" >
+                            thru (end date):
+                            {{ session_formset.empty_form.end }}</div>
+                            </div></td>
+                        <td  data-label="Time Comment">{{ session_formset.empty_form.session_comment}}</td>
                         </tr>
-                        
-                        </tr>
+                        <tr><hr></tr>
+                       
 
             </tbody>
         </table>
