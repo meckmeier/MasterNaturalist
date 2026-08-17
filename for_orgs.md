@@ -89,7 +89,7 @@ To add a new activity, click the PLUS sign in the Activities section header.
 > | Prerequisites | If your activity requires previous training, or the volunteer activity requires users to have some abilities, be sure to include it here. |
 
 ### Session information
-This section is for the when and where... depending on your activity you might have just one session... but you could also have multiple sessions and it's easy to add more here. The final cards are shown BY this session information - so if you have multiple sessions, you will see multiple cards in the activity lists.
+This section is for the when and where... depending on your activity you might have just one session... but you could also have multiple sessions and it's easy to add more here. Consider each session corresponds to a single date on the calendar view. The session dates are summarized in other views of the activity.
 
 
 > | Field | Description |
@@ -97,19 +97,10 @@ This section is for the when and where... depending on your activity you might h
 > | Format | In Person = you will need to pick a location. Online = you will need to pick a URL. Hybrid = if the main event is in-person, but there is a way to join online then call it Hybrid. You can specify both a URL and a Location. Self-selected locations - if your volunteer event is done at the volunteers discretion, then use this choice. |
 > | URL | for Online and Hybrid - it must be in a url format (www.mysite.org/trainingsession for example). |
 > | Location | If you have a default location, it will populate here automatically. But if you have not created a location yet - you can add one now (look below for more details). You can also find locations that might already be in the system. For example, all the state parks are already loaded. If you are a friends organization, for example, you can just pick your state park. |
-> | Ongoing | This checkbox indicates that the activity is happening over time. That is, there are not specific dates for it. You CAN choose to specific the range of dates for ongoing activities (so for example, if you are offering volunteer options from October 1 thru the 15 you can specify that in the Start and End). The dates will cause the activity to roll off when it is no longer in effect. |
-> | Start | If your activity is happening on specific dates - then you can record that here. If your activity is only one day long, just fill out the Start (the end will default to just one day). Use the YYYY-MM-DD format. |
-> | End | If your activity spans multiple days (like a conference that covers several days), then you can enter the end date here. Use the YYYY-MM-DD format. |
+> | Ongoing | This checkbox indicates that the activity is happening over a range of times. These events will not appear in the calendar view, but you can always see them in the Volunteer or Learn views. You can filter to just ongoing events once you are on that view. When you check Ongoing, you will see a start and end date field to specify the active dates for your activity. Outside that range, the event will no longer appear in active lists for end users. Leave these fields blank if you just want the activity to remain active. |
+> | Activity Date | If your event is not ongoing, then you will need to log a separate session for each day it occurs. If you have a 3-day conference, you would need a separate session for each day. This will cause your activity to appear on each day in the Calendar view. If you only want the event to show on the calendar on the initial date, type the first date here. You can use the time comment field to say that the session in over the course of multimple days. |
+> | Time Comment | You can specify times - or if you event spans multiple days, you could indicate that in this free form comment field. |
 
-### Additional Details
-These are optional fields that you can use to provide more details to the end users. 
-
-> | Field | Description |
-> | ----------- | ----------- |
-> | Date Description | If you want to say something more general than just the date, you can complete this field. |
-> | Time | this field is used to specify the duration of the event. |
-> | Time Description | like the date description, this is a generic time description. These fields are not session specific, so use them as general information. |
-> | Keywords | check the boxes for the content or service categories. These can be used in category searches to help users quickly search for specific types of activities. |
 
 
 #### Pick a Location
