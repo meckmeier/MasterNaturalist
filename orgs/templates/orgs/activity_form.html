@@ -134,15 +134,14 @@
         <div class="me-form-field-full">
             <div class="formset" data-prefix="locations">
                  {{ session_formset.management_form }}
-                <table class="formset-table {% if view_only %}view-mode{% endif %}">
+                <table class="me-formset-table {% if view_only %}view-mode{% endif %}">
                 <thead>
                     <tr> 
                         <th>Format</th>
                         <th>URL (if online option)</th>
                         <th>Location (if inperson)</th>
                         <th><i class="bi bi-info-circle" data-bs-toggle="tooltip" title="If checked, this session will be listed as ongoing and start/end dates will be hidden. Clear the check to show the start/end dates."> Ongoing</i></th>
-                        <th>Start</th>
-                        <th>End</th>
+                        <th>Activity Date</th>
                         <th>Time (optional) </th>
                     </tr>
                 </thead>
@@ -151,18 +150,20 @@
                         <tr class ="formset-row"> 
                             {% for hidden in form.hidden_fields %}
                                 {{ hidden }}
-                            {% endfor %}                                             
-                        <td>
+                            {% endfor %}       
+                                                    
+                        <td data-label="Format">
+                            
                             {{ form.session_format }}
                             {{ form.session_format.errors }}
                         </td>
-                        <td>
+                        <td data-label="URL">
                             <div class="url-group">
                             {{ form.session_url }}
                             {{ form.session_url.errors }}
                             </div>
                         </td> 
-                        <td>
+                        <td data-label="Location">
                            <div  class="loc-group">
                             <div class="real-location-field d-none">
                                 {{ form.location }}
@@ -187,30 +188,30 @@
                             </button>
                         </div>
                         </td>       
-                        <td>                            
+                        <td data-label="Ongoing">                            
                             {{form.ongoing }}
                              {{form.ongoing.errors}}
-                             <div class="small text-muted ongoing-help" style="display:none;">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Dates are optional. Use them to set a range for this ongoing activity.
-                        </td>
+               
                 
-                        <td class="date-group">
+                        <td class="date-group" data-label="Activity Date">
                             <div class="date-content">
+                            <div class="ongoing-help me-small" >Show from </div>
                             {{ form.start }}
                             {{ form.start.errors }}
-                            </div>
-                        </td>       
-                        <td class="date-group">
-                            <div class="date-content">
-                            {{ form.end }}
-                            {{ form.end.errors }}
+                            
+                       
+                            <div class="ongoing-help me-small" >
+                            thru (end date): {{ form.end }}
+                            {{ form.end.errors }}</div>
                             </div>
                         </td>    
-                        <td>
+                        <td data-label="Time Comment">
                             {{form.session_comment}}
                             {{form.session_comment.errors}}
                         </td>
+                    </tr>
+                    <tr class="session-divider">
+                        <td colspan="7"><hr></td>
                     </tr>
                    
   

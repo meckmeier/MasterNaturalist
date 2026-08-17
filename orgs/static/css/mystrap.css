@@ -188,6 +188,18 @@ a:active {
     background-color: transparent;
 
 }
+.me-formset-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 3px 0;
+}
+.me-formset-table th:nth-child(1) { width: 12%; }  /* Format */
+.me-formset-table th:nth-child(2) { width: 20%; }  /* URL */
+.me-formset-table th:nth-child(3) { width: 22%; }  /* Location */
+.me-formset-table th:nth-child(4) { width: 10%; }  /* Ongoing */
+.me-formset-table th:nth-child(5) { width: 15%; }  /* Date */
+.me-formset-table th:nth-child(6) { width: 21%; }   /* Time */
 /* Tabs */
 .me-tabs {
   display: flex;
@@ -214,6 +226,9 @@ a:active {
 /* Text */
 .me-muted {
   color: #777;
+}
+.me-small{
+  font-size: smaller;
 }
 
 .me-card {
@@ -1021,6 +1036,38 @@ li.inactive {
 
     font-size:.75rem;
     font-weight:600;
+}
+
+@media (max-width: 1000px) {
+    .me-formset-table,
+    .me-formset-table tbody,
+    .me-formset-table tr,
+    .me-formset-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .me-formset-table thead {
+        display: none;
+    }
+
+    .me-formset-table tr.me-formset-row {
+        margin-bottom: 1.5rem;
+        padding: .75rem 0;
+        border: none;
+    }
+
+    .me-formset-table td {
+        padding: .35rem 0;
+    }
+
+    .me-formset-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
 }
 
 @media (max-width: 480px) {
