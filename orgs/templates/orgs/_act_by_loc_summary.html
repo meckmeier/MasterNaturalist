@@ -36,10 +36,13 @@
 
             {% if card.activity.time_commitment_txt %} | <em>{{ card.activity.time_commitment_txt }}</em>{% endif %}
             {% for session in card.sessions %}
-                | {% if session.ongoing %}Ongoing{% endif%}
-                {% if session.start %}{{ session.start }}{% endif %}
+                | {% if session.ongoing %}Ongoing
+                {% if session.start %} ({{ session.start }} {% if session.end and session.start != session.end %} - {{ session.end }}{% else %} onward {% endif %}) {% endif %}
+                {% else %}
+                {{ session.start }}
+                {% endif%}
 
-                {% if session.end and session.start != session.end %} - {{ session.end }}{% endif %}
+               
                 {% if session.session_comment %}<em>{{ session.session_comment }}</em>{% endif %} 
                  
             {% endfor %}

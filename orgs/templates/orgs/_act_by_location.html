@@ -39,10 +39,11 @@
             {% if card.activity.time_commitment_txt %} | <em>{{ card.activity.time_commitment_txt }}</em>{% endif %}
             {% for s in card.sessions %}
                {% if s.session_format == "s" %}Self directed locations{% endif %}
-                | {% if s.ongoing %}Ongoing{% endif%}
-                {% if s.start %}{{ s.start }}{% endif %}
+                | {% if s.ongoing %}Ongoing
+                {% if s.start %} ({{ s.start }} {% if s.end and s.start != s.end %} - {{ s.end }}{% else %} onward {% endif %}){% endif %}
+                {% else %}{{ s.start }}{% endif%}
 
-                {% if s.end and s.start != s.end %} - {{ s.end }}{% endif %}
+                
                 {% if s.session_comment %}<em>{{ s.session_comment }}</em>{% endif %} 
                 {% if s.session_url %} <a href="{{s.session_url}}" target="_blank" rel="noopener noreferrer">
                         <i class=" bi bi-arrow-up-right-square" title="External link to session details"></i> Join online</a>{% endif %}

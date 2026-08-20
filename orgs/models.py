@@ -573,17 +573,21 @@ class SessionQuerySet(models.QuerySet):
     def current(self):
         today = timezone.now().date()
 
-        return self.active().filter(
+        return self.filter(
+        # Ongoing activities
+        Q(ongoing=True) & (
             Q(start__isnull=True) |
-            Q(start__gte=today) |
-            (Q(start__lt=today) & (Q(end__isnull=True) | Q(end__gte=today)))
+            Q(start__lte=today) &
+            (Q(end__isnull=True) | Q(end__gte=today))
         )
+        |
+        # Dated activities
+        Q(ongoing=False) & Q(start__gte=today)
+    )
     def upcoming(self):
-        today = timezone.now().date()
         return self.active().filter(ongoing=False )
 
     def ongoing(self):
-        today = timezone.now().date()
         return self.active().filter(ongoing=True)
    
 class Session(models.Model):
