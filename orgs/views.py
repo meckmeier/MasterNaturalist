@@ -741,20 +741,32 @@ def locations(request):
     today = timezone.now().date()
     active_filters = []
 
-
     current_session_filter = (
         Q(sessions__deleted=False) &
         Q(sessions__activity__deleted=False) &
         Q(sessions__activity__org__deleted=False) &
         (
-            Q(sessions__start__isnull=True) |
-            Q(sessions__start__gte=today) |
             (
-                Q(sessions__start__lt=today) &
-                (Q(sessions__end__isnull=True) | Q(sessions__end__gte=today))
+                Q(sessions__ongoing=True) &
+                (
+                    Q(sessions__start__isnull=True) |
+                    (
+                        Q(sessions__start__lte=today) &
+                        (
+                            Q(sessions__end__isnull=True) |
+                            Q(sessions__end__gte=today)
+                        )
+                    )
+                )
+            )
+            |
+            (
+                Q(sessions__ongoing=False) &
+                Q(sessions__start__gte=today)
             )
         )
     )
+   
     volunteer = Session.objects.current().filter(
         activity__activity_type="v",
     )

@@ -573,7 +573,7 @@ class SessionQuerySet(models.QuerySet):
     def current(self):
         today = timezone.now().date()
 
-        return self.filter(
+        return self.active().filter(
         # Ongoing activities
         Q(ongoing=True) & (
             Q(start__isnull=True) |
