@@ -28,7 +28,7 @@ def get_database_summary():
     "title": "Database Summary",
     "icon": "database",
     "rows": [
-        ("Organizations", Organization.objects.exclude(created_by__user__username="mary").count()),
+        ("Organizations", OrganizationEnrollmentRequest.objects.filter(created_org__isnull=False).count()),
         ("Locations", Location.objects.exclude(created_by__user__username="mary").count()),
         ("Activities", Activity.objects.exclude(created_by__user__username="mary").count()),
         ("Sessions", Session.objects.exclude(created_by__user__username="mary").count()),

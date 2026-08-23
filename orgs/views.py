@@ -170,6 +170,9 @@ def org_approve(request, enrollment_id):
             created_by=request.user.profile,
             updated_by=request.user.profile,
         )
+    enrollment.created_org = org
+    enrollment.save()
+    
     path = reverse("org_mgmt")
     org_url = f"{settings.SITE_URL}{path}?org={org.id}"
     
