@@ -28,10 +28,10 @@ def get_database_summary():
     "title": "Database Summary",
     "icon": "database",
     "rows": [
-        ("Organizations", Organization.objects.exclude(created_by__user__username="mary", created_by__isnull=True).count()),
-        ("Locations", Location.objects.exclude(created_by__user__username="mary", created_by__isnull=True).count()),
-        ("Activities", Activity.objects.exclude(created_by__user__username="mary", created_by__isnull=True).count()),
-        ("Sessions", Session.objects.exclude(created_by__user__username="mary", created_by__isnull=True).count()),
+        ("Organizations", Organization.objects.exclude(created_by__user__username="mary").count()),
+        ("Locations", Location.objects.exclude(created_by__user__username="mary").count()),
+        ("Activities", Activity.objects.exclude(created_by__user__username="mary").count()),
+        ("Sessions", Session.objects.exclude(created_by__user__username="mary").count()),
     ],
 }
 
