@@ -20,14 +20,29 @@ admin.site.register(Pending_Activity)
 admin.site.register(Pending_Session)
 admin.site.register(Pending_Location)
 admin.site.register(ZipToCounty)
-admin.site.register(OrganizationEnrollmentRequest)
 admin.site.register(ActivityLog)
 admin.site.register(UploadLog)
 admin.site.register(Region)
 admin.site.register(Video)
 
 
-
+@admin.register(OrganizationEnrollmentRequest)
+class OrgEnrollmentRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        "org_name",
+        "created_org"
+        "contact_name",
+        "contact_email",
+        "status",
+        "created_at",
+    )
+    search_fields = (
+        "org_name",
+        "contact_name",
+        "contact_email",
+    )
+    list_filter = ("status",)
+    ordering = ("-created_at",)
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = ["created_at", "name", "email", "page_url"]
