@@ -491,7 +491,8 @@ class Activity(models.Model):
     categories = models.ManyToManyField(EventCategory, blank=True, related_name="category_activities")
     date_description = models.CharField(max_length=255, default='', blank=True, null=True)
     time_description = models.CharField(max_length=255, default='', blank=True, null=True)
-    expire_date = models.DateField(default=default_expire_date)
+    expire_date = models.DateField(default=default_expire_date,    null=True,
+    blank=True,)
     activity_url = models.URLField(max_length=255, default="", blank=True, null=True)
     
     has_cost = models.BooleanField(default=False)

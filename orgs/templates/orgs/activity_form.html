@@ -27,6 +27,26 @@
     data-default-location="{{ default_location_id }}" data-org-id="{{ activity.org.id }}" 
     novalidate autocomplete="off">
  {% csrf_token %}
+ {% if activity_form.errors %}
+    <div class="alert alert-danger">
+        <strong>Activity errors:</strong>
+        {{ activity_form.errors }}
+    </div>
+{% endif %}
+
+{% if session_formset.errors %}
+    <div class="alert alert-danger">
+        <strong>Session errors:</strong>
+        {{ session_formset.errors }}
+    </div>
+{% endif %}
+
+{% if session_formset.non_form_errors %}
+    <div class="alert alert-danger">
+        <strong>Formset errors:</strong>
+        {{ session_formset.non_form_errors }}
+    </div>
+{% endif %}
  <input type="hidden" name="org" value="{{ request.GET.org }}">
  <input type="hidden" name="location" value="{{ request.GET.location }}">
 {% if next %}

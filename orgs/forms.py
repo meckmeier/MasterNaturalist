@@ -590,7 +590,7 @@ class ActivityForm(forms.ModelForm):
 
     class Meta:        
         model = Activity
-        fields = ["org", "title", "description", "activity_type", "categories", "activity_url", "has_cost", "contact_email", "time_commitment", "prerequisites", "expire_date",  "deleted"] 
+        fields = ["org", "title", "description", "activity_type", "categories", "activity_url", "has_cost", "contact_email", "time_commitment", "prerequisites",  "deleted"] 
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "prerequisites": forms.TextInput(attrs={"placeholder": "e.g. Previous training, experience, or materials needed"}),

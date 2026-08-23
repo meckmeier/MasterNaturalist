@@ -146,6 +146,7 @@ def build_activity_cards(sessions, location=None):
     for card in cards.values():
         card["sessions"].sort(
             key=lambda s: (
+                s.ongoing,
                 s.start is None,
                 s.start,
             )
@@ -160,6 +161,7 @@ def build_activity_cards(sessions, location=None):
     # Sort cards by earliest session
     cards.sort(
         key=lambda c: (
+            c["sessions"][0].ongoing,
             c["sessions"][0].start is None,
             c["sessions"][0].start,
             c["activity"].title.lower(),
