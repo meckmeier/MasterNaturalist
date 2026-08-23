@@ -29,7 +29,7 @@ admin.site.register(Video)
 @admin.register(OrganizationEnrollmentRequest)
 class OrgEnrollmentRequestAdmin(admin.ModelAdmin):
     list_display = (
-        "org_name",
+        "org_name", 
         "created_org",
         "contact_name",
         "contact_email",
