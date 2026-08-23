@@ -1504,7 +1504,6 @@ def activities(request):
     if activity_id:
         current_activity = Activity.objects.filter(id=activity_id).first()
     
-    today = timezone.now().date()
     # activities results... should i change this so we know what it is?
    
     queryset = Session.objects.current().select_related(
@@ -1564,16 +1563,14 @@ def activities(request):
             
         if data.get("time") == "dated":
             queryset = queryset.filter(ongoing=False)
+            active_filters.append("Upcoming")
         elif data.get("time") == "ongoing":
             queryset = queryset.filter(ongoing=True)
+            active_filters.append("Ongoing")
 
         if data.get("categories"):
             queryset = queryset.filter(activity__categories__id__in=data["categories"]).distinct()
             active_filters.append(f"Categories: {', '.join([str(c) for c in data['categories']])}")
-
-        if data.get("ongoing"):
-            queryset = queryset.filter(ongoing=True)
-            active_filters.append("Ongoing")
 
         if data.get("has_cost"):
             queryset = queryset.filter(activity__has_cost=False).distinct()
@@ -1585,13 +1582,23 @@ def activities(request):
             active_filters.append(f"Newly created")
 
         if data.get("start_date"):
-            queryset = queryset.filter(start__gte=data["start_date"])
-            active_filters.append(f"Start on or after: {data['start_date']}")
+            queryset = queryset.filter(
+                Q(ongoing=False, start__gte=data["start_date"]) |
+                Q(ongoing=True, end__isnull=True) |
+                Q(ongoing=True, end__gte=data["start_date"])
+            )
+            active_filters.append(
+                f"Active on or after: {data['start_date']}"
+            )
 
         if data.get("end_date"):
-            queryset = queryset.filter(start__lte=data["end_date"])
-            active_filters.append(f"Start on or before: {data['end_date']}")
-
+            queryset = queryset.filter(
+                Q(start__isnull=True) |
+                Q(start__lte=data["end_date"])
+            )
+            active_filters.append(
+                f"Active on or before: {data['end_date']}"
+            )
         formats = data.get("session_format", [])
         
         # Only filter if the user has unchecked something
@@ -1624,7 +1631,8 @@ def activities(request):
     clean_get = request.GET.copy()
     for p in ["page", "curr_page", "onl_page","ong_page"]:
         clean_get.pop(p, None)
-    
+    query_params = list(clean_get.lists())
+
 
     result_count = queryset.count()
     cards = build_activity_cards(queryset)
@@ -1635,7 +1643,7 @@ def activities(request):
                     "queryset": queryset,
                     "cards": cards,
                     "filter_form":filter_form,
-                    "query_params": clean_get,
+                    "query_params": query_params,
                     "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
                     "cats": EventCategory.objects.all(),
                     "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html,

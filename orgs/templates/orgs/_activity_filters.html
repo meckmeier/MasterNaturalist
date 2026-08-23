@@ -1,25 +1,34 @@
 <form method="get" action="{{ request.path }}" class="me-form">
     <div class="my-page">
-     {% csrf_token %}
-    <input type="hidden" name="page" value="{{ request.GET.page|default:'1' }}">
-        <div class="me-toggle" role="group" aria-label="When">
+    
 
-  <input type="radio" name="time" id="time-all" value=""
-         {% if not request.GET.time %}checked{% endif %}>
-  <label for="main-time-all">All</label>
 
-  <input type="radio" name="time" id="time-dated" value="dated"
-         {% if request.GET.time == "dated" %}checked{% endif %}>
-  <label for="main-time-dated">Dated</label>
+{% for key, values in query_params %}
+    {% if key != "time" and key != "activity_type" %}
+        {% for value in values %}
+            <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+    <div class="me-toggle" role="group" aria-label="When">
 
-  <input type="radio" name="time" id="time-ongoing" value="ongoing"
-         {% if request.GET.time == "ongoing" %}checked{% endif %}>
-  <label for="main-time-ongoing">Ongoing</label>
+        <input type="radio" name="time" id="time-all" value=""
+               {% if not request.GET.time %}checked{% endif %}>
+        <label for="time-all">All</label>
 
-</div>
+        <input type="radio" name="time" id="time-dated" value="dated"
+               {% if request.GET.time == "dated" %}checked{% endif %}>
+        <label for="time-dated">Upcoming</label>
+
+        <input type="radio" name="time" id="time-ongoing" value="ongoing"
+               {% if request.GET.time == "ongoing" %}checked{% endif %}>
+        <label for="time-ongoing">Ongoing</label>
+
+    </div>
+
     
   <!-- Activity Type -->
-  <div class="me-toggle" role="group">
+  <div class="me-toggle" role="group" aria-label="Activity Type">
     <input type="radio" name="activity_type" id="type-all" value=""
            {% if not request.GET.activity_type %}checked{% endif %}>
     <label for="type-all">All</label>
@@ -44,7 +53,7 @@
         {{ filter_form.org.errors }}
     </div>
      {% if user.is_authenticated %}
-     <input type="hidden" name="tab" id="tabInput" value="{{ request.GET.tab|default:'upcoming' }}">
+     
     <div >
         {{ filter_form.my_orgs }}
         {{ filter_form.my_orgs.label_tag }}
