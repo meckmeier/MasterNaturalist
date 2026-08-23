@@ -1510,7 +1510,7 @@ def activities(request):
             "location"         # Session -> Location
         ).prefetch_related(
             "activity__categories"  # m2m from Activity -> categories
-        ).order_by("start", "activity__title").distinct()
+        ).order_by("ongoing","start", "activity__title").distinct()
     
     get_data = request.GET.copy()
 

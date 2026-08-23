@@ -1069,7 +1069,17 @@ li.inactive {
         margin-bottom: .2rem;
     }
 }
+details {
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
 
+summary {
+    cursor: pointer;
+    font-weight: bold;
+}
 @media (max-width: 480px) {
   html {
     font-size: 14px;

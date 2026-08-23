@@ -86,6 +86,7 @@ urlpatterns = [
     path("help/video/<str:video_id>/",views.help_video, name="help_video"),
     path("countylist/", views.county_list, name="county_list"),
     path("upload_faq/", views.render_markdown, {"filename":"upload_faq"},name="upload_faq"),
+    path("faq/", views.render_markdown, {"filename":"faq"},name="faq"),
     path("news/",views.news, name="news"),
     path("dashboard/",views.dashboard,name="dashboard",),
 ]
