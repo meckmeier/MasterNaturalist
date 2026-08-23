@@ -25,13 +25,13 @@ from orgs.models import (
 def get_database_summary():
 
    return {
-    "title": "Database Summary",
+    "title": "Objects Created",
     "icon": "database",
     "rows": [
         ("Organizations", OrganizationEnrollmentRequest.objects.filter(created_org__isnull=False).count()),
-        ("Locations", Location.objects.exclude(created_by__user__username="mary").count()),
-        ("Activities", Activity.objects.exclude(created_by__user__username="mary").count()),
-        ("Sessions", Session.objects.exclude(created_by__user__username="mary").count()),
+        ("Locations", Location.objects.filter(org__organizationenrollmentrequest__created_org__isnull=False).count()),
+        ("Activities", Activity.objects.filter( org__organizationenrollmentrequest__created_org__isnull=False).count()),
+        ("Sessions", Session.objects.filter(activity__org__organizationenrollmentrequest__created_org__isnull=False).count()),
     ],
 }
 
