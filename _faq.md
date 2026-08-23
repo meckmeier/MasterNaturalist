@@ -1,25 +1,55 @@
+# Volunteers
 <details>
 <summary>What is WildPathsWI?</summary>
 
-WildPathsWI helps people discover nature-based volunteer and training opportunities.
+WildPathsWI helps people discover nature-based volunteer and training opportunities. It's a web-based database of organizations and their activities. Written by a Master Naturalist, it is designed for Master Naturalist to find volunteer and advanced training opportunities but anyone can use it.
+</deails>
+<details>
+<summary>Who is Wild Paths Wisconsin for?</summary>
+It is for everyone that is interested in nature based and conservation work in Wisconsin. We encourange any and all nature based organizations to log their organization and activities, so that the community of users will be able to find ways to expand their reach across the state.
+</details>
 
 </details>
 
 <details>
 <summary>How do I find opportunities?</summary>
 
-You can search and filter activities by location, organization, category, and more.
+YThe main landing page lets you see lists of volunteer or learning opportunities by clicking the button. You can use filters on each of the pages to include BOTH or other filters to focus in on your area, or interests. You can also see lists organized by date using the Calendar view (which will exclude any ongoing opportunities). Or you can see the list by Locations (which will exclude any online activities). The Organization button will let you see activities by each of the organizations that sponsored them.
 
 </details>
+<details>
+<summary>What does LEARN mean?</summary>
+The site was designed for Master Naturalists so knowing what they are expecting can help you target the activities you include here. Learning opportunities should focus on Wisconsin's natural, environmental or cultural history. If you have workshops that focus on specialized skills for volunteers they would also be great here. These activities should be formal training or workshops and be targeted to adult learners. 
+</details>
+<details>
+<summary>What does VOLUNTEER mean?</summary>
+For Master Naturalists, volunteer activities should be unpaid, under the direction or guidance of your organization/program and located in Wisconsin or neighboring states. The program focuses on work that falls into Citizen Science, Education and Stewardship. Volunteer work that supports an organization whose mission is focused on natural resources topics also counts. These are the guidelines for Master Naturalists. But remember we are open to all people interested in conservation efforts in Wisconsin. So any volunteer activity that supports that mission is welcome here. 
+</details>
+<details>
+<summary>What is an Organization?</summary>
+For the purposes of this site - an organization is an 'organizing' entity for activities. Usually an organization will be just that - a nature center, a friends group, visitor centers or watershed associations, for example. But an "organization" might also be programs inside a larger entity - like programs at the DNR. It's all built to help people find opportunities that interest them. Use your judgement about how to enter the data.
+</details>
+<details>
+<summary>What is a Location?</summary>
+A location is a physical address. It will allow us to map the event. There are shared locations, like state parks that are already in the system. Sometimes you might have an activity that uses a nature center (which is its own organization). The system will allow you to use existing locations. If your location is not already in the system, then you can add it. Don't worry if the location isn't 'yours' to manage, if you need to add it just add it. It's more important to make sure that people can find your activity's location. On the backend, we will monitor duplicate locations and may contact you to consolidate these locations later.
+</details>
+<details>
+<summary>How can I reach someone with a question?</summary>
+You can always use the Contact Me menu option, or the Contact link at the bottom of every page. Be sure to include your email address and I'll get back to you as quickly as I can. Thanks!
 
+</details>
 ## Organization Management
 <details>
-<summary>How do I enroll an organization in WildPathsWI.org?</summary>
+<summary>What organizations can enroll in Wild Paths Wisconsin?</summary>
+Organizations or programs that want dedicated nature-loving volunteers are welcome. Organizations really are the backbone of this site. Without your participation, there wouldn't be much for volunteers to find. But with you, we can build a wonderful community.
+</details>
+<details>
+<summary>How do I enroll an organization in Wild Paths Wisconsin?</summary>
 Use the Add Organization menu option. Fill out the form. You will get an email once the enrollment request is approved. The email will have a link to create a login, if you don't already have one. Use that link. If you already have a login then return to WildPaths and login - you will see a new Manage Organization button on the main page, and a new Organizer menu on the main menu list. On the tuturials page there is a video that will take you through the process of enrolling your organization.
 </details>
 <details>
 <summary>I've enrolled my organization - what do I do now?</summary>
-You should receive an email with an invitation to create a username. Follow the instructions and create a username. It's important to use that link so that your new username is 'connected' to the new organization. Although if you already have a login name when you did the Add Organization, you won't get that email. Your username is already 'connected'. With your connected username, a new menu item (Oganizer) will appear on the hamburger menu and a new button on the main landing page: Manage Organizations. This is the page you will use to add Activities, Locations, and Other Managers. There is a tutorial video that will take you thru the steps of using the Manage Organization page.
+You should receive an email with an invitation to create a username. Follow the instructions and create a username. It's important to use that link so that your new username is 'connected' to the new organization. Although if you already have a login name when you did the Add Organization, you won't get that email. Your username is already 'connected'. With your connected username, a new menu item (Oganizer) will appear on the hamburger menu and a new button on the main landing page: Manage Organizations. This is the page you will use to add Activities, Locations, and Other Managers. There is a tutorial video that will take you thru the steps of using the <a href="https://wildpathswi.org/help/video/osgj4g_XLzQ/">Manage Organization </a>page.
 </details>
 <details>
 <summary>What is the difference between the MAP page and the little Region Map?</summary>
@@ -27,7 +57,7 @@ The MAP page (you get there by clicking MAP on the main landing page) will take 
 </details>
 <details>
 <summary>How do I know what Region my organization is in?</summary>
-Regions are defined by counties - there is a Region by County page from the Tutorials page, where you can see which region your county is in.
+Regions are defined by counties - there is a <a href="https://wildpathswi.org/countylist/">Region by County </a>page from the Tutorials page, where you can see which region your county is in.
 </details>
 <details>
 <summary>How do I get a flag on the big map?</summary>
