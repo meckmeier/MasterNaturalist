@@ -4,72 +4,68 @@
 
 # Introduction
 
-The Wild Paths Wisconsin story in not really one about a software project.
+My little story about the origin of Wild Paths Wisconsin. It amused me to recreate the process by which this app was constructed. I did this so I could effectively estimate the number of hours it took for me to build it.
 
-It really began with a practical problem. Master Naturalist folk were collecting volunteer opportunities, and advanced training -- storing it in a PDF and publishing it on their portal site. Keeping it current was a job. As the list grew long it was harder for users to actually find the opportunities. So it started with wanting to make the job of maintaining the list easier and more consistent. Plus the added benefit of help users actually find the opportunities that excited them.
+It all started with a problem. I wanted to find places where I could volunteer. The only source of that was either word of mouth or a PDF file that the Master Naturalist folk posted on their portal site. So I contacted Becky and asked if there was something I could do to help make that more friendly. We started out just trying to make it easier for Martha to build the PDF (that is I tried automating the process of getting the Google form data into a PDF format, so she didn't have to do it manually). 
 
-The original goal was **not** to build an application. In fact, every
-effort was made to avoid building one. If we could solve it by 
-using familiar tools ---such as Google Sheets or
-Google Sites---that's what we wanted to do. Plus as a non-profit it was important
-to keep the solution inexpensive and self-maintaining.
+The original goal was **not** to build an application. In fact, we did everything we could to avoid building one. If we could solve it by using tools they were already using ---such as Google Sheets or Google Sites---that's what we wanted to do. Plus as a non-profit it was important to keep the solution inexpensive and self-maintaining.
 
-We started testing out ideas. Each idea told me something new and valuable about what was needed. Coupled
-with the fact that I was just interested in this idea -- how can you take data and present it on the web -- had pestered me in my previous career. It wasn't something I had to solve in my job but I thought it would be fun to see what it really takes. 
+We started trying stuff. Somethings worked... the Streamlit app was gorgeous, but a pain to update. Google sheets/apps was cheap (well free) and fit inside their current system infrastructure - but so not beautiful. And I was motivated. I have always had an interest in using data in a website, but just never had the chance, so exploring the options - keeping an eye on cost - was fun for me. 
 
 ------------------------------------------------------------------------
 
 # Part I -- Exploration
 
-## Streamlit -- Can the idea work? (July 2025)
+## Automate Google Sheet to PDF (June 2025)
 
 As a database guy, the first thing I did was adjust the current list of opportunities into
 a table. Now that I had data - I could do a lot of different things with it. First cut was to generate 
 the PDF from a google sheet. This was not very exciting to me, as the end user, because I still 
-couldn't really search the site. I used Streamlit (primarily because they had the free community site where 
-we could publish the final view - at no cost to Master Naturalists. The objective
-was to determine whether a modern, searchable interface would make the
-information significantly more useful.
+couldn't really search the site. It didn't really work for Martha either because of how much she had to touch each google sheet entry - validating it and adjusting it to fit what was true. 
+
+## Streamlit -- Can the idea work? (July 2025)
+So then I though maybe I could use a web builder. They used WordPress for their regular website, but when I looked at it the learning curve was too high and I was pretty sure it couldn't do what I wanted. So I started exploring other tools - and Streamlit came up. Although it did use Python in the construction of the site, it was a very visual and low code option. Plus Streamlit has a free community site where 
+we could publish the final view - at no cost to Master Naturalists. The objective was to determine whether a modern, searchable interface would make the information significantly more useful. Was it even worth it to try and build something more sophisticated.
 
  ![Streamlit](images/2025-07-StreamlitAppv1.png)
 
 It did.
 
-Searching, filtering, and card-based layouts showed the
-value of an interactive experience. Building this site was so fast - and it was right there on the web for all to use.
-However, keeping the underlying csv file current proved had issues. Ultimately I decided that getting the updated data involved too much technical work  for the staff so I went searching for other solutions. I will say this layout and interface became the gold standard for  a presentation. 
+Searching, filtering, and card-based layouts felt interactive and fun. Building this site was so fast - and it was right there on the web for all to use. Unfortunately, keeping the underlying csv file current proved troublesome. Ultimately I decided that getting the updated data involved too much technical work for the staff so I went searching for other solutions. I will say this layout and interface became the gold standard for  a presentation though.
 
-That shifted the project toward solving the data-management problem.
+At this point we had a visual way to show the data that really worked. It provided searching, and a clean way to communicate with the users. I cannot emphasize how fundamental this question was to the final solution.
+
+But now I had to figure out how to handle the data.
 
 ## HTML/CSV -- No fancy tools (August 2025)
 
-I put the data aside for the moment. Staff was currently getting opportunity data from a Google form and it was stored in a GoogleSheet.
-Staff would then take that sheet and build out a PDF file. What if all I did was simplify that... put a Googlesheet into CSV and send it into a HTML reader that would layout the data. While I wouldn't solve every problem, at least we would solve some of the work that the staff needed to do. I knew I could host GitHub pages for free off GitHub and that might just be a fine way to do this...
+Staff was currently getting opportunity data from a Google form and it was stored in a GoogleSheet. Martha would then take that sheet and build out a PDF file. What if all I did was simplify that... put a Googlesheet into CSV and send it into a HTML reader that would layout the data. While I wouldn't solve every problem, at least we would solve some of the work that the staff needed to do. I knew I could host GitHub pages for free off GitHub and that might just be a fine way to do this...
 
   ![GitHub](images/2025-08-12_NatureBased_GithubPages.png)
 
 This solution has so much promise. It was cheap (or free!). It didn't change anything about how they maintained their data. It introduced no fancy tools. Straight up HTML and Javascript to load the data. But to make it work, I had to adjust the data model of the google sheet to the point that maintaining the data in a Google Sheet just got overwhelming. Plus I still didn't have a great interface. It was workable. And certainly better. But the data management issue because the sticking point.
 
-We spent a certain amount of time trying to see if this idea - of hosting a relatively simple web interface inside the University system might work. But this also resulted in some dead ends. And technical conversations no one wanted to have. 
+While I was not great at CSS and HTML, I was fairly sure that with enough time, I could mimic the lovely layout of Streamlit - searching etc, would involve an investment in Javascript (which even now sends shivers of distate up my spine -- I really am not a js person). But because I couldn't handle the data in a github page, I needed to find a platform that would allow me to store data. 
+
+Their systems had some options for this, but wading into it was fraught with some concerns and big technical discussions we just didn't want to wade into.
 
 ## Google Apps Script (Sept 2025)
 
-So now the data is in Google Sheets. So I explored the Google universe to see if there was a good 
-way to use the sheet as data and just present it via Google world. 
+Given that the data is in Google Sheets at this point, it seemed worth it to explore the Google universe to see if there was a good way to use the sheet as data and just present it inside Google world. 
 
-The goal was to "leverage an existing workflow" instead of introducing new technology. If staff could continue maintaining the date in a familiar environment, adoption would be much easier. The other issue that presented here was the need to find a hosting environment. Master Naturalist is a part of the University of Wisconsin Extension and I wanted them to own the final solution. That meant finding tools or platforms that could be hosted inside their current tech stack. Our first cut was Google.
+The goal was to "leverage an existing workflow" instead of introducing new technology. If staff could continue maintaining the data in a familiar environment, adoption would be much easier. The other issue that presented here was the need to find a hosting environment. Master Naturalist is a part of the University of Wisconsin Extension and I wanted them to own the final solution. That meant finding tools or platforms that could be hosted inside their current tech stack. Our first cut was Google.
 
 Here there were two problems. One was that a single google sheet flattened to accomodate all the data while great for presentation was a little tricky for maintenance. I started to build out organization sheets, plus activity sheets that linked back. Not perfect but it could work. However, the second problem was that the Google Site tool just didn't give me enough control over the layout. As soon as I wanted to do something a little bit different than "out of the box" presentation I ran into costs. Not surprising.
 
- ![GoogleApp](images/2025-08_25_GoogleApp.png)
+ ![GoogleApp](images/2025-08-25_GoogleApp.png)
 
 
 ## CS50 (Sep 2025 -- Jan 2026)
 
-Every prototype was an attempt to avoid unnecessary complexity. All the tries above... they told me that to do what I wanted really involved a framework. I needed a backend database to store the data and to capture the data, and a frontend to present it. Since there didn't seem to be a way to solve the problem without that structure, I decided to take the CS50 Web Development Class. It was a free class offered by Harvard. That class used Django so that is the framework I went with. I had a lot of conversations 
-with ChatGPT to try and see if a better framework existed, but since I know had some familiarity with it, and there were inexpensive hosting options. Not free, but not too expensive. Given all that I found it became clear that this tool was not going to live at the Master Naturalists, but rather I would have to own it. And while I wasn't sure that was the most sustainable solution for them, I was so intrigued by finding out if I really could build out this thing, I decided to take it on. 
+Every prototype was an attempt to avoid unnecessary complexity. All the attempts above... they told me that to do what I wanted really involved a framework. I needed a backend database to store the data and to capture the data, and a frontend to present it. Since there didn't seem to be a way to solve the problem without that structure, I decided to take the CS50 Web Development Class. It was a free class offered by Harvard. That class used Django so that is the framework I went with. I had a lot of conversations 
+with ChatGPT to try and see if a better framework existed, but since I had some familiarity with it, and there were inexpensive hosting options. Given all that I found it became clear that this tool was not going to live at the Master Naturalists, but rather I would have to own it. And while I wasn't sure that was the most sustainable solution for them, I was so intrigued by finding out if I really could build out this thing, I decided to take it on. 
 
-After completing the CS50 class, I wanted to recreate the basic Streamlit interface so that using Django. It seemed relatively straightforward (a csv file that showed each row as a card with some filtering options), 
+For my capstone project in the course, I recreated the basic Streamlit interface so that using Django. It seemed relatively straightforward (a csv file that showed each row as a card with some filtering options), 
 but to implement required the following:
 
     * datamodel - done in sqllite : Organization, OrgLocation, Event.
@@ -86,11 +82,9 @@ https://www.youtube.com/watch?v=j7pzoyLu--s
 # Part III -- Building WildPaths
 ## March 15, 2026-July 2026
 
-This period was spent taking that django project, and refining it slightly. And also figuring out how to get it into a hosted environment. 
-Using Render's free service, I migrated the database to PostGre, added some additional Event details, and refined the pages. The process of 
-exploring all the different elements of going from a class capstone project to actually deploying a site that Becky could look at and respond to 
-took as much time as building the initial prototype. Welcome to web development. What I learned here is that the coordination of tools, frameworks, 
-site management, etc. all that stuff takes a long time to learn. By March 15, I was sending the site to render for deployment.
+This period was spent taking that django project, and refining it slightly. And also figuring out how to get it into a hosted environment. Using Render's free service, I migrated the database to PostGre, added some additional Event details, and refined the pages. The process of exploring all the different elements of going from a class capstone project to actually deploying a site that Becky could look at and respond to 
+took as much time as building the initial prototype. Welcome to web development. What I learned here is that the coordination of tools, frameworks, site management, etc. all that stuff takes a long time to learn. By March 15, I was sending the site to render for deployment.
+
     
 * Mar 26: Canopy app; model has evolved to use Activities/Sessions and Location is decoupled from Organization.
 * Apr 4: renamed to Wild Paths Wisconsin
@@ -102,7 +96,7 @@ site management, etc. all that stuff takes a long time to learn. By March 15, I 
 how to captcha all the pages that were getting attacked. The render site was stable, but email was blocked until I reached the next month as I was not ready 
 to pay for email yet. It just pretty much locked down new registrations until I was able to resolve the issue.
 
-* Mar - the rest of this month was dealing with incorporating all the required elements to prevent bot attacks. Adding captcha. Also migration my
+* May - the rest of this month was dealing with incorporating all the required elements to prevent bot attacks. Adding captcha. Also migration my
  dns server to Cloudflare where I was able to add additional security provisions.
 
 * May 17: changed model so that site was open to the public. Login is only required for Organization Management. Able to finalize the Add Organization routine which required email.

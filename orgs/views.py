@@ -52,7 +52,7 @@ def run_cleanup_old_imports(request):
 
         call_command(
             "cleanup_old_imports",
-            days=10,
+            days=20,
             delete=True,
             stdout=out,
         )
