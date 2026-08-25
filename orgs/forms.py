@@ -194,7 +194,7 @@ class LocForm(forms.ModelForm):
     org_loc_url = forms.CharField(required=False)
     class Meta:
         model = Location
-        fields = [ "loc_name", "physical_location", "address", "city_name", "county_id", "region", "state", "zip_code", "org_loc_url", "location_about", "contact_email"]
+        fields = [ "loc_name", "physical_location", "address", "city_name", "county_id", "region", "state", "zip_code", "org_loc_url", "location_about", "contact_email", "latitude", "longitude", "deleted"]
         widgets = {
             "location_about": forms.Textarea(attrs={
                 "rows": 3,

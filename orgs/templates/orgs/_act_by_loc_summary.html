@@ -2,11 +2,12 @@
 {% load highlight %}
 {% load can_edit_filters %}
 <a class="me-activity-link" href="#"
+id="activity-{{ card.activity.id }}"
    data-activity="{{ card.activity.id }}"
    data-location="{{ card.location.id|default:'0' }}"
    data-bs-toggle="modal"
    data-bs-target="#activityPanel">
- <div class="me-card" id="activity-{{ card.activity.id }}">
+ <div class="me-card" >
 
 
   <!-- Header row -->

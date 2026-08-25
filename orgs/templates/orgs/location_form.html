@@ -71,6 +71,15 @@
             {{ form.county_id}}
             {{ form.county_id.errors }}
         </div>
+        <div></div><div></div><div class="me-form-field">
+            If you know the latitude and longitude of this location, please enter them here. Otherwise, leave blank and the system will attempt to determine them automatically.
+            {{ form.latitude.label_tag }}
+            {{ form.latitude}}
+            {{ form.latitude.errors }}
+            {{ form.longitude.label_tag }}
+            {{ form.longitude}}
+            {{ form.longitude.errors }}
+        </div>
    </div>
          <!-- submit button INSIDE the form -->
         <button type ="submit" class="me-btn">
@@ -85,7 +94,7 @@
 
 {% if loc.created_by %}
   <p>Created : {{ loc.created_by }}
-  /{{ loc.created_at }}
+  | {{ loc.created_at }}
 {% endif %}</p>
 
 <p>Last updated by: 
