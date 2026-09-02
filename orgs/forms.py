@@ -594,7 +594,7 @@ class ActivityForm(forms.ModelForm):
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "prerequisites": forms.TextInput(attrs={"placeholder": "e.g. Previous training, experience, or materials needed"}),
-            "expire_date": forms.DateInput(attrs={"type": "date"}),
+            
             "deleted": forms.CheckboxInput(attrs={"style": "display:none;"}),
             "activity_url": forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/eventpage"}),
             "contact_email": forms.EmailInput(attrs={"placeholder": "contact@yourorg.org"})
@@ -604,10 +604,7 @@ class ActivityForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if not self.instance.pk:
-            self.fields["expire_date"].initial = (
-                default_expire_date()
-            )
+
 
         self.fields["activity_type"].required = True
 
