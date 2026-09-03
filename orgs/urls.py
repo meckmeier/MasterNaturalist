@@ -23,6 +23,7 @@ urlpatterns = [
     path("staff/org-enrollments/<int:enrollment_id>/deny/", views.org_deny, name="org_deny"),  
     path("staff/operations/", views.staff_landing, name="staff_landing"),
     path("locations/manage/", views.location_manage, name="location_manage"),
+    path("locations/latlng/", views.location_latlng, name="location_latlng"),
     path("locations/<int:location_id>/action/", views.location_action, name="location_action"),
     path("org-invite/<uuid:token>/", views.accept_org_invite, name="accept_org_invite",),
     path("org_mgmt/", views.org_mgmt, name="org_mgmt"),

@@ -3222,3 +3222,15 @@ def county_list(request):
     return render(request, "orgs/county_by_region.html", {
         "regions": regions,
     })
+
+@staff_member_required
+def location_latlng(request):
+
+    locations = Location.objects.filter(
+        Q(latitude__isnull=True) |
+        Q(longitude__isnull=True)
+    ).order_by("loc_name")
+
+    return render(request, "orgs/staff/location_latlng.html", {
+        "locations": locations,
+    })

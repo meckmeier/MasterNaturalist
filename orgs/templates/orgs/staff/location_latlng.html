@@ -1,0 +1,36 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<div class="me-page">
+
+<h1>Locations without Latitude or Longitude</h1>
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% for each in locations %}
+    
+  <div class="card mb-3" id="loc_id={{ each.id }}">
+    <div class="card-body">
+      <h5 class="card-title">{{ each.loc_name }}
+             <a href="{% url 'loc_edit' each.id %}?next=locations/latlng/#loc_id={{ each.id }}" title="edit location">
+            <i class="bi bi-pencil"></i></h5>
+      <p class="card-text">{{ each.address }}, {{ each.city }}, {{ each.state }} {{ each.zip }}</p>
+
+    </div>
+  </div>
+
+{% empty %}
+  <p>No locations without latitude or longitude found.</p>
+{% endfor %}
+
+
+
+{% endblock %}
