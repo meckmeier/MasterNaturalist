@@ -1,240 +1,223 @@
 
 from django.core.management.base import BaseCommand
+from django.db.models import Q
+
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
-from django.db.models import Q
+from geopy.exc import (
+    GeocoderRateLimited,
+    GeocoderServiceError,
+    GeocoderTimedOut,
+    GeocoderUnavailable,
+)
+
 import logging
-from geopy.exc import GeocoderTimedOut, GeocoderServiceError, GeocoderUnavailable
+
 from orgs.models import Location
+
 
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
-    help = "Geocode Location records that are missing latitude/longitude."
+# Results at this level are too broad to be useful as a
+# location for an activity.
+BROAD_TYPES = {
+    "country",
+    "state",
+    "county",
+    "city",
+    "town",
+    "village",
+    "municipality",
+    "postcode",
+}
 
+
+
+
+class Command(BaseCommand):
+    help = "Find coordinates for Location records."
     def add_arguments(self, parser):
+
         parser.add_argument(
             "--all",
             action="store_true",
-            help="Update all locations, even if they already have latitude/longitude.",
+            help="Process all locations, including those that already have coordinates.",
         )
+
         parser.add_argument(
             "--limit",
             type=int,
             default=None,
             help="Only process this many locations.",
         )
+
         parser.add_argument(
             "--dry-run",
             action="store_true",
-            help="Show what would be updated without saving.",
+            help="Show results without saving coordinates.",
         )
 
     def handle(self, *args, **options):
+
         update_all = options["all"]
         limit = options["limit"]
         dry_run = options["dry_run"]
 
+        # ---------------------------------------------------------
+        # Nominatim
+        # ---------------------------------------------------------
+
         geolocator = Nominatim(
-            user_agent="volunteer_map_app mary@eckmeier.com"
+            user_agent="volunteer_map_app mary@eckmeier.com",
+            timeout=10,
         )
 
         geocode = RateLimiter(
             geolocator.geocode,
-            min_delay_seconds=1,
+            min_delay_seconds=2,
+            max_retries=0,
             swallow_exceptions=False,
         )
 
+        # ---------------------------------------------------------
+        # Locations to process
+        # ---------------------------------------------------------
+
         if update_all:
-            qs = Location.objects.all()
+            locations = Location.objects.all()
         else:
-            qs = Location.objects.filter(
-                Q(latitude__isnull=True) | Q(longitude__isnull=True)
+            locations = Location.objects.filter(
+                Q(latitude__isnull=True)
+                | Q(longitude__isnull=True)
             )
 
+        locations = locations.order_by("id")
+
         if limit:
-            qs = qs[:limit]
+            locations = locations[:limit]
 
-        total = qs.count() if hasattr(qs, "count") else len(qs)
+        total = locations.count()
 
-        self.stdout.write(f"Processing {total} location(s)...")
-
-        logger.warning(
-            "Starting geocode run. total=%s dry_run=%s update_all=%s",
-            total,
-            dry_run,
-            update_all,
+        self.stdout.write(
+            f"Processing {total} location(s)..."
         )
 
-        updated = 0
+        found = 0
+        manual_review = 0
         skipped = 0
-        failed = 0
 
-        for loc in qs:
+        # ---------------------------------------------------------
+        # Process locations
+        # ---------------------------------------------------------
 
-            loc_name = (loc.loc_name or "").strip()
+        for loc in locations:
+
+            name = (loc.loc_name or "").strip()
             address = (loc.address or "").strip()
-            city_name = (loc.city_name or "").strip()
-            zip_code = (loc.zip_code or "").strip()
+            city = (loc.city_name or "").strip()
             state = (loc.state or "").strip() or "WI"
+            county = (loc.county_id.county_name or "").strip() if loc.county_id else ""
+            zip_code = (loc.zip_code or "").strip()
 
-            # ---------------------------------------------------------
-            # We need at least some identifying information.
-            # ---------------------------------------------------------
+            self.stdout.write("")
+            self.stdout.write("=" * 50)
+            self.stdout.write(f"Location {loc.id}: {name}")
 
-            if not loc_name and not address and not city_name and not zip_code:
+            # Need a name or address to search
+            if not name and not address:
                 self.stdout.write(
-                    self.style.WARNING(
-                        f"SKIP: {loc.id} has no location information."
-                    )
+                    self.style.WARNING("  No name or address. Skipping.")
                 )
                 skipped += 1
                 continue
 
-            # ---------------------------------------------------------
-            # Build several possible queries.
-            #
-            # Name is first because nature locations often appear in
-            # OpenStreetMap under their place name rather than their
-            # mailing/street address.
-            # ---------------------------------------------------------
-
-            queries = []
-
-            if loc_name:
-                queries.append(
-                    ("name + state", f"{loc_name}, {state}, USA")
-                )
-
-                if city_name:
-                    queries.append(
-                        (
-                            "name + city + state",
-                            f"{loc_name}, {city_name}, {state}, USA",
-                        )
-                    )
-
-            if address:
-                address_parts = [address]
-
-                if city_name:
-                    address_parts.append(city_name)
-
-                address_parts.append(state)
-
-                if zip_code:
-                    address_parts.append(zip_code)
-
-                address_parts.append("USA")
-
-                queries.append(
-                    ("address + city + state", ", ".join(address_parts))
-                )
+            accepted = None
+            accepted_method = None
+            accepted_query = None
 
             # ---------------------------------------------------------
-            # Try each query until we get a useful result.
+            # NAME SEARCH
             # ---------------------------------------------------------
 
-            geo = None
-            successful_method = None
-            successful_query = None
+            if name:
 
-            for method, query in queries:
+                if county:
+                    query = f"{name}, {county} County, {state}, USA"
+                else:
+                    query = f"{name}, {state}, USA"
 
-                self.stdout.write(
-                    f"Trying: {loc.id} | {loc_name}"
-                )
-                self.stdout.write(
-                    f"  Method: {method}"
-                )
-                self.stdout.write(
-                    f"  Query:  {query}"
-                )
+                self.stdout.write("  Trying name search:")
+                self.stdout.write(f"    {query}")
 
-                logger.warning(
-                    "GEOCODE QUERY | loc_id=%s | loc_name=%r | "
-                    "city=%r | zip_code=%r | state=%r | "
-                    "method=%r | query=%r",
+                logger.info(
+                    "GEOCODE NAME | loc_id=%s | query=%r",
                     loc.id,
-                    loc_name,
-                    city_name,
-                    zip_code,
-                    state,
-                    method,
                     query,
                 )
 
                 try:
-                    candidate = geocode(query)
-
-                    if not candidate:
-                        self.stdout.write("  No result.")
-                        continue
-
-                    # -------------------------------------------------
-                    # Inspect the result.
-                    # -------------------------------------------------
-
-                    raw = getattr(candidate, "raw", {}) or {}
-
-                    result_class = raw.get("class")
-                    result_type = raw.get("type")
-                    display_name = raw.get("display_name", "")
-
-                    self.stdout.write(
-                        f"  Candidate: {display_name}"
-                    )
-                    self.stdout.write(
-                        f"  Type: {result_class}/{result_type}"
-                    )
-
-                    logger.warning(
-                        "GEOCODE CANDIDATE | loc_id=%s | method=%r | "
-                        "query=%r | class=%r | type=%r | "
-                        "returned_address=%r | lat=%s | lng=%s",
-                        loc.id,
-                        method,
+                    candidates = geocode(
                         query,
-                        result_class,
-                        result_type,
-                        display_name,
-                        candidate.latitude,
-                        candidate.longitude,
+                        exactly_one=False,
+                        limit=5,
                     )
 
-                    # -------------------------------------------------
-                    # Reject results that are obviously too broad.
-                    #
-                    # We don't want a city, county, state, etc. becoming
-                    # the coordinate for an actual location.
-                    # -------------------------------------------------
+                    if not candidates:
+                        self.stdout.write("  No name results.")
 
-                    broad_types = {
-                        "country",
-                        "state",
-                        "county",
-                        "city",
-                        "town",
-                        "village",
-                        "municipality",
-                        "postcode",
-                    }
-
-                    if result_type in broad_types:
+                    else:
                         self.stdout.write(
-                            self.style.WARNING(
-                                f"  Rejected broad result: "
-                                f"{result_class}/{result_type}"
-                            )
+                            f"  Found {len(candidates)} candidate(s)."
                         )
-                        continue
 
-                    # Good enough to use.
-                    geo = candidate
-                    successful_method = method
-                    successful_query = query
-                    break
+                        for candidate in candidates:
+
+                            raw = getattr(candidate, "raw", {}) or {}
+
+                            result_class = raw.get("class")
+                            result_type = raw.get("type")
+                            display_name = raw.get("display_name", "")
+
+                            self.stdout.write(
+                                f"    Candidate: {display_name}"
+                            )
+                            self.stdout.write(
+                                f"      Type: {result_class}/{result_type}"
+                            )
+
+                            # Ignore broad geographic results
+                            if result_type in BROAD_TYPES:
+                                continue
+
+                            accepted = candidate
+                            accepted_method = "name"
+                            accepted_query = query
+                            break
+
+                        if accepted:
+                            self.stdout.write(
+                                self.style.SUCCESS(
+                                    "  Name result accepted."
+                                )
+                            )
+                        else:
+                            self.stdout.write(
+                                self.style.WARNING(
+                                    "  No usable name result."
+                                )
+                            )
+
+                except GeocoderRateLimited:
+
+                    self.stdout.write(
+                        self.style.ERROR(
+                            "  Nominatim rate limit reached. Stopping."
+                        )
+                    )
+
+                    manual_review += 1
+                    continue
 
                 except (
                     GeocoderTimedOut,
@@ -244,111 +227,212 @@ class Command(BaseCommand):
 
                     self.stdout.write(
                         self.style.ERROR(
-                            f"  GEOCODER ERROR: "
-                            f"{type(e).__name__}: {e}"
+                            f"  Geocoder error: {type(e).__name__}"
                         )
                     )
 
-                    logger.exception(
-                        "GEOCODER ERROR | loc_id=%s | "
-                        "method=%r | query=%r | "
-                        "error_type=%s | error=%s",
+                    logger.warning(
+                        "GEOCODE NAME ERROR | loc_id=%s | error=%s",
                         loc.id,
-                        method,
-                        query,
-                        type(e).__name__,
                         e,
                     )
 
-                    # Try the next query.
-                    continue
+            # =====================================================
+            # 2. ADDRESS SEARCH
+            #
+            # Address + city + state + ZIP.
+            #
+            # NO COUNTY CHECK.
+            #
+            # The address is considered authoritative even if
+            # its county differs from the stored county.
+            # =====================================================
 
-                except Exception as e:
+            if accepted is None and address:
+
+                address_parts = [address]
+
+                if city:
+                    address_parts.append(city)
+
+                address_parts.append(state)
+
+                if zip_code:
+                    address_parts.append(zip_code)
+
+                address_parts.append("USA")
+
+                query = ", ".join(address_parts)
+
+                self.stdout.write(
+                    "  Trying address search:"
+                )
+                self.stdout.write(
+                    f"    {query}"
+                )
+
+                logger.info(
+                    "GEOCODE ADDRESS | loc_id=%s | query=%r",
+                    loc.id,
+                    query,
+                )
+
+                try:
+
+                    candidate = geocode(query)
+
+                    if not candidate:
+
+                        self.stdout.write(
+                            "  No address result."
+                        )
+
+                    else:
+
+                        raw = getattr(
+                            candidate,
+                            "raw",
+                            {},
+                        ) or {}
+
+                        result_class = raw.get("class")
+                        result_type = raw.get("type")
+                        display_name = raw.get(
+                            "display_name",
+                            "",
+                        )
+
+                        self.stdout.write(
+                            f"    Candidate: {display_name}"
+                        )
+
+                        self.stdout.write(
+                            f"      Type: "
+                            f"{result_class}/{result_type}"
+                        )
+
+                        # -------------------------------------------------
+                        # NO COUNTY CHECK HERE.
+                        # -------------------------------------------------
+
+                        if result_type in BROAD_TYPES:
+
+                            self.stdout.write(
+                                self.style.WARNING(
+                                    "  Address result is too broad."
+                                )
+                            )
+
+                        else:
+
+                            accepted = candidate
+                            accepted_method = "address"
+                            accepted_query = query
+
+                            self.stdout.write(
+                                self.style.SUCCESS(
+                                    "  Address result accepted."
+                                )
+                            )
+
+                except GeocoderRateLimited:
 
                     self.stdout.write(
                         self.style.ERROR(
-                            f"  UNEXPECTED ERROR: "
-                            f"{type(e).__name__}: {e}"
+                            "  Nominatim rate limit reached. "
+                            "Stopping."
                         )
                     )
 
-                    logger.exception(
-                        "UNEXPECTED GEOCODE ERROR | loc_id=%s | "
-                        "method=%r | query=%r | "
-                        "error_type=%s | error=%s",
+                    manual_review += 1
+                    continue
+
+                except (
+                    GeocoderTimedOut,
+                    GeocoderServiceError,
+                    GeocoderUnavailable,
+                ) as e:
+
+                    self.stdout.write(
+                        self.style.ERROR(
+                            f"  Geocoder error: "
+                            f"{type(e).__name__}"
+                        )
+                    )
+
+                    logger.warning(
+                        "GEOCODE ADDRESS ERROR | "
+                        "loc_id=%s | error=%s",
                         loc.id,
-                        method,
-                        query,
-                        type(e).__name__,
                         e,
                     )
 
-                    # Try the next query.
-                    continue
+            # =====================================================
+            # 3. SAVE RESULT
+            # =====================================================
 
-            # ---------------------------------------------------------
-            # We found a usable result.
-            # ---------------------------------------------------------
-
-            if geo:
+            if accepted:
 
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"FOUND: {loc.loc_name}\n"
-                        f"  Method:  {successful_method}\n"
-                        f"  Query:   {successful_query}\n"
-                        f"  Match:   {geo.address}\n"
-                        f"  Coords:  {geo.latitude}, {geo.longitude}"
+                        f"FOUND: {name}\n"
+                        f"  Method:  {accepted_method}\n"
+                        f"  Query:   {accepted_query}\n"
+                        f"  Match:   {accepted.address}\n"
+                        f"  Coords:  "
+                        f"{accepted.latitude}, "
+                        f"{accepted.longitude}"
                     )
                 )
 
-                logger.warning(
-                    "GEOCODE MATCH | loc_id=%s | method=%r | "
-                    "query=%r | lat=%s | lng=%s | "
-                    "returned_address=%r",
-                    loc.id,
-                    successful_method,
-                    successful_query,
-                    geo.latitude,
-                    geo.longitude,
-                    getattr(geo, "address", None),
-                )
-
                 if not dry_run:
-                    loc.latitude = geo.latitude
-                    loc.longitude = geo.longitude
-                    loc.save(update_fields=["latitude", "longitude"])
 
-                updated += 1
+                    loc.latitude = accepted.latitude
+                    loc.longitude = accepted.longitude
+
+                    loc.save(
+                        update_fields=[
+                            "latitude",
+                            "longitude",
+                        ]
+                    )
+
+                found += 1
+
+            # =====================================================
+            # 4. MANUAL REVIEW
+            # =====================================================
 
             else:
 
                 self.stdout.write(
                     self.style.WARNING(
-                        f"NO USABLE MATCH: {loc.loc_name}"
+                        f"NO USABLE MATCH: {name}"
                     )
                 )
 
-                logger.warning(
-                    "GEOCODE NO USABLE MATCH | loc_id=%s | "
-                    "loc_name=%r",
-                    loc.id,
-                    loc_name,
+                self.stdout.write(
+                    "  --> Manual review required."
                 )
 
-                failed += 1
+                logger.warning(
+                    "GEOCODE MANUAL REVIEW | "
+                    "loc_id=%s | loc_name=%r",
+                    loc.id,
+                    name,
+                )
 
+                manual_review += 1
+
+        # ---------------------------------------------------------
+        # Summary
+        # ---------------------------------------------------------
+
+        self.stdout.write("")
         self.stdout.write(
             self.style.SUCCESS(
-                f"Done. Updated: {updated}, "
-                f"Failed: {failed}, "
+                f"Done. Found: {found}, "
+                f"Manual review: {manual_review}, "
                 f"Skipped: {skipped}"
             )
-        )
-
-        logger.warning(
-            "Finished geocode run. updated=%s failed=%s skipped=%s",
-            updated,
-            failed,
-            skipped,
         )
