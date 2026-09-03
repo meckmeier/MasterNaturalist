@@ -20,8 +20,9 @@
   <div class="card mb-3" id="loc_id={{ each.id }}">
     <div class="card-body">
       <h5 class="card-title">{{ each.loc_name }}
-             <a href="{% url 'loc_edit' each.id %}?next=locations/latlng/#loc_id={{ each.id }}" title="edit location">
-            <i class="bi bi-pencil"></i></h5>
+             <a href="{% url 'loc_edit' each.id %}?next={{ request.get_full_path }}">
+    <i class="bi bi-pencil"></i>
+</a></h5>
       <p class="card-text">{{ each.address }}, {{ each.city }}, {{ each.state }} {{ each.zip }}</p>
 
     </div>

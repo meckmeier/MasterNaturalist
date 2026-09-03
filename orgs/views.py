@@ -707,8 +707,10 @@ def loc_detail(request, loc_id=None):
                 if anchor:
                     url += f"#{anchor}"
                 return redirect(url)
-            else:
-                return redirect(f"{reverse('locations')}?view=list&loc={loc.id}")
+            if next_url:
+                return redirect(next_url)
+        
+            return redirect(f"{reverse('locations')}?view=list&loc={loc.id}")
         else:
             #print("loc form errors",form.errors)
             messages.error(request, "there are errors in the form.")

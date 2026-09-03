@@ -14,8 +14,9 @@
 
     <form method="post" class="loc-form me-form" id="location-form">
     {% csrf_token %}
-   {{form.id}}
-      
+<input type="hidden"
+       name="next"
+       value="{{ request.POST.next|default:request.GET.next|default:request.get_full_path }}">
     
     <div class = "me-form-grid {% if view_only %}view-mode{% endif %}">
         <div class ="me-form-field-full">

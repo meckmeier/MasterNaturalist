@@ -15,9 +15,10 @@
         {% endif %}
 
         {% if loc|can_edit:request.user %}
-          <a href="{% url 'loc_edit' loc.id %}?next="org_mgmt#{{ org.id }}" title="edit location">
-            <i class="bi bi-pencil"></i>
-          </a>
+          <a href="{% url 'loc_edit' loc.id %}?next={{ request.get_full_path|urlencode }}%23loc-{{ loc.id }}"
+   title="edit location">
+    <i class="bi bi-pencil"></i>
+</a>
         {% endif %}
       </div>
 
