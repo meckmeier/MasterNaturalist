@@ -48,6 +48,23 @@
         <label for="view-map">Map View</label>
 
     </div>
+    <div class="me-toggle" role="group" style="margin: 15px;">
+
+    <input type="radio"
+           name="activity_status"
+           id="activity-main-has"
+           value="has"
+           {% if request.GET.activity_status != "all" %}checked{% endif %}>
+    <label for="activity-main-has">Has Activities</label>
+
+    <input type="radio"
+           name="activity_status"
+           id="activity-main-all"
+           value="all"
+           {% if request.GET.activity_status == "all" %}checked{% endif %}>
+    <label for="activity-main-all">Show All</label>
+
+</div>
 
  <button class="me-btn me-btn-small me-btn-compact-mobile"
             type="button"
@@ -107,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     radios.forEach(radio => {
         radio.addEventListener("change", function () {
-            console.log("view changed to", this.value);
+            console.log("filter changed to", this.value);
             form.submit();
         });
     });
@@ -157,5 +174,6 @@ document.addEventListener("click", async function (e) {
 
     document.getElementById("activityContent").innerHTML = html;
 });
+
 </script>
 {% endblock %}
