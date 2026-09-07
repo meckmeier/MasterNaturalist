@@ -674,7 +674,9 @@ def loc_detail(request, loc_id=None):
     
 
     org_on_url = request.GET.get("org")
-    
+    next_url = request.GET.get("next") or request.POST.get("next")
+    anchor = request.GET.get("anchor") or request.POST.get("anchor")
+
     if not org_on_url and not loc:
         messages.success(request, "Org context is needed for to create a new location", extra_tags=f"main-msg")
         return redirect(f"{reverse('org_mgmt')}")
@@ -689,18 +691,44 @@ def loc_detail(request, loc_id=None):
                 loc.owner = request.user.profile
                 loc.created_by = request.user.profile
                 loc.updated_by = request.user.profile
-                loc.save()
+                try:
+                    loc.save()
+                except IntegrityError:
+                    messages.error(
+                        request,
+                        f"A location with these details already exists."
+                    )
+                    return render(request, "orgs/location_form.html", {
+                        "loc": loc,
+                        "form": form,
+                        "view_only": view_only,
+                        "can_edit": can_edit,
+                        "next_url": next_url,
+                        "anchor": anchor,
+                    })
                 messages.success(request, f"Location '{loc.loc_name}' saved successfully!")
                
             else:
                 loc = form.save(commit=False)
                 loc.updated_by = request.user.profile
-                loc.save()
-                messages.success(request, f"Location '{loc.loc_name}' updated successfully!")
-
-            next_url = request.GET.get("next") or request.POST.get("next")
+                try:
+                    loc.save()
+                except IntegrityError:
+                    messages.error(
+                        request,
+                        f"A location with these details already exists."
+                    )
+                    return render(request, "orgs/location_form.html", {
+                        "loc": loc,
+                        "form": form,
+                        "view_only": view_only,
+                        "can_edit": can_edit,
+                        "next_url": next_url,
+                        "anchor": anchor,
+                    })
+                
             print ("next_url is:", next_url)
-            anchor = request.GET.get("anchor") or request.POST.get("anchor")
+            
 
             if next_url == "org_mgmt":
                 url = reverse("org_mgmt")
@@ -719,6 +747,8 @@ def loc_detail(request, loc_id=None):
                 "form": form,
                 "view_only": view_only,
                 "can_edit": can_edit,
+                "next_url":next_url,
+                "anchor":anchor,
              })
         
     else:
@@ -738,6 +768,8 @@ def loc_detail(request, loc_id=None):
                 "form": form,
                 "view_only": view_only,
                 "can_edit": can_edit,
+                "next_url":next_url,
+                "anchor":anchor,
                })
     
 def locations(request):
