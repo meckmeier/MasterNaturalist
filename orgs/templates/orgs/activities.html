@@ -110,15 +110,36 @@
 
 
 {% endblock %}
+
 {% block extrajs %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+
     document.querySelectorAll(".quick-filters input").forEach(el => {
         el.addEventListener("change", () => {
             console.log("QUICK FILTER CHANGED", el.name, el.value);
             el.closest("form").submit();
         });
     });
+
+
+    // Track interest when someone clicks Learn More or Contact
+    document.querySelectorAll("[data-activity-id]").forEach(link => {
+        link.addEventListener("click", () => {
+
+            const activityId = link.dataset.activityId;
+
+            fetch(`/activity/${activityId}/interest/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+            });
+
+        });
+    });
+
 });
 </script>
+
 {% endblock %}

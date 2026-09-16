@@ -23,6 +23,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Count, Q
+from urllib.parse import urlencode
 
 from datetime import date, time, timedelta
 from pathlib import Path
@@ -1590,6 +1591,15 @@ def activities(request):
                     "result_count": result_count,
 
                   } )
+
+
+def activity_interest(request, activity_id):
+    activity = get_object_or_404(Activity, pk=activity_id)
+
+    activity.interest_count += 1
+    activity.save(update_fields=["interest_count"])
+
+    return JsonResponse({"success": True})
 
 def get_grouped_categories():
     categories = EventCategory.objects.all().order_by("name")

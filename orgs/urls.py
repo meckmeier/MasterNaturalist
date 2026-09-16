@@ -34,10 +34,11 @@ urlpatterns = [
         
         path("activity/<int:activity_id>/edit/", views.activity_edit, name="activity_edit"),
         path("activity/<int:activity_id>/delete/", views.activity_delete, name="activity_delete"),
+        path("activity/<int:activity_id>/interest/", views.activity_interest, name="activity_interest"),
         path("locations/search/", views.location_search, name="location_search"),
         path("org/<int:org_id>/locs/new/", views.loc_create, name="loc_create"),
         path("locs/<int:loc_id>/edit/", views.loc_edit, name="loc_edit"),
-        path("locs/<int:loc_id>/", views.loc_detail, name="loc_view"),
+        #path("locs/<int:loc_id>/", views.loc_detail, name="loc_view"),
         path("locations/loc_modal/", views.quick_location_create, name="quick_location_create"),
     path("map/", views.map_view, name="map"),
     #path("about/", TemplateView.as_view(template_name="orgs/about.html"), name="about"),

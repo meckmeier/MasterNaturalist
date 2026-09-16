@@ -505,6 +505,7 @@ class Activity(models.Model):
     updated_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="updated_activities")
     updated_at = models.DateTimeField(auto_now=True)
     source_upload = models.ForeignKey(ActivityUpload, null=True, blank=True, on_delete=SET_NULL)
+    interest_count = models.PositiveIntegerField(default=0)
     objects = ActivityQuerySet().as_manager()       # default behavior
     all_objects = models.Manager()
 

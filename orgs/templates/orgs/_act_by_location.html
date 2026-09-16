@@ -141,15 +141,16 @@
           </a>
         {% endif %}
 
-     
+
+</a>
       {% if card.activity.activity_url %}
-            <a class="me-btn me-btn-compact-mobile" href="{{ card.activity.activity_url }}" target="_blank" rel="noopener noreferrer" title="External link to activity site">
+            <a class="me-btn me-btn-compact-mobile" href="{{ card.activity.activity_url }}" data-activity-id="{{ card.activity.id }}" target="_blank" rel="noopener noreferrer" title="External link to activity site">
               <span><i class="bi bi-arrow-up-right-square me-btn-icon"></i></span>
             <span class="me-btn-label">Learn More</span></a>
       {% endif %}
       {% if card.activity.contact_email%}
               {% with body_text="Hello, I found this opportunity on Wild Paths Wisconsin and I'm interested in "|add:card.activity.title|add:" at "|add:card.activity.org.org_name|add:". Thank you." %}
-           <a class="me-btn me-btn-compact-mobile" href="mailto:{{ card.activity.contact_email }}?subject={{ card.activity.title|urlencode }}&body={{ body_text|urlencode }}" title="Send email to contact">
+           <a class="me-btn me-btn-compact-mobile" href="mailto:{{ card.activity.contact_email }}?subject={{ card.activity.title|urlencode }}&body={{ body_text|urlencode }}" data-activity-id="{{ card.activity.id }}" title="Send email to contact">
             <span> 
           <i class="bi bi-envelope me-btn-icon" title="send email to contact person"></i></span>
          <span class="me-btn-label">Contact</span></a>{% endwith %}
