@@ -9,7 +9,7 @@
   <div class="me-card">
     <div class="me-card-header">
       <div class="me-card-header-left">
-        <h2 >User Info for {{ request.user.get_full_name|default:request.user.username }}</h2>
+        <h2 >User Info for {{ request.user.email }}</h2>
       </div>
       <div class="me-card-header-right">
         <div class="me-card-icons">
@@ -22,19 +22,23 @@
     <form method="post" novalidate>
       {% csrf_token %}
       {{ user_form.non_field_errors}}
-
+      
       <div class="form-field-full">
         {{user_form.first_name.label_tag}}
         {{user_form.first_name}}
         {{user_form.first_name.errors}}
       </div>
-
+      
       <div class="form-field-full">
         {{user_form.last_name.label_tag}}
         {{user_form.last_name}}
         {{user_form.last_name.errors}}
       </div>      
-
+    <div class="form-field-full">
+        {{user_form.username.label_tag}}
+        {{user_form.username}}
+        {{user_form.username.errors}}
+      </div>
       {{ form.non_field_errors}}
 
       <!-- Bio -->

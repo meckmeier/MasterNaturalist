@@ -259,7 +259,7 @@ class OrgInvite(models.Model):
         return f"{self.email} invite for {self.org.org_name}"
     @property
     def is_used(self):
-        return self.used_at is not None
+        return self.accepted 
     
 class FollowOrg(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followers')
@@ -417,11 +417,10 @@ class Location(models.Model):
             return False
         if user.is_staff:
             return True
-        if self.org is None:
+        if not self.org:
             return False
         return self.org.managed.filter(
-            profile=user.profile,
-            role__in=["owner", "admin", "editor"],
+            profile=user.profile
         ).exists()
     
 
@@ -517,8 +516,7 @@ class Activity(models.Model):
             return False
         return (
             user.is_staff
-            or self.org.managed.filter(profile=user.profile,
-                                          role__in=["owner","admin","editor"]).exists()
+            or self.org.managed.filter(profile=user.profile).exists()
     )
     def save(self, *args, **kwargs):
         self.activity_url = normalize_url(self.activity_url)

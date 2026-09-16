@@ -14,14 +14,11 @@ urlpatterns = [
     #path("activities/<int:pk>/panel/", views.activity_panel, name="activity_panel",),
     path("act-loc-panel/<int:location_id>/<int:activity_id>/",views.act_loc_panel,name="act_loc_panel"),
     path("activities/", views.activities, name="activities"),
-    path("opps/", views.opps, name="opps"),
+
     path("orgs/", views.orgs, name="orgs"),
     path("org/enroll/", views.org_enroll, name="org_enroll"),
     path("org/enroll/thanks/", views.org_enroll_thanks, name="org_enroll_thanks"),
-    path("staff/org-enrollments/", views.org_enrollment_list, name="org_enrollment_list"),
-    path("staff/org-enrollments/<int:enrollment_id>/approve/", views.org_approve, name="org_approve"),
-    path("staff/org-enrollments/<int:enrollment_id>/deny/", views.org_deny, name="org_deny"),  
-    path("staff/operations/", views.staff_landing, name="staff_landing"),
+    
     path("locations/manage/", views.location_manage, name="location_manage"),
     path("locations/latlng/", views.location_latlng, name="location_latlng"),
     path("locations/<int:location_id>/action/", views.location_action, name="location_action"),
@@ -38,8 +35,8 @@ urlpatterns = [
         path("activity/<int:activity_id>/edit/", views.activity_edit, name="activity_edit"),
         path("activity/<int:activity_id>/delete/", views.activity_delete, name="activity_delete"),
         path("locations/search/", views.location_search, name="location_search"),
-        path("locs/new/", views.loc_detail, name="loc_create"),
-        path("locs/<int:loc_id>/edit/", views.loc_detail, name="loc_edit"),
+        path("org/<int:org_id>/locs/new/", views.loc_create, name="loc_create"),
+        path("locs/<int:loc_id>/edit/", views.loc_edit, name="loc_edit"),
         path("locs/<int:loc_id>/", views.loc_detail, name="loc_view"),
         path("locations/loc_modal/", views.quick_location_create, name="quick_location_create"),
     path("map/", views.map_view, name="map"),
@@ -48,9 +45,16 @@ urlpatterns = [
     path("follow_org/<int:org_id>", views.follow_org, name="follow_org"),
     path("org/<int:org_id>/default-location/<int:loc_id>/",views.org_set_default_location,name="org_set_default_location"),
     path("profile/", views.profile_view, name="profile"),
-    path("staff/user/", views.staff_user_manage, name="staff_user_manage"),
 
-    
+    path("staff/org-enrollments/", views.org_enrollment_list, name="org_enrollment_list"),
+    path("staff/org-enrollments/<int:enrollment_id>/approve/", views.org_approve, name="org_approve"),
+    path("staff/org-enrollments/<int:enrollment_id>/deny/", views.org_deny, name="org_deny"),  
+    path("staff/operations/", views.staff_landing, name="staff_landing"),
+    path("staff/user/", views.staff_user_manage, name="staff_user_manage"),
+    path("staff/update-latlng/", views.run_update_latlng, name="run_update_latlng"),
+    path("staff/cleanup-imports/", views.run_cleanup_old_imports, name="run_cleanup_old_imports"),
+    path("staff/dashboard/",views.staff_dashboard,name="staff_dashboard",),
+
     path("login", lambda request: redirect("account_login"), name="login"),
     path("logout", lambda request: redirect("account_logout"), name="logout"),
     path("register", lambda request: redirect("account_signup"), name="register"),
@@ -72,8 +76,7 @@ urlpatterns = [
     path("upload/<int:upload_id>/rollback/", views.upload_rollback, name="upload_rollback"),
     path("uploads/<int:upload_id>/results/",views.upload_results,name="upload_results"),
     path("lookup-zip/", views.lookup_zip, name="lookup_zip"),
-    path("staff/update-latlng/", views.run_update_latlng, name="run_update_latlng"),
-    path("staff/cleanup-imports/", views.run_cleanup_old_imports, name="run_cleanup_old_imports"),
+    
     path("test_email",views.test_email, name="test_email"),
     path("test_html", views.test_html, name="test_html"),
 
@@ -89,7 +92,7 @@ urlpatterns = [
     path("upload_faq/", views.render_markdown, {"filename":"upload_faq"},name="upload_faq"),
     path("faq/", views.render_markdown, {"filename":"_faq"},name="faq"),
     path("news/",views.news, name="news"),
-    path("dashboard/",views.dashboard,name="dashboard",),
+    
 ]
 
 if settings.DEBUG:

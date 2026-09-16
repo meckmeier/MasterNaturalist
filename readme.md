@@ -115,7 +115,7 @@ https://www.youtube.com/watch?v=xfV6BcMvwxU - Manage Your Organization
 
 re-record - use fades to switch topics. Land on the pages longer so user can absorb the information. 
 
-# News Aggregation for Canopy
+# News Aggregation 
 Provide a Wisconsin Nature News page that aggregates news from organizations already participating in Canopy.
 
 ## Source Configuration
@@ -156,4 +156,6 @@ No need to store the full article.
 Each item links to the original article on the organization's website.
 
 
-
+9/8/2026
+updaging the location add by highlighting locations without addresses.
+(code is done just not pushed. i need to do more extensive testing before deploying now.)

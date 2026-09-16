@@ -97,7 +97,6 @@ def get_or_create_pending_location(raw, org, upload, result=None):
     matched_location = None
     score = 0
     reason = ""
-    done = "created"
 
     loc_name = str(raw.location_name or "")[:255]
     address = str(raw.address or "")[:255]
@@ -159,7 +158,7 @@ def get_or_create_pending_location(raw, org, upload, result=None):
             match_reason=reason,
         )
 
-        return pending_location, done
+        return pending_location, default_status
 
     except Exception as e:
         if result is not None:

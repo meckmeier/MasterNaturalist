@@ -217,49 +217,6 @@ class LocForm(forms.ModelForm):
 
         return cleaned_data
     
-class BaseLocationFormSet(BaseInlineFormSet):
-    def clean(self):
-        super().clean()
-        all_names =[]
-        for form in self.forms:
-            if not hasattr(form, "cleaned_data"):
-                continue
-            if form.cleaned_data.get('DELETE'):
-                continue 
-            if form.cleaned_data:
-                continue
-
-            loc_name = form.cleaned_data.get('loc_name')
-            physical = form.cleaned_data.get('physical_location')
-            deleted = form.cleaned_data.get('deleted')
-
-            if not loc_name or not physical or deleted:
-                continue
-            normalized_name = loc_name.strip().lower()
-
-            if normalized_name in all_names:
-                raise ValidationError(f"Duplicate location name '{loc_name}' is not allowed.")
-            all_names.append(normalized_name)
-
-            qs.Location.objects.filter(
-                physical_location=True,
-                deleted=False,
-                loc_name__iexact=loc_name.strip()
-            )
-            if form.instance.pk:
-                qs=qs.exclude(pk=form.instance.pk)
-            if qs.exists():
-                raise ValidationError(f"Location name '{loc_name}' already exists for another organization.")
-
-
-LocationFormSet = inlineformset_factory(
-    Organization,
-    Location,
-    fields = ['id','loc_name', 'region','physical_location','org_loc_url', 'contact_email',  'location_about',  'address', 'city_name','county_id', 'state', 'zip_code'],
-    extra=0,
-    can_delete=True,
-    formset=BaseLocationFormSet,
-)
 
 class LocationOrgForm(forms.Form):
     org = forms.ModelChoiceField(
@@ -520,7 +477,6 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        model = Profile
         fields = ["bio", "my_region", "include_online"]
         widgets = {
             "bio": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
@@ -532,7 +488,7 @@ class ProfileForm(forms.ModelForm):
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["first_name", "last_name"]
+        fields = ["first_name", "last_name", "username"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

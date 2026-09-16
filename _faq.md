@@ -73,7 +73,7 @@ The Activity page has a quick add feature, so you can create the location NAME w
 </details>
 <details>
 <summary>I already know my latitude and longitude. Can I just type it in the system?</summary>
-That field is not visible right now, but it will appear in future editions of the app.
+You sure can! The fields are near the bottom of the page on the location edit form.
 </details>
 <details>
 <summary>Why are there two different URLS in the activity page - one at the top and one in the session section?</summary>

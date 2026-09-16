@@ -4,7 +4,7 @@
 
 
 {% for key, values in query_params %}
-    {% if key != "time" and key != "activity_type" %}
+    {% if key != "time" and key != "activity_type" and key != "session_format" and key != "categories" %}
         {% for value in values %}
             <input type="hidden" name="{{ key }}" value="{{ value }}">
         {% endfor %}
