@@ -91,3 +91,7 @@ When you are adding sessions for your activity, you can say WHEN it happens. Usu
 <summary>Why can't I do recurring events?</summary>
 In the interest of making the site easy to build and easy to navigate, I didn't build a full on calendar function. So if your event is recurring, you have to type in each date as a session. Any event that is not ongoing will appear on the calendar on the dates that you add. If you want it to appear multiple times on the calendar you have to create multiple sessions.
 </details>
+<details>
+<summary>I don't have time to maintain all my activities here - can I still use Wild Paths Wisconsin?</summary>
+I think you can... Create your organization. Add in a single activity, but set it to ongoing, leave the start/end dates blank so you don't have to maintain dates here. If you want to have a flag on the map, set the activity to be InPerson and create a location. You will need to go into the location and type the address so we can create a flag but you only need to do that once. The only thing you won't have is an entry on the calendar because there is no date for this but you will be visible on the Organizations, and Volunteer or Training lists. With the location, you will show on the Map view as well. Be sure to add in a URL for the activity so users can find out more about your activity specifics in your website. 
+</details>
