@@ -93,5 +93,16 @@ In the interest of making the site easy to build and easy to navigate, I didn't 
 </details>
 <details>
 <summary>I don't have time to maintain all my activities here - can I still use Wild Paths Wisconsin?</summary>
-I think you can... Create your organization. Add in a single activity, but set it to ongoing, leave the start/end dates blank so you don't have to maintain dates here. If you want to have a flag on the map, set the activity to be InPerson and create a location. You will need to go into the location and type the address so we can create a flag but you only need to do that once. The only thing you won't have is an entry on the calendar because there is no date for this but you will be visible on the Organizations, and Volunteer or Training lists. With the location, you will show on the Map view as well. Be sure to add in a URL for the activity so users can find out more about your activity specifics in your website. 
+I think you can... 
+
+1. Add your organization (using the menu).
+2. You will still need to create a username (by following the approval email).
+3. Add in one activity
+    a. Be sure to add in your own website or contact so people can get connected to your current process.
+    a. If you want a flag, set it to InPerson, and create a location.
+    b. Use the checkbox to pick Ongoing. Leave the start/end dates blank so you don't have to maintain dates at all. 
+4. If you created a location, edit the location to add in the address (so we can create the flag).
+
+These steps will put your organization on the Organization list; your activity on the Volunteer or Training list; and if you did the location, on the Map. The only thing you won't have is an entry on the calendar.
+
 </details>
