@@ -157,5 +157,27 @@ Each item links to the original article on the organization's website.
 
 
 9/8/2026
-updaging the location add by highlighting locations without addresses.
-(code is done just not pushed. i need to do more extensive testing before deploying now.)
+updating the location add by highlighting locations without addresses.
+9/18/2026 - added in logging for each click on the activity more info or contact buttons in prep for a sorting option, added in faq for people who don't have time to maintain a whole process.
+
+to do
+sort - find a way to identify activities that have been viewed, and rotate them in the sort.
+Am currently logging clicks for more info... need code for pulling that data out of the system.
+- added dashboard element to count the activities that have been clicked on.
+
+do you need to add sort function?
+
+add in a location specific video.
+
+need a management process to look for orgs that have no managers, send email to the person that registered and use this text:
+Dear person,
+Thank you for creating a new organization at WildPathsWI.org (YOUR ORG)! Generally, after I approve your organization, you should receive an email from me (mary@eckmeier.com) with a link to create your username. Sometimes  it can get stuck in Spam folders, so you may have missed it. If you would like to add in activities or locations for your organization, you will need to create a username.
+
+If you cannot find the email from me, you can just use the REGISTER link on the main page to create a username. Be sure to use this email (YOUREMAIL)- and let me know when you have created it and I will assign you to manage the organization.
+
+If you have other questions, please reach out. If you would like more details on how to manage an organization, there is a document, as well as a video under Tutorials and Documentation.
+
+Thanks again for joining us!
+
+Mary
+WildPathsWI.org

@@ -11,7 +11,6 @@ admin.site.register(Commitment)
 admin.site.register(Profile)
 admin.site.register(FollowOrg)  
 admin.site.register(EventCategory)
-admin.site.register(Activity)
 admin.site.register(Session)
 admin.site.register(OrgManager)
 admin.site.register(ActivityUpload)
@@ -25,6 +24,20 @@ admin.site.register(UploadLog)
 admin.site.register(Region)
 admin.site.register(Video)
 
+@admin.register(Activity)
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "interest_count",
+        "activity_type",
+        "source_upload",
+        "created_by",
+        "created_at",
+    )
+    search_fields = (
+        "activity_type",
+        "interest_count"
+    )
 
 @admin.register(OrganizationEnrollmentRequest)
 class OrgEnrollmentRequestAdmin(admin.ModelAdmin):

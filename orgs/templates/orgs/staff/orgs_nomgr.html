@@ -1,0 +1,31 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<div class="me-page">
+
+<h1>Organizations with No Managers</h1>
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+{% for request in orgs %}
+    <div>
+        <strong>{{ request.created_org.org_name }}</strong>       <a class="me-icon-btn" href="{% url 'org_mgmt' %}?org={{ request.created_org.id }}">
+    <i class="bi bi-gear-fill me-btn-icon me-btn-black-icon"></i>
+</a><br>
+        Request: {{ request.contact_name }} — {{ request.contact_email }}<br>
+        Org ID: {{ request.created_org.id }}<br>
+        Managers: {{ request.created_org.managed.count }}
+    </div>
+    <hr>
+{% empty %}
+    <p>No approved enrollment requests with a created organization.</p>
+{% endfor %}
+
+{% endblock %}

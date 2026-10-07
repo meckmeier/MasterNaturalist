@@ -3187,6 +3187,20 @@ def county_list(request):
     return render(request, "orgs/county_by_region.html", {
         "regions": regions,
     })
+@login_required
+@staff_member_required
+def staff_orgs_nomgr(request):
+    orgs = OrganizationEnrollmentRequest.objects.filter(
+                status="a",
+                created_org__isnull=False,
+                created_org__managed__isnull=True,
+            ).select_related(
+                "created_org",
+               
+            )
+    return render(request, "orgs/staff/orgs_nomgr.html", {
+                    "orgs": orgs,
+                })
 
 @login_required
 @staff_member_required

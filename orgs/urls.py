@@ -55,6 +55,8 @@ urlpatterns = [
     path("staff/update-latlng/", views.run_update_latlng, name="run_update_latlng"),
     path("staff/cleanup-imports/", views.run_cleanup_old_imports, name="run_cleanup_old_imports"),
     path("staff/dashboard/",views.staff_dashboard,name="staff_dashboard",),
+    path("staff/orgs_nomgr/",views.staff_orgs_nomgr,name="staff_orgs_nomgr",),
+    
 
     path("login", lambda request: redirect("account_login"), name="login"),
     path("logout", lambda request: redirect("account_logout"), name="logout"),
