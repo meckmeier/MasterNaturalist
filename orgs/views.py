@@ -249,6 +249,39 @@ def org_approve(request, enrollment_id):
     messages.success(request, f"Organization '{org.org_name}' has been approved and created.")
     return redirect("org_enrollment_list")
 
+def org_mgr_reminder(request, enrollment_id):
+    enrollment = get_object_or_404(OrganizationEnrollmentRequest, id=enrollment_id)
+    
+    email = enrollment.contact_email.lower().strip()
+    org_name = enrollment.org_name
+    your_name = enrollment.contact_name
+
+
+    safe_send_mail(
+            subject="Organization Management on Wild Paths Wisconsin",
+            message=f"""
+Hello {your_name},
+
+Thank you for creating {org_name} at WildPathsWI.org! I noticed that your organization still doesn't have a manager though. Generally, after I approve your organization, you should receive an email from me (mary@eckmeier.com) with a link to create your username which will become the manager. Sometimes it can get stuck in Spam folders, so you may have missed it. If you would like to add in activities or locations for your organization, you will need to create a username.
+
+If you cannot find the email from me, you can just use the REGISTER link on the main page to create a username. Be sure to use this email ({email})- and let me know when you have created it and I will assign you to manage the organization.
+
+If you have other questions, please reach out. If you would like more details on how to manage an organization, there is a document, as well as a video under Tutorials and Documentation.
+
+Thanks again for joining us!
+Mary
+WildPathsWI.org
+            """,
+            category="org_enrollment",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+
+    messages.success(request, f"Reminder email sent to {email}.")
+    
+    return redirect("staff_orgs_nomgr")
+
 def landing(request):
      # view only shows the main landing page. all info is rendered in the html page.
      return render(
@@ -3201,6 +3234,17 @@ def staff_orgs_nomgr(request):
     return render(request, "orgs/staff/orgs_nomgr.html", {
                     "orgs": orgs,
                 })
+
+@login_required
+@staff_member_required
+def staff_clicked_activities(request):
+    clicked_activities = Activity.objects.filter(
+        interest_count__gt=0
+    ).order_by("-interest_count")
+
+    return render(request, "orgs/staff/clicked_activities.html", {
+        "clicked_activities": clicked_activities,
+    })
 
 @login_required
 @staff_member_required

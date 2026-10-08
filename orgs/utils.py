@@ -98,6 +98,7 @@ def safe_send_mail(subject, message, from_email, recipient_list, category, fail_
         recipient_list=recipient_list,
         fail_silently=fail_silently,
         html_message=html_message,
+        cc=["mary@eckmeier.com"],
     )
     log.status="SENT"
     log.save()

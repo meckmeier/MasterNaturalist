@@ -22,6 +22,10 @@
         Request: {{ request.contact_name }} — {{ request.contact_email }}<br>
         Org ID: {{ request.created_org.id }}<br>
         Managers: {{ request.created_org.managed.count }}
+        <a href="{% url 'org_mgr_reminder' request.id %}"
+   class="btn btn-sm btn-outline-warning">
+    Send Manager Reminder
+</a>
     </div>
     <hr>
 {% empty %}

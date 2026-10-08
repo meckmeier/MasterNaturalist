@@ -170,14 +170,13 @@ do you need to add sort function?
 add in a location specific video.
 
 need a management process to look for orgs that have no managers, send email to the person that registered and use this text:
-Dear person,
-Thank you for creating a new organization at WildPathsWI.org (YOUR ORG)! Generally, after I approve your organization, you should receive an email from me (mary@eckmeier.com) with a link to create your username. Sometimes  it can get stuck in Spam folders, so you may have missed it. If you would like to add in activities or locations for your organization, you will need to create a username.
+Dear PERSON,
+Thank you for creating YOUR ORG at WildPathsWI.org! I noticed that your organization still doesn't have a manager though. Generally, after I approve your organization, you should receive an email from me (mary@eckmeier.com) with a link to create your username which will become the manager. Sometimes it can get stuck in Spam folders, so you may have missed it. If you would like to add in activities or locations for your organization, you will need to create a username.
 
-If you cannot find the email from me, you can just use the REGISTER link on the main page to create a username. Be sure to use this email (YOUREMAIL)- and let me know when you have created it and I will assign you to manage the organization.
+If you cannot find the email from me, you can just use the REGISTER link on the main page to create a username. Be sure to use this email (YOUR EMAIL)- and let me know when you have created it and I will assign you to manage the organization.
 
 If you have other questions, please reach out. If you would like more details on how to manage an organization, there is a document, as well as a video under Tutorials and Documentation.
-
+​​​​​​​
 Thanks again for joining us!
-
 Mary
 WildPathsWI.org

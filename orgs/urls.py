@@ -50,12 +50,15 @@ urlpatterns = [
     path("staff/org-enrollments/", views.org_enrollment_list, name="org_enrollment_list"),
     path("staff/org-enrollments/<int:enrollment_id>/approve/", views.org_approve, name="org_approve"),
     path("staff/org-enrollments/<int:enrollment_id>/deny/", views.org_deny, name="org_deny"),  
+    path("staff/org-enrollments/<int:enrollment_id>/manager-reminder/", views.org_mgr_reminder, name="org_mgr_reminder"),
     path("staff/operations/", views.staff_landing, name="staff_landing"),
     path("staff/user/", views.staff_user_manage, name="staff_user_manage"),
     path("staff/update-latlng/", views.run_update_latlng, name="run_update_latlng"),
     path("staff/cleanup-imports/", views.run_cleanup_old_imports, name="run_cleanup_old_imports"),
     path("staff/dashboard/",views.staff_dashboard,name="staff_dashboard",),
     path("staff/orgs_nomgr/",views.staff_orgs_nomgr,name="staff_orgs_nomgr",),
+    path("staff/clicked_activities/",views.staff_clicked_activities,name="staff_clicked_activities",), 
+    
     
 
     path("login", lambda request: redirect("account_login"), name="login"),
