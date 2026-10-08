@@ -1,6 +1,3 @@
-
-
-
 from warnings import filters
 
 from django.conf import settings
@@ -15,7 +12,7 @@ from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError
 from django.db import transaction
-from django.db.models import Q, Min, Prefetch, F
+from django.db.models import Q, Min, Prefetch, F, Sum
 from django.http import  Http404, HttpResponseNotFound, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -30,11 +27,7 @@ from pathlib import Path
 from .utils import  safe_send_mail
 import markdown
 import json
-import pandas as pd
-from .services.csv_importer import CSVImporter
-from orgs.services.activity_tracking import track_activity
-from orgs.services.helper_function import get_county_from_zip, normalize_address_key, similarity, normalize_location_name
-from itertools import groupby
+
 
 from collections import defaultdict
 from collections import OrderedDict
@@ -42,6 +35,15 @@ from io import StringIO
 from orgs.models import *
 from .forms import *
 from .utils import build_activity_cards
+
+from orgs.services.csv_importer import CSVImporter
+from orgs.services.helper_function import get_county_from_zip, normalize_address_key, similarity, normalize_location_name
+from orgs.services.activity_tracker import track_activity
+from orgs.services.dashboard_services import build_dashboard
+from orgs.services.mapping import build_mapping, build_dropdown_options, validate_mapping, build_default_mapping
+from orgs.services.pending import build_pending_for_upload
+from orgs.services.publish import publish_pending_upload
+
 from .decorators import org_access_required
 
 
@@ -290,6 +292,7 @@ def landing(request):
 
 
 def orgs(request):
+    track_activity( request, action="org_list_view")
     # view that runs the org list - this page has it's own filter page.
     q = request.GET.get("q", "")
     locations_qs = Location.objects.active()
@@ -447,6 +450,7 @@ def follow_org(request, org_id):
     follow_relation, created = FollowOrg.objects.get_or_create(profile=profile, followOrg=org)
     
     if not created:
+        track_activity(request, "favorite_remove", org=org)
         follow_relation.delete()
 
     if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts=None):
@@ -682,6 +686,7 @@ def org_edit(request, org_id):
                 org.created_by = request.user.profile
             org.updated_by = request.user.profile
             org.save()
+            track_activity(request, action="org_update", org=org)
             messages.success(request, "Organization added successfully.", extra_tags=f"orgmsg-{org.id}")
             return redirect(f"{reverse('org_mgmt')}#org-{org.id}")
         else:
@@ -722,6 +727,7 @@ def loc_edit(request, loc_id):
             loc = form.save(commit=False)
             loc.updated_by = request.user.profile
             loc.save()
+            track_activity(request, action="location_update", org=loc.org, location=loc)
             if next_url == "org_mgmt":
                 url = reverse("org_mgmt")
                 if anchor:
@@ -745,6 +751,7 @@ def loc_edit(request, loc_id):
 @login_required
 @org_access_required
 def loc_create(request, org_id):
+    
     org = request.org  # org is set by the org_access_required decorator
     next_url="org_mgmt"
     anchor = request.GET.get("anchor") or request.POST.get("anchor")
@@ -758,6 +765,7 @@ def loc_create(request, org_id):
             loc.created_by = request.user.profile
             loc.updated_by = request.user.profile
             loc.save()
+            track_activity(request, action="location_create", org=request.org, location=loc)
             messages.success(request, f"Location '{loc.loc_name}' created successfully!")
             if next_url == "org_mgmt":
                 url = reverse("org_mgmt")
@@ -881,7 +889,7 @@ def loc_detail(request, loc_id=None):
                })
     
 def locations(request):
-    
+    track_activity(request, action="map_view")
     q = request.GET.get("q", "")
     today = timezone.now().date()
     active_filters = []
@@ -1467,6 +1475,7 @@ def profile_view(request):
 
 
 def activities(request):
+    track_activity( request, action="activity_list_view")
     q = request.GET.get("q", "")
 
     activity_id = request.GET.get("activity_id", "")
@@ -1628,7 +1637,7 @@ def activities(request):
 
 def activity_interest(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
-
+    track_activity(request, action="interest_click", org=activity.org, activity=activity)
     activity.interest_count += 1
     activity.save(update_fields=["interest_count"])
 
@@ -1697,6 +1706,8 @@ def _activity_form_workflow(request, org, activity, is_new=False):
             activity.updated_by = request.user.profile
             activity.org = org
             activity.save()
+            track_activity(request, action="activity_create" if is_new else "activity_update", org=org, activity=activity)
+
             activity_form.save_m2m()
 
             sessions = session_formset.save(commit=False)
@@ -2052,7 +2063,7 @@ def debug_sessions(request):
         "today": today
     })
 
-from orgs.services.mapping import build_mapping, build_dropdown_options, validate_mapping, build_default_mapping
+
 
 @login_required
 def upload_csv(request, org_id):
@@ -2287,7 +2298,7 @@ def upload_review_raw(request, upload_id):
         "skipped_count": skipped_rows.count(),
     })
 
-from orgs.services.pending import build_pending_for_upload
+
 
 @login_required
 def upload_build_pending(request, upload_id):
@@ -2640,6 +2651,7 @@ def upload_review_activities(request, upload_id):
 # Success page
 def upload_success(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
+    track_activity(request, action="upload_success", org=upload.organization)
     return render(request, "orgs/upload/upload_success.html", {
         "upload": upload,
         "location_count": Location.objects.filter(source_upload=upload).count(),
@@ -2651,6 +2663,7 @@ def upload_success(request, upload_id):
 @login_required
 def upload_cancel_confirm(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
+    track_activity(request, action="upload_cancel", org=upload.organization)
     next_url = request.GET.get("next")
 
     if not request.user.is_staff and upload.uploaded_by != request.user:
@@ -2692,6 +2705,7 @@ def upload_cancel_confirm(request, upload_id):
 @login_required
 def upload_rollback_confirm(request, upload_id):
     upload = get_object_or_404(ActivityUpload, id=upload_id)
+    track_activity(request, action="upload_rollback", org=upload.organization)
 
     context = {
         "upload": upload,
@@ -2747,7 +2761,7 @@ def normalize(text):
     return text.strip().lower() if text else ""
 
 
-from orgs.services.publish import publish_pending_upload
+
 
 @login_required
 def upload_publish(request, upload_id):
@@ -2941,6 +2955,7 @@ def feedback_view(request):
         form = FeedbackForm(request.POST)
         if form.is_valid():
             form.save()
+            track_activity(request, action="feedback_submitted")
             messages.success(request, "Thanks for the feedback.")
             return redirect("feedback")
     else:
@@ -2950,6 +2965,7 @@ def feedback_view(request):
     return render(request, "orgs/feedback.html", {"form": form})
 
 def calendar(request):
+    track_activity( request, action="calendar_view")
     active_filters = []
     
     queryset = Session.objects.current().filter(ongoing=False).exclude(start__isnull=True).select_related(
@@ -3186,7 +3202,7 @@ def news(request):
             "articles": articles,
         },
     )
-from orgs.services.dashboard_services import build_dashboard
+
 @login_required
 @staff_member_required
 @user_passes_test(lambda u: u.is_superuser)
@@ -3241,9 +3257,13 @@ def staff_clicked_activities(request):
     clicked_activities = Activity.objects.filter(
         interest_count__gt=0
     ).order_by("-interest_count")
+    total_interest = clicked_activities.aggregate(
+        total=Sum("interest_count")
+    )["total"] or 0
 
     return render(request, "orgs/staff/clicked_activities.html", {
         "clicked_activities": clicked_activities,
+        "total_interest": total_interest,
     })
 
 @login_required

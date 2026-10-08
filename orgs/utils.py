@@ -8,16 +8,21 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.mail import send_mail
 
+
 geolocator = Nominatim(user_agent="volunteer_map_app")
 geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
 
 import logging
 import os
 
+logger = logging.getLogger(__name__)
+
 from django.core.mail import send_mail
 from django.core.cache import cache
 
-logger = logging.getLogger(__name__)
+
+
+
 
 def get_postmark_period_start():
     today = date.today()
@@ -98,7 +103,7 @@ def safe_send_mail(subject, message, from_email, recipient_list, category, fail_
         recipient_list=recipient_list,
         fail_silently=fail_silently,
         html_message=html_message,
-        cc=["mary@eckmeier.com"],
+
     )
     log.status="SENT"
     log.save()

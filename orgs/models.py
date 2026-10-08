@@ -853,23 +853,33 @@ class Feedback(models.Model):
 
 class ActivityLog(models.Model):
     ACTION_CHOICES = [
-        ("visit", "Page visit"),
+        ("calendar_view", "Calendar viewed"),
+        ("map_view", "Map viewed"),
+        ("org_list_view", "Organization list viewed"),
+        ("activity_list_view", "Activity list viewed"),
         ("org_enroll", "Organization enrollment"),
         ("favorite_add", "Favorite added"),
         ("favorite_remove", "Favorite removed"),
-        ("login_attempt", "Login attempt"),
-        ("signup_attempt", "Signup attempt"),
+        ("interest_click", "Interest click"),
+
+        ("profile_update", "Profile update"),
+        ("org_update", "Organization update"),
+        ("activity_create", "Activity created"),
+        ("activity_update", "Activity update"),
+        ("location_create", "Location created"),
+        ("location_update", "Location update"),
+        ("upload_success", "Upload success"),
+        ("upload_cancel", "Upload canceled"),
+        ("upload_rollback", "Upload rolled back"),
+        ("feedback", "Feedback submitted"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     action = models.CharField(max_length=50, choices=ACTION_CHOICES)
 
-    org = models.ForeignKey(
-        Organization,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    org = models.ForeignKey( Organization, on_delete=models.SET_NULL, null=True, blank=True )
+    location = models.ForeignKey( Location, on_delete=models.SET_NULL, null=True, blank=True )
+    activity = models.ForeignKey( Activity, on_delete=models.SET_NULL, null=True, blank=True )
 
     path = models.CharField(max_length=500, blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
