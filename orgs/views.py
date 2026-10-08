@@ -13,6 +13,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Q, Min, Prefetch, F, Sum
+from django.db.models.functions import TruncDate
 from django.http import  Http404, HttpResponseNotFound, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -3264,6 +3265,22 @@ def staff_clicked_activities(request):
     return render(request, "orgs/staff/clicked_activities.html", {
         "clicked_activities": clicked_activities,
         "total_interest": total_interest,
+    })
+
+@login_required
+@staff_member_required
+def staff_activitylog(request):
+    
+    action_counts = (
+        ActivityLog.objects
+        .annotate(date=TruncDate("created_at"))
+        .values("date", "action")
+        .annotate(count=Count("id"))
+        .order_by( "action", "date")
+    )
+        
+    return render(request, "orgs/staff/activity_log.html", {
+        "action_counts": action_counts,
     })
 
 @login_required

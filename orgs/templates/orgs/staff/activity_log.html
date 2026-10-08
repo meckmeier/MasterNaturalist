@@ -1,0 +1,28 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<div class="me-page">
+<h3>By Date</h3>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            
+            <th>Action</th>
+            <th>Date</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in action_counts %}
+        <tr>
+           
+            <td>{{ item.action }}</td>
+             <td>{{ item.date|date:"M j, Y" }}</td>
+            <td>{{ item.count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

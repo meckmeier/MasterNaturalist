@@ -58,7 +58,7 @@ urlpatterns = [
     path("staff/dashboard/",views.staff_dashboard,name="staff_dashboard",),
     path("staff/orgs_nomgr/",views.staff_orgs_nomgr,name="staff_orgs_nomgr",),
     path("staff/clicked_activities/",views.staff_clicked_activities,name="staff_clicked_activities",), 
-    
+    path("staff/activitylog/",views.staff_activitylog,name="staff_activitylog",),
     
 
     path("login", lambda request: redirect("account_login"), name="login"),

@@ -21,6 +21,7 @@ from orgs.models import (
     Pending_Location,
     Pending_Session,
     EmailLog,
+    ActivityLog,
 )
 def get_database_summary():
 
@@ -48,6 +49,7 @@ def get_data_quality_summary():
                 ("uploaded_activities", Activity.objects.filter( source_upload__isnull=False ).count()),
                 ("orgs without managers", Organization.objects.filter(managed__isnull=True).distinct().count()),
                 ("clicked_activities", Activity.objects.filter(interest_count__gt=0).count()),
+                ("activity log", ActivityLog.objects.count()),
             ]
 
     }
