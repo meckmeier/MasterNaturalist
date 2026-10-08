@@ -293,7 +293,22 @@ def landing(request):
 
 
 def orgs(request):
-    track_activity( request, action="org_list_view")
+    filter_params = [
+        "q",
+        "org",
+        "org_id",
+        "my_orgs",
+        "county",
+        "region",
+        "has_volunteer",
+        "has_training",
+    ]
+
+    has_filters = any(request.GET.get(param) for param in filter_params)
+
+    if not has_filters:
+        track_activity(request, action="org_list_view")
+
     # view that runs the org list - this page has it's own filter page.
     q = request.GET.get("q", "")
     locations_qs = Location.objects.active()
@@ -446,11 +461,13 @@ def follow_org(request, org_id):
     next_url = request.POST.get("next") or request.GET.get("next")
     org = Organization.objects.get(id=org_id)
 
-    track_activity(request, "favorite_add", org=org)
+    
     profile = Profile.objects.get(user=request.user)
     follow_relation, created = FollowOrg.objects.get_or_create(profile=profile, followOrg=org)
     
-    if not created:
+    if created:
+        track_activity(request, "favorite_add", org=org)
+    else:
         track_activity(request, "favorite_remove", org=org)
         follow_relation.delete()
 
@@ -890,7 +907,24 @@ def loc_detail(request, loc_id=None):
                })
     
 def locations(request):
-    track_activity(request, action="map_view")
+    filter_params = {
+        "q",
+        "activity_status",
+        "org",
+        "loc",
+        "my_orgs",
+        "county",
+        "region",
+    }
+
+    has_filters = any(
+        request.GET.get(param)
+        for param in filter_params
+    )
+
+    if not has_filters:
+        track_activity(request, action="map_view")
+
     q = request.GET.get("q", "")
     today = timezone.now().date()
     active_filters = []
@@ -1476,7 +1510,13 @@ def profile_view(request):
 
 
 def activities(request):
-    track_activity( request, action="activity_list_view")
+    if request.get_full_path() in [
+        "/activities/",
+        "/activities/?activity_type=v",
+        "/activities/?activity_type=t",
+    ]:
+        track_activity(request, action="activity_list_view")    
+
     q = request.GET.get("q", "")
 
     activity_id = request.GET.get("activity_id", "")
@@ -2966,7 +3006,29 @@ def feedback_view(request):
     return render(request, "orgs/feedback.html", {"form": form})
 
 def calendar(request):
-    track_activity( request, action="calendar_view")
+    filter_params = [
+            "q",
+            "month",
+            "org",
+            "my_orgs",
+            "county",
+            "region",
+            "activity_type",
+            "time",
+            "categories",
+            "ongoing",
+            "has_cost",
+            "new",
+            "start_date",
+            "end_date",
+            "activity_id",
+        ]
+
+    has_filters = any(request.GET.get(param) for param in filter_params)
+
+    if not has_filters:
+        track_activity(request, action="calendar_view")
+
     active_filters = []
     
     queryset = Session.objects.current().filter(ongoing=False).exclude(start__isnull=True).select_related(
