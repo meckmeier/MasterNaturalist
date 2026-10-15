@@ -886,12 +886,14 @@ class ActivityLog(models.Model):
     user_agent = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    session_key = models.CharField( max_length=40,    null=True,    blank=True,    db_index=True,)
 
     class Meta:
         indexes = [
             models.Index(fields=["action"]),
             models.Index(fields=["created_at"]),
             models.Index(fields=["org"]),
+            models.Index(fields=["location"]),
         ]
 
     def __str__(self):
