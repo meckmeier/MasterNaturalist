@@ -37,12 +37,29 @@ from orgs.services.helper_function import *
 
 #actual classes for models
 #-------------------------------------------------------
+
+# New MAJOR implementation allowing for multiple states in the app and database.
+class State(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    abbr = models.CharField(max_length=2, unique=True)
+    slug = models.SlugField(unique=True)
+    fips = models.CharField(max_length=2, unique=True)
+    is_active = models.BooleanField(default=False)
+    domain = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+    
 class ZipToCounty (models.Model):
     zip=models.CharField(max_length=5, unique=True)
     county=models.ForeignKey("County", on_delete=models.CASCADE, related_name="zips")
     def __str__(self):
         return self.zip
-
      
 class Commitment(models.Model):
     time= models.CharField(max_length=50)
@@ -63,6 +80,7 @@ class EventCategory(models.Model):
 
 class Region(models.Model):
     code = models.CharField(max_length=2, unique=True)
+    state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="regions")
     name = models.CharField(max_length=100)
     map_filename = models.CharField(max_length=100)
 
@@ -78,6 +96,9 @@ class Region(models.Model):
 class County(models.Model):
     county_name=models.CharField(max_length=100)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name="counties", blank=True, null=True)
+    state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="counties")
+    fips = models.CharField(max_length=5, blank=True, null=True)
+
     class Meta:
         ordering = ["county_name"]
             
@@ -93,6 +114,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     bio=models.TextField(blank=True)
     is_master_naturalist = models.BooleanField(default=False)
+    my_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.SET_NULL, related_name="profiles")
+
     my_region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
      # Personalization Toggles
     include_online = models.BooleanField(default=True)
@@ -115,16 +138,31 @@ class Profile(models.Model):
     def is_org_manager(self):
         return self.managers.exists()
 
+class StateAdmin(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="state_admin_roles")
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name="admins")
+
+    class Meta:
+        unique_together = ("profile", "state")
+
+    def __str__(self):
+        return f"{self.profile} administers {self.state}"
+    
 class OrgQuerySet(models.QuerySet):
     def active(self):
         return self.filter(deleted=False)
 
 class Organization(models.Model):
     org_name = models.CharField(max_length=255, unique=True)
+
     org_url = models.URLField(max_length=200, default="", blank=True)
     in_wisconsin = models.BooleanField(default=True)
     host = models.BooleanField(default=False)
     about = models.TextField(default ="" , blank=True)
+    home_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="home_orgs")
+    is_national = models.BooleanField(default=False)
+    states_served = models.ManyToManyField("State", blank=True, related_name="orgs_serving")
+
     region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
     training_url = models.URLField(max_length=200, default="", blank=True)
     volunteer_url = models.URLField(max_length=200, default="", blank=True)
@@ -192,6 +230,7 @@ class OrganizationEnrollmentRequest(models.Model):
         )
     news_url = models.URLField(max_length=500, default="", blank=True)
     about = models.TextField(blank=True)
+    state = models.ForeignKey("State", null=True, blank=True, on_delete=models.SET_NULL, related_name="enrollment_requests")
     region = models.ForeignKey(Region,null=True, blank=True, on_delete=models.SET_NULL)
     contact_name = models.CharField(max_length=255)
     contact_email = models.EmailField()
@@ -358,6 +397,7 @@ class Location(models.Model):
     city_name = models.CharField(max_length=255, blank=True,null=True )
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL, related_name="locations")
     region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
+    us_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="locations")
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     org_loc_url = models.URLField(max_length=255, default="", blank=True)
@@ -652,6 +692,8 @@ class RawLoadData(models.Model):
     location_name = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=255, null=True, blank=True)
+    us_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.SET_NULL, related_name="raw_rows")
+
     state = models.CharField(max_length=2, default="WI", null=True, blank=True)
     zip = models.CharField(max_length=20, null=True, blank=True)
 
@@ -697,6 +739,7 @@ class Pending_Location(models.Model):
     city_name = models.CharField(max_length=255, blank=True,null=True )
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL)
     region=models.ForeignKey(Region, blank=True, null=True, on_delete=models.SET_NULL)
+    us_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="pending_locations")
     state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     org_loc_url = models.URLField(max_length=255, default="", blank=True)
@@ -876,6 +919,7 @@ class ActivityLog(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    state = models.ForeignKey("State", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
 
     org = models.ForeignKey( Organization, on_delete=models.SET_NULL, null=True, blank=True )
     location = models.ForeignKey( Location, on_delete=models.SET_NULL, null=True, blank=True )

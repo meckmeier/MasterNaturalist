@@ -23,7 +23,8 @@ admin.site.register(ActivityLog)
 admin.site.register(UploadLog)
 admin.site.register(Region)
 admin.site.register(Video)
-
+admin.site.register(State)
+admin.site.register(StateAdmin)
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (
