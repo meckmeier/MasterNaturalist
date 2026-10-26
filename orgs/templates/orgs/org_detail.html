@@ -36,13 +36,16 @@
             {{ form.org_url}}
             {{ form.org_url.errors }}
         </div>
-        <div class ="me-form-field">
-            {{ form.in_wisconsin.label_tag }}
-            {{ form.in_wisconsin}}
-            {{ form.in_wisconsin.errors }}
+        <div class="me-form-field">
+            {{ form.is_national.label_tag }}
+            {{ form.is_national }}
+            {{ form.is_national.errors }}
             
         </div>
          <div class ="me-form-field">
+            {{ form.home_state.label_tag }}
+            {{ form.home_state }}
+            {{ form.home_state.errors }}
             {{ form.region.label_tag }}
             {{ form.region}}
             {{ form.region.errors }}

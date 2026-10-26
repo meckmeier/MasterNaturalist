@@ -49,7 +49,7 @@ def normalize_url(url):
                 return "https://" + url
         return url
 
-def build_location_fingerprint(*, org_id, loc_name, address=None, city_name=None, state="WI"):
+def build_location_fingerprint(*,  loc_name, address=None, city_name=None, state=None):
     name = normalize_text(loc_name)
     address = normalize_address(address)
     city = normalize_text(city_name)
@@ -58,7 +58,7 @@ def build_location_fingerprint(*, org_id, loc_name, address=None, city_name=None
     if address:
         return f"addr|{name}|{address}|{city}|{state}"
 
-    return f"org|{org_id}|{name}|{city}|{state}"
+    return f"{name}|{city}|{state}"
 
 def normalize_zip_code(value):
     """
@@ -158,7 +158,7 @@ def normalize_address_key(loc):
     parts = [
         loc.address,
         loc.city_name,
-        loc.state,
+        loc.state_abbr,
         loc.zip_code,
     ]
 

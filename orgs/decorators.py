@@ -1,6 +1,6 @@
 from functools import wraps
 
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, Http404
 from django.shortcuts import get_object_or_404
 
 from .models import Organization, OrgManager
@@ -30,4 +30,13 @@ def org_access_required(view_func):
 
         return view_func(request, *args, **kwargs)
 
+    return wrapper
+
+
+def state_required(view):
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if request.state is None:
+            raise Http404("State required")
+        return view(request, *args, **kwargs)
     return wrapper

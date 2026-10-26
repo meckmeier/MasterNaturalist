@@ -116,7 +116,7 @@ class Command(BaseCommand):
             name = (loc.loc_name or "").strip()
             address = (loc.address or "").strip()
             city = (loc.city_name or "").strip()
-            state = (loc.state or "").strip() or "WI"
+            state = (loc.state_abbr).strip()
             county = (loc.county_id.county_name or "").strip() if loc.county_id else ""
             zip_code = (loc.zip_code or "").strip()
 

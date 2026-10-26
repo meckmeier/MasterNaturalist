@@ -4,6 +4,8 @@
 
 This Privacy Policy explains how we collect, use, and protect your information.
 
+This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.
+
 ###Information We Collect
 
 We may collect:

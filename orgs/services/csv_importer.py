@@ -2,7 +2,7 @@
 import re
 import pandas as pd
 from datetime import datetime, date
-from orgs.models import RawLoadData
+from orgs.models import RawLoadData, State
 import traceback
 import io
 
@@ -217,6 +217,26 @@ class CSVImporter:
             return val
         warnings.append(f"contact_email: invalid email '{val}'")
         return None
+
+    def parse_state(self, value):
+
+        value = str(value).strip()
+
+        state = State.objects.filter(
+            name__iexact=value
+        ).first()
+
+        if state:
+            return state.abbr.upper()
+
+        state = State.objects.filter(
+            abbr__iexact=value
+        ).first()
+
+        if state:
+            return state.abbr.upper()
+
+        return None
     
     def required_text(self, value, field_name, errors):
         value = str(value or "").strip()
@@ -253,6 +273,7 @@ class CSVImporter:
             "online": self.get_bool(row, "online"),
             "session_url": self.parse_url(self.get_val(row,"session_url"),warnings),
             "city": self.get_val(row, "city"),
+            "state": self.parse_state(self.get_val(row, "state")),
             "location_name": self.get_val(row, "location_name"),
             "address": self.get_val(row, "address"),
             "start_date": self.parse_date(self.get_val(row, "start_date"), "start_date", warnings),
@@ -346,6 +367,7 @@ class CSVImporter:
                     city=cleaned["city"],
                     location_name=cleaned["location_name"],
                     address=cleaned["address"],
+                    state=cleaned["state"],
 
                     start_date=cleaned["start_date"],
                     end_date=cleaned["end_date"],

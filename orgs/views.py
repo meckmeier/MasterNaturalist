@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from .decorators import state_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import PermissionDenied
 
@@ -177,7 +178,8 @@ def org_approve(request, enrollment_id):
             news_source=enrollment.news_source,
             news_url=enrollment.news_url,
             region=enrollment.region,
-            in_wisconsin=True,
+            home_state=enrollment.state , 
+                is_national=False,
             created_by=request.user.profile,
             updated_by=request.user.profile,
         )
@@ -291,8 +293,10 @@ def landing(request):
         request,
         "orgs/landing.html")
 
-
+@state_required
 def orgs(request):
+    #introducing the state filter
+    state= request.state
     filter_params = [
         "q",
         "org",
@@ -326,7 +330,7 @@ def orgs(request):
     )
 
     org_queryset = (
-        Organization.objects.active()
+        Organization.objects.active().visible_in(state)
         .order_by("org_name")
         .prefetch_related(
             Prefetch(
@@ -348,7 +352,7 @@ def orgs(request):
     if "org_id" in get_data and "org" not in get_data:
         get_data["org"]=get_data["org_id"]
     
-    filter_form=OrgFilterForm(get_data or None)
+    filter_form=OrgFilterForm(get_data or None, state=state)
     if filter_form.is_valid():
         
         data = filter_form.cleaned_data
@@ -423,8 +427,8 @@ def orgs(request):
                 org.activity_cards = build_activity_cards(sessions)
 
     followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
-    counties = County.objects.all()
-    all_orgs =Organization.objects.active().order_by("org_name")
+    counties = County.objects.all().filter(state=state).order_by("county_name") 
+    all_orgs =Organization.objects.active().visible_in(state).order_by("org_name")
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
 
@@ -434,9 +438,6 @@ def orgs(request):
     result_count = org_queryset.count()
     
     
-
-    
-    
     return render(
         request,
         "orgs/orgs.html",
@@ -444,7 +445,7 @@ def orgs(request):
             "organizations": org_queryset,
             "q": q,
             "followed_orgs": followed_orgs,
-            "filter_form": OrgFilterForm(request.GET or None),
+            "filter_form": OrgFilterForm(request.GET or None, state=state),
             "counties": counties,
             "query_params": clean_get,
             "orgs": all_orgs,
@@ -479,6 +480,7 @@ def follow_org(request, org_id):
 @login_required
 def org_mgmt(request):
     # managing YOUR organizations - this is where you can edit them, add activities, etc.
+    state = request.state
     today = timezone.localdate()
     if not request.user.is_authenticated:
         return redirect("login")
@@ -559,7 +561,7 @@ def org_mgmt(request):
             )
         )
     get_data = request.GET.copy()
-    filter_form=OrgFilterForm(get_data or None)
+    filter_form=OrgFilterForm(get_data or None, state=state)
     if filter_form.is_valid():
     
         data = filter_form.cleaned_data
@@ -569,7 +571,7 @@ def org_mgmt(request):
 
     return render(request, "orgs/org_mgmt.html", {
         "organizations": orgs,
-        "filter_form": OrgFilterForm(request.GET or None),
+        "filter_form": OrgFilterForm(request.GET or None, state=state),
         "next_url": request.get_full_path(),
             })
 
@@ -907,6 +909,7 @@ def loc_detail(request, loc_id=None):
                })
     
 def locations(request):
+    state = request.state
     filter_params = {
         "q",
         "activity_status",
@@ -955,18 +958,19 @@ def locations(request):
         )
     )
    
-    volunteer = Session.objects.current().filter(
+    volunteer = Session.objects.current().for_state(state).filter(
         activity__activity_type="v",
     )
 
-    training = Session.objects.current().filter(
+    training = Session.objects.current().for_state(state).filter(
         activity__activity_type="t",
     )
-    all_sessions = Session.objects.current()
+    all_sessions = Session.objects.current().for_state(state)
 
     queryset = (
         Location.objects
         .filter(deleted=False)
+        .for_state(state) 
         .annotate(
             volunteer_count=Count(
                 "sessions",
@@ -1010,7 +1014,7 @@ def locations(request):
     if "activity_status" not in get_data:
         get_data["activity_status"] = "has"
 
-    filter_form = LocFilterForm(get_data)
+    filter_form = LocFilterForm(get_data, state=state)
     
     if filter_form.is_valid():
         
@@ -1072,8 +1076,8 @@ def locations(request):
 
 
     followed_orgs = FollowOrg.objects.filter(profile=request.user.profile).values_list('followOrg_id', flat=True) if request.user.is_authenticated else []
-    counties = County.objects.all()
-    all_locs =Location.objects.filter(deleted=False).order_by("loc_name")
+    counties = County.objects.filter(state=state).all()
+    all_locs =Location.objects.for_state(state).filter(deleted=False).order_by("loc_name")
     clean_get = request.GET.copy()
     clean_get.pop("page", None)
     clean_get.pop("view", None)
@@ -1510,6 +1514,7 @@ def profile_view(request):
 
 
 def activities(request):
+    state = request.state
     if request.get_full_path() in [
         "/activities/",
         "/activities/?activity_type=v",
@@ -1524,11 +1529,11 @@ def activities(request):
     active_filters = []
 
     if activity_id:
-        current_activity = Activity.objects.filter(id=activity_id).first()
+        current_activity = Activity.objects.for_state(state).filter(id=activity_id).first()
     
     # activities results... should i change this so we know what it is?
    
-    queryset = Session.objects.current().select_related(
+    queryset = Session.objects.current().for_state(state).select_related(
             "activity",        # follow FK from Session -> Activity
             "activity__org",   # Activity -> Organization
             "location"         # Session -> Location
@@ -1545,7 +1550,7 @@ def activities(request):
         get_data.setlist("session_format", ["i", "o", "s"])
     
 
-    filter_form=EventFilterForm(get_data or None)
+    filter_form=EventFilterForm(get_data or None, state=state)
     if filter_form.is_valid():
     
         data = filter_form.cleaned_data
@@ -1857,7 +1862,7 @@ def location_search(request):
             "loc_name": loc.loc_name,
             "label": loc.loc_name,
             "city_name": loc.city_name,
-            "state": loc.state,
+            "state": loc.state_abbr,
             "org_name": loc.org.org_name if loc.org else "",
         }
     
@@ -1911,7 +1916,7 @@ def map_view(request):
     )
 
     locations_qs = Location.objects.filter(
-        state="WI",
+        
         latitude__isnull=False,
         longitude__isnull=False
     ).select_related("county_id").annotate(
@@ -3006,6 +3011,7 @@ def feedback_view(request):
     return render(request, "orgs/feedback.html", {"form": form})
 
 def calendar(request):
+    state=request.state
     filter_params = [
             "q",
             "month",
@@ -3031,7 +3037,7 @@ def calendar(request):
 
     active_filters = []
     
-    queryset = Session.objects.current().filter(ongoing=False).exclude(start__isnull=True).select_related(
+    queryset = Session.objects.current().for_state(state).filter(ongoing=False).exclude(start__isnull=True).select_related(
                 "activity",        # follow FK from Session -> Activity
                 "activity__org",   # Activity -> Organization
                 "location"         # Session -> Location
@@ -3049,7 +3055,7 @@ def calendar(request):
     
 
 
-    filter_form=EventFilterForm(get_data or None)
+    filter_form=EventFilterForm(get_data or None, state=state)
     if filter_form.is_valid():
     
         data = filter_form.cleaned_data
@@ -3184,7 +3190,7 @@ def calendar(request):
     return render(request, "orgs/calendar.html", {
         "filter_form":filter_form,
         "query_params": clean_get,
-        "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
+        "orgs": Organization.objects.active().visible_in(state).order_by("org_name"),
         "cats": EventCategory.objects.all(),
         "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html,
         "calendar": calendar,

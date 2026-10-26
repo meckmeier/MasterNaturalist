@@ -18,6 +18,8 @@ Listings on the App do not constitute endorsement, recommendation, or certificat
 
 The App is not responsible for the actions, policies, or practices of any third-party organization. 
 
+This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.
+
 ###Participation at Your Own Risk
 
 Participation in any volunteer activity or event is at your own risk.

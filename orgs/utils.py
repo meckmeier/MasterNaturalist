@@ -176,7 +176,7 @@ def build_activity_cards(sessions, location=None):
 
     return cards
 
-def get_lat_lng(city, county=None, state="WI"):
+def get_lat_lng(city, county=None, state=None):
     parts = [city]
     if county:
         parts.append(f"{county} County")
@@ -206,7 +206,7 @@ def update_latlng():
 
     geolocator = Nominatim(user_agent="my_django_app")
     for loc in Location.objects.filter(latitude__isnull=True, longitude__isnull=True):
-        address = f"{loc.loc_name}, {loc.city}, {loc.state}"
+        address = f"{loc.loc_name}, {loc.city}, {loc.state_abbr}"
         geo = geolocator.geocode(address)
         if geo:
             loc.latitude = geo.latitude

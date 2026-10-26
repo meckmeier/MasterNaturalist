@@ -35,7 +35,7 @@
             {% if loc.loc_name != "No Location" %}
 
             {{ loc.address }}, {{ loc.city_name }} | {{ loc.county_id.county_name }}
-            <br> {{loc.region}}, {{loc.state}}
+            <br> {{loc.region}}, {{loc.state_abbr}}, {{ loc.real_location.state_abbr }}
             {% endif %}
 
 

@@ -52,7 +52,7 @@
         <div class="me-card-split-left">
             <h5 class="mt-2">{{ loc.loc_name }}</h5>
             {{ loc.address }} <br>
-            {{ loc.city_name }}{% if loc.state %}, {{ loc.state }}{% endif %}
+            {{ loc.city_name }}{% if loc.state_abbr %}, {{ loc.state_abbr }}{% endif %}
             {% if loc.zip_code %} {{ loc.zip_code }}{% endif %}<br>
 
             {% if loc.county_id %}
@@ -166,7 +166,7 @@
         {% if loc.real_location %}
                 {{ loc.real_location.loc_name }}<br>
                 {{ loc.real_location.address }}<br>
-                {{ loc.real_location.city_name }}{% if loc.real_location.state %}, {{ loc.real_location.state }}{% endif %}
+                {{ loc.real_location.city_name }}{% if loc.real_location.state_abbr %}, {{ loc.real_location.state_abbr }}{% endif %}
                 {% if loc.real_location.zip_code %} {{ loc.real_location.zip_code }}{% endif %}
             
         {% else %}
@@ -181,7 +181,7 @@
                 NEW LOCATION will be created -
                 {{ loc.loc_name }}<br>
                 {{ loc.address }}<br>
-                {{ loc.city_name }}{% if loc.state %}, {{ loc.state }}{% endif %}
+                {{ loc.city_name }}{% if loc.state_abbr %}, {{ loc.state_abbr }}{% endif %}
                 {% if loc.zip_code %} {{ loc.zip_code }}{% endif %}
             {% endif %}
       

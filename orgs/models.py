@@ -1,3 +1,4 @@
+import code
 import re
 import secrets
 import uuid
@@ -46,6 +47,10 @@ class State(models.Model):
     fips = models.CharField(max_length=2, unique=True)
     is_active = models.BooleanField(default=False)
     domain = models.CharField(max_length=100, blank=True)
+    map_center_lat = models.FloatField(null=True, blank=True)
+    map_center_lng = models.FloatField(null=True, blank=True)
+    map_zoom = models.PositiveSmallIntegerField(default=7)
+    contact_email = models.EmailField(blank=True)
 
     class Meta:
         ordering = ["name"]
@@ -56,8 +61,13 @@ class State(models.Model):
 
     
 class ZipToCounty (models.Model):
-    zip=models.CharField(max_length=5, unique=True)
+    zip=models.CharField(max_length=5)
     county=models.ForeignKey("County", on_delete=models.CASCADE, related_name="zips")
+    state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="zips")
+    share = models.DecimalField(max_digits=5, decimal_places=4, null=True, blank=True)
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["zip", "state"], name="uniq_zip_per_state")]
+
     def __str__(self):
         return self.zip
      
@@ -79,7 +89,7 @@ class EventCategory(models.Model):
         return self.name
 
 class Region(models.Model):
-    code = models.CharField(max_length=2, unique=True)
+    code = models.CharField(max_length=2)
     state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="regions")
     name = models.CharField(max_length=100)
     map_filename = models.CharField(max_length=100)
@@ -92,15 +102,20 @@ class Region(models.Model):
     
     class Meta:
         ordering = ["name"]
+        constraints = [
+        models.UniqueConstraint(fields=["state", "code"], name="uniq_region_code_per_state"), ]
 
 class County(models.Model):
     county_name=models.CharField(max_length=100)
-    region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name="counties", blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.PROTECT, related_name="counties")
     state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="counties")
-    fips = models.CharField(max_length=5, blank=True, null=True)
+    fips = models.CharField(max_length=5, unique=True,blank=True, null=True)
 
     class Meta:
         ordering = ["county_name"]
+        constraints = [
+            models.UniqueConstraint(fields=["state", "county_name"], name="uniq_county_name_per_state"),
+         ]
             
     def __str__(self):
         return self.county_name
@@ -148,15 +163,20 @@ class StateAdmin(models.Model):
     def __str__(self):
         return f"{self.profile} administers {self.state}"
     
+
 class OrgQuerySet(models.QuerySet):
     def active(self):
         return self.filter(deleted=False)
 
+    def visible_in(self, state):
+        return self.filter(
+            Q(home_state=state) | Q(states_served=state)
+        ).distinct()
+    
 class Organization(models.Model):
     org_name = models.CharField(max_length=255, unique=True)
 
     org_url = models.URLField(max_length=200, default="", blank=True)
-    in_wisconsin = models.BooleanField(default=True)
     host = models.BooleanField(default=False)
     about = models.TextField(default ="" , blank=True)
     home_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="home_orgs")
@@ -213,6 +233,8 @@ class Organization(models.Model):
         self.training_url = normalize_url(self.training_url)
 
         super().save(*args, **kwargs)
+
+
 
 
 class OrganizationEnrollmentRequest(models.Model):
@@ -388,6 +410,12 @@ class LocationQuerySet(models.QuerySet):
     def active(self):
         return self.filter(deleted=False,
                            org__deleted=False)
+    
+    def for_state(self, state):
+        from .models import Organization
+        return self.filter(
+            org__in=Organization.objects.active().visible_in(state).values("pk")
+        )
 
 class Location(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.SET_NULL, related_name="locations", blank=True, null=True)
@@ -398,7 +426,6 @@ class Location(models.Model):
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL, related_name="locations")
     region = models.ForeignKey( Region, null=True, blank=True, on_delete=models.SET_NULL)
     us_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="locations")
-    state = models.CharField(max_length=100, default='WI', blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     org_loc_url = models.URLField(max_length=255, default="", blank=True)
     location_about = models.TextField(default="", blank=True )
@@ -425,19 +452,19 @@ class Location(models.Model):
     all_objects = models.Manager()
 
     def build_fingerprint(self):
-       return build_location_fingerprint(
-        org_id=self.org_id,
-        loc_name=self.loc_name,
-        address=self.address,
-        city_name=self.city_name,
-        state=self.state,
-    )
+        return build_location_fingerprint(
+           
+            loc_name=self.norm_loc_name,
+            address=self.norm_address,
+            city_name=self.norm_city,
+            state=self.norm_state,
+        )
         
     def save(self, *args, **kwargs):
         # 👇 ALWAYS populate normalized fields
         self.norm_loc_name = normalize_text(self.loc_name)
         self.norm_city =  normalize_text(self.city_name or "")
-        self.norm_state = normalize_text(self.state or "wi")
+        self.norm_state = normalize_text(self.state_abbr.lower() if self.state_abbr else "")
         self.norm_address = normalize_address(self.address or "")
 
         # 👇 build fingerprint
@@ -463,7 +490,10 @@ class Location(models.Model):
             profile=user.profile
         ).exists()
     
-
+    @property
+    def state_abbr(self):
+        return self.us_state.abbr if self.us_state_id else ""
+    
     @property
     def organizations(self):
         orgs = {}
@@ -486,12 +516,21 @@ class Location(models.Model):
 
         return sorted(orgs.values(), key=lambda o: o.org_name)
 
+
+
 class ActivityQuerySet(models.QuerySet):
     def base(self):
         return self.filter(
             deleted=False,
             org__deleted=False
         )
+    
+    def for_state(self, state):
+        from .models import Organization
+        return self.filter(
+            org__in=Organization.objects.active().visible_in(state).values("pk")
+        )
+    
     def with_active_flag(self):
         current_sessions = Session.objects.current().filter(
             activity=OuterRef('pk')
@@ -629,6 +668,12 @@ class SessionQuerySet(models.QuerySet):
 
     def ongoing(self):
         return self.active().filter(ongoing=True)
+    
+    def  for_state(self, state):
+        from .models import Organization
+        return self.filter(
+            activity__org__in=Organization.objects.active().visible_in(state).values("pk")
+        )
    
 class Session(models.Model):
     activity=models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="sessions")
@@ -692,9 +737,8 @@ class RawLoadData(models.Model):
     location_name = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=255, null=True, blank=True)
-    us_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.SET_NULL, related_name="raw_rows")
-
-    state = models.CharField(max_length=2, default="WI", null=True, blank=True)
+    
+    state = models.CharField(max_length=2, null=True, blank=True)
     zip = models.CharField(max_length=20, null=True, blank=True)
 
     ongoing = models.BooleanField(null=True)   # ✅ changed
@@ -740,7 +784,7 @@ class Pending_Location(models.Model):
     county_id = models.ForeignKey(County, blank=True, null=True, on_delete=models.SET_NULL)
     region=models.ForeignKey(Region, blank=True, null=True, on_delete=models.SET_NULL)
     us_state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="pending_locations")
-    state = models.CharField(max_length=100, default='WI', blank=True)
+    
     zip_code = models.CharField(max_length=20, blank=True)
     org_loc_url = models.URLField(max_length=255, default="", blank=True)
     location_about = models.TextField(default="", blank=True )
@@ -778,29 +822,33 @@ class Pending_Location(models.Model):
 
     fingerprint = models.CharField(max_length=500)
 
+    @property
+    def state_abbr(self):
+        return self.us_state.abbr if self.us_state_id else ""
+    
     def build_fingerprint(self):
         return build_location_fingerprint(
-        org_id=self.org_id,
-        loc_name=self.loc_name,
-        address=self.address,
-        city_name=self.city_name,
-        state=self.state,
+        
+        loc_name=self.norm_loc_name,
+        address=self.norm_address,
+        city_name=self.norm_city,
+        state=self.norm_state,
     )
     
     def save(self, *args, **kwargs):
         # 👇 ALWAYS populate normalized fields
         self.norm_loc_name = normalize_text(self.loc_name)
         self.norm_city = normalize_text(self.city_name)
-        self.norm_state = normalize_text(self.state)
+        self.norm_state = normalize_text(self.state_abbr.lower() if self.state_abbr else "")
         self.norm_address = normalize_address(self.address)
 
         # 👇 build fingerprint
         self.fingerprint = self.build_fingerprint()
 
         super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.loc_name} ({self.org})"
-    
     
     class Meta:
         constraints = [
@@ -809,6 +857,7 @@ class Pending_Location(models.Model):
                 name="unique_pending_location_per_upload_fingerprint",
             )
         ]
+
     
 class Pending_Activity(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="pending_activities")
@@ -865,7 +914,8 @@ class Feedback(models.Model):
     page_url = models.CharField(max_length=500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     handled = models.BooleanField(default=False)
-    
+    state = models.ForeignKey("State", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+
     def __str__(self):
         who = self.name or self.email or "Anonymous"
         return f"{who} - {self.created_at:%Y-%m-%d %H:%M}"

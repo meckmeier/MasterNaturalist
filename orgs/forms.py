@@ -97,6 +97,7 @@ class OrgEnrollmentForm(forms.ModelForm):
             "news_url",
             "about",
             "region",
+            "state",
             "contact_name",
             "contact_email",
             "contact_title",
@@ -140,11 +141,7 @@ class OrgEnrollmentForm(forms.ModelForm):
         return name
     
 class OrgForm(forms.ModelForm):
-    in_wisconsin = forms.BooleanField(
-        label="WI",
-        required=False,
-        widget=forms.CheckboxInput()
-    )
+    
 
     org_url = forms.CharField(required=False)
     volunteer_url = forms.CharField(required=False)
@@ -154,8 +151,9 @@ class OrgForm(forms.ModelForm):
         model = Organization
         fields = [
             'id', 'org_name', 'org_url', 'volunteer_url', 'training_url', 'news_url', 'news_source',
-            'in_wisconsin', 'about', 'region', 'host', 'deleted', 'default_location','example_org'
+            'is_national','home_state', 'about', 'region',  'host', 'deleted', 'default_location','example_org'
         ]
+        labels = {"is_national": "National organization", "home_state": "Home state"}
         widgets = {
             "about": forms.Textarea(attrs={"rows": 5}),
             "org_url": forms.TextInput(attrs={
@@ -171,10 +169,16 @@ class OrgForm(forms.ModelForm):
                 "placeholder": "https://www.yourorg.org/rss_feed or /news or /subscribe"
             }),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["home_state"].queryset = State.objects.filter(is_active=True)
 
     def clean(self):
         cleaned_data = super().clean()
-
+        if not cleaned_data.get("is_national") and not cleaned_data.get("home_state"):
+            self.add_error("home_state", "Choose a home state, or mark the organization as national.")
+            return cleaned_data
+        
         for field in ["org_url", "volunteer_url", "training_url", "news_url"]:
             url = cleaned_data.get(field)
             if url:
@@ -194,7 +198,7 @@ class LocForm(forms.ModelForm):
     org_loc_url = forms.CharField(required=False)
     class Meta:
         model = Location
-        fields = [ "loc_name", "physical_location", "address", "city_name", "county_id", "region", "state", "zip_code", "org_loc_url", "location_about", "contact_email", "latitude", "longitude", "deleted"]
+        fields = [ "loc_name", "physical_location", "address", "city_name", "county_id", "region", "us_state", "zip_code", "org_loc_url", "location_about", "contact_email", "latitude", "longitude", "deleted"]
         widgets = {
             "location_about": forms.Textarea(attrs={
                 "rows": 3,
@@ -292,7 +296,7 @@ class EventFilterForm(forms.Form):
         widget=forms.RadioSelect
     )
     org= forms.ModelChoiceField(
-        queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
+        queryset=Organization.objects.none().order_by ("org_name"),
         required=False,
         empty_label="Any",
         label="Org Name",
@@ -318,7 +322,7 @@ class EventFilterForm(forms.Form):
         widget=forms.Select(attrs={"class":"form-select"})       
     )
     region = forms.ModelChoiceField(
-        queryset = Region.objects.all().order_by("name"),
+        queryset = Region.objects.none().order_by("name"),
         required=False,
         empty_label="Any",
         label="Region",
@@ -345,8 +349,20 @@ class EventFilterForm(forms.Form):
         )
 
             
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, state=None, **kwargs):
         super().__init__(*args, **kwargs)
+        if state is None:
+            raise ValueError("EventFilterForm requires a state")
+        else:
+            self.fields["org"].queryset = (
+                    Organization.objects.active().visible_in(state).order_by("org_name")
+                )
+            self.fields["county"].queryset = (
+                    County.objects.filter(state=state).order_by("county_name")
+                )
+            self.fields["region"].queryset = (
+                    Region.objects.filter(state=state).order_by("name")
+                )
         category_qs = EventCategory.objects.all().order_by("category_class", "name")
         self.fields["categories"].queryset = category_qs
 
@@ -379,10 +395,13 @@ class EventFilterForm(forms.Form):
             choices.append((value, label))
 
         self.fields["month"].choices = choices
+         
+       
+
         
 class OrgFilterForm(forms.Form):
     org= forms.ModelChoiceField(
-        queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
+        queryset=Organization.objects.none().order_by ("org_name"),
         required=False,
         empty_label="Any",
         label="Org Name",
@@ -405,7 +424,7 @@ class OrgFilterForm(forms.Form):
     )
    
     region = forms.ModelChoiceField(
-        queryset=Region.objects.all().order_by ("name"),
+        queryset=Region.objects.none().order_by ("name"),
         required=False,
         empty_label="Any",
         label="Region",
@@ -419,10 +438,20 @@ class OrgFilterForm(forms.Form):
             "placeholder":"Search in name, location or description"
         })
     )
+    def __init__(self, *args, state=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if state is None:
+            raise ValueError("OrgFilterForm requires a state")
+        self.fields["org"].queryset = (
+            Organization.objects.active().visible_in(state).order_by("org_name")
+        )
+        self.fields["region"].queryset = (
+            Region.objects.filter(state=state).order_by("name")
+        )
 
 class LocFilterForm(forms.Form):
     org= forms.ModelChoiceField(
-        queryset=Organization.objects.filter(deleted=False).order_by ("org_name"),
+        queryset=Organization.objects.none().order_by ("org_name"),
         required=False,
         empty_label="Any",
         label="Org Name",
@@ -433,7 +462,7 @@ class LocFilterForm(forms.Form):
         label="Show Followed Organizations"
     )
     loc = forms.ModelChoiceField(
-        queryset=Location.objects.filter(deleted=False).order_by ("loc_name"),
+        queryset=Location.objects.none().order_by ("loc_name"),
         required=False,
         empty_label="Any",
         label="Location Name",
@@ -452,14 +481,14 @@ class LocFilterForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-select"}),
     )
     county = forms.ModelChoiceField(
-        queryset = County.objects.all().order_by("county_name"),
+        queryset = County.objects.none().order_by("county_name"),
         required=False,
         empty_label="Any",
         label="County" ,
         widget=forms.Select(attrs={"class":"form-select"})       
     )
     region = forms.ModelChoiceField(
-        queryset = Region.objects.all().order_by("name"),
+        queryset = Region.objects.none().order_by("name"),
         required=False,
         empty_label="Any",
         label="Region",
@@ -472,6 +501,14 @@ class LocFilterForm(forms.Form):
             "placeholder":"Search in name, location or description"
         })
     )
+    def __init__(self, *args, state=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if state is None:
+            raise ValueError("LocFilterForm requires a state")
+        self.fields["org"].queryset = Organization.objects.active().visible_in(state).order_by("org_name")
+        self.fields["loc"].queryset = Location.objects.filter(deleted=False).for_state(state).order_by("loc_name")
+        self.fields["county"].queryset = County.objects.filter(state=state)
+        self.fields["region"].queryset = Region.objects.filter(state=state).order_by("name")
 
 class ProfileForm(forms.ModelForm):
 

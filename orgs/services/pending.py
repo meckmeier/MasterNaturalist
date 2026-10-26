@@ -1,7 +1,7 @@
 
 from django.db import transaction
 from django.utils import timezone
-from orgs.models import (RawLoadData, Pending_Location, Pending_Activity, Pending_Session, Location, ZipToCounty, EventCategory)
+from orgs.models import (State, RawLoadData, Pending_Location, Pending_Activity, Pending_Session, Location, ZipToCounty, EventCategory)
 from orgs.services.helper_function import get_county_from_zip
 
 class PendingBuildResult:
@@ -101,17 +101,23 @@ def get_or_create_pending_location(raw, org, upload, result=None):
     loc_name = str(raw.location_name or "")[:255]
     address = str(raw.address or "")[:255]
     city_name = str(raw.city or "")[:255]
-    state = str(raw.state or "WI").strip().upper()[:2]
+    state_abbr = str(raw.state or "").strip().upper()[:2]
+    print(f"Row {raw.row_number}: loc_name={loc_name}, address={address}, city_name={city_name}, state_abbr={state_abbr}")
+    if not state_abbr and org and org.home_state_id:
+        state_abbr = org.home_state.abbr
+    us_state = State.objects.filter(abbr=state_abbr).first() if state_abbr else None
+    print(f"Row {raw.row_number}: us_state={us_state}")
     zip_code = str(raw.zip or "")[:5]
 
     fingerprint = build_location_fingerprint(
-        org_id=org.id,
+        
         loc_name=clean(loc_name),
         address=clean(address),
         city_name=clean(city_name),
-        state=clean(state),
+        state=clean(state_abbr),
     )
-
+    print(f"Row {raw.row_number}: fingerprint={fingerprint}")
+    
     pending_location = Pending_Location.objects.filter(
         source_upload=upload,
         fingerprint=fingerprint,
@@ -145,7 +151,7 @@ def get_or_create_pending_location(raw, org, upload, result=None):
             loc_name=loc_name,
             address=address,
             city_name=city_name,
-            state=state,
+            us_state=us_state,
             zip_code=zip_code,
             county_id=county,
             region=county.region if county else None,
