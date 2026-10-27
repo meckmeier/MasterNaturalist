@@ -51,7 +51,14 @@ class State(models.Model):
     map_center_lng = models.FloatField(null=True, blank=True)
     map_zoom = models.PositiveSmallIntegerField(default=7)
     contact_email = models.EmailField(blank=True)
-
+    logo = models.CharField(
+        max_length=200, blank=True,
+        help_text="Static path, e.g. img/logos/wi.png",
+    )
+    brand_color = models.CharField(
+        max_length=7, blank=True,
+        help_text="Hex color, e.g. #1b5e20",
+    )
     class Meta:
         ordering = ["name"]
 

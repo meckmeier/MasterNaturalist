@@ -73,31 +73,14 @@ class OrgEnrollmentForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org"})
     )
-    volunteer_url = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/volunteer"})
-    )
-    training_url = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/training"})
-    )
-    news_url = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": "https://www.yourorg.org/feed or/news or /subscribe"})
-    )
 
     class Meta:
         model = OrganizationEnrollmentRequest
         fields = [
             "org_name",
             "org_url",
-            "volunteer_url",
-            "training_url",
-            "news_source",
-            "news_url",
             "about",
             "region",
-            "state",
             "contact_name",
             "contact_email",
             "contact_title",
@@ -107,6 +90,11 @@ class OrgEnrollmentForm(forms.ModelForm):
         widgets = {
             "about": forms.Textarea(attrs={"rows": 5}),
         }
+    def __init__(self, *args, state=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if state is None:
+            raise ValueError("OrgForm requires a state")
+        self.state = state
 
     def clean(self):
         cleaned_data = super().clean()
@@ -121,10 +109,11 @@ class OrgEnrollmentForm(forms.ModelForm):
 
         return cleaned_data
     def clean_org_name(self):
+        
         name = self.cleaned_data.get("org_name", "").strip()
 
         # Check approved organizations
-        if Organization.objects.filter(org_name__iexact=name).exists():
+        if Organization.objects.active().visible_in(self.state).filter(org_name__iexact=name).exists():
             raise forms.ValidationError(
                 "That organization already exists."
             )
@@ -132,7 +121,8 @@ class OrgEnrollmentForm(forms.ModelForm):
         # Check pending enrollment requests
         if OrganizationEnrollmentRequest.objects.filter(
             org_name__iexact=name,
-            status="new"
+            status="new",
+            state = self.state
         ).exists():
             raise forms.ValidationError(
                 "A request for that organization is already pending review."
@@ -208,6 +198,14 @@ class LocForm(forms.ModelForm):
                 "placeholder": "https://www.yourorg.org/location"
             }),
         }
+    def __init__(self, *args, state=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if state is None:
+            raise ValueError("LocForm requires a state")
+        self.state = state
+        self.fields["county_id"].queryset = County.objects.filter(state=state).order_by("county_name")
+        self.fields["region"].queryset = Region.objects.filter(state=state).order_by("name")
+        
     def clean(self):
         cleaned_data = super().clean()
 
@@ -222,12 +220,6 @@ class LocForm(forms.ModelForm):
         return cleaned_data
     
 
-class LocationOrgForm(forms.Form):
-    org = forms.ModelChoiceField(
-        queryset=Organization.objects.filter(deleted=False).order_by("org_name"),
-        required=False,
-        label="Owner organization"
-    )
 
 
 class LocationMergeForm(forms.Form):

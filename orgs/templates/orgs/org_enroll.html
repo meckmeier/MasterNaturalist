@@ -40,19 +40,11 @@
         <div class ="me-form-field">
             Main URL:
             {{ form.org_url}}
-            {{ form.org_url.errors }}
-            
-           
+            {{ form.org_url.errors }}           
         </div>
-        
-        <div class="me-form-field">
-
-        </div>
-         <div class ="me-form-field">
-            {{ form.state.label_tag }}
-            {{ form.state}}
-            {{ form.state.errors }}
-        </div>
+        <div></div>
+        <div></div>
+      
         
        
          <div class="me-form-field">
@@ -81,10 +73,15 @@
 
             
      </div>
+
+    <div class="mb-3">
+            {{ form.turnstile }}
+        </div>
      <button type="submit" class="me-btn">
           <span><i class="bi bi-floppy me-btn-icon"></i></span>
             <span class="me-btn-label">Save</span>
         </button>
+    
 </form>
 <p>Once this request is approved, you will receive an email invitation to create your organization management account.</p>
 </div>

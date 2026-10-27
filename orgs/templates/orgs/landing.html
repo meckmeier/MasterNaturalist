@@ -5,10 +5,13 @@
 <div class="me-landing-content">
     <br>
 
-     <img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" width ="210" class="img-fluid">
-
+   {% if current_state and current_state.logo %}   
+<img src="{% static current_state.logo %}" alt="{{ current_state.name }}" width ="210" class="img-fluid">
+{% else %}
+<img src="{% static 'orgs/images/wpwlogo13_9d.svg'%}" width ="210" class="img-fluid">
+{% endif %}
 <br><br>
-<h4>Finding your Path to Conservation in Wisconsin</h4>
+<h4>Finding your Path to Conservation in {{ current_state.name }}</h4>
  
 
 

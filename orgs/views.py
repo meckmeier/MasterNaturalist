@@ -289,7 +289,16 @@ WildPathsWI.org
 
 def landing(request):
      # view only shows the main landing page. all info is rendered in the html page.
-     return render(
+    if request.state is None:
+        states = State.objects.filter(is_active=True)
+        last = request.COOKIES.get("last_state")
+        if last and not request.GET.get("change"):
+            match = states.filter(slug=last).first()
+            if match:
+                return redirect(f"/{match.slug}/")
+        return render(request, "orgs/state_picker.html", {"states": states})
+    
+    return render(
         request,
         "orgs/landing.html")
 
@@ -509,7 +518,7 @@ def org_mgmt(request):
     # is_staff gets to see all the organizations
     if request.user.is_staff:
         orgs = (Organization.objects
-        .active()
+        .active().visible_in(state)
         .annotate(
             hasUploads =Exists(
                     ActivityUpload.objects.filter(organization=OuterRef("pk"))
@@ -535,7 +544,7 @@ def org_mgmt(request):
     # if you are not is_staff, you have to be in the OrgManagers table to see the org on this page.
     else:
         orgs = (
-            Organization.objects.active()
+            Organization.objects.active().visible_in(state)
             .filter(managed__profile=request.user.profile)
             .distinct()
             .annotate(
@@ -576,15 +585,15 @@ def org_mgmt(request):
             })
 
 def org_enroll(request):
-    
+    state=request.state
     if request.method == "POST":
         track_activity(request, "org_enroll", org=None)
-        form = OrgEnrollmentForm(request.POST)
+        form = OrgEnrollmentForm(request.POST, state=state)
         
         if form.is_valid():
             
             enrollment = form.save(commit=False)
-
+            enrollment.state = request.state
             if request.user.is_authenticated:
                 enrollment.created_by = request.user.profile
                                                                         
@@ -620,7 +629,7 @@ def org_enroll(request):
             print("org_enroll form errors:", form.errors.as_json())
             print("POST data:", request.POST)
     else:
-        form = OrgEnrollmentForm()
+        form = OrgEnrollmentForm(state=request.state)
 
     return render(request, "orgs/org_enroll.html", {"form": form})
 
@@ -731,6 +740,7 @@ def org_edit(request, org_id):
 
 @login_required
 def loc_edit(request, loc_id):
+    state = request.state
     loc = get_object_or_404(Location, id=loc_id)   
 
     if not loc.can_edit(request.user):
@@ -742,7 +752,7 @@ def loc_edit(request, loc_id):
 
     
     if request.method == "POST":
-        form = LocForm(request.POST, instance=loc)
+        form = LocForm(request.POST, instance=loc, state=state)
         if form.is_valid():
             loc = form.save(commit=False)
             loc.updated_by = request.user.profile
@@ -760,7 +770,7 @@ def loc_edit(request, loc_id):
             messages.error(request, "There are errors in the form.")
 
     else:
-        form = LocForm(instance=loc)
+        form = LocForm(instance=loc, state = state)
 
     return render(request, "orgs/location_form.html", {
         "loc": loc,
@@ -771,13 +781,13 @@ def loc_edit(request, loc_id):
 @login_required
 @org_access_required
 def loc_create(request, org_id):
-    
+    state = request.state
     org = request.org  # org is set by the org_access_required decorator
     next_url="org_mgmt"
     anchor = request.GET.get("anchor") or request.POST.get("anchor")
 
     if request.method == "POST":
-        form = LocForm(request.POST)
+        form = LocForm(request.POST, state=state)
         if form.is_valid():
             loc = form.save(commit=False)
             loc.org = org
@@ -796,7 +806,7 @@ def loc_create(request, org_id):
         else:
             messages.error(request, "There are errors in the form.")
     else:
-        form = LocForm()
+        form = LocForm(state=state)
 
     return render(request, "orgs/location_form.html", {
         "form": form,
@@ -805,6 +815,7 @@ def loc_create(request, org_id):
     })
 # consider deleting this once you fully test the change.
 def loc_detail(request, loc_id=None):
+    state = request.state
     loc=get_object_or_404(Location, id=loc_id) if loc_id else None
     view_only= request.resolver_match.url_name =="loc_view"
     can_edit = True
@@ -818,7 +829,7 @@ def loc_detail(request, loc_id=None):
         return redirect(f"{reverse('org_mgmt')}")
     
     if request.method == "POST" and can_edit and not view_only:
-        form= LocForm(request.POST, instance=loc) 
+        form= LocForm(request.POST, instance=loc, state=state) 
         
         if form.is_valid():
             if loc is None:
@@ -889,11 +900,11 @@ def loc_detail(request, loc_id=None):
         
     else:
         if loc:  # editing existing
-            form = LocForm(instance=loc)
+            form = LocForm(instance=loc, state=state)
         else:  # creating new
             
             loc = Location(org_id=org_on_url) if org_on_url else Location()
-            form = LocForm(instance=loc)
+            form = LocForm(instance=loc, state=state)
                 
     if view_only:
         for field in form.fields.values():

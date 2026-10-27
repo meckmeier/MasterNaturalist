@@ -24,5 +24,11 @@ class StateMiddleware:
                 request.state = state
                 request.path_info = "/" + rest
                 set_script_prefix(f"{get_script_prefix()}{state.slug}/")
-
-        return self.get_response(request)
+        response = self.get_response(request)
+        if request.state is not None:
+            response.set_cookie(
+                "last_state", request.state.slug,
+                max_age=60 * 60 * 24 * 365, samesite="Lax",
+            )
+        return response
+      

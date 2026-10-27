@@ -1,0 +1,24 @@
+{% extends "orgs/layout.html" %}
+{% block body %}
+{% load static %}
+<div class="me-page">
+
+  <h1 class="mb-2">Choose your state</h1>
+  <p class="text-muted mb-4">Find volunteer and learning opportunities near you.</p>
+
+  <div class="row g-3">
+    {% for s in states %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <a href="/{{ s.slug }}/" class="card h-100 text-decoration-none">
+          <div class="card-body text-center">
+            <div class="display-6">{{ s.abbr }}</div>
+            <div>{{ s.name }}</div>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <p>No states are available yet.</p>
+    {% endfor %}
+  </div>
+</div>
+    {% endblock %}
