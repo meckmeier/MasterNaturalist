@@ -1,4 +1,5 @@
-{% load static %}
+{% load static l10n %}
+
 
 
   <div id="map" style="width: 100%; height: 600px;"></div>
@@ -8,9 +9,21 @@
 
 
 <script>
-// Initialize map
-const map = L.map('map').setView([44.5, -89.5], 7); // Center on WI
 
+// State values from Django
+const stateFips = "{{ current_state.fips|default:'' }}";
+const stateSlug = "{{ current_state.slug|default:'' }}";
+const centerLat = {{ current_state.map_center_lat|default:"null"|unlocalize }};
+const centerLng = {{ current_state.map_center_lng|default:"null"|unlocalize }};
+const startZoom = {{ current_state.map_zoom|default:"7"|unlocalize }};
+
+// Initialize map
+// Center on the state; fall back to a US view if the state has no center set
+const hasCenter = centerLat !== null && centerLng !== null;
+const map = L.map('map').setView(
+    hasCenter ? [centerLat, centerLng] : [39.8, -98.6],
+    hasCenter ? startZoom : 4
+);
 // Use Humanitarian OSM tiles (free, reliable)
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OSM',
@@ -74,7 +87,7 @@ locations.forEach(loc => {
     }
     const marker = L.marker([loc.latitude, loc.longitude], { icon: icon })
         .bindPopup(`<b>${loc.name}</b><br>${loc.county}
-        <a href="/locations/?loc=${loc.id}&view=list">View Details</a>`);
+        <a href="/${stateSlug}/locations/?loc=${loc.id}&view=list">View Details</a>`);
     marker.addTo(map);
     markers.push({ marker: marker, county: loc.county });
 });
@@ -101,44 +114,25 @@ legend.addTo(map);
 fetch("{% static 'orgs/geo/gz_2010_us_050_00_500k.json' %}")
 .then(res => res.json())
 .then(data => {
-    // Filter only Wisconsin counties
-    const wiCounties = {
-        type: "FeatureCollection",
-        features: data.features.filter(f => f.properties.STATE === "55")
-    };
-    console.log("Wisconsin counties loaded:", wiCounties.features.length);
+    const features = data.features.filter(f => f.properties.STATE === stateFips);
 
-    // Add GeoJSON layer
-    const geojsonLayer = L.geoJSON(wiCounties, {
-    style: { color: '#3388ff', weight: 2, fillOpacity: 0.05 },
-
-    onEachFeature: function(feature, layer) {
-        layer.bindTooltip(feature.properties.NAME, {
-            sticky: true   // follows the mouse
-        });
+    // No county shapes for this state: skip the overlay, keep the center/zoom above
+    if (features.length === 0) {
+        console.log("No county overlay for state", stateFips);
+        return;
     }
-}).addTo(map);
-    //old code that actually used a click on the county. const geojsonLayer = L.geoJSON(wiCounties, {
-    //    style: { color: '#3388ff', weight: 2, fillOpacity: 0.05 },
-    //    onEachFeature: function(feature, layer) {
-    //        layer.bindPopup(feature.properties.NAME);
 
-     //       layer.on('click', function() {
-     //           const countyName = feature.properties.NAME;
-     //           markers.forEach(m => {
-     //               if (m.county === countyName) {
-     //                   m.marker.addTo(map);
-     //               } else {
-     //                   map.removeLayer(m.marker);
-     //               }
-     //           });
-      //      });
-    //    }
-    //}).addTo(map);
+    const geojsonLayer = L.geoJSON(
+        { type: "FeatureCollection", features: features },
+        {
+            style: { color: '#3388ff', weight: 2, fillOpacity: 0.05 },
+            onEachFeature: function(feature, layer) {
+                layer.bindTooltip(feature.properties.NAME, { sticky: true });
+            }
+        }
+    ).addTo(map);
 
-    // Fit map to Wisconsin counties bounds
     map.fitBounds(geojsonLayer.getBounds());
-
 })
 .catch(err => console.error("Error loading GeoJSON:", err));
 </script>

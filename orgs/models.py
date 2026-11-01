@@ -70,7 +70,7 @@ class State(models.Model):
 class ZipToCounty (models.Model):
     zip=models.CharField(max_length=5)
     county=models.ForeignKey("County", on_delete=models.CASCADE, related_name="zips")
-    state = models.ForeignKey("State", null=True, blank=True, on_delete=models.PROTECT, related_name="zips")
+    state = models.ForeignKey("State", on_delete=models.PROTECT, related_name="zips")
     share = models.DecimalField(max_digits=5, decimal_places=4, null=True, blank=True)
     class Meta:
         constraints = [models.UniqueConstraint(fields=["zip", "state"], name="uniq_zip_per_state")]

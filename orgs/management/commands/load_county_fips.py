@@ -3,7 +3,7 @@ import re
 import requests
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from orgs.models import State, County
+from orgs.models import Region, State, County
 
 CENSUS_URL = "https://api.census.gov/data/2020/dec/pl"
 
@@ -26,10 +26,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **opts):
         for abbr in opts["states"]:
+            
+
             st = State.objects.filter(abbr=abbr.upper()).first()
             if not st:
                 raise CommandError(f"Unknown state: {abbr}")
-
+            default_region = Region.objects.filter(state=st).order_by("code").first()
+            if opts["create_missing"] and not default_region:
+                raise CommandError(f"State {abbr} has no regions; create one first before using --create-missing")
             params = {"get": "NAME", "for": "county:*", "in": f"state:{st.fips}"}
             key = os.environ.get("CENSUS_API_KEY")
             if not key:
@@ -83,7 +87,7 @@ class Command(BaseCommand):
                     if opts["create_missing"]:
                         for fips, short in unmatched_census:
                             County.objects.create(
-                                state=st, fips=fips,
+                                state=st, fips=fips, region=default_region,
                                 county_name=re.sub(r"\s+County$", "", short),
                             )
                 self.stdout.write(self.style.SUCCESS("  Saved."))

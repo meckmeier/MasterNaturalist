@@ -141,7 +141,8 @@ def get_or_create_pending_location(raw, org, upload, result=None):
             default_status = "create"
 
     try:
-        county = get_county_from_zip(zip_code)
+        state = State.objects.filter(abbr=state_abbr.upper()).first()
+        county = get_county_from_zip(zip_code, state)
 
         pending_location = Pending_Location.objects.create(
             source_upload=upload,

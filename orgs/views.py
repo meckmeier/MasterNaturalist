@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .decorators import state_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import PermissionDenied
 
@@ -46,7 +45,7 @@ from orgs.services.mapping import build_mapping, build_dropdown_options, validat
 from orgs.services.pending import build_pending_for_upload
 from orgs.services.publish import publish_pending_upload
 
-from .decorators import org_access_required
+from .decorators import org_access_required, state_required
 
 
 @login_required
@@ -96,7 +95,7 @@ def run_update_latlng(request):
 def org_enrollment_list(request):
     from django.db.models import Case, When, Value, IntegerField
 
-    enrollments = OrganizationEnrollmentRequest.objects.annotate(
+    enrollments = OrganizationEnrollmentRequest.objects.filter(state=request.state).annotate(
         pending_first=Case(
             When(status="p", then=Value(0)),
             default=Value(1),
@@ -115,13 +114,15 @@ def help_video(request, video_id):
     return render(request, "orgs/help_video.html", {"video_id": video_id})
 
 
-@login_required
+
 @staff_member_required
+@state_required
 def org_deny(request, enrollment_id):
 
     enrollment = get_object_or_404(
         OrganizationEnrollmentRequest,
-        id=enrollment_id
+        id=enrollment_id,
+        state=request.state
     )
 
     if request.method == "POST":
@@ -153,11 +154,11 @@ def org_deny(request, enrollment_id):
 
     return redirect("org_enrollment_list")
 
-@login_required
 @staff_member_required
+@state_required
 @transaction.atomic
 def org_approve(request, enrollment_id):
-    enrollment = get_object_or_404(OrganizationEnrollmentRequest, id=enrollment_id)
+    enrollment = get_object_or_404(OrganizationEnrollmentRequest, id=enrollment_id, state=request.state)
     if request.method != "POST":
         return render(request, "orgs/org_approve.html", {"enrollment": enrollment})
     if enrollment.status=="a":
@@ -179,7 +180,7 @@ def org_approve(request, enrollment_id):
             news_url=enrollment.news_url,
             region=enrollment.region,
             home_state=enrollment.state , 
-                is_national=False,
+            is_national=False,
             created_by=request.user.profile,
             updated_by=request.user.profile,
         )
@@ -254,8 +255,10 @@ def org_approve(request, enrollment_id):
     messages.success(request, f"Organization '{org.org_name}' has been approved and created.")
     return redirect("org_enrollment_list")
 
+@state_required
+@staff_member_required
 def org_mgr_reminder(request, enrollment_id):
-    enrollment = get_object_or_404(OrganizationEnrollmentRequest, id=enrollment_id)
+    enrollment = get_object_or_404(OrganizationEnrollmentRequest, id=enrollment_id, state=request.state)
     
     email = enrollment.contact_email.lower().strip()
     org_name = enrollment.org_name
@@ -469,7 +472,7 @@ def follow_org(request, org_id):
     #utility that adds an org to the orgFollowers table or removes it if it is there.
     # once done it returns from where it was called.
     next_url = request.POST.get("next") or request.GET.get("next")
-    org = Organization.objects.get(id=org_id)
+    org = get_object_or_404(Organization.objects.active().visible_in(request.state), id=org_id)
 
     
     profile = Profile.objects.get(user=request.user)
@@ -1292,11 +1295,12 @@ def staff_user_manage(request):
         "updated_activities": updated_activities,
     })
 
-@login_required
+@state_required
 @staff_member_required
 def location_manage(request):
+    state=request.state
     duplicate_groups = (
-        Location.objects
+        Location.objects.for_state(state)
         .filter(deleted=False)
         .values("loc_name")
         .annotate(location_count=Count("id"))
@@ -1308,7 +1312,7 @@ def location_manage(request):
 
     for group in duplicate_groups:
         locs = (
-            Location.objects
+            Location.objects.for_state(state)
             .filter(deleted=False, loc_name=group["loc_name"])
             .select_related("org", "county_id")
             .annotate(
@@ -1325,7 +1329,7 @@ def location_manage(request):
         })
 
     all_locations = list(
-        Location.objects
+        Location.objects.for_state(state)
         .filter(deleted=False)
         .select_related("org", "county_id")
         .annotate(
@@ -1388,7 +1392,7 @@ def location_manage(request):
                 "count": len(locs),
                 "locations": locs,
             })
-    organizations = Organization.objects.filter(deleted=False).order_by("org_name")
+    organizations = Organization.objects.active().visible_in(state).order_by("org_name")
 
     return render(request, "orgs/staff/location_manage.html", {
         "grouped_locations": grouped_locations,
@@ -1397,11 +1401,13 @@ def location_manage(request):
         "address_match_groups": address_match_groups,
     })
 
-@login_required
+
 @staff_member_required
+@state_required
 @transaction.atomic
 def location_action(request, location_id):
-    location = get_object_or_404(Location, id=location_id, deleted=False)
+    state=request.state
+    location = get_object_or_404(Location.objects.for_state(state).active(), id=location_id, deleted=False)
 
     if request.method != "POST":
         return redirect("location_manage")
@@ -1428,7 +1434,7 @@ def location_action(request, location_id):
             messages.error(request, "Choose a location to merge into.")
             return redirect("location_manage")
 
-        target = get_object_or_404(Location, id=merge_into_id, deleted=False)
+        target = get_object_or_404(Location.objects.for_state(state).active(), id=merge_into_id, deleted=False)
 
         if target.id == location.id:
             messages.error(request, "You cannot merge a location into itself.")
@@ -1470,10 +1476,12 @@ def location_action(request, location_id):
     return redirect("location_manage")
 
 
-
+@state_required
 def lookup_zip(request):
-    county = get_county_from_zip(request.GET.get("zip_code"))
-
+    zip_code = request.GET.get("zip_code","")
+    county = get_county_from_zip(zip_code, request.state)
+    if not county:
+        return JsonResponse({"found": False, "county_id": None, "region_id": None})
     if county:
         return JsonResponse({
             "found": True,
@@ -1481,11 +1489,7 @@ def lookup_zip(request):
             "region_id": county.region_id,
         })
 
-    return JsonResponse({
-        "found": False,
-        "county_id": None,
-        "region_id": None,
-    })
+
 
 @login_required
 @org_access_required
@@ -1682,7 +1686,7 @@ def activities(request):
                     "cards": cards,
                     "filter_form":filter_form,
                     "query_params": query_params,
-                    "orgs": Organization.objects.filter(deleted=False).order_by("org_name"),
+                    "orgs": Organization.objects.active().visible_in(state).order_by("org_name"),
                     "cats": EventCategory.objects.all(),
                     "q":q, # i needed to pass this q from the filter_form so i can highlight the search text in the html,
                     "current_activity": current_activity,
@@ -1848,12 +1852,13 @@ def activity_delete(request,activity_id=None):
         "activity": activity
     })
 
-
+@state_required
 def location_search(request):
+    state=request.state
     q = request.GET.get("q", "").lower()
     org_id = request.GET.get("org_id")
     
-    locations =  Location.objects.filter(deleted=False)
+    locations =  Location.objects.for_state(state).filter(deleted=False)
    
     if q:
         locations = locations.filter(
@@ -1864,7 +1869,7 @@ def location_search(request):
         org_locations = locations.filter(org_id=org_id)
         other_locations = locations.exclude(org_id=org_id)
     else:
-        org_locations = Location.objects.none()
+        org_locations = Location.objects.for_state(state).none()
         other_locations = locations
     
     def serialize(loc):
@@ -1916,20 +1921,21 @@ def quick_location_create(request):
         "org": org,
     })
 
-
+@state_required
 def map_view(request):
-    training_qs = Activity.objects.training().filter(
+    state = request.state
+    training_qs = Activity.objects.for_state(state).training().filter(
         sessions__location=OuterRef("pk")
     )
 
-    volunteer_qs = Activity.objects.volunteer().filter(
+    volunteer_qs = Activity.objects.for_state(state).volunteer().filter(
         sessions__location=OuterRef("pk")
     )
 
-    locations_qs = Location.objects.filter(
+    locations_qs = Location.objects.for_state(state).filter(
         
         latitude__isnull=False,
-        longitude__isnull=False
+        longitude__isnull=False,
     ).select_related("county_id").annotate(
         has_training=Exists(training_qs),
         has_volunteer=Exists(volunteer_qs),
@@ -2877,32 +2883,34 @@ def upload_publish(request, upload_id):
 
 
 @login_required
+@state_required
 def upload_dashboard(request):
+    state = request.state
     upload_id = request.GET.get("upload")
     org_id = request.GET.get("org")
 
-    
-    if request.user.is_staff:
-        uploads = ActivityUpload.objects.select_related(
-            "organization", "uploaded_by"
-        ) .prefetch_related("stage_logs").order_by("-uploaded_at")
-    else:
-        uploads = ActivityUpload.objects.filter(
-            Q(uploaded_by=request.user) |
-            Q(published_by=request.user.profile)
-        ).select_related(
-            "organization", "published_by", "uploaded_by"
-        ).prefetch_related("stage_logs").order_by("-uploaded_at")
+    uploads = ActivityUpload.objects.filter(
+        organization__in=Organization.objects.active().visible_in(state).values("pk")
+    )
+
+    if not request.user.is_staff:
+        uploads = uploads.filter(
+            Q(uploaded_by=request.user) | Q(published_by=request.user.profile)
+        )
+
+    uploads = (
+        uploads
+        .select_related("organization", "published_by", "uploaded_by")
+        .prefetch_related("stage_logs")
+        .order_by("-uploaded_at")
+    )
 
     if upload_id:
         uploads = uploads.filter(id=upload_id)
-
     if org_id:
-        uploads = uploads.filter(organization=org_id)
-        
-    return render(request, "orgs/upload/upload_dashboard.html", {
-        "uploads": uploads,
-    })
+        uploads = uploads.filter(organization_id=org_id)
+
+    return render(request, "orgs/upload/upload_dashboard.html", {"uploads": uploads})
 
 from types import SimpleNamespace
 @login_required
@@ -3223,7 +3231,7 @@ def act_loc_panel(request, location_id, activity_id):
             location__isnull=True,
         )
     else:
-        location = get_object_or_404(Location, pk=location_id)
+        location = get_object_or_404(Location.objects.for_state(request.state).active(), pk=location_id)
         sessions = Session.objects.current().filter(
             activity_id=activity_id,
             location_id=location_id,
@@ -3251,7 +3259,7 @@ import feedparser
 import datetime
 def news(request):
     articles = []
-    feed_list = Organization.objects.filter(news_source="rss")
+    feed_list = Organization.objects.for_state(request.state).filter(news_source="rss")
     for each in feed_list:
         feed = feedparser.parse(each.news_url)
 
@@ -3283,7 +3291,7 @@ def news(request):
         },
     )
 
-@login_required
+
 @staff_member_required
 @user_passes_test(lambda u: u.is_superuser)
 def staff_dashboard(request):
@@ -3304,10 +3312,11 @@ def staff_dashboard(request):
 def staff_landing(request):
     return render(request, "orgs/staff/staff_landing.html")
     
-
+@state_required
 def county_list(request):
+    state = request.state
     regions = (
-        Region.objects
+        Region.objects.filter(state=state)
         .prefetch_related("counties")
         .exclude(counties__isnull=True)
         .order_by("name")
@@ -3316,6 +3325,7 @@ def county_list(request):
     return render(request, "orgs/county_by_region.html", {
         "regions": regions,
     })
+
 @login_required
 @staff_member_required
 def staff_orgs_nomgr(request):

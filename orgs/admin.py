@@ -5,8 +5,6 @@ from .models import *
 
 # Register your models here.
 admin.site.register(User)
-admin.site.register(Organization)
-admin.site.register(County)
 admin.site.register(Commitment)
 admin.site.register(Profile)
 admin.site.register(FollowOrg)  
@@ -18,13 +16,76 @@ admin.site.register(RawLoadData)
 admin.site.register(Pending_Activity)
 admin.site.register(Pending_Session)
 admin.site.register(Pending_Location)
-admin.site.register(ZipToCounty)
 admin.site.register(ActivityLog)
 admin.site.register(UploadLog)
-admin.site.register(Region)
 admin.site.register(Video)
-admin.site.register(State)
+
 admin.site.register(StateAdmin)
+
+@admin.register(State)
+class StateAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "abbr",
+        "fips",
+        "map_center_lat",
+        "map_center_lng",
+        "map_zoom",
+        "is_active",
+    )
+    search_fields = (
+        "name",
+        "abbr",
+    )
+
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "state",
+        "code",
+    )
+    search_fields = (
+        "name",
+        "state__name",
+        "code",
+    )
+@admin.register(ZipToCounty)
+class ZipToCountyAdmin(admin.ModelAdmin):
+    list_display = (
+        "zip",
+        "county",
+        "state",
+    )
+    search_fields = (
+        "zip",
+        "county__county_name",
+        "state__name",
+    )
+@admin.register(Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = (
+        "org_name",
+        "home_state",
+        "deleted",
+        "created_at",
+    )
+    search_fields = (
+        "org_name",
+        "home_state__name",
+    )
+@admin.register(County)
+class CountyAdmin(admin.ModelAdmin):
+    list_display = (
+        "county_name",
+        "state",
+        "fips",
+    )
+    search_fields = (
+        "county_name",
+        "state__name",
+        "fips",
+    )
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = (

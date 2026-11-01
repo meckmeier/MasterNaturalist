@@ -220,15 +220,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const countyField = document.getElementById("id_county_id");
     const regionField = document.getElementById("id_region");
     console.log("starting zip code lookup wiring", { zipField, countyField, regionField });
-    
-    if (zipField && countyField && regionField) {
+    const lookupUrl = document.querySelector('meta[name="lookup-zip"]')?.content;
+    if (zipField && countyField && regionField && lookupUrl) {
         
         zipField.addEventListener("change", function () {
             
             const zip = zipField.value.trim().substring(0, 5);          
             
             
-            fetch(`/lookup-zip/?zip_code=${zip}`)
+            fetch(`${lookupUrl}?zip_code=${encodeURIComponent(zip)}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("zip lookup response", data);

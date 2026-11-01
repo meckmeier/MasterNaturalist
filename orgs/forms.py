@@ -1,3 +1,4 @@
+from dataclasses import field
 from urllib import request
 
 from django import forms
@@ -9,6 +10,8 @@ from allauth.account.forms import SignupForm
 from django.contrib.auth.models import User
 from turnstile.fields import TurnstileField
 from django.utils import timezone
+
+from orgs.context_processors import state
 from .models import *
 from .services.helper_function import default_expire_date, normalize_url
 
@@ -141,7 +144,8 @@ class OrgForm(forms.ModelForm):
         model = Organization
         fields = [
             'id', 'org_name', 'org_url', 'volunteer_url', 'training_url', 'news_url', 'news_source',
-            'is_national','home_state', 'about', 'region',  'host', 'deleted', 'default_location','example_org'
+            'is_national','home_state','states_served', 'about', 'region',  'host', 'deleted', 'default_location'
+            ,'example_org'
         ]
         labels = {"is_national": "National organization", "home_state": "Home state"}
         widgets = {
@@ -162,6 +166,10 @@ class OrgForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["home_state"].queryset = State.objects.filter(is_active=True)
+        self.fields["home_state"].disabled = True
+        if self.instance and self.instance.pk:
+            # editing: show the org's own home state
+            field.queryset = State.objects.filter(pk=self.instance.home_state_id)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -205,7 +213,10 @@ class LocForm(forms.ModelForm):
         self.state = state
         self.fields["county_id"].queryset = County.objects.filter(state=state).order_by("county_name")
         self.fields["region"].queryset = Region.objects.filter(state=state).order_by("name")
-        
+        # default only for a new location, and only if nothing is set yet
+        if not self.instance.pk and not self.initial.get("us_state"):
+            self.initial["us_state"] = state.pk
+            
     def clean(self):
         cleaned_data = super().clean()
 
@@ -224,14 +235,22 @@ class LocForm(forms.ModelForm):
 
 class LocationMergeForm(forms.Form):
     from_location = forms.ModelChoiceField(
-        queryset=Location.objects.filter(deleted=False).order_by("physical_location", "city_name"),
+        queryset=Location.objects.none().order_by("physical_location", "city_name"),
         label="Merge this location"
     )
 
     to_location = forms.ModelChoiceField(
-        queryset=Location.objects.filter(deleted=False).order_by("physical_location", "city_name"),
+        queryset=Location.objects.none().order_by("physical_location", "city_name"),
         label="Into this location"
     )
+
+    def __init__(self, *args, state=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if state is None:
+            raise ValueError("LocationMergeForm requires a state")
+        self.state = state
+        self.fields["from_location"].queryset = Location.objects.active().for_state(state).order_by("physical_location", "city_name")
+        self.fields["to_location"].queryset = Location.objects.active().for_state(state).order_by("physical_location", "city_name")
 
     def clean(self):
         cleaned = super().clean()

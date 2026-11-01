@@ -1,8 +1,9 @@
 # orgs/services/location_matcher.py
 
 from difflib import SequenceMatcher
+from urllib import request
 from orgs.models import Location
-
+from orgs.context_processors import state
 
 def norm(value):
     return (value or "").strip().lower()
@@ -13,15 +14,13 @@ def similarity(a, b):
 
 
 def find_best_location_match(raw_row, org):
+
     raw_name = norm(raw_row.location_name)
     raw_address = norm(raw_row.address)
     raw_city = norm(raw_row.city)
 
-    
 
-    candidates = Location.objects.filter(
-        deleted=False,
-    )
+    candidates = Location.objects.active().for_state(request.state)
 
 
     best_match = None

@@ -63,6 +63,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalEl = document.getElementById("locationSearchModal");
 
     if (!modalEl) return;
+    const searchUrl = modalEl.dataset.searchUrl;
+    const createUrl = modalEl.dataset.createUrl;
 
     syncAllLocationDisplays();
 
@@ -138,14 +140,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData(form);
         const quickLocationForm = document.getElementById("quick-location-form");
         const csrfToken = getCSRFTokenFromForm(quickLocationForm);
-
-        fetch("/locations/loc_modal/", {
+        fetch(createUrl, {
             method: "POST",
             body: formData,
-            headers: {
-                "X-CSRFToken": csrfToken
-            }
+            headers: { "X-CSRFToken": csrfToken }
         })
+        
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function renderLocationResults(query) {
-        fetch(`/locations/search/?q=${encodeURIComponent(query)}&org_id=${currentOrgId}`)
+        fetch(`${searchUrl}?q=${encodeURIComponent(query)}&org_id=${currentOrgId}`)
             .then(res => res.json())
             .then(data => {
                 renderGroup(orgResults, data.org_locations || []);

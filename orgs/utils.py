@@ -203,6 +203,7 @@ def update_latlng():
     # to call from the:  python manage.py shell
     # >>> from orgs.utils import update_latlng
     # >>> update_latlng()
+    from orgs.models import Location
 
     geolocator = Nominatim(user_agent="my_django_app")
     for loc in Location.objects.filter(latitude__isnull=True, longitude__isnull=True):
@@ -222,5 +223,7 @@ def resaveLocations():
     # to call from the:  python manage.py shell
     # >>> from orgs.utils import resaveLocations
     # >>> resaveLocations()
+    from orgs.models import Location
+    
     for loc in Location.objects.all():
         loc.save()

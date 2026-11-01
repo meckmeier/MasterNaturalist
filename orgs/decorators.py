@@ -6,16 +6,28 @@ from django.shortcuts import get_object_or_404
 from .models import Organization, OrgManager
 
 
+def state_required(view ):
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if request.state is None:
+            raise Http404("State required")
+        return view(request, *args, **kwargs)
+    return wrapper
+
 def org_access_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
-
+        if getattr(request, "state", None) is None:
+            raise Http404("State required")
         org_id = kwargs.get("org_id")
 
         if org_id is None:
             org_id = request.GET.get("org") or request.POST.get("org")
 
-        org = get_object_or_404(Organization, id=org_id)
+        org = get_object_or_404(
+            Organization.objects.active().visible_in(request.state),
+            id=org_id,
+        )
 
         if not (
             request.user.is_staff
@@ -32,11 +44,3 @@ def org_access_required(view_func):
 
     return wrapper
 
-
-def state_required(view):
-    @wraps(view)
-    def wrapper(request, *args, **kwargs):
-        if request.state is None:
-            raise Http404("State required")
-        return view(request, *args, **kwargs)
-    return wrapper

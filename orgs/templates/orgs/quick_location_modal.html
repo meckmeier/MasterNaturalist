@@ -1,5 +1,10 @@
 {# location search modal #}
-<div class="modal fade" id="locationSearchModal" tabindex="-1" aria-labelledby="locationSearchModalLabel" aria-hidden="true">
+
+     >
+<div class="modal fade" id="locationSearchModal" tabindex="-1" 
+aria-labelledby="locationSearchModalLabel" aria-hidden="true"
+data-search-url="{% url 'location_search' %}"
+data-create-url="{% url 'quick_location_create' %}" >
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
