@@ -43,17 +43,15 @@ if DEBUG:
 else:
     # In production, no admin emails are sent. to protect postmark
     ADMINS = []
-    EMAIL_BACKEND = "anymail.backends.postmark.EmailBackend"
+    # EMAIL_BACKEND = "anymail.backends.postmark.EmailBackend" --be sure to set this when you add email back in
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 ANYMAIL = {
     "POSTMARK_SERVER_TOKEN": os.environ.get("POSTMARK_API_KEY"),
 }
 
-DEFAULT_FROM_EMAIL = os.environ.get(
-    "DEFAULT_FROM_EMAIL",
-    "mary@eckmeier.com"
-)
+
 EMAIL_ENABLED = os.getenv("EMAIL_ENABLED", "True") == "True"
 EMAIL_HOURLY_LIMIT = int(os.getenv("EMAIL_HOURLY_LIMIT", "50"))
 EMAIL_MONTHLY_LIMIT = int(os.getenv("EMAIL_MONTHLY_LIMIT", "9000"))
@@ -68,7 +66,8 @@ SITE_ID = 1
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_ADAPTER = "orgs.adapters.CustomAccountAdapter"
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# ACCOUNT_EMAIL_VERIFICATION = "mandatory" -- be sure to reset this when you add email in.
+ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_LOGIN_METHODS = {"email", "username"}
 ACCOUNT_FORMS = {
     "signup": "orgs.forms.CustomSignupForm",
