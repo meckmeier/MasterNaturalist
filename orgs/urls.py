@@ -8,7 +8,8 @@ from django.shortcuts import redirect
 
 from . import views
 urlpatterns = [
-    path("",  views.landing, name="landing"),
+    path("", views.temp, name="temp"),
+    path("landing",  views.landing, name="landing"),
 
     path("calendar/", views.calendar, name="calendar"),
     #path("activities/<int:pk>/panel/", views.activity_panel, name="activity_panel",),

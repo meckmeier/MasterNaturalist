@@ -2969,6 +2969,9 @@ def upload_results(request, upload_id):
         "cards": cards,
     })
 
+def temp(request):
+    return render(request, "orgs/temp.html", {})
+
 from django.db import DatabaseError
 @login_required
 @staff_member_required
