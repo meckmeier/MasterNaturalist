@@ -1,7 +1,19 @@
 from django.contrib import admin
 
 from .models import *
+from django.contrib import admin, messages
+from django.core.management import call_command
 
+@admin.action(description="Onboard selected states")
+def onboard_states(modeladmin, request, queryset):
+    for state in queryset:
+        try:
+            call_command("onboard_state", state.abbr, activate=True)
+            messages.success(request, f"Onboarded {state.abbr}")
+        except Exception as e:
+            messages.error(request, f"{state.abbr} failed: {e}")
+
+    
 
 # Register your models here.
 admin.site.register(User)
@@ -37,6 +49,7 @@ class StateAdmin(admin.ModelAdmin):
         "name",
         "abbr",
     )
+    actions = [onboard_states]
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
@@ -64,6 +77,7 @@ class ZipToCountyAdmin(admin.ModelAdmin):
     )
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
+    filter_horizontal = ("states_served",)
     list_display = (
         "org_name",
         "home_state",
@@ -74,6 +88,7 @@ class OrganizationAdmin(admin.ModelAdmin):
         "org_name",
         "home_state__name",
     )
+    
 @admin.register(County)
 class CountyAdmin(admin.ModelAdmin):
     list_display = (
@@ -175,3 +190,4 @@ class EmailLogAdmin(admin.ModelAdmin):
     )
 
     ordering = ("-sent_at",)
+

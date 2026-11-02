@@ -48,6 +48,7 @@ from orgs.services.publish import publish_pending_upload
 from .decorators import org_access_required, state_required
 
 
+
 @login_required
 @staff_member_required
 def run_cleanup_old_imports(request):
@@ -1478,8 +1479,13 @@ def location_action(request, location_id):
 
 @state_required
 def lookup_zip(request):
-    zip_code = request.GET.get("zip_code","")
-    county = get_county_from_zip(zip_code, request.state)
+    zip_code = request.GET.get("zip_code", "")[:5]
+    state_id = request.GET.get("state")
+
+    state = State.objects.filter(pk=state_id).first() if state_id else None
+    county = get_county_from_zip(zip_code, state) if state else None
+
+    county = get_county_from_zip(zip_code, state)
     if not county:
         return JsonResponse({"found": False, "county_id": None, "region_id": None})
     if county:
@@ -1489,7 +1495,16 @@ def lookup_zip(request):
             "region_id": county.region_id,
         })
 
-
+def state_options(request):
+    state = State.objects.filter(pk=request.GET.get("state")).first()
+    if not state:
+        return JsonResponse({"counties": [], "regions": []})
+    counties = County.objects.filter(state=state).order_by("county_name")
+    regions = Region.objects.filter(state=state).order_by("name")
+    return JsonResponse({
+        "counties": [{"id": c.pk, "name": c.county_name} for c in counties],
+        "regions": [{"id": r.pk, "name": r.name} for r in regions],
+    })
 
 @login_required
 @org_access_required
@@ -3297,12 +3312,14 @@ def news(request):
 
 @staff_member_required
 @user_passes_test(lambda u: u.is_superuser)
+@state_required
 def staff_dashboard(request):
     """
     Administrative dashboard summarizing the health of WildPaths.
     """
+    state=request.state
 
-    context = build_dashboard()
+    context = build_dashboard(state)
 
     return render(
         request,

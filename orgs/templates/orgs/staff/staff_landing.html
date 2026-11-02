@@ -5,7 +5,7 @@
 
 <div class="container py-4">
 
-    <h1 class="mb-4">Staff Dashboard</h1>
+    <h1 class="mb-4">{{ current_state.name }} Dashboard</h1>
 <!-- Administration -->
     <h3 class="mb-3">Administration</h3>
 
@@ -28,12 +28,10 @@
         </a>
 
         <a href="{% url 'staff_user_manage' %}" class="btn btn-outline-primary">
-            <i class="bi bi-people"></i> User Statistics
+            <i class="bi bi-people"></i> Statistics
         </a>
 
-        <a href="/admin/" class="btn btn-outline-secondary">
-            <i class="bi bi-tools"></i> Django Admin
-        </a>
+
 
     </div>
     <!-- Primary Tasks -->

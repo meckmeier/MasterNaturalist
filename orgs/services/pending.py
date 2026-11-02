@@ -42,9 +42,9 @@ def build_pending_for_upload(upload):
                     f"Row {raw.row_number}: Unexpected error: {str(e)}"
                 )
 
-    # rollback entire transaction if any row failed
-    if result.errors:
-        raise Exception("; ".join(result.errors))
+        # rollback entire transaction if any row failed
+        if result.errors:
+            raise Exception("; ".join(result.errors))
 
 
     return result
@@ -102,11 +102,11 @@ def get_or_create_pending_location(raw, org, upload, result=None):
     address = str(raw.address or "")[:255]
     city_name = str(raw.city or "")[:255]
     state_abbr = str(raw.state or "").strip().upper()[:2]
-    print(f"Row {raw.row_number}: loc_name={loc_name}, address={address}, city_name={city_name}, state_abbr={state_abbr}")
+    
     if not state_abbr and org and org.home_state_id:
         state_abbr = org.home_state.abbr
-    us_state = State.objects.filter(abbr=state_abbr).first() if state_abbr else None
-    print(f"Row {raw.row_number}: us_state={us_state}")
+    state = State.objects.filter(abbr=state_abbr).first() if state_abbr else None
+    print(f"Row {raw.row_number}: state={state}")
     zip_code = str(raw.zip or "")[:5]
 
     fingerprint = build_location_fingerprint(
@@ -133,8 +133,8 @@ def get_or_create_pending_location(raw, org, upload, result=None):
         score = 0
         reason = "Location not required"
     else:
-        matched_location, score, reason = find_best_location_match(raw, org)
-
+        matched_location, score, reason = find_best_location_match(raw, state)
+        print(f"Row {raw.row_number}: matched_location={matched_location}, score={score}, reason={reason}")
         if matched_location:
             default_status = "matched"
         else:
@@ -152,7 +152,7 @@ def get_or_create_pending_location(raw, org, upload, result=None):
             loc_name=loc_name,
             address=address,
             city_name=city_name,
-            us_state=us_state,
+            us_state=state,
             zip_code=zip_code,
             county_id=county,
             region=county.region if county else None,

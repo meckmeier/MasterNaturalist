@@ -23,33 +23,33 @@ from orgs.models import (
     EmailLog,
     ActivityLog,
 )
-def get_database_summary():
+def get_database_summary(state):
 
    return {
     "title": "Objects Created",
     "icon": "database",
     "rows": [
-        ("Organizations", OrganizationEnrollmentRequest.objects.filter(created_org__isnull=False).count()),
-        ("Locations", Location.objects.filter(org__organizationenrollmentrequest__created_org__isnull=False).count()),
-        ("Activities", Activity.objects.filter( org__organizationenrollmentrequest__created_org__isnull=False).count()),
-        ("Sessions", Session.objects.filter(activity__org__organizationenrollmentrequest__created_org__isnull=False).count()),
+        ("Organizations", OrganizationEnrollmentRequest.objects.filter(created_org__isnull=False,state=state).count()),
+        ("Locations", Location.objects.filter(org__organizationenrollmentrequest__created_org__isnull=False, org__home_state=state).count()),
+        ("Activities", Activity.objects.filter( org__organizationenrollmentrequest__created_org__isnull=False, org__home_state=state).count()),
+        ("Sessions", Session.objects.filter(activity__org__organizationenrollmentrequest__created_org__isnull=False, activity__org__home_state=state).count()),
     ],
 }
 
     
-def get_data_quality_summary():
+def get_data_quality_summary(state):
 
     return {
         "title": "Data Quality",
             "icon": "data_quality",
             "rows": [
-                ("organizations_without_activities", Organization.objects.filter( activities__isnull=True).distinct().count()),
-                ("locations_without_sessions",Location.objects.filter(sessions__isnull=True).distinct().count()),
-                ("locations_without_orgs", Location.objects.filter(org__isnull=True).distinct().count()),
-                ("uploaded_activities", Activity.objects.filter( source_upload__isnull=False ).count()),
-                ("orgs without managers", Organization.objects.filter(managed__isnull=True).distinct().count()),
+                ("organizations_without_activities", Organization.objects.visible_in(state).filter( activities__isnull=True).distinct().count()),
+                ("locations_without_sessions",Location.objects.for_state(state).filter(sessions__isnull=True).distinct().count()),
+                ("locations_without_orgs", Location.objects.for_state(state).filter(org__isnull=True).distinct().count()),
+                ("uploaded_activities", Activity.objects.filter( source_upload__isnull=False).count()),
+                ("orgs without managers", Organization.objects.visible_in(state).filter(managed__isnull=True).distinct().count()),
                 ("clicked_activities", Activity.objects.filter(interest_count__gt=0).count()),
-                ("activity log", ActivityLog.objects.count()),
+                ("activity log", ActivityLog.objects.filter(state=state).count()),
             ]
 
     }
@@ -144,22 +144,23 @@ def get_development_summary():
             settings.ALLOWED_HOSTS),
                ]
     }
-def get_pending_enrollments():
+def get_pending_enrollments(state):
 
     return OrganizationEnrollmentRequest.objects.filter(
-        status="p"
+        status="p",
+        state=state
     ).count()
 
-def build_dashboard():
+def build_dashboard(state):
     return {
         "sections": [
-            get_database_summary(),
-            get_data_quality_summary(),
+            get_database_summary(state),
+            get_data_quality_summary(state),
             get_freshness_summary(),
             get_security_summary(),
             get_email_summary(),
             get_performance_summary(),
             get_development_summary(),
         ],
-          "pending_enrollments": get_pending_enrollments(),
+          "pending_enrollments": get_pending_enrollments(state),
     }

@@ -8,8 +8,8 @@ from django.shortcuts import redirect
 
 from . import views
 urlpatterns = [
-    path("", views.temp, name="temp"),
-    path("landing",  views.landing, name="landing"),
+    #path("", views.temp, name="temp"),
+    path("",  views.landing, name="landing"),
 
     path("calendar/", views.calendar, name="calendar"),
     #path("activities/<int:pk>/panel/", views.activity_panel, name="activity_panel",),
@@ -56,6 +56,7 @@ urlpatterns = [
     path("staff/user/", views.staff_user_manage, name="staff_user_manage"),
     path("staff/update-latlng/", views.run_update_latlng, name="run_update_latlng"),
     path("staff/cleanup-imports/", views.run_cleanup_old_imports, name="run_cleanup_old_imports"),
+
     path("staff/dashboard/",views.staff_dashboard,name="staff_dashboard",),
     path("staff/orgs_nomgr/",views.staff_orgs_nomgr,name="staff_orgs_nomgr",),
     path("staff/clicked_activities/",views.staff_clicked_activities,name="staff_clicked_activities",), 
@@ -83,7 +84,7 @@ urlpatterns = [
     path("upload/<int:upload_id>/rollback/", views.upload_rollback, name="upload_rollback"),
     path("uploads/<int:upload_id>/results/",views.upload_results,name="upload_results"),
     path("lookup-zip/", views.lookup_zip, name="lookup_zip"),
-    
+    path("lookup-state-options/", views.state_options, name="lookup_state_options"),
     path("test_email",views.test_email, name="test_email"),
     path("test_html", views.test_html, name="test_html"),
 

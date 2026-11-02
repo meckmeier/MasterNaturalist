@@ -1,5 +1,5 @@
 from dataclasses import field
-from urllib import request
+
 
 from django import forms
 from django.forms import inlineformset_factory, BaseInlineFormSet
@@ -211,7 +211,16 @@ class LocForm(forms.ModelForm):
         if state is None:
             raise ValueError("LocForm requires a state")
         self.state = state
-        self.fields["county_id"].queryset = County.objects.filter(state=state).order_by("county_name")
+        #the location's own state wins.
+        loc_state = state
+        if self.is_bound:
+            sid = self.data.get(self.add_prefix("us_state"))
+            if sid:
+                loc_state = State.objects.filter(pk=sid).first() or state
+        elif self.instance.pk and self.instance.us_state_id:
+            loc_state= self.instance.us_state
+        
+        self.fields["county_id"].queryset = County.objects.filter(state=loc_state).order_by("county_name")
         self.fields["region"].queryset = Region.objects.filter(state=state).order_by("name")
         # default only for a new location, and only if nothing is set yet
         if not self.instance.pk and not self.initial.get("us_state"):
@@ -219,7 +228,13 @@ class LocForm(forms.ModelForm):
             
     def clean(self):
         cleaned_data = super().clean()
-
+        st = cleaned_data.get("us_state")
+        county = cleaned_data.get("county_id")
+        region = cleaned_data.get("region")
+        if st and county and county.state_id != st.pk:
+            self.add_error("county_id", "County is not in the selected state.")
+        if st and region and region.state_id != st.pk:
+            self.add_error("region", "Region is not in the selected state.")
         for field in ["org_loc_url"]:
             url = cleaned_data.get(field)
             if url:

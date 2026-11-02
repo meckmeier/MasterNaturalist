@@ -1,7 +1,7 @@
 # orgs/services/location_matcher.py
 
 from difflib import SequenceMatcher
-from urllib import request
+
 from orgs.models import Location
 from orgs.context_processors import state
 
@@ -13,15 +13,13 @@ def similarity(a, b):
     return SequenceMatcher(None, norm(a), norm(b)).ratio()
 
 
-def find_best_location_match(raw_row, org):
+def find_best_location_match(raw_row, state=None):
 
     raw_name = norm(raw_row.location_name)
     raw_address = norm(raw_row.address)
     raw_city = norm(raw_row.city)
 
-
-    candidates = Location.objects.active().for_state(request.state)
-
+    candidates = Location.objects.active().filter(us_state=state)
 
     best_match = None
     best_score = 0
@@ -30,8 +28,6 @@ def find_best_location_match(raw_row, org):
     for loc in candidates:
         score = 0
         reason = []
-
-
 
         # Strongest: address match
         if raw_address and norm(loc.address) == raw_address:

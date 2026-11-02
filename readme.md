@@ -56,28 +56,6 @@ verify that the email sent when createing a new org actually creates the new use
 test that with other people.
 
 
-add 2fa
-X Install 2FA 
-X Run migrations
-* note on login page: For added security you can enable 2FA authentication.
-* banner on OrgMgmt - For added security, organizers should enable two-factor authentication.
-* add menu option 
-<a href="{% url 'two_factor:setup' %}">Set up two-factor authentication</a>
-* later enforce it: add to org_mgmt view:
-if request.user.is_authenticated:
-    is_organizer = request.user.profile.managers.exists() or request.user.is_staff
-
-    if is_organizer and not request.user.is_verified():
-        return redirect("two_factor:setup")
-
-Add Rate Limiting (you can only do something so many times)
-* login, signin, registration, etc.
-- pip install django-ratelimit
-- add to views
-from django_ratelimit.decorators import ratelimit
-@ratelimit(key='ip', rate='5/m', method='POST')
-def my_view(request):
-
 
 Version Two:
 * one new field to Profile (terms_accepted_at)
@@ -180,3 +158,39 @@ If you have other questions, please reach out. If you would like more details on
 Thanks again for joining us!
 Mary
 WildPathsWI.org
+
+Additional security implementations:
+add 2fa
+X Install 2FA 
+X Run migrations
+* note on login page: For added security you can enable 2FA authentication.
+* banner on OrgMgmt - For added security, organizers should enable two-factor authentication.
+* add menu option 
+<a href="{% url 'two_factor:setup' %}">Set up two-factor authentication</a>
+* later enforce it: add to org_mgmt view:
+if request.user.is_authenticated:
+    is_organizer = request.user.profile.managers.exists() or request.user.is_staff
+
+    if is_organizer and not request.user.is_verified():
+        return redirect("two_factor:setup")
+
+Add Rate Limiting (you can only do something so many times)
+* login, signin, registration, etc.
+- pip install django-ratelimit
+- add to views
+from django_ratelimit.decorators import ratelimit
+@ratelimit(key='ip', rate='5/m', method='POST')
+def my_view(request):
+
+MULTISTATE Version
+Codebase sent to test bed with multistate implementation.
+* disable postmark email/ so test will send emails to the console (you will need to reset settings.py when you are ready to redeploy).
+* use test keys from turnstile, so you can move thru the app/ once you are ready to launch you will need to change the keys to your current widget keys.
+* documenting all interconnected services as you deploy new version.
+
+Outstanding tasks:
+State Administration/ need to build out a model and method for master naturalist organizations to manage their states.
+Location.objects.for_state(state)
+Activity.objects.for_state(state)
+Session.objects.for_state(state)
+Organization.objects.visible_in(state)

@@ -21,7 +21,7 @@
    
 
 <div >
-<h1>My Organizations</h1>
+<h1>{{current_state.name}} Organizations</h1>
 
 {% if user.is_staff %}
 <form method="get" action="{{ request.path }}" class="mb-3" style="margin:10px;" id="org-quick-filter-form">

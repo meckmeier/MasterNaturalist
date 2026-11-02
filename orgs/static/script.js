@@ -213,34 +213,60 @@ document.addEventListener("DOMContentLoaded", function () {
 
         wireSessionRow(newRow);
     });
-
-    console.log("finished with current code")
-
-    const zipField = document.getElementById("id_zip_code");
-    const countyField = document.getElementById("id_county_id");
-    const regionField = document.getElementById("id_region");
-    console.log("starting zip code lookup wiring", { zipField, countyField, regionField });
-    const lookupUrl = document.querySelector('meta[name="lookup-zip"]')?.content;
-    if (zipField && countyField && regionField && lookupUrl) {
-        
-        zipField.addEventListener("change", function () {
-            
-            const zip = zipField.value.trim().substring(0, 5);          
-            
-            
-            fetch(`${lookupUrl}?zip_code=${encodeURIComponent(zip)}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log("zip lookup response", data);
-                    if (data.found) {
-                        countyField.value = data.county_id;
-                        regionField.value = data.region_id;
-                    }
-                    
-                })
-                .catch(error => console.error("Zip lookup failed:", error));
-        });
-        
+    function setSelect(select, id, label) {
+        if (!id) { select.value = ""; return; }
+        if (![...select.options].some(o => o.value == id)) {
+            select.add(new Option(label, id));
+        }
+        select.value = id;
     }
+
+    function fillSelect(select, items) {
+        select.innerHTML = "";
+        select.add(new Option("---------", ""));
+        items.forEach(i => select.add(new Option(i.name, i.id)));
+    }
+
+const zipField = document.getElementById("id_zip_code");
+const countyField = document.getElementById("id_county_id");
+const regionField = document.getElementById("id_region");
+const stateField = document.getElementById("id_us_state");
+const lookupUrl = document.querySelector('meta[name="lookup-zip"]')?.content;
+const optionsUrl = document.querySelector('meta[name="lookup-state-options"]')?.content;
+
+if (zipField && countyField && regionField && stateField && lookupUrl) {
+
+    function refreshStateOptions() {
+        if (!optionsUrl || !stateField.value) return Promise.resolve();
+        return fetch(`${optionsUrl}?state=${encodeURIComponent(stateField.value)}`)
+            .then(r => r.json())
+            .then(data => {
+                fillSelect(countyField, data.counties);
+                fillSelect(regionField, data.regions);
+            });
+    }
+
+    function lookupCounty() {
+        const zip = zipField.value.trim().substring(0, 5);
+        if (zip.length < 5 || !stateField.value) return;
+        const params = new URLSearchParams({ zip_code: zip, state: stateField.value });
+        fetch(`${lookupUrl}?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.found) {
+                    setSelect(countyField, data.county_id, data.county_name);
+                    setSelect(regionField, data.region_id, data.region_name);
+                } else {
+                    countyField.value = "";
+                    regionField.value = "";
+                }
+            })
+            .catch(error => console.error("Zip lookup failed:", error));
+    }
+
+    zipField.addEventListener("change", lookupCounty);
+    stateField.addEventListener("change", () => refreshStateOptions().then(lookupCounty));
+}
+    
     console.log("last line of script reached")
 });
