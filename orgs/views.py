@@ -12,9 +12,9 @@ from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError
 from django.db import transaction
-from django.db.models import Q, Min, Prefetch, F, Sum
+from django.db.models import Q, Min, Prefetch, F, Sum, Count, Max, Avg
 from django.db.models.functions import TruncDate
-from django.http import  Http404, HttpResponseNotFound, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import  Http404, HttpResponseNotFound, HttpResponseRedirect,  HttpResponse, HttpResponseForbidden, JsonResponse, request
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.urls import reverse
@@ -45,7 +45,7 @@ from orgs.services.mapping import build_mapping, build_dropdown_options, validat
 from orgs.services.pending import build_pending_for_upload
 from orgs.services.publish import publish_pending_upload
 
-from .decorators import org_access_required, state_required
+from .decorators import org_access_required, state_required, superuser_required
 
 
 
@@ -71,7 +71,7 @@ def run_cleanup_old_imports(request):
     })
 
 
-@login_required
+
 @staff_member_required
 def run_update_latlng(request):
     output = None
@@ -90,6 +90,7 @@ def run_update_latlng(request):
     return render(request, "orgs/staff/run_update_latlng.html", {
         "output": output,
     })
+
 
 @login_required
 @staff_member_required
@@ -134,11 +135,11 @@ def org_deny(request, enrollment_id):
         enrollment.save()
         email = enrollment.contact_email.lower().strip()
         
-        safe_send_mail(subject="Your request to add an organization on Wild Paths Wisconsin has been DENIED",
+        safe_send_mail(subject="Your request to add an organization on Wild Paths {enrollment.state} has been DENIED",
                    message=f"""
                         Hello,
 
-                        Your organization, {enrollment.org_name}, has been denied for Wild Paths Wisconsin.
+                        Your organization, {enrollment.org_name}, has been denied for Wild Paths.
 
                         If you believe this request was denied unjustly, you may respond to this email with an explanation.
 
@@ -197,15 +198,15 @@ def org_approve(request, enrollment_id):
     if user and hasattr(user, "profile"):
         OrgManager.objects.get_or_create(profile=user.profile, org=org, role="owner")
         
-        safe_send_mail(subject="Organization Approved on Wild Paths Wisconsin",
+        safe_send_mail(subject=f"Organization Approved on Wild Paths {org.home_state} - You Can Now Manage It",
                    message=f"""
                         Hello,
 
-                        Your organization, {org.org_name}, has been approved for Wild Paths Wisconsin.
+                        Your organization, {org.org_name}, has been approved for Wild Paths {org.home_state}.
 
                         To manage this organization, you will need to login. From there you should see the new Manage Organization button.
 
-                        For more details on how to manage your organization, you can view this tutorial: https://wildpathswi.org/help/video/9Vdfv2czSvE/
+                        For more details on how to manage your organization, you can view this tutorial: https://wildpaths.org/help/video/9Vdfv2czSvE/
 
                         If you are currently logged in, you can use this link to see the new organization. {org_url}
 
@@ -225,11 +226,11 @@ def org_approve(request, enrollment_id):
         )
 
         invite_url = request.build_absolute_uri(reverse("accept_org_invite", args=[invite.token]))
-        safe_send_mail(subject="Organization Approved on Wild Paths Wisconsin",
+        safe_send_mail(subject=f"Organization Approved on Wild Paths {org.home_state} - Create Your Account",
                    message=f"""
                         Hello,
 
-                        Your organization, {org.org_name}, has been approved for Wild Paths Wisconsin.
+                        Your organization, {org.org_name}, has been approved for Wild Paths {org.home_state}.
 
                         Please use this link to create your login and manage the organization:
 
@@ -267,11 +268,11 @@ def org_mgr_reminder(request, enrollment_id):
 
 
     safe_send_mail(
-            subject="Organization Management on Wild Paths Wisconsin",
+            subject=f"Organization Management on Wild Paths {enrollment.state}",
             message=f"""
 Hello {your_name},
 
-Thank you for creating {org_name} at WildPathsWI.org! I noticed that your organization still doesn't have a manager though. Generally, after I approve your organization, you should receive an email from me (mary@eckmeier.com) with a link to create your username which will become the manager. Sometimes it can get stuck in Spam folders, so you may have missed it. If you would like to add in activities or locations for your organization, you will need to create a username.
+Thank you for creating {org_name} at WildPaths.org! I noticed that your organization still doesn't have a manager though. Generally, after I approve your organization, you should receive an email from me (mary@eckmeier.com) with a link to create your username which will become the manager. Sometimes it can get stuck in Spam folders, so you may have missed it. If you would like to add in activities or locations for your organization, you will need to create a username.
 
 If you cannot find the email from me, you can just use the REGISTER link on the main page to create a username. Be sure to use this email ({email})- and let me know when you have created it and I will assign you to manage the organization.
 
@@ -279,7 +280,7 @@ If you have other questions, please reach out. If you would like more details on
 
 Thanks again for joining us!
 Mary
-WildPathsWI.org
+WildPaths.org
             """,
             category="org_enrollment",
             from_email=settings.DEFAULT_FROM_EMAIL,
@@ -2011,8 +2012,6 @@ def test_email(request):
 
     return render(request, "orgs/test_email.html", context)
 
-def superuser_required(user):
-    return user.is_superuser
 
 
 
@@ -3311,7 +3310,7 @@ def news(request):
 
 
 @staff_member_required
-@user_passes_test(lambda u: u.is_superuser)
+@superuser_required
 @state_required
 def staff_dashboard(request):
     """
@@ -3349,10 +3348,12 @@ def county_list(request):
 @login_required
 @staff_member_required
 def staff_orgs_nomgr(request):
+    state=request.state
     orgs = OrganizationEnrollmentRequest.objects.filter(
                 status="a",
                 created_org__isnull=False,
                 created_org__managed__isnull=True,
+                created_org__in=Organization.objects.active().visible_in(state).values("pk"),
             ).select_related(
                 "created_org",
                
@@ -3361,25 +3362,77 @@ def staff_orgs_nomgr(request):
                     "orgs": orgs,
                 })
 
-@login_required
+@state_required
 @staff_member_required
 def staff_clicked_activities(request):
-    clicked_activities = Activity.objects.filter(
-        interest_count__gt=0
-    ).order_by("-interest_count")
-    total_interest = clicked_activities.aggregate(
-        total=Sum("interest_count")
-    )["total"] or 0
+    state = request.state
+    days = int(request.GET.get("days", 30))
+    since = timezone.now() - timedelta(days=days)
+
+    clicks = ActivityLog.objects.filter(
+        action="interest_click",
+        created_at__gte=since,
+        activity__deleted=False,
+        org__in=Organization.objects.active().visible_in(state).values("pk"),
+    )
+
+    def top(field, n=10):
+        return (
+            clicks.exclude(**{f"{field}__isnull": True,})
+            .values(label=F(field))
+            .annotate(total=Count("id"),
+                      visitors=Count("session_key", distinct=True))
+            .order_by("-total")[:n]
+        )
 
     return render(request, "orgs/staff/clicked_activities.html", {
-        "clicked_activities": clicked_activities,
-        "total_interest": total_interest,
+        "days": days,
+        "total_clicks": clicks.count(),
+        "total_visitors": clicks.values("session_key").distinct().count(),
+        "by_org": top("org__org_name"),
+        "by_activity": top("activity__title"),
+        "by_county": top("activity__sessions__location__county_id__county_name"),
+        "by_region": top("activity__sessions__location__region__name"),
     })
 
-@login_required
+@state_required
 @staff_member_required
+def staff_clicked_actions(request):
+    state = request.state
+    days = int(request.GET.get("days", 30))
+    since = timezone.now() - timedelta(days=days)
+
+    clicks = ActivityLog.objects.filter(
+        state=state,
+        created_at__gte=since,
+        
+    )
+
+    ACTION_LABELS = dict(ActivityLog.ACTION_CHOICES)
+
+    rows = (
+        clicks.values("action")
+        .annotate(total=Count("id"),
+                visitors=Count("session_key", distinct=True))
+        .order_by("-total")
+    )
+    by_actions = [
+        {"label": ACTION_LABELS.get(r["action"], r["action"]),
+        "total": r["total"], "visitors": r["visitors"]}
+        for r in rows
+    ]
+    return render(request, "orgs/staff/clicked_actions.html", {
+        "days": days,
+        "total_clicks": clicks.count(),
+        "total_visitors": clicks.values("session_key").distinct().count(),
+        "by_actions": by_actions,
+    })
+
+
+@staff_member_required
+@state_required
 def staff_activitylog(request):
-    
+    state=request.state
     action_counts = (
         ActivityLog.objects
         .annotate(date=TruncDate("created_at"))
@@ -3392,15 +3445,62 @@ def staff_activitylog(request):
         "action_counts": action_counts,
     })
 
-@login_required
-@staff_member_required
-def location_latlng(request):
 
-    locations = Location.objects.filter(
+@staff_member_required
+@state_required
+def location_latlng(request):
+    state=request.state
+    locations = Location.objects.for_state(state).filter(
         Q(latitude__isnull=True) |
         Q(longitude__isnull=True)
     ).order_by("loc_name")
 
     return render(request, "orgs/staff/location_latlng.html", {
         "locations": locations,
+    })
+
+@superuser_required
+def staff_state_summary(request):
+    days = int(request.GET.get("days", 30))
+    now = timezone.now()
+    since = now - timedelta(days=days)
+    prev_since = since - timedelta(days=days)
+
+    rows = []
+    for state in State.objects.order_by("-is_active", "name"):
+        org_ids = Organization.objects.active().visible_in(state).values("pk")
+        activities = Activity.objects.filter(deleted=False, org__in=org_ids)
+
+        # activities by type (v = volunteer, t = learn)
+        type_counts = dict(
+            activities.values_list("activity_type").annotate(n=Count("id"))
+        )
+
+        upcoming = Session.objects.filter(
+            activity__in=activities.values("pk"), start__gte=now
+        ).count()
+
+        # unique visitors this period vs. the previous period of the same length
+        logs = ActivityLog.objects.filter(state=state, session_key__isnull=False)
+        visitors = (logs.filter(created_at__gte=since)
+                        .values("session_key").distinct().count())
+        prev_visitors = (logs.filter(created_at__gte=prev_since, created_at__lt=since)
+                             .values("session_key").distinct().count())
+        trend = (round((visitors - prev_visitors) * 100 / prev_visitors)
+                 if prev_visitors else None)
+
+        rows.append({
+            "state": state,
+            "orgs": Organization.objects.active().visible_in(state).count(),
+            "volunteer": type_counts.get("v", 0),
+            "learn": type_counts.get("t", 0),
+            "upcoming": upcoming,
+            "visitors": visitors,
+            "trend": trend,
+            "last_update": activities.aggregate(last=Max("updated_at"))["last"],
+        })
+
+    return render(request, "orgs/staff/state_summary.html", {
+        "days": days,
+        "rows": rows,
     })

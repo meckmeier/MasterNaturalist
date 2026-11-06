@@ -1,0 +1,11 @@
+<!-- orgs/click_table.html -->
+<table class="table table-sm">
+  <thead><tr><th>Name</th><th class="text-end">Clicks</th><th class="text-end">Visitors</th></tr></thead>
+  <tbody>
+  {% for row in rows %}
+    <tr><td>{{ row.label }}</td><td class="text-end">{{ row.total }}</td><td class="text-end">{{ row.visitors }}</td></tr>
+  {% empty %}
+    <tr><td colspan="3">No clicks in this period.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

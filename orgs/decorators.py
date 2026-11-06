@@ -2,9 +2,15 @@ from functools import wraps
 
 from django.http import HttpResponseForbidden, Http404
 from django.shortcuts import get_object_or_404
-
+from django.contrib.auth.decorators import user_passes_test
 from .models import Organization, OrgManager
 
+from django.contrib.auth.decorators import user_passes_test
+
+superuser_required = user_passes_test(
+    lambda u: u.is_active and u.is_superuser,
+    login_url="account_login",
+)
 
 def state_required(view ):
     @wraps(view)

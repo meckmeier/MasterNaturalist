@@ -6,6 +6,8 @@ sessions, and password validation. django-allauth provides the account
 management workflow. WildPaths customizes the signup process, user interface,
 and organization invitation process.
 
+* multistate implementation does NOT affect user workflow. The same user can chose to belong to multiple states. They just have to switch to the state they want to see. There is only filter for the OrgManagers - and they are only allowed to manage the orgs when they are in the states where those Orgs belong. Otherwise they do not see the other Orgs they manage. (I think)
+
 ## Authentication Architecture
     Django
         ↓
@@ -41,6 +43,11 @@ This decorator is used to indicate which views require login in views:
 - def upload_review_locations
 - def upload_review_activitie
 - ... etc.
+
+@staff_required
+(uses the User Staff Setting to indicate if a user is staff)
+Only staff can see the State Admin menu option.
+
 
 ### settings.py
 

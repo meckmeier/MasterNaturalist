@@ -116,6 +116,12 @@ Aug 4th - first org added: Kishwauketoe Nature Conservancy
 Aug 6th - zoom meeting office hours
 
 ------------------------------------------------------------------------
+# Part V - Multi-state
+## November 2026
+Started 10/31 to rebuild code to address multiple states. One database, middleware to federate the environment, model changes to support the federated state filter, querysets to make filters consistent across the code base. Lots of testing.
+
+
+------------------------------------------------------------------------
 
 # Historical Artifacts
 
@@ -128,3 +134,12 @@ Current archive includes screenshots and source from:
 -   History/benchmark01
 
 Artifacts are stored under `docs/images/`.
+
+# Wild Paths Wisconsin Historical Images
+
+| File | Date | Description |
+|------|------|-------------|
+| 2025-07-StreamlitAppv1.png | Jul 2025 | First interactive Streamlit prototype |
+| 2025-08-12 NatureBased_GitHubPages.png| Attempt to use only HTML and JSON to host on githubpages. |
+| 2025-08-25_GoogleApp.png | Attempt to use Google ecosystem to easily build website. |
+| 2026-02-17_FirstDjango.png | First django upload after completing CS50 Web Development Course |

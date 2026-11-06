@@ -151,3 +151,7 @@ June and July. Adding in video help files, plus other user documentation. Minor 
 The Git history substantially increases confidence in the engineering estimate because it confirms prolonged, clustered development rather than isolated feature additions. The remaining uncertainty comes primarily from the pre-Git exploration and from design, debugging, and research time that is not directly represented by commits.
 
 
+# Multi-State Development Effort
+Started October 31 - to build one database with a federate state feature.
+* Middleware to provide state element - then using that inside all the views. Adding QuerySets for Organization, Location, Activities and Sessions so we can filter easily and consistently across the code base. State onboarding. Adding additional tables to work thru the State, Region, County hierarchy - pulling Zips from US API bases, so it will be easier to onboard new states.
+

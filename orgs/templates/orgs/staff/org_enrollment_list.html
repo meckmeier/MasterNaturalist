@@ -1,7 +1,7 @@
 {% extends "orgs/layout.html" %}
 
 {% block body %}
-<h1>Organization Enrollment Requests</h1>
+<h1>Organization Enrollment Requests for {{ request.state }}</h1>
 
 {% if enrollments %}
   {% for e in enrollments %}

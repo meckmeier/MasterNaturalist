@@ -1,0 +1,24 @@
+{% extends "orgs/layout.html" %}
+
+{% block body %}
+<div class="me-page">
+
+  <h1>Interest clicks, last {{ days }} days</h1>
+  <p>{{ total_clicks }} clicks from {{ total_visitors }} visitors</p>
+
+  <form method="get" class="mb-3">
+    <select name="days" onchange="this.form.submit()">
+      {% for d in "7 30 90 365"|make_list %}{% endfor %}
+      <option value="7"  {% if days == 7 %}selected{% endif %}>7 days</option>
+      <option value="30" {% if days == 30 %}selected{% endif %}>30 days</option>
+      <option value="90" {% if days == 90 %}selected{% endif %}>90 days</option>
+      <option value="365" {% if days == 365 %}selected{% endif %}>1 year</option>
+    </select>
+  </form>
+
+  <h2>Actions</h2>
+  {% include "orgs/staff/_click_table.html" with rows=by_actions key="label" %}
+  
+</div>
+
+{% endblock %}

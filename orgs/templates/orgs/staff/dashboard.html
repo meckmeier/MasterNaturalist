@@ -5,7 +5,7 @@
 
 <div class="container-fluid">
 
-    <h2 class="mb-4">Wild Paths Wisconsin Dashboard</h2>
+    <h2 class="mb-4">Wild Paths {{ request.state }} Dashboard</h2>
 {% if pending_enrollments %}
 
 <div class="alert alert-warning d-flex justify-content-between align-items-center mb-4">
@@ -14,7 +14,7 @@
         <strong>⚠ Enrollment Requests</strong><br>
         There {{ pending_enrollments|pluralize:"is,are" }}
         <strong>{{ pending_enrollments }}</strong>
-        pending enrollment request{{ pending_enrollments|pluralize }} awaiting review.
+        pending enrollment request{{ pending_enrollments|pluralize }} awaiting review for {{ request.state }}.
     </div>
 
     <a href="{% url 'org_enrollment_list' %}"

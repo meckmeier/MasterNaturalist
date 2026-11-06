@@ -3,25 +3,27 @@
 {% block body %}
 <div class="me-page">
 
-<h1>Clicked Activities</h1>
-<p>
-Total Clicks: {{ total_interest }}</p>
-{% if messages %}
-  {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button"
-              class="btn-close"
-              data-bs-dismiss="alert"></button>
-    </div>
-  {% endfor %}
-{% endif %}
-{% for each in clicked_activities %}
-    <div>
-         {{ each.title }} - {{ each.org.org_name }} ({{each.interest_count}} clicks)
-    </div>
+  <h1>Interest clicks, last {{ days }} days</h1>
+  <p>{{ total_clicks }} clicks from {{ total_visitors }} visitors</p>
 
-{% empty %}
-    <p>No clicked activities found.</p>
-{% endfor %}
+  <form method="get" class="mb-3">
+    <select name="days" onchange="this.form.submit()">
+      {% for d in "7 30 90 365"|make_list %}{% endfor %}
+      <option value="7"  {% if days == 7 %}selected{% endif %}>7 days</option>
+      <option value="30" {% if days == 30 %}selected{% endif %}>30 days</option>
+      <option value="90" {% if days == 90 %}selected{% endif %}>90 days</option>
+      <option value="365" {% if days == 365 %}selected{% endif %}>1 year</option>
+    </select>
+  </form>
+
+  <h2>Top organizations</h2>
+  {% include "orgs/staff/_click_table.html" with rows=by_org key="org__org_name" %}
+  <h2>Top activities</h2>
+  {% include "orgs/staff/_click_table.html" with rows=by_activity key="activity__title" %}
+  <h2>By county</h2>
+  {% include "orgs/staff/_click_table.html" with rows=by_county key="activity__sessions__location__county_id__county_name" %}
+  <h2>By region</h2>
+  {% include "orgs/staff/_click_table.html" with rows=by_region key="activity__sessions__location__region__name" %}
+</div>
+
 {% endblock %}

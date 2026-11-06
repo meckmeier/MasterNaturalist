@@ -9,6 +9,7 @@ import platform
 from datetime import timedelta
 from django.contrib.auth import get_user_model
 
+from orgs.context_processors import state
 from orgs.models import (
     Organization,
     OrganizationEnrollmentRequest,
@@ -44,11 +45,9 @@ def get_data_quality_summary(state):
             "icon": "data_quality",
             "rows": [
                 ("organizations_without_activities", Organization.objects.visible_in(state).filter( activities__isnull=True).distinct().count()),
-                ("locations_without_sessions",Location.objects.for_state(state).filter(sessions__isnull=True).distinct().count()),
-                ("locations_without_orgs", Location.objects.for_state(state).filter(org__isnull=True).distinct().count()),
-                ("uploaded_activities", Activity.objects.filter( source_upload__isnull=False).count()),
                 ("orgs without managers", Organization.objects.visible_in(state).filter(managed__isnull=True).distinct().count()),
-                ("clicked_activities", Activity.objects.filter(interest_count__gt=0).count()),
+                ("uploaded_activities", Activity.objects.for_state(state).filter( source_upload__isnull=False).count()),
+                ("clicked_activities", Activity.objects.for_state(state).filter(interest_count__gt=0).count()),
                 ("activity log", ActivityLog.objects.filter(state=state).count()),
             ]
 
@@ -68,14 +67,17 @@ def get_freshness_summary():
                 ]
 
     }
-def get_security_summary():
+def get_security_summary(state):
     
     User = get_user_model() 
     return { "title": "Security",
                "icon": "security",
                "rows": [
 
-                    ("users", Profile.objects.count()),
+                    ("system users", Profile.objects.count()),
+                    (f"{state} managers",Profile.objects.filter(
+                            managers__org__in=Organization.objects.active().visible_in(state).values("pk")
+                        ).distinct().count()),
                     ("staff", User.objects.filter(is_staff=True).count()),
                     ("inactive", User.objects.filter(is_active=False).count()),
             ]
@@ -157,7 +159,7 @@ def build_dashboard(state):
             get_database_summary(state),
             get_data_quality_summary(state),
             get_freshness_summary(),
-            get_security_summary(),
+            get_security_summary(state),
             get_email_summary(),
             get_performance_summary(),
             get_development_summary(),

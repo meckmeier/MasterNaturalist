@@ -14,6 +14,45 @@ This document explains how Wild Paths Wisconsin is constructed.
 It focuses on architecture rather than implementation.
 
 ---
+# Principles
+
+## Simplicity
+
+Choose the simplest solution that satisfies the requirements.
+
+---
+
+## Maintainability
+
+Future volunteers should be able to understand and maintain the system.
+
+---
+
+## Data First
+
+The data model should drive application design.
+
+---
+
+## Incremental Improvement
+
+Small improvements accumulate into large progress.
+
+---
+
+## Practical Technology
+
+Technology should solve problems rather than create them.
+
+---
+
+## Build for Nonprofits
+
+Wild Paths Wisconsin is designed for conservation organizations with limited technical resources.
+
+---
+
+## Learn What Is Necessary
 
 # Major Components
 
@@ -72,3 +111,4 @@ Primary production database.
 - Entity relationship diagrams
 - Deployment architecture
 - Import pipeline diagrams
+
