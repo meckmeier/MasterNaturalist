@@ -40,6 +40,9 @@
     <input type="radio" class="btn-check" name="activity_type" id="type-training" value="t"
            {% if request.GET.activity_type == "t" %}checked{% endif %}>
     <label for="type-training">Learn</label>
+    <input type="radio" class="btn-check" name="activity_type" id="type-event" value="e"
+           {% if request.GET.activity_type == "e" %}checked{% endif %}>
+    <label for="type-event">Event</label>
   </div>
   </div>
       <div class="mb-3"> 

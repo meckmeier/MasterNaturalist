@@ -79,6 +79,10 @@
     <input type="radio" name="activity_type" id="main-type-training" value="t"
            {% if request.GET.activity_type == "t" %}checked{% endif %}>
     <label for="main-type-training">Learn</label>
+    
+    <input type="radio" name="activity_type" id="main-type-event" value="e"
+           {% if request.GET.activity_type == "e" %}checked{% endif %}>
+    <label for="main-type-event">Event</label>
   </div>
 <button class="me-btn me-btn-compact-mobile me-btn-small"
             type="button"

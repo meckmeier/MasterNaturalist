@@ -266,6 +266,10 @@ class OrganizationEnrollmentRequest(models.Model):
     contact_title = models.CharField(max_length=255, blank=True)
     authorized = models.BooleanField(default=False)
     message = models.TextField(blank=True)
+    location_name = models.CharField(max_length=255, blank=True)
+    address= models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    zip = models.CharField(max_length=10, blank=True)
 
     status = models.CharField(
         max_length=1,
@@ -564,13 +568,17 @@ class ActivityQuerySet(models.QuerySet):
         return self.active().filter(
             activity_type="t"
         )
+    def event(self):
+        return self.active().filter(
+            activity_type="e"
+        )
     
 class Activity(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="activities")
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     activity_type = models.CharField(max_length=1,
-                                  choices=[("v","Volunteer"),("t","Learn" )])
+                                  choices=[("v","Volunteer"),("t","Learn" ),("e","Event")])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
     time_commitment_txt = models.CharField(max_length=255, default="", blank=True, null=True)
     categories = models.ManyToManyField(EventCategory, blank=True, related_name="category_activities")
@@ -871,7 +879,7 @@ class Pending_Activity(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     activity_type = models.CharField(max_length=1,
-                                  choices=[("v","Volunteer Opportunity"),("t","Training" )])
+                                  choices=[("v","Volunteer Opportunity"),("t","Training" ),("e","Event")])
     time_commitment = models.ForeignKey( Commitment, on_delete=models.SET_NULL, null=True, blank=True)
     time_description = models.CharField(max_length=255, default='', blank=True, null=True)
     

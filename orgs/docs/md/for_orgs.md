@@ -2,10 +2,13 @@
 If you are an organization or program that wants dedicated nature-loving volunteers - Welcome! We are excited to have you. Organizations really are the backbone of this site. Without your participation, there wouldn't be much for volunteers to find. But with you, we can build a wonderful community.
 
 ## Learning Guidelines
-The site was designed for Master Naturalists so knowing what they are expecting can help you target the activities you include here. Learning opportunities should focus on Wisconsin's natural, environmental or cultural history. If you have workshops that focus on specialized skills for volunteers they would also be great here. These activities should be formal training or workshops and be targeted to adult learners. 
+The site was designed for Master Naturalists so knowing what they are expecting can help you target the activities you include here. Learning opportunities should focus on your state's natural, environmental or cultural history. If you have workshops that focus on specialized skills for volunteers they would also be great here. These activities should be formal training or workshops and be targeted to adult learners. 
 
 ## Volunteer Guidelines
-For Master Naturalists, volunteer activities should be unpaid, under the direction or guidance of your organization/program and located in Wisconsin or neighboring states. The program focuses on work that falls into Citizen Science, Education and Stewardship. Volunteer work that supports an organization whose mission is focused on natural resources topics also counts. These are the guidelines for Master Naturalists. But remember we are open to all people interested in conservation efforts in Wisconsin. So any volunteer activity that supports that mission is welcome here. 
+For Master Naturalists, volunteer activities should be unpaid, under the direction or guidance of your organization/program and located in your state or neighboring states. The program focuses on work that falls into Citizen Science, Education and Stewardship. Volunteer work that supports an organization whose mission is focused on natural resources topics also counts. These are the guidelines for Master Naturalists. But remember we are open to all people interested in conservation efforts. So any volunteer activity that supports that mission is welcome here. 
+
+## Event Guidelines
+Because we want to provide a forum that encourages all kinds of participation in the natural world, if you have events at your location that are not volunteer, nor learning activities, you can log them as Events. These should have DATES, so they show on the calendar view, and they can be accessed via the filter button on the volunteer or learning lists sites.
 
 ## What is an Organization
 For the purposes of this site - an organization is an 'organizing' entity for activities. Usually an organization will be just that - a nature center, a friends group, visitor centers or watershed associations, for example. But an "organization" might also be programs inside a larger entity - like programs at the DNR. It's all built to help people find opportunities that interest them. Use your judgement about how to enter the data.
@@ -34,7 +37,8 @@ You can
 > | Contact Name | REQUIRED. |
 > | Contact Title | OPTIONAL, but helpful |
 > | Authorized to represent the organization | We are asking you to confirm your role. Once this organization is created you will be responsible for maintaining the organization going forward. We expect only authorized folks to be submit requests. |
-
+> | Address, City, Zip | OPTIONAL but you should fill this out if you want a flag on the map! | 
+> | Location name | If this address has it's own name different from your organization, you can fill this in. Otherwise the location name will match the organization. This is the name that will appear on the map flag. |
 
 
 After your request is approved, you will receive an email from Wild Paths Wisconsin (it comes from mary@eckmeier.com right now). In the email, you will find a link to asking you to register for the site. 
@@ -52,7 +56,7 @@ After your request is approved, you will receive an email from Wild Paths Wiscon
 5. Click the link in that email - and click CONFIRM EMAIL. This will complete your registration.
 
 ### Login
-The confirm email button should take you to a login screen - but if not go to WildPathsWi.org and look for the LOGIN button near the bottom of the page.
+The confirm email button should take you to a login screen - but if not go to WildPaths.org and look for the LOGIN button near the bottom of the page.
 1. Type your username (or you can use your email - both will work).
 2. Type your password.
 
@@ -68,7 +72,7 @@ Once you are successfully logged in, the system will automatically make you a ma
 
 NOTE: if something goes wrong and you are not able to see this page, please submit a feedback request and indicate that you are having login problems. Provide your username and Organization name. Someone will get back to you with a resolution.
 
-NOTE: if you wish to have someone else also manage your organization, have that person REGISTER. There is a button at the bottom of the main page of WildPathsWi.org. Once they have created a new login, you will be able to use their email address to add them to the Managers section of your organization.
+NOTE: if you wish to have someone else also manage your organization, have that person REGISTER. There is a button at the bottom of the main page of WildPaths.org. Once they have created a new login, you will be able to use their email address to add them to the Managers section of your organization.
 
 ## Activities
 
@@ -80,7 +84,7 @@ To add a new activity, click the PLUS sign in the Activities section header.
 > | Field | Description |
 > | ----------- | ----------- |
 > | Title | REQUIRED. This is the main name of your activity. It will appear at the top of each card. |
-> | Type | REQUIRED. Activities are either Volunteer or Learn. |
+> | Type | REQUIRED. Activities are either Volunteer or Learn. Or you can use the new Events for things that don't fall into either category. |
 > | Org | This will already be filled in for you. |
 > | URL for Activity | Use this slot for more information about this particular activity. |
 > | Activity Contact | Use this lot for an email. You must have EITHER a URL or a Contact email - otherwise users won't know how to get in touch with you! |

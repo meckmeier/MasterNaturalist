@@ -89,6 +89,10 @@ class OrgEnrollmentForm(forms.ModelForm):
             "contact_title",
             "authorized",
             "message",
+            "location_name",
+            "address",
+            "city",
+            "zip",
         ]
         widgets = {
             "about": forms.Textarea(attrs={"rows": 5}),
@@ -134,7 +138,6 @@ class OrgEnrollmentForm(forms.ModelForm):
         return name
     
 class OrgForm(forms.ModelForm):
-    
 
     org_url = forms.CharField(required=False)
     volunteer_url = forms.CharField(required=False)
@@ -316,7 +319,7 @@ class EventFilterForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
     )
     activity_type = forms.ChoiceField(
-        choices=[("", "Any"), ("v", "Volunteer"), ("t", "Training")],
+        choices=[("", "Any"), ("v", "Volunteer"), ("t", "Training"), ("e", "Event")],
         required=False, 
         label="Type",
         widget=forms.RadioSelect
@@ -359,7 +362,7 @@ class EventFilterForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             "class":"form-control mr-2",
-            "placeholder":"Search in org, location, event or description"
+            "placeholder":"Search in org, location, activity title, or description"
         })
     )
     categories = forms.ModelMultipleChoiceField(
@@ -622,7 +625,6 @@ class ActivityForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
 
 
         self.fields["activity_type"].required = True

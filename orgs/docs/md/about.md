@@ -1,4 +1,4 @@
-# Wild Path - Wisconsin
+# Wild Path
 
 
 > ## The Mission: make it easy for any nature lover to find places to learn and volunteer. 
@@ -6,11 +6,12 @@
 
 Hi - I'm Mary and I am a Wisconsin Master Naturalist! <a href="https://wimasternaturalist.org/" target="_blank" rel="noopener noreferrer" title="External link to Master Naturalist site">Wisconsin Master Naturalist</a> is a great program that builds a network of well-informed volunteers dedicated to conservation service within their communities. I wanted to do all that, but I live in a pretty rural area of Wisconsin. There are things going on here, but it was not simple for me to connect to all the opportunities in my own community. So I thought "Wouldn't it be nice to make a site where **any** nature lover could find organizations that want their help?" And Wild Paths Wisconsin was born! It was nurtured in collaboration by Becky Sapper and the Wisconsin Master Naturalist program. 
 
+Over time, this idea felt like it could help out other states as well. So we build this current version where you can pick your state - and find convservation efforts in YOUR state as well. Each state has to register and then organizations or programs inside that state will need to register, but once it's all set up individuals will be able to see places to learn about nature and help preserve it.
 
  <a href="/help/video/_pEHMJEaE3g/" >Play this Welcome video to learn more about using this site.</a>
 
 ## Activities
-Activities come in two flavors - **Volunteer** or **Learning** opportunities. They are sponsored by **Organizations** and they take place in **Locations** (some key words you will find in our site). If the location has an address, it will show up on a map. All activities have a way to get more information from the sponsoring organization: an information website, or an email. Some activities are online - like web-based training..
+Activities come in two flavors - **Volunteer** or **Learning** opportunities. They are sponsored by **Organizations** and they take place in **Locations** (some key words you will find in our site). If the location has an address, it will show up on a map. All activities have a way to get more information from the sponsoring organization: an information website, or an email. Some activities are online - like web-based training.. We've add a new type of activity called an **event** - these are just things happening that are neither learning nor volunteer but might be interesting to the volunteer.
 
 Keep your eye out for the **FILTER** button - that will let you target your view. 
 

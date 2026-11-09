@@ -191,13 +191,27 @@ def org_approve(request, enrollment_id):
     
     path = reverse("org_mgmt")
     org_url = f"{settings.SITE_URL}{path}?org={org.id}"
-    
+
+    if enrollment.address and enrollment.zip:
+        # Create a default location for the organization
+        loc=Location.objects.create(
+            org=org,
+            loc_name=enrollment.location_name or org.org_name,
+            address=enrollment.address,
+            zip_code=enrollment.zip,
+            county_id=get_county_from_zip(enrollment.zip, enrollment.state),
+            us_state=enrollment.state,
+            city_name=enrollment.city,
+        )
+        loc.save()
+        org.default_location = loc
+        org.save()
     # Optionally, you could also create an OrgManager entry for the contact person here if you want them to have immediate access.
     email = enrollment.contact_email.lower().strip()
     user=User.objects.filter(email__iexact=email).first()
     if user and hasattr(user, "profile"):
         OrgManager.objects.get_or_create(profile=user.profile, org=org, role="owner")
-        
+
         safe_send_mail(subject=f"Organization Approved on Wild Paths {org.home_state} - You Can Now Manage It",
                    message=f"""
                         Hello,
@@ -3010,8 +3024,8 @@ def test_html(request):
 
 
 def render_markdown(request, filename):
-    
-    file_path = Path(settings.BASE_DIR) / f"{filename}.md"
+    MD_DIR = Path(settings.BASE_DIR) / "orgs" / "docs" / "md"
+    file_path = MD_DIR / f"{filename}.md"
     
     if not file_path.exists():
         raise Http404(f"{filename}.md not found at {file_path}")

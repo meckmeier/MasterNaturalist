@@ -6,7 +6,7 @@ This Privacy Policy explains how we collect, use, and protect your information.
 
 This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.
 
-###Information We Collect
+### Information We Collect
 
 We may collect:
 - basic account information, such as name or email, if you create an account
@@ -15,7 +15,7 @@ We may collect:
 
 We only collect information necessary to operate and improve the App.
 
-###How We Use Information
+### How We Use Information
 
 We use your information to:
 - provide and improve the App
@@ -23,7 +23,7 @@ We use your information to:
 - communicate with you, if applicable
 - maintain the security and integrity of the App
 
-###Sharing of Information
+### Sharing of Information
 
 We do not sell your personal information.
 
@@ -34,28 +34,28 @@ We may share information:
 
 Information you submit for listings may be publicly visible.
 
-###Data Security
+### Data Security
 
 We take reasonable steps to protect your information. However, no system can be completely secure.
 
-###Your Choices
+### Your Choices
 
 You may:
 - choose not to provide personal information
 - request correction or removal of your information, where applicable
 
-###Third-Party Links
+### Third-Party Links
 
 The App may link to external organization websites. We are not responsible for their privacy practices.
 
-###Children’s Privacy
+### Children’s Privacy
 
 The App is not intended for children under 13, and we do not knowingly collect personal information from children.
 
-###Changes to This Policy
+### Changes to This Policy
 
 We may update this Privacy Policy from time to time. Continued use of the App means you accept the updated policy.
 
-###Contact
+### Contact
 
 If you have questions about this Privacy Policy, please contact us through the App.

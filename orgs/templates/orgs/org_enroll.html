@@ -69,10 +69,34 @@
             {{ form.authorized }}
             {{ form.authorized.errors }}
         </div>
-        <div>Indicate if you are authorized to represent this organization. </div>
+        <div class="me-form-field">
+            Indicate if you are authorized to represent this organization. </div>
+     <div class="me-form-field-full">Default location - this is needed to get a flag on the map. If you leave the location name blank, the location will use your organization's name.</div>
+        <div class="me-form-field">
+            {{ form.address.label_tag }}
+            {{ form.address }}
+            {{ form.address.errors }}
 
-            
-     </div>
+            {{ form.city.label_tag }}
+            {{ form.city }}
+            {{ form.city.errors }}
+            </div>
+<div class="me-form-field">
+            {{ form.zip.label_tag }}
+            {{ form.zip }}
+            {{ form.zip.errors }}
+        </div>
+
+     <div class="me-form-field">
+
+           Location Name (<em>if different from organization name</em>):
+            {{ form.location_name }}
+            {{ form.location_name.errors }}
+            </div>
+
+        </div>
+
+     
 
     <div class="mb-3">
             {{ form.turnstile }}
@@ -81,7 +105,7 @@
           <span><i class="bi bi-floppy me-btn-icon"></i></span>
             <span class="me-btn-label">Save</span>
         </button>
-    
+        </div> 
 </form>
 <p>Once this request is approved, you will receive an email invitation to create your organization management account.</p>
 </div>
